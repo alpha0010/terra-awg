@@ -1,3 +1,4 @@
+#include "DataID.h"
 #include "Random.h"
 #include "World.h"
 #include "Writer.h"
@@ -112,8 +113,24 @@ int main()
     for (int i = 0; i < 4; ++i) {
         w.putUint32(rnd.getInt(0, 7)); // Cave style.
     }
+    std::vector<int> styles{
+        rnd.select<int>({FOREST_BACKGROUNDS}),
+        rnd.select<int>({FOREST_BACKGROUNDS}),
+        rnd.select<int>({FOREST_BACKGROUNDS}),
+        rnd.select<int>({FOREST_BACKGROUNDS}),
+        rnd.getInt(0, 4), // Corruption.
+        rnd.getInt(0, 5), // Jungle.
+        rnd.select<int>(
+            {0, 1, 2, 3, 4, 5, 6, 7, 21, 22, 31, 32, 41, 42}), // Snow.
+        rnd.getInt(0, 4),                                      // Hallow.
+        rnd.getInt(0, 5),                                      // Crimson.
+        rnd.getInt(0, 4),                                      // Desert.
+        rnd.getInt(0, 5),                                      // Ocean.
+        rnd.getInt(0, 3),                                      // Mushroom.
+        rnd.getInt(0, 2)                                       // Underworld.
+    };
     w.putUint32(rnd.getInt(0, 3));      // Ice style.
-    w.putUint32(rnd.getInt(0, 5));      // Jungle style.
+    w.putUint32(styles[5]);             // Jungle style.
     w.putUint32(rnd.getInt(0, 2));      // Underworld style.
     w.putUint32(world.getWidth() / 2);  // Spawn X.
     w.putUint32(world.getHeight() / 2); // Spawn Y.
@@ -130,34 +147,33 @@ int main()
     for (int i = 0; i < 20; ++i) {
         w.putBool(false); // Bosses and npc saves.
     }
-    w.putUint8(0);    // Shadow orbs smashed.
-    w.putUint32(0);   // Alters smashed.
-    w.putBool(false); // Hard mode.
-    w.putBool(false); // After party of doom.
-    w.putUint32(0);   // Invasion delay.
-    w.putUint32(0);   // Invasion size.
-    w.putUint32(0);   // Invasion type.
-    w.putFloat64(0);  // Invasion X.
-    w.putFloat64(0);  // Slime rain time.
-    w.putUint8(0);    // Sundial cooldown.
-    w.putBool(false); // Raining.
-    w.putUint32(0);   // Rain time left.
-    w.putFloat32(0);  // Max rain.
-    w.putUint32(-1);  // Cobalt ore variant.
-    w.putUint32(-1);  // Mythril ore variant.
-    w.putUint32(-1);  // Adamantite ore variant.
-    w.putUint8(rnd.select<uint8_t>({FOREST_BACKGROUNDS})); // Forest style.
-    w.putUint8(rnd.getInt(0, 4));                          // Corruption style.
-    w.putUint8(rnd.getInt(0, 1)); // Underground jungle style.
-    w.putUint8(rnd.select<uint8_t>(
-        {0, 1, 2, 3, 4, 5, 6, 7, 21, 22, 31, 32, 41, 42})); // Snow style.
-    w.putUint8(rnd.getInt(0, 4));                           // Hallow style.
-    w.putUint8(rnd.getInt(0, 5));                           // Crimson style.
-    w.putUint8(rnd.getInt(0, 4));                           // Desert style.
-    w.putUint8(rnd.getInt(0, 5));                           // Ocean style.
-    w.putUint32(0);                                         // Cloud background.
-    w.putUint16(0);                                         // Number of clouds.
-    w.putFloat32(0);                                        // Wind speed.
+    w.putUint8(0);                  // Shadow orbs smashed.
+    w.putUint32(0);                 // Alters smashed.
+    w.putBool(false);               // Hard mode.
+    w.putBool(false);               // After party of doom.
+    w.putUint32(0);                 // Invasion delay.
+    w.putUint32(0);                 // Invasion size.
+    w.putUint32(0);                 // Invasion type.
+    w.putFloat64(0);                // Invasion X.
+    w.putFloat64(0);                // Slime rain time.
+    w.putUint8(0);                  // Sundial cooldown.
+    w.putBool(false);               // Raining.
+    w.putUint32(0);                 // Rain time left.
+    w.putFloat32(0);                // Max rain.
+    w.putUint32(-1);                // Cobalt ore variant.
+    w.putUint32(-1);                // Mythril ore variant.
+    w.putUint32(-1);                // Adamantite ore variant.
+    w.putUint8(styles[0]);          // Forest style.
+    w.putUint8(styles[4]);          // Corruption style.
+    w.putUint8(rnd.getInt(0, 1));   // Underground jungle style.
+    w.putUint8(styles[6]);          // Snow style.
+    w.putUint8(styles[7]);          // Hallow style.
+    w.putUint8(styles[8]);          // Crimson style.
+    w.putUint8(styles[9]);          // Desert style.
+    w.putUint8(styles[10]);         // Ocean style.
+    w.putUint32(0);                 // Cloud background.
+    w.putUint16(0);                 // Number of clouds.
+    w.putFloat32(0);                // Wind speed.
     w.putUint32(0);                 // Players finished angler quest.
     w.putBool(false);               // Saved angler.
     w.putUint32(rnd.getInt(0, 38)); // Angler quest.
@@ -173,16 +189,41 @@ int main()
     for (int i = 0; i < 21; ++i) {
         w.putBool(false); // Bosses.
     }
-    w.putUint32(0);   // Party cooldown.
-    w.putUint32(0);   // Partying NPCs.
-    w.putBool(false); // Sandstorm active.
-    w.putUint32(0);   // Sandstorm remaining time.
-    w.putFloat32(0);  // Sandstorm severity.
-    w.putFloat32(0);  // Sandstorm intended severity.
-    w.putBool(false); // Saved tavernkeep.
-    w.putBool(false); // Old one's army tier 1 complete.
-    w.putBool(false); // Old one's army tier 2 complete.
-    w.putBool(false); // Old one's army tier 3 complete.
+    w.putUint32(0);         // Party cooldown.
+    w.putUint32(0);         // Partying NPCs.
+    w.putBool(false);       // Sandstorm active.
+    w.putUint32(0);         // Sandstorm remaining time.
+    w.putFloat32(0);        // Sandstorm severity.
+    w.putFloat32(0);        // Sandstorm intended severity.
+    w.putBool(false);       // Saved tavernkeep.
+    w.putBool(false);       // Old one's army tier 1 complete.
+    w.putBool(false);       // Old one's army tier 2 complete.
+    w.putBool(false);       // Old one's army tier 3 complete.
+    w.putUint8(styles[11]); // Mushroom style.
+    w.putUint8(styles[12]); // Underworld style (again?).
+    for (int i = 1; i < 4; ++i) {
+        w.putUint8(styles[i]); // Forest style.
+    }
+    w.putBool(false); // Used combat book.
+    w.putUint32(0);   // Lantern night cooldown.
+    w.putBool(false); // Genuine lantern night.
+    w.putBool(false); // Manual lantern night.
+    w.putBool(false); // Lantern night next is genuine.
+    w.putUint32(styles.size());
+    for (int style : styles) {
+        w.putUint32(style); // Tree top variation.
+    }
+    w.putBool(false); // Force halloween.
+    w.putBool(false); // Force christmas.
+    w.putUint32(rnd.select<int>({TileID::copperOre, TileID::tinOre}));
+    w.putUint32(rnd.select<int>({TileID::ironOre, TileID::leadOre}));
+    w.putUint32(rnd.select<int>({TileID::silverOre, TileID::tungstenOre}));
+    w.putUint32(rnd.select<int>({TileID::goldOre, TileID::platinumOre}));
+    for (int i = 0; i < 25; ++i) {
+        w.putBool(false); // Bosses and npc saves.
+    }
+    w.putUint8(0); // Moondial cooldown.
+    sectionPointers.push_back(w.tellp());
 
     // Finalize.
     w.seekp(sectionTablePos);
