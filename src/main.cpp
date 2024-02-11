@@ -77,17 +77,18 @@ int main()
     w.putBitVec(importantTiles);
     std::vector<uint32_t> sectionPointers{w.tellp()};
 
-    w.putString("test"); // Map name.
-    w.putString("AWG");  // Seed.
-    w.skipBytes(8);      // Generator version. (Is this needed?)
+    const char *mapName = "test";
+    w.putString(mapName); // Map name.
+    w.putString("AWG");   // Seed.
+    w.skipBytes(8);       // Generator version. (Is this needed?)
     for (int i = 0; i < 16; ++i) {
         w.putUint8(rnd.getByte()); // GUID.
     }
-    w.putUint32(
-        rnd.getInt(0, std::numeric_limits<int32_t>::max())); // World ID.
-    w.putUint32(0);                                          // Map left pixel.
-    w.putUint32(16 * world.getWidth());                      // Map right pixel.
-    w.putUint32(0);                                          // Map top pixel.
+    int worldID = rnd.getInt(0, std::numeric_limits<int32_t>::max());
+    w.putUint32(worldID);                // World ID.
+    w.putUint32(0);                      // Map left pixel.
+    w.putUint32(16 * world.getWidth());  // Map right pixel.
+    w.putUint32(0);                      // Map top pixel.
     w.putUint32(16 * world.getHeight()); // Map bottom pixel.
     w.putUint32(world.getHeight());      // Vertical tiles.
     w.putUint32(world.getWidth());       // Horizontal tiles.
@@ -354,6 +355,57 @@ int main()
         }
     }
     sectionPointers.push_back(w.tellp());
+
+    w.putUint16(0);  // Number of chests.
+    w.putUint16(40); // Slots per chest.
+    sectionPointers.push_back(w.tellp());
+
+    w.putUint16(0); // Number of signs.
+    sectionPointers.push_back(w.tellp());
+
+    w.putUint32(0);  // Number of shimmered NPCs.
+    w.putBool(true); // Begin town NPC record.
+    w.putUint32(22); // The guide.
+    w.putString(rnd.select<std::string>(
+        {"Andrew", "Asher", "Bradley", "Brandon", "Brett",
+         "Brian",  "Cody",  "Cole",    "Colin",   "Connor",
+         "Daniel", "Dylan", "Garrett", "Harley",  "Jack",
+         "Jacob",  "Jake",  "Jan",     "Jeff",    "Jeffrey",
+         "Joe",    "Kevin", "Kyle",    "Levi",    "Logan",
+         "Luke",   "Marty", "Maxwell", "Ryan",    "Scott",
+         "Seth",   "Steve", "Tanner",  "Trent",   "Wyatt",
+         "Zach"}));                      // NPC name.
+    w.putFloat32(world.getWidth() / 2);  // NPC position X.
+    w.putFloat32(world.getHeight() / 2); // NPC position Y.
+    w.putBool(true);                     // NPC is homeless.
+    w.putUint32(0);                      // NPC home X.
+    w.putUint32(0);                      // NPC home Y.
+    w.putBool(true);                     // Unknown?
+    w.putUint32(0);                      // NPC variation.
+    w.putBool(false);                    // End town NPC records.
+    w.putBool(false);                    // End pillar records.
+    sectionPointers.push_back(w.tellp());
+
+    w.putUint32(0); // Number of tile entities.
+    sectionPointers.push_back(w.tellp());
+
+    w.putUint32(0); // Number of weighted pressure plates.
+    sectionPointers.push_back(w.tellp());
+
+    w.putUint32(0); // Number of houses.
+    sectionPointers.push_back(w.tellp());
+
+    w.putUint32(0); // Bestiary kills.
+    w.putUint32(0); // Bestiary seen.
+    w.putUint32(0); // Bestiary chatted.
+    sectionPointers.push_back(w.tellp());
+
+    w.putBool(false); // End creative powers records.
+    sectionPointers.push_back(w.tellp());
+
+    w.putBool(true); // Begin footer.
+    w.putString(mapName);
+    w.putUint32(worldID);
 
     // Finalize.
     w.seekp(sectionTablePos);
