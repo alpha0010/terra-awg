@@ -2,6 +2,7 @@
 #include "Random.h"
 #include "World.h"
 #include "Writer.h"
+#include <array>
 #include <chrono>
 #include <set>
 
@@ -223,6 +224,135 @@ int main()
         w.putBool(false); // Bosses and npc saves.
     }
     w.putUint8(0); // Moondial cooldown.
+    sectionPointers.push_back(w.tellp());
+
+    for (int x = 0; x < world.getWidth(); ++x) {
+        for (int y = 0; y < world.getHeight(); ++y) {
+            Tile &tile = world.getTile(x, y);
+
+            int rle = 0;
+            while (y + rle + 1 < world.getHeight() &&
+                   tile == world.getTile(x, y + rle + 1)) {
+                ++rle;
+            }
+            y += rle;
+
+            std::array<uint8_t, 4> flags{0, 0, 0, 0};
+            if (rle > 255) {
+                flags[0] |= 128;
+            } else if (rle > 0) {
+                flags[0] |= 64;
+            }
+            if (tile.blockID > 0) {
+                flags[0] |= 2;
+                if (tile.blockID > 255) {
+                    flags[0] |= 32;
+                }
+            }
+            if (tile.wallID > 0) {
+                flags[0] |= 4;
+                if (tile.wallID > 255) {
+                    flags[2] |= 64;
+                }
+            }
+            switch (tile.liquid) {
+            case Liquid::none:
+                break;
+            case Liquid::water:
+                flags[0] |= 8;
+                break;
+            case Liquid::lava:
+                flags[0] |= 16;
+                break;
+            case Liquid::honey:
+                flags[0] |= 24;
+                break;
+            case Liquid::shimmer:
+                flags[0] |= 8;
+                flags[2] |= 128;
+                break;
+            }
+            flags[1] |= static_cast<int>(tile.slope) << 4;
+            if (tile.wireRed) {
+                flags[1] |= 2;
+            }
+            if (tile.wireBlue) {
+                flags[1] |= 4;
+            }
+            if (tile.wireGreen) {
+                flags[1] |= 8;
+            }
+            if (tile.wireYellow) {
+                flags[2] |= 32;
+            }
+            if (tile.actuator) {
+                flags[2] |= 2;
+            }
+            if (tile.actuated) {
+                flags[2] |= 4;
+            }
+            if (tile.blockPaint > 0) {
+                flags[2] |= 8;
+            }
+            if (tile.wallPaint > 0) {
+                flags[2] |= 16;
+            }
+            if (tile.echoCoatBlock) {
+                flags[3] |= 2;
+            }
+            if (tile.echoCoatWall) {
+                flags[3] |= 4;
+            }
+            if (tile.illuminantBlock) {
+                flags[3] |= 8;
+            }
+            if (tile.illuminantWall) {
+                flags[3] |= 16;
+            }
+            for (int i = 2; i >= 0; --i) {
+                if (flags[i + 1] > 0) {
+                    flags[i] |= 1;
+                }
+            }
+            for (int i = 0; i < 4; ++i) {
+                if (flags[i] == 0 && i > 0) {
+                    break;
+                }
+                w.putUint8(flags[i]);
+            }
+            if (tile.blockID > 0) {
+                if (tile.blockID > 255) {
+                    w.putUint16(tile.blockID);
+                } else {
+                    w.putUint8(tile.blockID);
+                }
+                if (importantTiles[tile.blockID]) {
+                    w.putUint16(0); // TODO
+                    w.putUint16(0); // TODO
+                }
+                if (tile.blockPaint > 0) {
+                    w.putUint8(tile.blockPaint);
+                }
+            }
+            if (tile.wallID > 0) {
+                w.putUint8(0xff & tile.wallID);
+                if (tile.wallPaint > 0) {
+                    w.putUint8(tile.wallPaint);
+                }
+            }
+            if (tile.liquid != Liquid::none) {
+                w.putUint8(0xff); // Liquid amount.
+            }
+            if (tile.wallID > 255) {
+                w.putUint8(tile.wallID >> 8);
+            }
+            if (rle > 255) {
+                w.putUint16(rle);
+            } else if (rle > 0) {
+                w.putUint8(rle);
+            }
+        }
+    }
     sectionPointers.push_back(w.tellp());
 
     // Finalize.
