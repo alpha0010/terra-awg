@@ -4,6 +4,10 @@
 namespace TileID
 {
 enum {
+    empty = -1,
+    dirt = 0,
+    stone = 1,
+    grass = 2,
     ironOre = 6,
     copperOre = 7,
     goldOre = 8,

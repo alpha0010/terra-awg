@@ -1,6 +1,8 @@
 #ifndef TILE_H
 #define TILE_H
 
+#include "DataID.h"
+
 enum class Liquid { none, water, lava, honey, shimmer };
 
 enum class Slope { none = 0, half, topRight, topLeft, bottomRight, bottomLeft };
@@ -8,7 +10,7 @@ enum class Slope { none = 0, half, topRight, topLeft, bottomRight, bottomLeft };
 class Tile
 {
 public:
-    int blockID;
+    int blockID = TileID::empty;
     int wallID;
     int blockPaint;
     int wallPaint;

@@ -12,6 +12,12 @@ uint8_t Random::getByte()
     return getInt(0, 0xff);
 }
 
+double Random::getDouble(double min, double max)
+{
+    std::uniform_real_distribution<> dist(min, max);
+    return dist(rnd);
+}
+
 int Random::getInt(int min, int max)
 {
     std::uniform_int_distribution<> dist(min, max);

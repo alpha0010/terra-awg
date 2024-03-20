@@ -2,6 +2,7 @@
 #include "Random.h"
 #include "World.h"
 #include "Writer.h"
+#include "biomes/Forest.h"
 #include <array>
 #include <chrono>
 #include <set>
@@ -61,6 +62,8 @@ int main()
 {
     Random rnd;
     World world;
+
+    genForest(rnd, world);
 
     Writer w;
     w.putUint32(279); // File format version.
@@ -244,7 +247,7 @@ int main()
             } else if (rle > 0) {
                 flags[0] |= 64;
             }
-            if (tile.blockID > 0) {
+            if (tile.blockID != TileID::empty) {
                 flags[0] |= 2;
                 if (tile.blockID > 255) {
                     flags[0] |= 32;
@@ -321,7 +324,7 @@ int main()
                 }
                 w.putUint8(flags[i]);
             }
-            if (tile.blockID > 0) {
+            if (tile.blockID != TileID::empty) {
                 if (tile.blockID > 255) {
                     w.putUint16(tile.blockID);
                 } else {

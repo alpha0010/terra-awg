@@ -14,6 +14,7 @@ public:
 
     bool getBool();
     uint8_t getByte();
+    double getDouble(double min, double max);
     int getInt(int min, int max);
     std::vector<int> partitionRange(int numSegments, int range);
 
