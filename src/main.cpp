@@ -2,7 +2,7 @@
 #include "Random.h"
 #include "World.h"
 #include "Writer.h"
-#include "biomes/Forest.h"
+#include "biomes/Base.h"
 #include <array>
 #include <chrono>
 #include <set>
@@ -63,7 +63,7 @@ int main()
     Random rnd;
     World world;
 
-    genForest(rnd, world);
+    genWorldBase(rnd, world);
 
     Writer w;
     w.putUint32(279); // File format version.
@@ -119,20 +119,19 @@ int main()
         w.putUint32(rnd.getInt(0, 7)); // Cave style.
     }
     std::vector<int> styles{
-        rnd.select<int>({FOREST_BACKGROUNDS}),
-        rnd.select<int>({FOREST_BACKGROUNDS}),
-        rnd.select<int>({FOREST_BACKGROUNDS}),
-        rnd.select<int>({FOREST_BACKGROUNDS}),
+        rnd.select({FOREST_BACKGROUNDS}),
+        rnd.select({FOREST_BACKGROUNDS}),
+        rnd.select({FOREST_BACKGROUNDS}),
+        rnd.select({FOREST_BACKGROUNDS}),
         rnd.getInt(0, 4), // Corruption.
         rnd.getInt(0, 5), // Jungle.
-        rnd.select<int>(
-            {0, 1, 2, 3, 4, 5, 6, 7, 21, 22, 31, 32, 41, 42}), // Snow.
-        rnd.getInt(0, 4),                                      // Hallow.
-        rnd.getInt(0, 5),                                      // Crimson.
-        rnd.getInt(0, 4),                                      // Desert.
-        rnd.getInt(0, 5),                                      // Ocean.
-        rnd.getInt(0, 3),                                      // Mushroom.
-        rnd.getInt(0, 2)                                       // Underworld.
+        rnd.select({0, 1, 2, 3, 4, 5, 6, 7, 21, 22, 31, 32, 41, 42}), // Snow.
+        rnd.getInt(0, 4),                                             // Hallow.
+        rnd.getInt(0, 5), // Crimson.
+        rnd.getInt(0, 4), // Desert.
+        rnd.getInt(0, 5), // Ocean.
+        rnd.getInt(0, 3), // Mushroom.
+        rnd.getInt(0, 2)  // Underworld.
     };
     w.putUint32(rnd.getInt(0, 3));      // Ice style.
     w.putUint32(styles[5]);             // Jungle style.
@@ -220,10 +219,10 @@ int main()
     }
     w.putBool(false); // Force halloween.
     w.putBool(false); // Force christmas.
-    w.putUint32(rnd.select<int>({TileID::copperOre, TileID::tinOre}));
-    w.putUint32(rnd.select<int>({TileID::ironOre, TileID::leadOre}));
-    w.putUint32(rnd.select<int>({TileID::silverOre, TileID::tungstenOre}));
-    w.putUint32(rnd.select<int>({TileID::goldOre, TileID::platinumOre}));
+    w.putUint32(rnd.select({TileID::copperOre, TileID::tinOre}));
+    w.putUint32(rnd.select({TileID::ironOre, TileID::leadOre}));
+    w.putUint32(rnd.select({TileID::silverOre, TileID::tungstenOre}));
+    w.putUint32(rnd.select({TileID::goldOre, TileID::platinumOre}));
     for (int i = 0; i < 25; ++i) {
         w.putBool(false); // Bosses and npc saves.
     }
@@ -369,15 +368,14 @@ int main()
     w.putUint32(0);  // Number of shimmered NPCs.
     w.putBool(true); // Begin town NPC record.
     w.putUint32(22); // The guide.
-    w.putString(rnd.select<std::string>(
-        {"Andrew", "Asher", "Bradley", "Brandon", "Brett",
-         "Brian",  "Cody",  "Cole",    "Colin",   "Connor",
-         "Daniel", "Dylan", "Garrett", "Harley",  "Jack",
-         "Jacob",  "Jake",  "Jan",     "Jeff",    "Jeffrey",
-         "Joe",    "Kevin", "Kyle",    "Levi",    "Logan",
-         "Luke",   "Marty", "Maxwell", "Ryan",    "Scott",
-         "Seth",   "Steve", "Tanner",  "Trent",   "Wyatt",
-         "Zach"}));                      // NPC name.
+    w.putString(rnd.select({"Andrew", "Asher", "Bradley", "Brandon", "Brett",
+                            "Brian",  "Cody",  "Cole",    "Colin",   "Connor",
+                            "Daniel", "Dylan", "Garrett", "Harley",  "Jack",
+                            "Jacob",  "Jake",  "Jan",     "Jeff",    "Jeffrey",
+                            "Joe",    "Kevin", "Kyle",    "Levi",    "Logan",
+                            "Luke",   "Marty", "Maxwell", "Ryan",    "Scott",
+                            "Seth",   "Steve", "Tanner",  "Trent",   "Wyatt",
+                            "Zach"}));   // NPC name.
     w.putFloat32(world.getWidth() / 2);  // NPC position X.
     w.putFloat32(world.getHeight() / 2); // NPC position Y.
     w.putBool(true);                     // NPC is homeless.
@@ -403,6 +401,24 @@ int main()
     w.putUint32(0); // Bestiary chatted.
     sectionPointers.push_back(w.tellp());
 
+    w.putBool(true); // New creative power record.
+    w.putUint16(0);
+    w.putBool(false); // Freeze time.
+    w.putBool(true);  // New creative power record.
+    w.putUint16(8);
+    w.putFloat32(0); // Time rate.
+    w.putBool(true); // New creative power record.
+    w.putUint16(9);
+    w.putBool(false); // Freeze rain status.
+    w.putBool(true);  // New creative power record.
+    w.putUint16(10);
+    w.putBool(false); // Freeze wind status.
+    w.putBool(true);  // New creative power record.
+    w.putUint16(12);
+    w.putFloat32(0); // Difficulty.
+    w.putBool(true); // New creative power record.
+    w.putUint16(13);
+    w.putBool(false); // Freeze infection spread.
     w.putBool(false); // End creative powers records.
     sectionPointers.push_back(w.tellp());
 

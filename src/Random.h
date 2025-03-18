@@ -7,20 +7,31 @@
 class Random
 {
 private:
+    std::vector<double> coarseNoise;
+    std::vector<double> fineNoise;
+    int noiseWidth;
+    int noiseHeight;
+    int noiseDeltaX;
+    int noiseDeltaY;
     std::default_random_engine rnd;
 
 public:
     Random();
 
+    void initNoise(int width, int height, double scale);
+    void shuffleNoise();
+
     bool getBool();
     uint8_t getByte();
     double getDouble(double min, double max);
     int getInt(int min, int max);
+    double getCoarseNoise(int x, int y) const;
+    double getFineNoise(int x, int y) const;
     std::vector<int> partitionRange(int numSegments, int range);
 
-    template <typename T> T select(const std::vector<T> &list)
+    template <typename T> T select(std::initializer_list<T> list)
     {
-        return list[getInt(0, list.size() - 1)];
+        return *(list.begin() + getInt(0, list.size() - 1));
     }
 };
 

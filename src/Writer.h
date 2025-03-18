@@ -2,6 +2,7 @@
 #define WRITER_H
 
 #include "ieee754_types.hpp"
+#include <cstdint>
 #include <fstream>
 #include <vector>
 

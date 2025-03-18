@@ -3,7 +3,7 @@
 CXXFLAGS := -Wall -Wextra -pedantic -Werror -std=c++20 -O2
 
 SRCS := src/main.cpp src/Random.cpp src/World.cpp src/Writer.cpp \
-    src/biomes/Forest.cpp
+    src/biomes/Base.cpp
 OUT := terra-awg
 
 BUILD_DIR := build

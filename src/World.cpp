@@ -22,6 +22,11 @@ int World::getCavernLevel()
     return 0.41 * height;
 }
 
+int World::getUnderworldLevel()
+{
+    return height - 230;
+}
+
 Tile &World::getTile(int x, int y)
 {
     if (x < 0 || x >= width || y < 0 || y >= height) {

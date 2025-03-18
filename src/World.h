@@ -19,6 +19,7 @@ public:
     int getHeight();
     int getUndergroundLevel();
     int getCavernLevel();
+    int getUnderworldLevel();
     Tile &getTile(int x, int y);
 };
 
