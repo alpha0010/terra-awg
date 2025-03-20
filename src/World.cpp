@@ -1,28 +1,31 @@
 #include "World.h"
 
+#include "Random.h"
+#include <iostream>
+
 World::World() : width(6400), height(1800), tiles(width * height) {}
 
-int World::getWidth()
+int World::getWidth() const
 {
     return width;
 }
 
-int World::getHeight()
+int World::getHeight() const
 {
     return height;
 }
 
-int World::getUndergroundLevel()
+int World::getUndergroundLevel() const
 {
     return 0.28 * height;
 }
 
-int World::getCavernLevel()
+int World::getCavernLevel() const
 {
     return 0.41 * height;
 }
 
-int World::getUnderworldLevel()
+int World::getUnderworldLevel() const
 {
     return height - 230;
 }
@@ -33,4 +36,41 @@ Tile &World::getTile(int x, int y)
         return scratchTile;
     }
     return tiles[y + x * height];
+}
+
+bool World::isExposed(int x, int y) const
+{
+    if (x < 1 || x >= width - 1 || y < 1 || y >= height - 1) {
+        return false;
+    }
+    for (int i = -1; i < 2; ++i) {
+        for (int j = -1; j < 2; ++j) {
+            if (tiles[(y + j) + (x + i) * height].blockID == TileID::empty) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+void World::planBiomes(Random &rnd)
+{
+    std::cout << "Planning biomes\n";
+    while (true) {
+        desertCenter = rnd.getDouble(0.09, 0.91);
+        jungleCenter = rnd.getDouble(0.12, 0.39);
+        if (rnd.getBool()) {
+            jungleCenter = 1 - jungleCenter;
+        }
+        snowCenter = rnd.getDouble(0.12, 0.88);
+
+        if (std::abs(desertCenter - jungleCenter) > 0.15 &&
+            std::abs(desertCenter - snowCenter) > 0.15 &&
+            std::abs(snowCenter - jungleCenter) > 0.15) {
+            break;
+        }
+    }
+    desertCenter *= width;
+    jungleCenter *= width;
+    snowCenter *= width;
 }

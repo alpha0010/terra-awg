@@ -3,6 +3,10 @@
 #include "World.h"
 #include "Writer.h"
 #include "biomes/Base.h"
+#include "biomes/Desert.h"
+#include "biomes/Jungle.h"
+#include "biomes/Ocean.h"
+#include "biomes/Snow.h"
 #include <array>
 #include <chrono>
 #include <set>
@@ -63,7 +67,18 @@ int main()
     Random rnd;
     World world;
 
+    world.isCrimson = rnd.getBool();
+    world.copperVariant = rnd.select({TileID::copperOre, TileID::tinOre});
+    world.ironVariant = rnd.select({TileID::ironOre, TileID::leadOre});
+    world.silverVariant = rnd.select({TileID::silverOre, TileID::tungstenOre});
+    world.goldVariant = rnd.select({TileID::goldOre, TileID::platinumOre});
+
     genWorldBase(rnd, world);
+    genOceans(rnd, world);
+    world.planBiomes(rnd);
+    genSnow(rnd, world);
+    genDesert(rnd, world);
+    genJungle(rnd, world);
 
     Writer w;
     w.putUint32(279); // File format version.
@@ -147,7 +162,7 @@ int main()
     w.putBool(false);                   // Eclipse.
     w.putUint32(world.getWidth() / 4);  // Dungeon X.
     w.putUint32(world.getHeight() / 2); // Dungeon Y.
-    w.putBool(rnd.getBool());           // Is crimson.
+    w.putBool(world.isCrimson);         // Is crimson.
     for (int i = 0; i < 20; ++i) {
         w.putBool(false); // Bosses and npc saves.
     }
@@ -219,10 +234,10 @@ int main()
     }
     w.putBool(false); // Force halloween.
     w.putBool(false); // Force christmas.
-    w.putUint32(rnd.select({TileID::copperOre, TileID::tinOre}));
-    w.putUint32(rnd.select({TileID::ironOre, TileID::leadOre}));
-    w.putUint32(rnd.select({TileID::silverOre, TileID::tungstenOre}));
-    w.putUint32(rnd.select({TileID::goldOre, TileID::platinumOre}));
+    w.putUint32(world.copperVariant);
+    w.putUint32(world.ironVariant);
+    w.putUint32(world.silverVariant);
+    w.putUint32(world.goldVariant);
     for (int i = 0; i < 25; ++i) {
         w.putBool(false); // Bosses and npc saves.
     }

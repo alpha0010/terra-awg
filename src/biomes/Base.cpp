@@ -2,6 +2,8 @@
 
 #include "Random.h"
 #include "World.h"
+#include <algorithm>
+#include <iostream>
 
 void scatterResource(Random &rnd, World &world, int resource)
 {
@@ -18,16 +20,44 @@ void scatterResource(Random &rnd, World &world, int resource)
     }
 }
 
+void genOreVeins(Random &rnd, World &world, int oreRoof, int oreFloor, int ore)
+{
+    rnd.shuffleNoise();
+    for (int numDeposits = world.getWidth() * (oreFloor - oreRoof) / 40000;
+         numDeposits > 0;
+         --numDeposits) {
+        int x = rnd.getInt(0, world.getWidth());
+        int y = rnd.getInt(oreRoof, oreFloor);
+        double depositSize = rnd.getDouble(4, 10);
+        for (int i = -10; i < 10; ++i) {
+            for (int j = -10; j < 10; ++j) {
+                double threshold =
+                    1 - std::pow(std::hypot(i, j) / depositSize, 0.3);
+                if (std::abs(rnd.getFineNoise(x + i, y + j)) < threshold) {
+                    Tile &tile = world.getTile(x + i, y + j);
+                    if (tile.blockID != TileID::empty) {
+                        tile.blockID = ore;
+                    }
+                }
+            }
+        }
+    }
+}
+
 void genWorldBase(Random &rnd, World &world)
 {
     rnd.initNoise(world.getWidth(), world.getHeight(), 0.07);
+    std::cout << "Generating base terrain\n";
     double surfaceLevel = rnd.getDouble(
         0.7 * world.getUndergroundLevel(),
         0.8 * world.getUndergroundLevel());
     int center = world.getWidth() / 2;
     for (int x = 0; x < world.getWidth(); ++x) {
         for (int y = surfaceLevel +
-                     std::min(0.1 * std::abs(center - x) + 15, 50.0) *
+                     std::min(
+                         {0.1 * std::abs(center - x) + 15,
+                          0.08 * std::min(x, world.getWidth() - x) + 5,
+                          50.0}) *
                          rnd.getCoarseNoise(x, 0);
              y < world.getHeight();
              ++y) {
@@ -64,6 +94,33 @@ void genWorldBase(Random &rnd, World &world)
         }
     }
 
+    std::cout << "Generating ore veins\n";
+    genOreVeins(
+        rnd,
+        world,
+        0.6 * world.getUndergroundLevel(),
+        (world.getUndergroundLevel() + world.getCavernLevel()) / 2,
+        world.copperVariant);
+    genOreVeins(
+        rnd,
+        world,
+        0.85 * world.getUndergroundLevel(),
+        (2 * world.getCavernLevel() + world.getUnderworldLevel()) / 3,
+        world.ironVariant);
+    genOreVeins(
+        rnd,
+        world,
+        (world.getUndergroundLevel() + world.getCavernLevel()) / 2,
+        (world.getCavernLevel() + world.getUnderworldLevel()) / 2,
+        world.silverVariant);
+    genOreVeins(
+        rnd,
+        world,
+        (2 * world.getCavernLevel() + world.getUnderworldLevel()) / 3,
+        world.getUnderworldLevel(),
+        world.goldVariant);
+
+    std::cout << "Digging caves\n";
     rnd.shuffleNoise();
     for (int x = 0; x < world.getWidth(); ++x) {
         for (int y = 0; y < world.getHeight(); ++y) {

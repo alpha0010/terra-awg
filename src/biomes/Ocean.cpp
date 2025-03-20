@@ -1,0 +1,55 @@
+#include "Ocean.h"
+
+#include "Random.h"
+#include "World.h"
+#include <iostream>
+
+void genOceans(Random &rnd, World &world)
+{
+    std::cout << "Filling oceans\n";
+    rnd.shuffleNoise();
+    int waterTable = 0;
+    while (world.getTile(300, waterTable).blockID == TileID::empty) {
+        ++waterTable;
+    }
+    waterTable += rnd.getInt(4, 12);
+    for (int x = 0; x < 340; ++x) {
+        double drop = 90 * (1 - 1 / (1 + std::exp(0.041 * (200 - x))));
+        double sandDepth = 30 + 8 * rnd.getCoarseNoise(x, 0);
+        if (x > 200) {
+            sandDepth *= (320.0 - x) / 120;
+        }
+        auto fillColumn = [&](int effectiveX) {
+            for (int y = 0.3 * world.getUndergroundLevel();
+                 y < world.getUndergroundLevel();
+                 ++y) {
+                if (world.getTile(effectiveX, y).blockID != TileID::empty) {
+                    for (int i = 0; i < drop; ++i) {
+                        Tile &tile = world.getTile(effectiveX, y + i);
+                        tile.blockID = TileID::empty;
+                        if (y + i > waterTable) {
+                            tile.liquid = Liquid::water;
+                        }
+                    }
+                    for (int i = drop + 1; i < drop + sandDepth; ++i) {
+                        Tile &tile = world.getTile(effectiveX, y + i);
+                        if (y + i > waterTable + 20) {
+                            if (tile.blockID == TileID::stone) {
+                                tile.blockID = TileID::coralstone;
+                            } else {
+                                tile.blockID = TileID::sand;
+                            }
+                        } else if (tile.blockID != TileID::dirt) {
+                            tile.blockID = TileID::shellPile;
+                        } else {
+                            tile.blockID = TileID::sand;
+                        }
+                    }
+                    break;
+                }
+            }
+        };
+        fillColumn(x);
+        fillColumn(world.getWidth() - x - 1);
+    }
+}
