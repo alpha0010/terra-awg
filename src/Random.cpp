@@ -1,31 +1,8 @@
 #include "Random.h"
 
 #include "OpenSimplexNoise.hpp"
+#include "Util.h"
 #include <iostream>
-#include <ranges>
-#include <thread>
-
-template <std::ranges::input_range R, class UnaryFunc>
-constexpr void parallelFor(R &&r, UnaryFunc f)
-{
-    std::vector<std::thread> pool;
-    size_t numThreads = std::max(std::thread::hardware_concurrency(), 4u);
-    for (size_t loopId = 0; loopId < numThreads; ++loopId) {
-        pool.emplace_back([&r, &f, loopId, numThreads]() {
-            auto itr = r.begin();
-            for (size_t i = 0; i < loopId && itr != r.end(); ++i, ++itr)
-                ;
-            while (itr != r.end()) {
-                f(*itr);
-                for (size_t i = 0; i < numThreads && itr != r.end(); ++i, ++itr)
-                    ;
-            }
-        });
-    }
-    for (auto &worker : pool) {
-        worker.join();
-    }
-}
 
 Random::Random()
     : noiseWidth(0), noiseHeight(0), noiseDeltaX(0), noiseDeltaY(0),

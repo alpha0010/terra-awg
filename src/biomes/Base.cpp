@@ -1,6 +1,7 @@
 #include "Base.h"
 
 #include "Random.h"
+#include "Util.h"
 #include "World.h"
 #include <algorithm>
 #include <iostream>
@@ -9,16 +10,18 @@
 void scatterResource(Random &rnd, World &world, int resource)
 {
     rnd.shuffleNoise();
-    for (int x = 0; x < world.getWidth(); ++x) {
-        for (int y = 0; y < world.getHeight(); ++y) {
-            if (rnd.getFineNoise(x, y) > 0.7) {
-                Tile &tile = world.getTile(x, y);
-                if (tile.blockID != TileID::empty) {
-                    tile.blockID = resource;
+    parallelFor(
+        std::views::iota(0, world.getWidth()),
+        [resource, &rnd, &world](int x) {
+            for (int y = 0; y < world.getHeight(); ++y) {
+                if (rnd.getFineNoise(x, y) > 0.7) {
+                    Tile &tile = world.getTile(x, y);
+                    if (tile.blockID != TileID::empty) {
+                        tile.blockID = resource;
+                    }
                 }
             }
-        }
-    }
+        });
 }
 
 void genOreVeins(Random &rnd, World &world, int oreRoof, int oreFloor, int ore)
@@ -60,37 +63,40 @@ void genWorldBase(Random &rnd, World &world)
             rnd.getInt(0, world.getHeight()),
             wallId);
     }
-    for (int x = 0; x < world.getWidth(); ++x) {
-        for (int y = surfaceLevel +
-                     std::min(
-                         {0.1 * std::abs(center - x) + 15,
-                          0.08 * std::min(x, world.getWidth() - x) + 5,
-                          50.0}) *
-                         rnd.getCoarseNoise(x, 0);
-             y < world.getHeight();
-             ++y) {
-            double threshold =
-                y < world.getUndergroundLevel()
-                    ? 3.0 * y / world.getUndergroundLevel() - 3
-                    : static_cast<double>(y - world.getUndergroundLevel()) /
-                          (world.getHeight() - world.getUndergroundLevel());
-            Tile &tile = world.getTile(x, y);
-            tile.blockID = rnd.getFineNoise(x, y) > threshold ? TileID::dirt
-                                                              : TileID::stone;
-            for (auto [i, j, wallId] : wallVarNoise) {
-                if (std::abs(rnd.getCoarseNoise(x + i, y + j)) < 0.07) {
-                    tile.wallID = wallId;
-                    break;
+    parallelFor(
+        std::views::iota(0, world.getWidth()),
+        [center, surfaceLevel, &rnd, &wallVarNoise, &world](int x) {
+            for (int y = surfaceLevel +
+                         std::min(
+                             {0.1 * std::abs(center - x) + 15,
+                              0.08 * std::min(x, world.getWidth() - x) + 5,
+                              50.0}) *
+                             rnd.getCoarseNoise(x, 0);
+                 y < world.getHeight();
+                 ++y) {
+                double threshold =
+                    y < world.getUndergroundLevel()
+                        ? 3.0 * y / world.getUndergroundLevel() - 3
+                        : static_cast<double>(y - world.getUndergroundLevel()) /
+                              (world.getHeight() - world.getUndergroundLevel());
+                Tile &tile = world.getTile(x, y);
+                tile.blockID = rnd.getFineNoise(x, y) > threshold
+                                   ? TileID::dirt
+                                   : TileID::stone;
+                for (auto [i, j, wallId] : wallVarNoise) {
+                    if (std::abs(rnd.getCoarseNoise(x + i, y + j)) < 0.07) {
+                        tile.wallID = wallId;
+                        break;
+                    }
+                }
+                if (tile.wallID == WallID::empty &&
+                    y < world.getUndergroundLevel()) {
+                    tile.wallID = tile.blockID == TileID::stone
+                                      ? WallID::Unsafe::rockyDirt
+                                      : WallID::Unsafe::dirt;
                 }
             }
-            if (tile.wallID == WallID::empty &&
-                y < world.getUndergroundLevel()) {
-                tile.wallID = tile.blockID == TileID::stone
-                                  ? WallID::Unsafe::rockyDirt
-                                  : WallID::Unsafe::dirt;
-            }
-        }
-    }
+        });
 
     scatterResource(rnd, world, TileID::clay);
     scatterResource(rnd, world, TileID::sand);
@@ -149,20 +155,23 @@ void genWorldBase(Random &rnd, World &world)
 
     std::cout << "Digging caves\n";
     rnd.shuffleNoise();
-    for (int x = 0; x < world.getWidth(); ++x) {
-        for (int y = 0; y < world.getHeight(); ++y) {
-            double threshold = y < world.getUndergroundLevel()
-                                   ? 3 - 3.1 * y / world.getUndergroundLevel()
-                               : y > world.getUnderworldLevel()
-                                   ? 3.1 * (y - world.getUnderworldLevel()) /
-                                             underworldHeight -
-                                         0.1
-                                   : -0.1;
-            if (std::abs(rnd.getCoarseNoise(x, 2 * y) + 0.1) < 0.15 &&
-                rnd.getFineNoise(x, y) > threshold) {
-                Tile &tile = world.getTile(x, y);
-                tile.blockID = TileID::empty;
+    parallelFor(
+        std::views::iota(0, world.getWidth()),
+        [underworldHeight, &rnd, &world](int x) {
+            for (int y = 0; y < world.getHeight(); ++y) {
+                double threshold =
+                    y < world.getUndergroundLevel()
+                        ? 3 - 3.1 * y / world.getUndergroundLevel()
+                    : y > world.getUnderworldLevel()
+                        ? 3.1 * (y - world.getUnderworldLevel()) /
+                                  underworldHeight -
+                              0.1
+                        : -0.1;
+                if (std::abs(rnd.getCoarseNoise(x, 2 * y) + 0.1) < 0.15 &&
+                    rnd.getFineNoise(x, y) > threshold) {
+                    Tile &tile = world.getTile(x, y);
+                    tile.blockID = TileID::empty;
+                }
             }
-        }
-    }
+        });
 }

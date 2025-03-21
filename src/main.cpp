@@ -3,7 +3,9 @@
 #include "World.h"
 #include "Writer.h"
 #include "biomes/Base.h"
+#include "biomes/Corruption.h"
 #include "biomes/Desert.h"
+#include "biomes/Forest.h"
 #include "biomes/Jungle.h"
 #include "biomes/Ocean.h"
 #include "biomes/Snow.h"
@@ -79,6 +81,8 @@ int main()
     genSnow(rnd, world);
     genDesert(rnd, world);
     genJungle(rnd, world);
+    genForest(rnd, world);
+    genCorruption(rnd, world);
 
     Writer w;
     w.putUint32(279); // File format version.

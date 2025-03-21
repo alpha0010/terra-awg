@@ -23,6 +23,7 @@ enum {
     mud = 59,
     jungleGrass = 60,
     mushroomGrass = 70,
+    ebonsand = 112,
     silt = 123,
     snow = 147,
     ice = 161,
@@ -51,9 +52,15 @@ enum {
     granite = 368,
     sandstone = 396,
     hardenedSand = 397,
+    hardenedEbonsand = 398,
+    hardenedCrimsand = 399,
+    ebonsandstone = 400,
+    crimsandstone = 401,
     desertFossil = 404,
     snowCloud = 460,
-    shellPile = 495
+    lesion = 474,
+    shellPile = 495,
+    corruptJungleGrass = 661
 };
 }
 
@@ -86,6 +93,10 @@ enum {
     granite = 180,
     craggyStone = 185,
     sandstone = 187,
+    corruptGrowth = 188,
+    corruptMass = 189,
+    corruptPustule = 190,
+    corruptTendril = 191,
     layeredDirt = 196,
     crumblingDirt = 197,
     crackedDirt = 198,
@@ -103,6 +114,8 @@ enum {
     mottledStone = 214,
     fracturedStone = 215,
     hardenedSand = 216,
+    hardenedEbonsand = 217,
+    ebonsandstone = 220,
     livingWood = 244,
 };
 }
@@ -134,6 +147,13 @@ inline std::array const jungle = {
     WallID::Unsafe::leafyJungle,
     WallID::Unsafe::ivyStone,
     WallID::Unsafe::jungleVine};
+
+inline std::array const corruption = {
+    WallID::Unsafe::ebonstone,
+    WallID::Unsafe::corruptGrowth,
+    WallID::Unsafe::corruptMass,
+    WallID::Unsafe::corruptPustule,
+    WallID::Unsafe::corruptTendril};
 
 inline std::array const underworld = {
     WallID::Unsafe::ember,
