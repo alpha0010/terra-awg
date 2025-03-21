@@ -6,7 +6,7 @@
 
 void genForest(Random &rnd, World &world)
 {
-    std::cout << "Nurturing forest\n";
+    std::cout << "Nurturing forests\n";
     rnd.shuffleNoise();
     for (int x = 0; x < world.getWidth(); ++x) {
         for (int y = 0; y < world.getUndergroundLevel(); ++y) {

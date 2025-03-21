@@ -47,6 +47,32 @@ void Random::initNoise(int width, int height, double scale)
     noiseHeight = height;
 }
 
+void Random::computeBlurNoise()
+{
+    std::cout << "Blurring noise\n";
+    blurNoise.resize(coarseNoise.size());
+    parallelFor(std::views::iota(0, noiseWidth), [this](int x) {
+        double accu = 0;
+        for (int y = noiseHeight - 40; y < noiseHeight; ++y) {
+            accu = 0.9 * accu + 0.1 * coarseNoise[x * noiseHeight + y];
+        }
+        for (int y = 0; y < noiseHeight; ++y) {
+            accu = 0.9 * accu + 0.1 * coarseNoise[x * noiseHeight + y];
+            blurNoise[x * noiseHeight + y] = accu;
+        }
+    });
+    parallelFor(std::views::iota(0, noiseHeight), [this](int y) {
+        double accu = 0;
+        for (int x = noiseWidth - 40; x < noiseWidth; ++x) {
+            accu = 0.9 * accu + 0.1 * blurNoise[x * noiseHeight + y];
+        }
+        for (int x = 0; x < noiseWidth; ++x) {
+            accu = 0.9 * accu + 0.1 * blurNoise[x * noiseHeight + y];
+            blurNoise[x * noiseHeight + y] = accu;
+        }
+    });
+}
+
 void Random::shuffleNoise()
 {
     noiseDeltaX = getInt(0, noiseWidth);
@@ -73,6 +99,13 @@ int Random::getInt(int min, int max)
 {
     std::uniform_int_distribution<> dist(min, max);
     return dist(rnd);
+}
+
+double Random::getBlurNoise(int x, int y) const
+{
+    return blurNoise
+        [noiseHeight * ((x + noiseDeltaX) % noiseWidth) +
+         ((y + noiseDeltaY) % noiseHeight)];
 }
 
 double Random::getCoarseNoise(int x, int y) const

@@ -7,6 +7,7 @@
 class Random
 {
 private:
+    std::vector<double> blurNoise;
     std::vector<double> coarseNoise;
     std::vector<double> fineNoise;
     int noiseWidth;
@@ -19,12 +20,14 @@ public:
     Random();
 
     void initNoise(int width, int height, double scale);
+    void computeBlurNoise();
     void shuffleNoise();
 
     bool getBool();
     uint8_t getByte();
     double getDouble(double min, double max);
     int getInt(int min, int max);
+    double getBlurNoise(int x, int y) const;
     double getCoarseNoise(int x, int y) const;
     double getFineNoise(int x, int y) const;
     std::vector<int> partitionRange(int numSegments, int range);

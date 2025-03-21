@@ -4,6 +4,7 @@
 #include "Writer.h"
 #include "biomes/Base.h"
 #include "biomes/Corruption.h"
+#include "biomes/Crimson.h"
 #include "biomes/Desert.h"
 #include "biomes/Forest.h"
 #include "biomes/Jungle.h"
@@ -82,7 +83,11 @@ int main()
     genDesert(rnd, world);
     genJungle(rnd, world);
     genForest(rnd, world);
-    genCorruption(rnd, world);
+    if (world.isCrimson) {
+        genCrimson(rnd, world);
+    } else {
+        genCorruption(rnd, world);
+    }
 
     Writer w;
     w.putUint32(279); // File format version.

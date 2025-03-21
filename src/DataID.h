@@ -36,6 +36,7 @@ enum {
     cloud = 189,
     livingWood = 191,
     leaf = 192,
+    flesh = 195,
     rainCloud = 196,
     asphalt = 198,
     crimsonGrass = 199,
@@ -60,7 +61,8 @@ enum {
     snowCloud = 460,
     lesion = 474,
     shellPile = 495,
-    corruptJungleGrass = 661
+    corruptJungleGrass = 661,
+    crimsonJungleGrass = 662
 };
 }
 
@@ -97,6 +99,10 @@ enum {
     corruptMass = 189,
     corruptPustule = 190,
     corruptTendril = 191,
+    crimsonCrust = 192,
+    crimsonScab = 193,
+    crimsonTeeth = 194,
+    crimsonBlister = 195,
     layeredDirt = 196,
     crumblingDirt = 197,
     crackedDirt = 198,
@@ -115,7 +121,9 @@ enum {
     fracturedStone = 215,
     hardenedSand = 216,
     hardenedEbonsand = 217,
+    hardenedCrimsand = 218,
     ebonsandstone = 220,
+    crimsandstone = 221,
     livingWood = 244,
 };
 }
@@ -147,6 +155,13 @@ inline std::array const jungle = {
     WallID::Unsafe::leafyJungle,
     WallID::Unsafe::ivyStone,
     WallID::Unsafe::jungleVine};
+
+inline std::array const crimson = {
+    WallID::Unsafe::crimstone,
+    WallID::Unsafe::crimsonCrust,
+    WallID::Unsafe::crimsonScab,
+    WallID::Unsafe::crimsonTeeth,
+    WallID::Unsafe::crimsonBlister};
 
 inline std::array const corruption = {
     WallID::Unsafe::ebonstone,
