@@ -3,6 +3,7 @@
 #include "Random.h"
 #include "World.h"
 #include <iostream>
+#include <map>
 
 void genSnow(Random &rnd, World &world)
 {
@@ -12,6 +13,15 @@ void genSnow(Random &rnd, World &world)
     double scanDist = 0.08 * world.getWidth();
     double snowFloor =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
+    std::map<int, int> snowWalls;
+    for (int wallId : WallVariants::dirt) {
+        snowWalls[wallId] = rnd.select(
+            {WallID::Unsafe::snow,
+             WallID::Unsafe::ice,
+             rnd.select(
+                 WallVariants::stone.begin(),
+                 WallVariants::stone.end())});
+    }
     for (int x = center - scanDist; x < center + scanDist; ++x) {
         for (int y = 0; y < world.getUnderworldLevel(); ++y) {
             double threshold = std::max(
@@ -24,9 +34,11 @@ void genSnow(Random &rnd, World &world)
             switch (tile.blockID) {
             case TileID::dirt:
                 tile.blockID = TileID::snow;
+                tile.wallID = WallID::Unsafe::snow;
                 break;
             case TileID::stone:
                 tile.blockID = TileID::ice;
+                tile.wallID = WallID::Unsafe::ice;
                 break;
             case TileID::clay:
                 tile.blockID = TileID::stone;
@@ -42,6 +54,10 @@ void genSnow(Random &rnd, World &world)
                 break;
             default:
                 break;
+            }
+            auto itr = snowWalls.find(tile.wallID);
+            if (itr != snowWalls.end()) {
+                tile.wallID = itr->second;
             }
         }
     }

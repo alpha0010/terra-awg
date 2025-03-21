@@ -3,6 +3,7 @@
 #include "Random.h"
 #include "World.h"
 #include <iostream>
+#include <map>
 
 void genDesert(Random &rnd, World &world)
 {
@@ -12,6 +13,11 @@ void genDesert(Random &rnd, World &world)
     double scanDist = 0.08 * world.getWidth();
     double desertFloor =
         (world.getCavernLevel() + 4 * world.getUnderworldLevel()) / 5;
+    std::map<int, int> sandWalls{{WallID::empty, WallID::empty}};
+    for (int wallId : WallVariants::dirt) {
+        sandWalls[wallId] = rnd.select(
+            {WallID::Unsafe::sandstone, WallID::Unsafe::hardenedSand});
+    }
     for (int x = center - scanDist; x < center + scanDist; ++x) {
         for (int y = 0; y < world.getUnderworldLevel(); ++y) {
             double threshold = std::max(
@@ -47,6 +53,15 @@ void genDesert(Random &rnd, World &world)
                 break;
             default:
                 break;
+            }
+            if (tile.blockID == TileID::sandstone) {
+                tile.wallID = WallID::Unsafe::sandstone;
+            } else if (
+                tile.blockID == TileID::sand ||
+                tile.blockID == TileID::hardenedSand) {
+                tile.wallID = WallID::Unsafe::hardenedSand;
+            } else {
+                tile.wallID = sandWalls[tile.wallID];
             }
         }
     }

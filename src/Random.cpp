@@ -65,7 +65,6 @@ void Random::initNoise(int width, int height, double scale)
                     0.125 * fineNoise[x * height + y];
             }
         });
-    std::cout << "  Complete\n";
 
     noiseWidth = width;
     noiseHeight = height;

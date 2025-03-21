@@ -3,6 +3,7 @@
 #include "Random.h"
 #include "World.h"
 #include <iostream>
+#include <map>
 
 void genJungle(Random &rnd, World &world)
 {
@@ -10,6 +11,21 @@ void genJungle(Random &rnd, World &world)
     rnd.shuffleNoise();
     double center = world.jungleCenter;
     double scanDist = 0.11 * world.getWidth();
+    std::map<int, int> surfaceJungleWalls{{WallID::empty, WallID::empty}};
+    for (int wallId : WallVariants::dirt) {
+        surfaceJungleWalls[wallId] = rnd.select(
+            {WallID::Unsafe::jungle,
+             WallID::Unsafe::jungle,
+             rnd.select(
+                 WallVariants::stone.begin(),
+                 WallVariants::stone.end())});
+    }
+    std::map<int, int> undergroundJungleWalls;
+    for (int wallId : WallVariants::dirt) {
+        undergroundJungleWalls[wallId] = rnd.select(
+            WallVariants::jungle.begin(),
+            WallVariants::jungle.end());
+    }
     for (int x = center - scanDist; x < center + scanDist; ++x) {
         for (int y = 0; y < world.getHeight(); ++y) {
             double threshold =
@@ -40,14 +56,28 @@ void genJungle(Random &rnd, World &world)
                 tile.blockID = TileID::jungleGrass;
                 break;
             case TileID::sand:
-            case TileID::mud:
                 tile.blockID = TileID::silt;
+                break;
+            case TileID::mud:
+                tile.blockID = TileID::stone;
                 break;
             case TileID::cloud:
                 tile.blockID = TileID::rainCloud;
                 break;
             default:
                 break;
+            }
+            if (y < world.getUndergroundLevel()) {
+                if (tile.blockID == TileID::empty) {
+                    tile.wallID = surfaceJungleWalls[tile.wallID];
+                } else {
+                    tile.wallID = WallID::Unsafe::mud;
+                }
+            } else {
+                auto itr = undergroundJungleWalls.find(tile.wallID);
+                if (itr != undergroundJungleWalls.end()) {
+                    tile.wallID = itr->second;
+                }
             }
         }
     }

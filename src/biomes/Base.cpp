@@ -4,6 +4,7 @@
 #include "World.h"
 #include <algorithm>
 #include <iostream>
+#include <map>
 
 void scatterResource(Random &rnd, World &world, int resource)
 {
@@ -52,6 +53,13 @@ void genWorldBase(Random &rnd, World &world)
         0.7 * world.getUndergroundLevel(),
         0.8 * world.getUndergroundLevel());
     int center = world.getWidth() / 2;
+    std::vector<std::tuple<int, int, int>> wallVarNoise;
+    for (int wallId : WallVariants::dirt) {
+        wallVarNoise.emplace_back(
+            rnd.getInt(0, world.getWidth()),
+            rnd.getInt(0, world.getHeight()),
+            wallId);
+    }
     for (int x = 0; x < world.getWidth(); ++x) {
         for (int y = surfaceLevel +
                      std::min(
@@ -69,6 +77,18 @@ void genWorldBase(Random &rnd, World &world)
             Tile &tile = world.getTile(x, y);
             tile.blockID = rnd.getFineNoise(x, y) > threshold ? TileID::dirt
                                                               : TileID::stone;
+            for (auto [i, j, wallId] : wallVarNoise) {
+                if (std::abs(rnd.getCoarseNoise(x + i, y + j)) < 0.07) {
+                    tile.wallID = wallId;
+                    break;
+                }
+            }
+            if (tile.wallID == WallID::empty &&
+                y < world.getUndergroundLevel()) {
+                tile.wallID = tile.blockID == TileID::stone
+                                  ? WallID::Unsafe::rockyDirt
+                                  : WallID::Unsafe::dirt;
+            }
         }
     }
 
@@ -77,6 +97,12 @@ void genWorldBase(Random &rnd, World &world)
     scatterResource(rnd, world, TileID::mud);
 
     int underworldHeight = world.getHeight() - world.getUnderworldLevel();
+    std::map<int, int> underworldWalls{{WallID::empty, WallID::empty}};
+    for (int wallId : WallVariants::dirt) {
+        underworldWalls[wallId] = rnd.select(
+            WallVariants::underworld.begin(),
+            WallVariants::underworld.end());
+    }
     for (int x = 0; x < world.getWidth(); ++x) {
         int underworldRoof =
             world.getUnderworldLevel() + 0.1 * underworldHeight +
@@ -91,6 +117,7 @@ void genWorldBase(Random &rnd, World &world)
             tile.blockID = y < underworldRoof || y > underworldFloor
                                ? TileID::ash
                                : TileID::empty;
+            tile.wallID = underworldWalls[tile.wallID];
         }
     }
 

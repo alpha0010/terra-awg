@@ -26,6 +26,7 @@ void genOceans(Random &rnd, World &world)
                 if (world.getTile(effectiveX, y).blockID != TileID::empty) {
                     for (int i = 0; i < drop; ++i) {
                         Tile &tile = world.getTile(effectiveX, y + i);
+                        tile.wallID = WallID::empty;
                         tile.blockID = TileID::empty;
                         if (y + i > waterTable) {
                             tile.liquid = Liquid::water;
@@ -33,6 +34,11 @@ void genOceans(Random &rnd, World &world)
                     }
                     for (int i = drop + 1; i < drop + sandDepth; ++i) {
                         Tile &tile = world.getTile(effectiveX, y + i);
+                        if (tile.wallID == WallID::Unsafe::dirt) {
+                            tile.wallID = WallID::Unsafe::wornStone;
+                        } else {
+                            tile.wallID = WallID::empty;
+                        }
                         if (y + i > waterTable + 20) {
                             if (tile.blockID == TileID::stone) {
                                 tile.blockID = TileID::coralstone;
