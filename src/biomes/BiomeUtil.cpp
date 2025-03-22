@@ -1,0 +1,49 @@
+#include "BiomeUtil.h"
+
+#include "Random.h"
+#include "World.h"
+
+std::pair<int, int> findStoneCave(int yMin, int yMax, Random &rnd, World &world)
+{
+    while (true) {
+        int x = rnd.getInt(50, world.getWidth() - 50);
+        int y = rnd.getInt(yMin, yMax);
+        if (world.getTile(x, y).blockID != TileID::empty) {
+            continue;
+        }
+        int caveRoof = y - 1;
+        while (caveRoof > 0 &&
+               world.getTile(x, caveRoof).blockID == TileID::empty) {
+            --caveRoof;
+        }
+        if (world.getTile(x, caveRoof).blockID != TileID::stone) {
+            continue;
+        }
+        int caveFloor = y + 1;
+        while (caveFloor < world.getHeight() &&
+               world.getTile(x, caveFloor).blockID == TileID::empty) {
+            ++caveFloor;
+        }
+        if (world.getTile(x, caveFloor).blockID != TileID::stone ||
+            caveFloor - caveRoof < 6) {
+            continue;
+        }
+        int left = x - 1;
+        while (left > 0 && world.getTile(left, y).blockID == TileID::empty) {
+            --left;
+        }
+        if (world.getTile(left, y).blockID != TileID::stone) {
+            continue;
+        }
+        int right = x + 1;
+        while (right < world.getWidth() &&
+               world.getTile(right, y).blockID == TileID::empty) {
+            ++right;
+        }
+        if (world.getTile(right, y).blockID != TileID::stone ||
+            right - left < 6) {
+            continue;
+        }
+        return {(left + right) / 2, (caveFloor + caveRoof) / 2};
+    }
+}

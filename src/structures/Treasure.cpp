@@ -32,7 +32,7 @@ int testOrbHeartCandidate(int x, int y, World &world)
         return TileID::empty;
     }
     int tendrilID = TileID::empty;
-    for (auto [i, j] : {std::pair{0, 0}, {0, 5}, {5, 0}, {5, 5}}) {
+    for (auto [i, j] : {std::pair{1, 1}, {1, 6}, {6, 1}, {6, 6}}) {
         int cornerID = world.getTile(x + i, y + j).blockID;
         if (cornerID == TileID::lesion || cornerID == TileID::flesh) {
             tendrilID = cornerID;
@@ -57,8 +57,12 @@ int testOrbHeartCandidate(int x, int y, World &world)
         TileID::crimsandstone,
         TileID::hardenedCrimsand,
         TileID::flesh};
-    for (int i = 0; i < 6; ++i) {
-        for (int j = 0; j < 6; ++j) {
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if (((i == 0 || i == 7) && (j < 2 || j > 5)) ||
+                ((j == 0 || j == 7) && (i < 2 || i > 5))) {
+                continue;
+            }
             if (!allowedTiles.contains(world.getTile(x + i, y + j).blockID)) {
                 return TileID::empty;
             }
@@ -162,8 +166,12 @@ void placeOrbHearts(
         if (tendrilID == TileID::empty) {
             continue;
         }
-        for (int i = 0; i < 6; ++i) {
-            for (int j = 0; j < 6; ++j) {
+        for (int i = 0; i < 8; ++i) {
+            for (int j = 0; j < 8; ++j) {
+                if (((i == 0 || i == 7) && (j < 2 || j > 5)) ||
+                    ((j == 0 || j == 7) && (i < 2 || i > 5))) {
+                    continue;
+                }
                 Tile &tile = world.getTile(x + i, y + j);
                 if (tile.blockID != tendrilID) {
                     tile.blockID = tendrilID == TileID::lesion
@@ -173,8 +181,8 @@ void placeOrbHearts(
             }
         }
         world.placeFramedTile(
-            x + 2,
-            y + 2,
+            x + 3,
+            y + 3,
             TileID::orbHeart,
             tendrilID == TileID::lesion ? Variant::corruption
                                         : Variant::crimson);

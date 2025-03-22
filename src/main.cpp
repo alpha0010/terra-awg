@@ -7,9 +7,11 @@
 #include "biomes/Crimson.h"
 #include "biomes/Desert.h"
 #include "biomes/Forest.h"
+#include "biomes/GemCave.h"
 #include "biomes/Jungle.h"
 #include "biomes/Ocean.h"
 #include "biomes/Snow.h"
+#include "biomes/SpiderNest.h"
 #include "structures/Treasure.h"
 #include <array>
 #include <chrono>
@@ -89,6 +91,8 @@ int main()
     } else {
         genCorruption(rnd, world);
     }
+    genGemCave(rnd, world);
+    genSpiderNest(rnd, world);
     genTreasure(rnd, world);
 
     Writer w;
