@@ -1,7 +1,7 @@
 #include "Random.h"
 
-#include "OpenSimplexNoise.hpp"
 #include "Util.h"
+#include "vendor/OpenSimplexNoise.hpp"
 #include <iostream>
 
 Random::Random()

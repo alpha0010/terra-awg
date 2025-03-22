@@ -6,6 +6,8 @@
 
 class Random;
 
+enum class Variant { none, corruption, crimson };
+
 class World
 {
 private:
@@ -23,6 +25,8 @@ public:
     int getCavernLevel() const;
     int getUnderworldLevel() const;
     Tile &getTile(int x, int y);
+    void
+    placeFramedTile(int x, int y, int blockID, Variant type = Variant::none);
 
     bool isExposed(int x, int y) const;
     void planBiomes(Random &rnd);
@@ -32,6 +36,8 @@ public:
     int ironVariant;
     int silverVariant;
     int goldVariant;
+
+    int spawnY;
 
     double desertCenter;
     double jungleCenter;

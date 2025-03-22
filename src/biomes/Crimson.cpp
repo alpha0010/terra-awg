@@ -131,4 +131,22 @@ void genCrimson(Random &rnd, World &world)
         rnd.getInt(
             (2 * world.getCavernLevel() + world.getUnderworldLevel()) / 3,
             world.getUnderworldLevel()));
+    bool clearFloating = false;
+    for (int y = 0.8 * world.getUndergroundLevel(); y > 0; --y) {
+        bool foundBlock = false;
+        for (int x = surfaceX - scanDist; x < surfaceX + scanDist; ++x) {
+            Tile &tile = world.getTile(x, y);
+            if (tile.blockID == TileID::flesh) {
+                if (clearFloating) {
+                    tile.blockID = TileID::empty;
+                } else {
+                    foundBlock = true;
+                    break;
+                }
+            }
+        }
+        if (!foundBlock) {
+            clearFloating = true;
+        }
+    }
 }

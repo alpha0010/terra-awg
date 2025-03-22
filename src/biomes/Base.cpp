@@ -63,6 +63,7 @@ void genWorldBase(Random &rnd, World &world)
             rnd.getInt(0, world.getHeight()),
             wallId);
     }
+    world.spawnY = surfaceLevel + 15 * rnd.getCoarseNoise(center, 0) - 1;
     parallelFor(
         std::views::iota(0, world.getWidth()),
         [center, surfaceLevel, &rnd, &wallVarNoise, &world](int x) {

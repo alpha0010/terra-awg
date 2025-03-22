@@ -11,6 +11,8 @@ class Tile
 {
 public:
     int blockID = TileID::empty;
+    int frameX;
+    int frameY;
     int wallID;
     int blockPaint;
     int wallPaint;

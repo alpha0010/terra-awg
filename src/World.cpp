@@ -38,6 +38,34 @@ Tile &World::getTile(int x, int y)
     return tiles[y + x * height];
 }
 
+void World::placeFramedTile(int x, int y, int blockID, Variant type)
+{
+    switch (blockID) {
+    case TileID::lifeCrystal:
+        for (int i = 0; i < 2; ++i) {
+            for (int j = 0; j < 2; ++j) {
+                Tile &tile = getTile(x + i, y + j);
+                tile.blockID = blockID;
+                tile.frameX = 18 * i;
+                tile.frameY = 18 * j;
+            }
+        }
+        break;
+    case TileID::altar:
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 2; ++j) {
+                Tile &tile = getTile(x + i, y + j);
+                tile.blockID = blockID;
+                tile.frameX = 18 * i + (type == Variant::crimson ? 54 : 0);
+                tile.frameY = 18 * j;
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
+
 bool World::isExposed(int x, int y) const
 {
     if (x < 1 || x >= width - 1 || y < 1 || y >= height - 1) {

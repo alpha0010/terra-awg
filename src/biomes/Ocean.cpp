@@ -9,7 +9,9 @@ void genOceans(Random &rnd, World &world)
     std::cout << "Filling oceans\n";
     rnd.shuffleNoise();
     int waterTable = 0;
-    while (world.getTile(300, waterTable).blockID == TileID::empty) {
+    while (world.getTile(300, waterTable).blockID == TileID::empty ||
+           world.getTile(world.getWidth() - 300, waterTable).blockID ==
+               TileID::empty) {
         ++waterTable;
     }
     waterTable += rnd.getInt(4, 12);

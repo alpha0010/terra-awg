@@ -10,6 +10,7 @@
 #include "biomes/Jungle.h"
 #include "biomes/Ocean.h"
 #include "biomes/Snow.h"
+#include "structures/Treasure.h"
 #include <array>
 #include <chrono>
 #include <set>
@@ -88,6 +89,7 @@ int main()
     } else {
         genCorruption(rnd, world);
     }
+    genTreasure(rnd, world);
 
     Writer w;
     w.putUint32(279); // File format version.
@@ -157,11 +159,11 @@ int main()
         rnd.getInt(0, 3), // Mushroom.
         rnd.getInt(0, 2)  // Underworld.
     };
-    w.putUint32(rnd.getInt(0, 3));      // Ice style.
-    w.putUint32(styles[5]);             // Jungle style.
-    w.putUint32(rnd.getInt(0, 2));      // Underworld style.
-    w.putUint32(world.getWidth() / 2);  // Spawn X.
-    w.putUint32(world.getHeight() / 2); // Spawn Y.
+    w.putUint32(rnd.getInt(0, 3));     // Ice style.
+    w.putUint32(styles[5]);            // Jungle style.
+    w.putUint32(rnd.getInt(0, 2));     // Underworld style.
+    w.putUint32(world.getWidth() / 2); // Spawn X.
+    w.putUint32(world.spawnY);         // Spawn Y.
     w.putFloat64(world.getUndergroundLevel());
     w.putFloat64(world.getCavernLevel());
     w.putFloat64(13500);                // Time of day.
@@ -354,8 +356,8 @@ int main()
                     w.putUint8(tile.blockID);
                 }
                 if (importantTiles[tile.blockID]) {
-                    w.putUint16(0); // TODO
-                    w.putUint16(0); // TODO
+                    w.putUint16(tile.frameX);
+                    w.putUint16(tile.frameY);
                 }
                 if (tile.blockPaint > 0) {
                     w.putUint8(tile.blockPaint);
@@ -399,16 +401,16 @@ int main()
                             "Joe",    "Kevin", "Kyle",    "Levi",    "Logan",
                             "Luke",   "Marty", "Maxwell", "Ryan",    "Scott",
                             "Seth",   "Steve", "Tanner",  "Trent",   "Wyatt",
-                            "Zach"}));   // NPC name.
-    w.putFloat32(world.getWidth() / 2);  // NPC position X.
-    w.putFloat32(world.getHeight() / 2); // NPC position Y.
-    w.putBool(true);                     // NPC is homeless.
-    w.putUint32(0);                      // NPC home X.
-    w.putUint32(0);                      // NPC home Y.
-    w.putBool(true);                     // Unknown?
-    w.putUint32(0);                      // NPC variation.
-    w.putBool(false);                    // End town NPC records.
-    w.putBool(false);                    // End pillar records.
+                            "Zach"}));  // NPC name.
+    w.putFloat32(world.getWidth() / 2); // NPC position X.
+    w.putFloat32(world.spawnY);         // NPC position Y.
+    w.putBool(true);                    // NPC is homeless.
+    w.putUint32(0);                     // NPC home X.
+    w.putUint32(0);                     // NPC home Y.
+    w.putBool(true);                    // Unknown?
+    w.putUint32(0);                     // NPC variation.
+    w.putBool(false);                   // End town NPC records.
+    w.putBool(false);                   // End pillar records.
     sectionPointers.push_back(w.tellp());
 
     w.putUint32(0); // Number of tile entities.
