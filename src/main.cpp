@@ -8,6 +8,7 @@
 #include "biomes/Desert.h"
 #include "biomes/Forest.h"
 #include "biomes/GemCave.h"
+#include "biomes/GlowingMushroom.h"
 #include "biomes/Jungle.h"
 #include "biomes/Ocean.h"
 #include "biomes/Snow.h"
@@ -86,6 +87,7 @@ int main()
     genDesert(rnd, world);
     genJungle(rnd, world);
     genForest(rnd, world);
+    genGlowingMushroom(rnd, world);
     if (world.isCrimson) {
         genCrimson(rnd, world);
     } else {

@@ -20,15 +20,18 @@ void fillGemCave(
         for (int j = -caveSize; j < caveSize; ++j) {
             double threshold = std::max(std::hypot(i, j) / caveSize, 0.35);
             Tile &tile = world.getTile(x + i, y + j);
+            int dispersal =
+                static_cast<int>(99999 * (1 + rnd.getFineNoise(x + i, y + j))) %
+                5;
             if (rnd.getFineNoise(x + i, y + j) > threshold) {
-                if (tile.blockID == TileID::stone) {
+                if (dispersal > 1 && tile.blockID == TileID::stone) {
                     tile.blockID = blockA;
                 }
                 if (tile.wallID != WallID::empty) {
                     tile.wallID = wallA;
                 }
             } else if (rnd.getFineNoise(x + i, y + j) < -threshold) {
-                if (tile.blockID == TileID::stone) {
+                if (dispersal > 1 && tile.blockID == TileID::stone) {
                     tile.blockID = blockB;
                 }
                 if (tile.wallID != WallID::empty) {

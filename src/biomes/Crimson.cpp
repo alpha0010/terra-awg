@@ -33,7 +33,9 @@ void genCrimson(Random &rnd, World &world)
         {TileID::sand, TileID::crimsand},
         {TileID::jungleGrass, TileID::crimsonJungleGrass},
         {TileID::mushroomGrass, TileID::crimsonJungleGrass},
+        {TileID::silt, TileID::crimstone},
         {TileID::ice, TileID::crimsonIce},
+        {TileID::slush, TileID::crimstone},
         {TileID::sandstone, TileID::crimsandstone},
         {TileID::hardenedSand, TileID::hardenedCrimsand}};
     std::map<int, int> crimsonWalls{

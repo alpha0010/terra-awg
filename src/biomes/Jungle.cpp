@@ -27,6 +27,7 @@ void genJungle(Random &rnd, World &world)
             WallVariants::jungle.end());
     }
     for (int x = center - scanDist; x < center + scanDist; ++x) {
+        int lastTileID = TileID::empty;
         for (int y = 0; y < world.getHeight(); ++y) {
             double threshold =
                 std::abs(x - center) / 100.0 - (world.getWidth() / 1050.0);
@@ -41,6 +42,12 @@ void genJungle(Random &rnd, World &world)
             if (y > world.getCavernLevel() &&
                 rnd.getCoarseNoise(2 * x, 2 * y) > threshold) {
                 tile.blockID = TileID::empty;
+                if (lastTileID == TileID::mud) {
+                    Tile &prevTile = world.getTile(x, y - 1);
+                    if (prevTile.blockID == TileID::mud) {
+                        prevTile.blockID = TileID::jungleGrass;
+                    }
+                }
             }
             switch (tile.blockID) {
             case TileID::dirt:
@@ -79,6 +86,7 @@ void genJungle(Random &rnd, World &world)
                     tile.wallID = itr->second;
                 }
             }
+            lastTileID = tile.blockID;
         }
     }
 }
