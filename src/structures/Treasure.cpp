@@ -8,6 +8,8 @@
 #include <set>
 #include <vector>
 
+typedef std::map<int, std::vector<std::pair<int, int>>> LocationBins;
+
 bool isPlacementCandidate(int x, int y, World &world)
 {
     if (world.getTile(x, y).blockID == TileID::empty ||
@@ -24,6 +26,47 @@ bool isPlacementCandidate(int x, int y, World &world)
     return true;
 }
 
+int testOrbHeartCandidate(int x, int y, World &world)
+{
+    if (y < world.getUndergroundLevel() || y > world.getUnderworldLevel()) {
+        return TileID::empty;
+    }
+    int tendrilID = TileID::empty;
+    for (auto [i, j] : {std::pair{0, 0}, {0, 5}, {5, 0}, {5, 5}}) {
+        int cornerID = world.getTile(x + i, y + j).blockID;
+        if (cornerID == TileID::lesion || cornerID == TileID::flesh) {
+            tendrilID = cornerID;
+            break;
+        }
+    }
+    if (tendrilID == TileID::empty) {
+        return tendrilID;
+    }
+    std::set<int> allowedTiles{
+        TileID::clay,
+        TileID::mud,
+        TileID::ebonstone,
+        TileID::ebonsand,
+        TileID::corruptIce,
+        TileID::ebonsandstone,
+        TileID::hardenedEbonsand,
+        TileID::lesion,
+        TileID::crimstone,
+        TileID::crimsand,
+        TileID::crimsonIce,
+        TileID::crimsandstone,
+        TileID::hardenedCrimsand,
+        TileID::flesh};
+    for (int i = 0; i < 6; ++i) {
+        for (int j = 0; j < 6; ++j) {
+            if (!allowedTiles.contains(world.getTile(x + i, y + j).blockID)) {
+                return TileID::empty;
+            }
+        }
+    }
+    return tendrilID;
+}
+
 int binLocation(int x, int y, int maxY)
 {
     int factor = 128;
@@ -33,29 +76,13 @@ int binLocation(int x, int y, int maxY)
     return x * maxY + y;
 }
 
-void genTreasure(Random &rnd, World &world)
+void placeLifeCrystals(
+    int maxBin,
+    LocationBins &locations,
+    Random &rnd,
+    World &world)
 {
-    std::cout << "Cataloging ground\n";
-    std::vector<std::vector<int>> rawLocations(world.getWidth());
-    parallelFor(
-        std::views::iota(50, world.getWidth() - 50),
-        [&rawLocations, &world](int x) {
-            for (int y = 50; y < world.getHeight() - 50; ++y) {
-                if (isPlacementCandidate(x, y, world)) {
-                    rawLocations[x].push_back(y);
-                }
-            }
-        });
-    std::map<int, std::vector<std::pair<int, int>>> locations;
-    for (size_t x = 0; x < rawLocations.size(); ++x) {
-        for (int y : rawLocations[x]) {
-            locations[binLocation(x, y, world.getHeight())].emplace_back(x, y);
-        }
-    }
-    std::cout << "Placing treasures\n";
     int lifeCrystalCount = world.getWidth() * world.getHeight() / 50000;
-    int maxBin =
-        binLocation(world.getWidth(), world.getHeight(), world.getHeight());
     while (lifeCrystalCount > 0) {
         int binId = rnd.getInt(0, maxBin);
         if (locations[binId].empty()) {
@@ -69,6 +96,10 @@ void genTreasure(Random &rnd, World &world)
             --lifeCrystalCount;
         }
     }
+}
+
+void placeAltars(int maxBin, LocationBins &locations, Random &rnd, World &world)
+{
     int altarCount = std::max(8, world.getWidth() / 200);
     std::set<int> corruptTiles{
         TileID::ebonstone,
@@ -111,4 +142,80 @@ void genTreasure(Random &rnd, World &world)
             --altarCount;
         }
     }
+}
+
+void placeOrbHearts(
+    int maxBin,
+    LocationBins &locations,
+    Random &rnd,
+    World &world)
+{
+    int orbHeartCount = world.getWidth() * world.getHeight() / 240000;
+    while (orbHeartCount > 0) {
+        int binId = rnd.getInt(0, maxBin);
+        if (locations[binId].empty()) {
+            continue;
+        }
+        auto [x, y] =
+            rnd.select(locations[binId].begin(), locations[binId].end());
+        int tendrilID = testOrbHeartCandidate(x, y, world);
+        if (tendrilID == TileID::empty) {
+            continue;
+        }
+        for (int i = 0; i < 6; ++i) {
+            for (int j = 0; j < 6; ++j) {
+                Tile &tile = world.getTile(x + i, y + j);
+                if (tile.blockID != tendrilID) {
+                    tile.blockID = tendrilID == TileID::lesion
+                                       ? TileID::ebonstone
+                                       : TileID::crimstone;
+                }
+            }
+        }
+        world.placeFramedTile(
+            x + 2,
+            y + 2,
+            TileID::orbHeart,
+            tendrilID == TileID::lesion ? Variant::corruption
+                                        : Variant::crimson);
+        --orbHeartCount;
+    }
+}
+
+void genTreasure(Random &rnd, World &world)
+{
+    std::cout << "Cataloging ground\n";
+    std::vector<std::vector<std::pair<int, int>>> rawLocations(
+        world.getWidth());
+    parallelFor(
+        std::views::iota(50, world.getWidth() - 50),
+        [&rawLocations, &world](int x) {
+            for (int y = 50; y < world.getHeight() - 50; ++y) {
+                if (isPlacementCandidate(x, y, world)) {
+                    rawLocations[x].emplace_back(y, 0);
+                }
+                if (testOrbHeartCandidate(x, y, world) != TileID::empty) {
+                    rawLocations[x].emplace_back(y, 1);
+                }
+            }
+        });
+    LocationBins flatLocations;
+    LocationBins orbHeartLocations;
+    for (size_t x = 0; x < rawLocations.size(); ++x) {
+        for (auto [y, flag] : rawLocations[x]) {
+            if (flag == 0) {
+                flatLocations[binLocation(x, y, world.getHeight())]
+                    .emplace_back(x, y);
+            } else {
+                orbHeartLocations[binLocation(x, y, world.getHeight())]
+                    .emplace_back(x, y);
+            }
+        }
+    }
+    std::cout << "Placing treasures\n";
+    int maxBin =
+        binLocation(world.getWidth(), world.getHeight(), world.getHeight());
+    placeLifeCrystals(maxBin, flatLocations, rnd, world);
+    placeAltars(maxBin, flatLocations, rnd, world);
+    placeOrbHearts(maxBin, orbHeartLocations, rnd, world);
 }
