@@ -47,9 +47,10 @@ void genDesert(Random &rnd, World &world)
                 tile.blockID = TileID::desertFossil;
                 break;
             case TileID::sand:
-                tile.blockID = y > world.getCavernLevel()
-                                   ? TileID::desertFossil
-                                   : TileID::hardenedSand;
+                tile.blockID = y > world.getCavernLevel() ? TileID::desertFossil
+                               : y > world.getUndergroundLevel()
+                                   ? TileID::hardenedSand
+                                   : TileID::sand;
                 break;
             default:
                 break;

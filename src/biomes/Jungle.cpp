@@ -57,6 +57,13 @@ void genJungle(Random &rnd, World &world)
                 if (rnd.getFineNoise(x, y) > threshold) {
                     tile.blockID = world.isExposed(x, y) ? TileID::jungleGrass
                                                          : TileID::mud;
+                    if (y < world.getUndergroundLevel() &&
+                        tile.blockID == TileID::mud &&
+                        static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
+                                100 ==
+                            0) {
+                        tile.blockID = TileID::jungleGrass;
+                    }
                 }
                 break;
             case TileID::grass:

@@ -16,11 +16,12 @@ private:
     int noiseDeltaY;
     std::default_random_engine rnd;
 
+    void computeBlurNoise();
+
 public:
     Random();
 
     void initNoise(int width, int height, double scale);
-    void computeBlurNoise();
     void shuffleNoise();
 
     bool getBool();

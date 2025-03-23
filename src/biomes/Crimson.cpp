@@ -10,7 +10,6 @@
 
 void genCrimson(Random &rnd, World &world)
 {
-    rnd.computeBlurNoise();
     std::cout << "Infecting the world\n";
     rnd.shuffleNoise();
     int surfaceX = world.getWidth() * rnd.getDouble(0.12, 0.39);

@@ -60,6 +60,7 @@ enum {
     coralstone = 315,
     marble = 367,
     granite = 368,
+    bubble = 379,
     sandstone = 396,
     hardenedSand = 397,
     hardenedEbonsand = 398,
@@ -70,8 +71,10 @@ enum {
     snowCloud = 460,
     lesion = 474,
     shellPile = 495,
+    heliumMossStone = 627,
     corruptJungleGrass = 661,
-    crimsonJungleGrass = 662
+    crimsonJungleGrass = 662,
+    aetherium = 659
 };
 }
 

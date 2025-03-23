@@ -10,15 +10,22 @@
 
 typedef std::map<int, std::vector<std::pair<int, int>>> LocationBins;
 
+bool isSolid(int tileId)
+{
+    return tileId != TileID::empty && tileId != TileID::bubble;
+}
+
 bool isPlacementCandidate(int x, int y, World &world)
 {
-    if (world.getTile(x, y).blockID == TileID::empty ||
-        world.getTile(x + 1, y).blockID == TileID::empty) {
+    if (!isSolid(world.getTile(x, y).blockID) ||
+        !isSolid(world.getTile(x + 1, y).blockID)) {
         return false;
     }
     for (int i = 0; i < 2; ++i) {
         for (int j = -3; j < 0; ++j) {
-            if (world.getTile(x + i, y + j).blockID != TileID::empty) {
+            Tile &tile = world.getTile(x + i, y + j);
+            if (tile.blockID != TileID::empty ||
+                tile.liquid == Liquid::shimmer) {
                 return false;
             }
         }

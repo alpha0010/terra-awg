@@ -2,6 +2,7 @@
 #include "Random.h"
 #include "World.h"
 #include "Writer.h"
+#include "biomes/Aether.h"
 #include "biomes/Base.h"
 #include "biomes/Corruption.h"
 #include "biomes/Crimson.h"
@@ -88,6 +89,7 @@ int main()
     genJungle(rnd, world);
     genForest(rnd, world);
     genGlowingMushroom(rnd, world);
+    genAether(rnd, world);
     if (world.isCrimson) {
         genCrimson(rnd, world);
     } else {

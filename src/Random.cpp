@@ -45,6 +45,8 @@ void Random::initNoise(int width, int height, double scale)
 
     noiseWidth = width;
     noiseHeight = height;
+
+    computeBlurNoise();
 }
 
 void Random::computeBlurNoise()
