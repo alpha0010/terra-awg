@@ -58,7 +58,10 @@ void genCrimson(Random &rnd, World &world)
             WallVariants::crimson.begin(),
             WallVariants::crimson.end());
     }
-    for (int wallId : {WallID::Unsafe::snow, WallID::Unsafe::ice}) {
+    for (int wallId :
+         {WallID::Unsafe::snow,
+          WallID::Unsafe::ice,
+          WallID::Unsafe::mushroom}) {
         crimsonWalls[wallId] = rnd.select(
             WallVariants::crimson.begin(),
             WallVariants::crimson.end());
@@ -107,11 +110,14 @@ void genCrimson(Random &rnd, World &world)
                         if (std::abs(rnd.getBlurNoise(x, y)) < threshold) {
                             tile.blockID = std::abs(rnd.getBlurNoise(x, y)) <
                                                    threshold - 0.045
-                                               ? TileID::crimtane
+                                               ? y > world.getUndergroundLevel()
+                                                     ? TileID::crimtane
+                                                     : TileID::crimstone
                                                : TileID::flesh;
                             if (tile.wallID != WallID::empty) {
                                 tile.wallID = WallID::Unsafe::crimsonBlister;
                             }
+                            tile.echoCoatBlock = false;
                         } else {
                             auto blockItr = crimsonBlocks.find(tile.blockID);
                             if (blockItr != crimsonBlocks.end()) {

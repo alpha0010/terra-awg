@@ -23,6 +23,7 @@ enum {
     clay = 40,
     sand = 53,
     ash = 57,
+    hellstone = 58,
     mud = 59,
     jungleGrass = 60,
     sapphireStone = 63,
@@ -72,6 +73,7 @@ enum {
     lesion = 474,
     shellPile = 495,
     heliumMossStone = 627,
+    ashGrass = 633,
     corruptJungleGrass = 661,
     crimsonJungleGrass = 662,
     aetherium = 659

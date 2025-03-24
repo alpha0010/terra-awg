@@ -1,3 +1,4 @@
+#include "Cleanup.h"
 #include "DataID.h"
 #include "Random.h"
 #include "World.h"
@@ -14,6 +15,7 @@
 #include "biomes/Ocean.h"
 #include "biomes/Snow.h"
 #include "biomes/SpiderNest.h"
+#include "biomes/Underworld.h"
 #include "structures/Treasure.h"
 #include <array>
 #include <chrono>
@@ -89,6 +91,7 @@ int main()
     genDesert(rnd, world);
     genJungle(rnd, world);
     genForest(rnd, world);
+    genUnderworld(rnd, world);
     genGlowingMushroom(rnd, world);
     genAether(rnd, world);
     if (world.isCrimson) {
@@ -99,6 +102,7 @@ int main()
     genGemCave(rnd, world);
     genSpiderNest(rnd, world);
     genTreasure(rnd, world);
+    smoothSurfaces(world);
 
     Writer w;
     w.putUint32(279); // File format version.

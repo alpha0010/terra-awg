@@ -112,7 +112,7 @@ void genWorldBase(Random &rnd, World &world)
     }
     for (int x = 0; x < world.getWidth(); ++x) {
         int underworldRoof =
-            world.getUnderworldLevel() + 0.1 * underworldHeight +
+            world.getUnderworldLevel() + 0.23 * underworldHeight +
             20 * rnd.getCoarseNoise(x, 0.33 * world.getHeight());
         int underworldFloor =
             world.getUnderworldLevel() + 0.5 * underworldHeight +

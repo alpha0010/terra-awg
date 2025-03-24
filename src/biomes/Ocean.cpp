@@ -15,12 +15,10 @@ void genOceans(Random &rnd, World &world)
         ++waterTable;
     }
     waterTable += rnd.getInt(4, 12);
-    for (int x = 0; x < 340; ++x) {
+    for (int x = 0; x < 390; ++x) {
         double drop = 90 * (1 - 1 / (1 + std::exp(0.041 * (200 - x))));
-        double sandDepth = 30 + 8 * rnd.getCoarseNoise(x, 0);
-        if (x > 200) {
-            sandDepth *= (320.0 - x) / 120;
-        }
+        double sandDepth = (40 + 9 * rnd.getCoarseNoise(x, 0)) *
+                           std::min(1.0, (400.0 - x) / 160);
         auto fillColumn = [&](int effectiveX) {
             for (int y = 0.3 * world.getUndergroundLevel();
                  y < world.getUndergroundLevel();

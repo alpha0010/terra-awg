@@ -44,11 +44,6 @@ void fillMushroomField(
                 }
             } else {
                 switch (tile.blockID) {
-                case TileID::empty:
-                    if (tile.wallID != WallID::empty) {
-                        tile.wallID = WallID::Unsafe::mushroom;
-                    }
-                    break;
                 case TileID::stone:
                 case TileID::clay:
                 case TileID::sand:
@@ -60,6 +55,11 @@ void fillMushroomField(
                         world.isExposed(x, y) || rnd.getInt(0, 100) == 0
                             ? TileID::mushroomGrass
                             : TileID::mud;
+                    [[fallthrough]];
+                case TileID::empty:
+                    if (tile.wallID != WallID::empty) {
+                        tile.wallID = WallID::Unsafe::mushroom;
+                    }
                     break;
                 case TileID::dirt:
                     tile.blockID = TileID::silt;

@@ -12,7 +12,10 @@ void genForest(Random &rnd, World &world)
         for (int y = 0; y < world.getUndergroundLevel(); ++y) {
             Tile &tile = world.getTile(x, y);
             if (tile.blockID == TileID::dirt) {
-                if (world.isExposed(x, y) || rnd.getInt(0, 100) == 0) {
+                if (world.isExposed(x, y) ||
+                    static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
+                            100 ==
+                        0) {
                     tile.blockID = TileID::grass;
                 }
             } else if (

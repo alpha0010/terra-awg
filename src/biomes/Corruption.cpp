@@ -57,7 +57,10 @@ void genCorruption(Random &rnd, World &world)
             WallVariants::corruption.begin(),
             WallVariants::corruption.end());
     }
-    for (int wallId : {WallID::Unsafe::snow, WallID::Unsafe::ice}) {
+    for (int wallId :
+         {WallID::Unsafe::snow,
+          WallID::Unsafe::ice,
+          WallID::Unsafe::mushroom}) {
         corruptWalls[wallId] = rnd.select(
             WallVariants::corruption.begin(),
             WallVariants::corruption.end());
@@ -100,11 +103,14 @@ void genCorruption(Random &rnd, World &world)
                         if (std::abs(rnd.getCoarseNoise(x, y)) < threshold) {
                             tile.blockID = std::abs(rnd.getCoarseNoise(x, y)) <
                                                    threshold - 0.065
-                                               ? TileID::demonite
+                                               ? y > world.getUndergroundLevel()
+                                                     ? TileID::demonite
+                                                     : TileID::ebonstone
                                                : TileID::lesion;
                             if (tile.wallID != WallID::empty) {
                                 tile.wallID = WallID::Unsafe::corruptTendril;
                             }
+                            tile.echoCoatBlock = false;
                         } else {
                             auto blockItr = corruptBlocks.find(tile.blockID);
                             if (blockItr != corruptBlocks.end()) {
