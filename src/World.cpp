@@ -71,6 +71,16 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
             }
         }
         break;
+    case TileID::larva:
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                Tile &tile = getTile(x + i, y + j);
+                tile.blockID = blockID;
+                tile.frameX = 18 * i;
+                tile.frameY = 18 * j;
+            }
+        }
+        break;
     default:
         break;
     }

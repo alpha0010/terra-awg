@@ -12,7 +12,8 @@ typedef std::map<int, std::vector<std::pair<int, int>>> LocationBins;
 
 bool isSolid(int tileId)
 {
-    return tileId != TileID::empty && tileId != TileID::bubble;
+    return tileId != TileID::empty && tileId != TileID::thinIce &&
+           tileId != TileID::bubble;
 }
 
 bool isPlacementCandidate(int x, int y, World &world)
@@ -24,7 +25,7 @@ bool isPlacementCandidate(int x, int y, World &world)
     for (int i = 0; i < 2; ++i) {
         for (int j = -3; j < 0; ++j) {
             Tile &tile = world.getTile(x + i, y + j);
-            if (tile.blockID != TileID::empty ||
+            if (tile.blockID != TileID::empty || tile.liquid == Liquid::lava ||
                 tile.liquid == Liquid::shimmer) {
                 return false;
             }
@@ -197,6 +198,30 @@ void placeOrbHearts(
     }
 }
 
+void placeLarvae(LocationBins &locations, Random &rnd, World &world)
+{
+    std::vector<std::pair<int, int>> hiveLocations;
+    for (const auto &locBin : locations) {
+        for (auto [x, y] : locBin.second) {
+            if (world.getTile(x, y - 1).wallID == WallID::Unsafe::hive) {
+                hiveLocations.emplace_back(x, y);
+            }
+        }
+    }
+    int larvaCount = rnd.getInt(3, 6);
+    for (int numTries = 0; larvaCount > 0 && numTries < 100; ++numTries) {
+        auto [x, y] = rnd.select(hiveLocations.begin(), hiveLocations.end());
+        Tile &tile = world.getTile(x, y - 1);
+        if (tile.wallID == WallID::Unsafe::hive &&
+            tile.liquid == Liquid::none &&
+            isPlacementCandidate(x - 1, y, world) &&
+            isPlacementCandidate(x + 2, y, world)) {
+            world.placeFramedTile(x, y - 3, TileID::larva);
+            --larvaCount;
+        }
+    }
+}
+
 void genTreasure(Random &rnd, World &world)
 {
     std::cout << "Cataloging ground\n";
@@ -230,6 +255,7 @@ void genTreasure(Random &rnd, World &world)
     std::cout << "Placing treasures\n";
     int maxBin =
         binLocation(world.getWidth(), world.getHeight(), world.getHeight());
+    placeLarvae(flatLocations, rnd, world);
     placeLifeCrystals(maxBin, flatLocations, rnd, world);
     placeAltars(maxBin, flatLocations, rnd, world);
     placeOrbHearts(maxBin, orbHeartLocations, rnd, world);

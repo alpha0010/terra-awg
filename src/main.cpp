@@ -10,12 +10,15 @@
 #include "biomes/Desert.h"
 #include "biomes/Forest.h"
 #include "biomes/GemCave.h"
+#include "biomes/GlowingMoss.h"
 #include "biomes/GlowingMushroom.h"
+#include "biomes/Hive.h"
 #include "biomes/Jungle.h"
 #include "biomes/Ocean.h"
 #include "biomes/Snow.h"
 #include "biomes/SpiderNest.h"
 #include "biomes/Underworld.h"
+#include "structures/Lake.h"
 #include "structures/Treasure.h"
 #include <array>
 #include <chrono>
@@ -93,6 +96,7 @@ int main()
     genForest(rnd, world);
     genUnderworld(rnd, world);
     genGlowingMushroom(rnd, world);
+    genHive(rnd, world);
     genAether(rnd, world);
     if (world.isCrimson) {
         genCrimson(rnd, world);
@@ -101,6 +105,8 @@ int main()
     }
     genGemCave(rnd, world);
     genSpiderNest(rnd, world);
+    genGlowingMoss(rnd, world);
+    genLake(world);
     genTreasure(rnd, world);
     smoothSurfaces(world);
 
