@@ -77,20 +77,18 @@ void simulateRain(World &world, int minX, int maxX)
         WallID::Unsafe::ebonsandstone,
         WallID::Unsafe::crimsandstone};
     for (int x = minX; x < maxX; x += 4) {
-        double pendingWater = 5.5;
-        for (int y = 0.57 * world.getUndergroundLevel();
-             y < world.getUnderworldLevel();
+        double pendingWater =
+            std::abs(x - world.jungleCenter) < 0.08 * world.getWidth() ? 15 : 2;
+        for (int y = world.spawnY - 45; y < world.getUnderworldLevel();
              y += 3) {
-            if (!isLiquidPathable(world, x, y)) {
-                continue;
-            }
-            if (y < lavaLevel &&
-                dryWalls.contains(world.getTile(x, y).wallID)) {
+            if (!isLiquidPathable(world, x, y) ||
+                (y < lavaLevel &&
+                 dryWalls.contains(world.getTile(x, y).wallID))) {
                 pendingWater = 2.1;
                 continue;
             }
             pendingWater +=
-                world.getTile(x, y).wallID == WallID::Unsafe::hive ? 1.9 : 0.6;
+                world.getTile(x, y).wallID == WallID::Unsafe::hive ? 1.9 : 1.1;
             auto [minDropX, maxDropX, dropY] =
                 followRainFrom(world, x, y, isLiquidPathable);
             if (maxDropX - minDropX < pendingWater) {
@@ -129,7 +127,8 @@ void evaporateSmallPools(World &world, int minX, int maxX)
                     return tile.liquid == Liquid::water ||
                            tile.liquid == Liquid::lava;
                 }));
-            if (poolDepth - y < 4) {
+            if (poolDepth - y < 4 &&
+                world.getTile(x, y - 1).blockID == TileID::empty) {
                 while (y <= poolDepth) {
                     world.getTile(x, y).liquid = Liquid::none;
                     ++y;

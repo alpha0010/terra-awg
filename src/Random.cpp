@@ -81,6 +81,18 @@ void Random::shuffleNoise()
     noiseDeltaY = getInt(0, noiseHeight);
 }
 
+void Random::saveShuffleState()
+{
+    savedNoiseDeltaX = noiseDeltaX;
+    savedNoiseDeltaY = noiseDeltaY;
+}
+
+void Random::restoreShuffleState()
+{
+    noiseDeltaX = savedNoiseDeltaX;
+    noiseDeltaY = savedNoiseDeltaY;
+}
+
 bool Random::getBool()
 {
     return getInt(0, 1) == 0;

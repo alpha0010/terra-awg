@@ -22,8 +22,8 @@ void genCorruption(Random &rnd, World &world)
     std::map<int, int> corruptBlocks{
         {TileID::stone, TileID::ebonstone},
         {TileID::grass, TileID::corruptGrass},
-        {TileID::ironOre, TileID::demonite},
-        {TileID::leadOre, TileID::demonite},
+        {TileID::ironOre, TileID::ebonstone},
+        {TileID::leadOre, TileID::ebonstone},
         {TileID::silverOre, TileID::demonite},
         {TileID::tungstenOre, TileID::demonite},
         {TileID::goldOre, TileID::demonite},
@@ -60,7 +60,9 @@ void genCorruption(Random &rnd, World &world)
     for (int wallId :
          {WallID::Unsafe::snow,
           WallID::Unsafe::ice,
-          WallID::Unsafe::mushroom}) {
+          WallID::Unsafe::mushroom,
+          WallID::Unsafe::marble,
+          WallID::Unsafe::granite}) {
         corruptWalls[wallId] = rnd.select(
             WallVariants::corruption.begin(),
             WallVariants::corruption.end());

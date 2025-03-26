@@ -23,8 +23,8 @@ void genCrimson(Random &rnd, World &world)
     std::map<int, int> crimsonBlocks{
         {TileID::stone, TileID::crimstone},
         {TileID::grass, TileID::crimsonGrass},
-        {TileID::ironOre, TileID::crimtane},
-        {TileID::leadOre, TileID::crimtane},
+        {TileID::ironOre, TileID::crimstone},
+        {TileID::leadOre, TileID::crimstone},
         {TileID::silverOre, TileID::crimtane},
         {TileID::tungstenOre, TileID::crimtane},
         {TileID::goldOre, TileID::crimtane},
@@ -61,7 +61,9 @@ void genCrimson(Random &rnd, World &world)
     for (int wallId :
          {WallID::Unsafe::snow,
           WallID::Unsafe::ice,
-          WallID::Unsafe::mushroom}) {
+          WallID::Unsafe::mushroom,
+          WallID::Unsafe::marble,
+          WallID::Unsafe::granite}) {
         crimsonWalls[wallId] = rnd.select(
             WallVariants::crimson.begin(),
             WallVariants::crimson.end());

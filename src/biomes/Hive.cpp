@@ -45,11 +45,10 @@ bool isHiveEdge(int x, int y, World &world)
     return false;
 }
 
-void genHive(Random &rnd, World &world)
+void fillHive(Random &rnd, World &world)
 {
-    std::cout << "Importing bees\n";
     rnd.shuffleNoise();
-    double size = world.getWidth() / rnd.getDouble(70, 100);
+    double size = world.getWidth() / rnd.getDouble(70, 120);
     int hiveX = rnd.getInt(
         world.jungleCenter - 0.075 * world.getWidth(),
         world.jungleCenter + 0.075 * world.getWidth());
@@ -73,7 +72,9 @@ void genHive(Random &rnd, World &world)
                 rnd.getFineNoise(x + hiveX, y + hiveY) >
                     std::max(0.5, threshold) &&
                 (tile.blockID == TileID::mud ||
-                 tile.blockID == TileID::jungleGrass)) {
+                 tile.blockID == TileID::jungleGrass ||
+                 tile.blockID == TileID::mushroomGrass ||
+                 tile.blockID == TileID::marble)) {
                 tile.blockID = TileID::honey;
             }
         }
@@ -91,5 +92,14 @@ void genHive(Random &rnd, World &world)
                 }
             }
         }
+    }
+}
+
+void genHive(Random &rnd, World &world)
+{
+    std::cout << "Importing bees\n";
+    int numHives = rnd.getInt(1, 3);
+    for (int i = 0; i < numHives; ++i) {
+        fillHive(rnd, world);
     }
 }

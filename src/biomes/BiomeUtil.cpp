@@ -3,9 +3,15 @@
 #include "Random.h"
 #include "World.h"
 
-std::pair<int, int> findStoneCave(int yMin, int yMax, Random &rnd, World &world)
+std::pair<int, int>
+findStoneCave(int yMin, int yMax, Random &rnd, World &world, int minSize)
 {
+    int numTries = 0;
     while (true) {
+        if (numTries % 100 == 99 && minSize > 3) {
+            --minSize;
+        }
+        ++numTries;
         int x = rnd.getInt(50, world.getWidth() - 50);
         int y = rnd.getInt(yMin, yMax);
         if (world.getTile(x, y).blockID != TileID::empty) {
@@ -25,7 +31,7 @@ std::pair<int, int> findStoneCave(int yMin, int yMax, Random &rnd, World &world)
             ++caveFloor;
         }
         if (world.getTile(x, caveFloor).blockID != TileID::stone ||
-            caveFloor - caveRoof < 6) {
+            caveFloor - caveRoof < minSize) {
             continue;
         }
         int left = x - 1;
@@ -41,7 +47,7 @@ std::pair<int, int> findStoneCave(int yMin, int yMax, Random &rnd, World &world)
             ++right;
         }
         if (world.getTile(right, y).blockID != TileID::stone ||
-            right - left < 6) {
+            right - left < minSize) {
             continue;
         }
         return {(left + right) / 2, (caveFloor + caveRoof) / 2};

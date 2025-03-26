@@ -61,8 +61,10 @@ enum {
     larva = 231,
     crimsand = 234,
     coralstone = 315,
+    smoothMarble = 357,
     marble = 367,
     granite = 368,
+    smoothGranite = 369,
     bubble = 379,
     lavaMossStone = 381,
     sandstone = 396,
@@ -183,19 +185,19 @@ inline std::array const jungle = {
     WallID::Unsafe::ivyStone,
     WallID::Unsafe::jungleVine};
 
+// Excludes: crimsonBlister
 inline std::array const crimson = {
     WallID::Unsafe::crimstone,
     WallID::Unsafe::crimsonCrust,
     WallID::Unsafe::crimsonScab,
-    WallID::Unsafe::crimsonTeeth,
-    WallID::Unsafe::crimsonBlister};
+    WallID::Unsafe::crimsonTeeth};
 
+// Excludes: corruptTendril
 inline std::array const corruption = {
     WallID::Unsafe::ebonstone,
     WallID::Unsafe::corruptGrowth,
     WallID::Unsafe::corruptMass,
-    WallID::Unsafe::corruptPustule,
-    WallID::Unsafe::corruptTendril};
+    WallID::Unsafe::corruptPustule};
 
 inline std::array const underworld = {
     WallID::Unsafe::ember,

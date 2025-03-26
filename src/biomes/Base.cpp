@@ -27,25 +27,18 @@ void scatterResource(Random &rnd, World &world, int resource)
 void genOreVeins(Random &rnd, World &world, int oreRoof, int oreFloor, int ore)
 {
     rnd.shuffleNoise();
-    for (int numDeposits = world.getWidth() * (oreFloor - oreRoof) / 40000;
-         numDeposits > 0;
-         --numDeposits) {
-        int x = rnd.getInt(0, world.getWidth());
-        int y = rnd.getInt(oreRoof, oreFloor);
-        double depositSize = rnd.getDouble(4, 10);
-        for (int i = -10; i < 10; ++i) {
-            for (int j = -10; j < 10; ++j) {
-                double threshold =
-                    1 - std::pow(std::hypot(i, j) / depositSize, 0.3);
-                if (std::abs(rnd.getFineNoise(x + i, y + j)) < threshold) {
-                    Tile &tile = world.getTile(x + i, y + j);
+    parallelFor(
+        std::views::iota(0, world.getWidth()),
+        [oreRoof, oreFloor, ore, &rnd, &world](int x) {
+            for (int y = oreRoof; y < oreFloor; ++y) {
+                if (rnd.getFineNoise(x, y) < -0.71) {
+                    Tile &tile = world.getTile(x, y);
                     if (tile.blockID != TileID::empty) {
                         tile.blockID = ore;
                     }
                 }
             }
-        }
-    }
+        });
 }
 
 void genWorldBase(Random &rnd, World &world)
@@ -156,18 +149,19 @@ void genWorldBase(Random &rnd, World &world)
 
     std::cout << "Digging caves\n";
     rnd.shuffleNoise();
+    rnd.saveShuffleState();
     parallelFor(
         std::views::iota(0, world.getWidth()),
         [underworldHeight, &rnd, &world](int x) {
             for (int y = 0; y < world.getHeight(); ++y) {
                 double threshold =
                     y < world.getUndergroundLevel()
-                        ? 3 - 3.1 * y / world.getUndergroundLevel()
+                        ? 2.94 - 3.1 * y / world.getUndergroundLevel()
                     : y > world.getUnderworldLevel()
                         ? 3.1 * (y - world.getUnderworldLevel()) /
                                   underworldHeight -
-                              0.1
-                        : -0.1;
+                              0.16
+                        : -0.16;
                 if (std::abs(rnd.getCoarseNoise(x, 2 * y) + 0.1) < 0.15 &&
                     rnd.getFineNoise(x, y) > threshold) {
                     Tile &tile = world.getTile(x, y);

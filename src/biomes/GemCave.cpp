@@ -58,7 +58,7 @@ void genGemCave(Random &rnd, World &world)
     int bandHeight =
         (world.getUnderworldLevel() - world.getUndergroundLevel()) /
         gemTypes.size();
-    int numCaves = world.getWidth() * world.getHeight() / 1640000;
+    int numCaves = world.getWidth() * world.getHeight() / 900000;
     for (size_t band = 0; band + 1 < gemTypes.size(); ++band) {
         for (int i = 0; i < numCaves; ++i) {
             auto [x, y] = findStoneCave(

@@ -14,6 +14,8 @@ private:
     int noiseHeight;
     int noiseDeltaX;
     int noiseDeltaY;
+    int savedNoiseDeltaX;
+    int savedNoiseDeltaY;
     std::default_random_engine rnd;
 
     void computeBlurNoise();
@@ -23,6 +25,8 @@ public:
 
     void initNoise(int width, int height, double scale);
     void shuffleNoise();
+    void saveShuffleState();
+    void restoreShuffleState();
 
     bool getBool();
     uint8_t getByte();

@@ -13,7 +13,8 @@ void genDesert(Random &rnd, World &world)
     double scanDist = 0.08 * world.getWidth();
     double desertFloor =
         (world.getCavernLevel() + 4 * world.getUnderworldLevel()) / 5;
-    std::map<int, int> sandWalls{{WallID::empty, WallID::empty}};
+    std::map<int, int> sandWalls{
+        {WallID::Unsafe::marble, WallID::Unsafe::marble}};
     for (int wallId : WallVariants::dirt) {
         sandWalls[wallId] = rnd.select(
             {WallID::Unsafe::sandstone, WallID::Unsafe::hardenedSand});
@@ -32,6 +33,7 @@ void genDesert(Random &rnd, World &world)
                 tile.blockID = TileID::sand;
                 break;
             case TileID::stone:
+            case TileID::smoothMarble:
                 tile.blockID = TileID::sandstone;
                 if (y > world.getCavernLevel()) {
                     if (std::abs(rnd.getCoarseNoise(x, y) + 0.23) < 0.04) {

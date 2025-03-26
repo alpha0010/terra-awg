@@ -12,8 +12,10 @@
 #include "biomes/GemCave.h"
 #include "biomes/GlowingMoss.h"
 #include "biomes/GlowingMushroom.h"
+#include "biomes/GraniteCave.h"
 #include "biomes/Hive.h"
 #include "biomes/Jungle.h"
+#include "biomes/MarbleCave.h"
 #include "biomes/Ocean.h"
 #include "biomes/Snow.h"
 #include "biomes/SpiderNest.h"
@@ -89,6 +91,7 @@ int main()
 
     genWorldBase(rnd, world);
     genOceans(rnd, world);
+    genMarbleCave(rnd, world);
     world.planBiomes(rnd);
     genSnow(rnd, world);
     genDesert(rnd, world);
@@ -96,6 +99,7 @@ int main()
     genForest(rnd, world);
     genUnderworld(rnd, world);
     genGlowingMushroom(rnd, world);
+    genGraniteCave(rnd, world);
     genHive(rnd, world);
     genAether(rnd, world);
     if (world.isCrimson) {

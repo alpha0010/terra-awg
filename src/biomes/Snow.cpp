@@ -33,6 +33,7 @@ void genSnow(Random &rnd, World &world)
             Tile &tile = world.getTile(x, y);
             switch (tile.blockID) {
             case TileID::dirt:
+            case TileID::smoothMarble:
                 tile.blockID = TileID::snow;
                 tile.wallID = WallID::Unsafe::snow;
                 break;

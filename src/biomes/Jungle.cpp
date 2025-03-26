@@ -70,6 +70,7 @@ void genJungle(Random &rnd, World &world)
                 tile.blockID = TileID::jungleGrass;
                 break;
             case TileID::sand:
+            case TileID::smoothMarble:
                 tile.blockID = TileID::silt;
                 break;
             case TileID::mud:
