@@ -44,19 +44,13 @@ void genCrimson(Random &rnd, World &world)
         {WallID::Unsafe::sandstone, WallID::Unsafe::crimsandstone},
         {WallID::Unsafe::hardenedSand, WallID::Unsafe::hardenedCrimsand}};
     for (int wallId : WallVariants::dirt) {
-        crimsonWalls[wallId] = rnd.select(
-            WallVariants::crimson.begin(),
-            WallVariants::crimson.end());
+        crimsonWalls[wallId] = rnd.select(WallVariants::crimson);
     }
     for (int wallId : WallVariants::stone) {
-        crimsonWalls[wallId] = rnd.select(
-            WallVariants::crimson.begin(),
-            WallVariants::crimson.end());
+        crimsonWalls[wallId] = rnd.select(WallVariants::crimson);
     }
     for (int wallId : WallVariants::jungle) {
-        crimsonWalls[wallId] = rnd.select(
-            WallVariants::crimson.begin(),
-            WallVariants::crimson.end());
+        crimsonWalls[wallId] = rnd.select(WallVariants::crimson);
     }
     for (int wallId :
          {WallID::Unsafe::snow,
@@ -64,9 +58,7 @@ void genCrimson(Random &rnd, World &world)
           WallID::Unsafe::mushroom,
           WallID::Unsafe::marble,
           WallID::Unsafe::granite}) {
-        crimsonWalls[wallId] = rnd.select(
-            WallVariants::crimson.begin(),
-            WallVariants::crimson.end());
+        crimsonWalls[wallId] = rnd.select(WallVariants::crimson);
     }
     std::set<int> tunnelBorderExclusions{
         TileID::empty,

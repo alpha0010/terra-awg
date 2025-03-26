@@ -401,8 +401,20 @@ int main()
     }
     sectionPointers.push_back(w.tellp());
 
-    w.putUint16(0);  // Number of chests.
-    w.putUint16(40); // Slots per chest.
+    w.putUint16(world.getChests().size()); // Number of chests.
+    w.putUint16(40);                       // Slots per chest.
+    for (auto &chest : world.getChests()) {
+        w.putUint32(chest.x); // Chest position X.
+        w.putUint32(chest.y); // Chest position Y.
+        w.putString("");      // Chest name.
+        for (auto &item : chest.items) {
+            w.putUint16(item.stack); // Item stack count.
+            if (item.stack > 0) {
+                w.putUint32(item.id);    // Item ID.
+                w.putUint8(item.prefix); // Item prefix.
+            }
+        }
+    }
     sectionPointers.push_back(w.tellp());
 
     w.putUint16(0); // Number of signs.

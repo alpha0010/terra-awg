@@ -37,13 +37,15 @@ public:
     double getFineNoise(int x, int y) const;
     std::vector<int> partitionRange(int numSegments, int range);
 
-    template <typename It> auto select(It first, It last) -> decltype(*first)
-    {
-        return *(first + getInt(0, std::distance(first, last) - 1));
-    }
     template <typename T> T select(std::initializer_list<T> list)
     {
         return *(list.begin() + getInt(0, list.size() - 1));
+    }
+    template <typename T> auto select(T list)
+    {
+        auto first = std::begin(list);
+        auto last = std::end(list);
+        return *(first + getInt(0, std::distance(first, last) - 1));
     }
 };
 

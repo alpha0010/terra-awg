@@ -1,6 +1,7 @@
 #ifndef WORLD_H
 #define WORLD_H
 
+#include "Chest.h"
 #include "Tile.h"
 #include <vector>
 
@@ -15,6 +16,7 @@ private:
     int height;
     Tile scratchTile;
     std::vector<Tile> tiles;
+    std::vector<Chest> chests;
 
 public:
     World();
@@ -27,6 +29,12 @@ public:
     Tile &getTile(int x, int y);
     void
     placeFramedTile(int x, int y, int blockID, Variant type = Variant::none);
+    Chest &placeChest(int x, int y);
+
+    const std::vector<Chest> &getChests() const
+    {
+        return chests;
+    }
 
     bool isExposed(int x, int y) const;
     void planBiomes(Random &rnd);

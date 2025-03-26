@@ -99,9 +99,7 @@ void genWorldBase(Random &rnd, World &world)
     int underworldHeight = world.getHeight() - world.getUnderworldLevel();
     std::map<int, int> underworldWalls{{WallID::empty, WallID::empty}};
     for (int wallId : WallVariants::dirt) {
-        underworldWalls[wallId] = rnd.select(
-            WallVariants::underworld.begin(),
-            WallVariants::underworld.end());
+        underworldWalls[wallId] = rnd.select(WallVariants::underworld);
     }
     for (int x = 0; x < world.getWidth(); ++x) {
         int underworldRoof =

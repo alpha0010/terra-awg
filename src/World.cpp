@@ -42,6 +42,7 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
 {
     switch (blockID) {
     case TileID::lifeCrystal:
+    case TileID::chest:
         for (int i = 0; i < 2; ++i) {
             for (int j = 0; j < 2; ++j) {
                 Tile &tile = getTile(x + i, y + j);
@@ -84,6 +85,12 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
     default:
         break;
     }
+}
+
+Chest &World::placeChest(int x, int y)
+{
+    placeFramedTile(x, y, TileID::chest);
+    return chests.emplace_back(x, y);
 }
 
 bool World::isExposed(int x, int y) const

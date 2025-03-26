@@ -16,15 +16,11 @@ void genJungle(Random &rnd, World &world)
         surfaceJungleWalls[wallId] = rnd.select(
             {WallID::Unsafe::jungle,
              WallID::Unsafe::jungle,
-             rnd.select(
-                 WallVariants::stone.begin(),
-                 WallVariants::stone.end())});
+             rnd.select(WallVariants::stone)});
     }
     std::map<int, int> undergroundJungleWalls;
     for (int wallId : WallVariants::dirt) {
-        undergroundJungleWalls[wallId] = rnd.select(
-            WallVariants::jungle.begin(),
-            WallVariants::jungle.end());
+        undergroundJungleWalls[wallId] = rnd.select(WallVariants::jungle);
     }
     for (int x = center - scanDist; x < center + scanDist; ++x) {
         int lastTileID = TileID::empty;

@@ -43,19 +43,13 @@ void genCorruption(Random &rnd, World &world)
         {WallID::Unsafe::sandstone, WallID::Unsafe::ebonsandstone},
         {WallID::Unsafe::hardenedSand, WallID::Unsafe::hardenedEbonsand}};
     for (int wallId : WallVariants::dirt) {
-        corruptWalls[wallId] = rnd.select(
-            WallVariants::corruption.begin(),
-            WallVariants::corruption.end());
+        corruptWalls[wallId] = rnd.select(WallVariants::corruption);
     }
     for (int wallId : WallVariants::stone) {
-        corruptWalls[wallId] = rnd.select(
-            WallVariants::corruption.begin(),
-            WallVariants::corruption.end());
+        corruptWalls[wallId] = rnd.select(WallVariants::corruption);
     }
     for (int wallId : WallVariants::jungle) {
-        corruptWalls[wallId] = rnd.select(
-            WallVariants::corruption.begin(),
-            WallVariants::corruption.end());
+        corruptWalls[wallId] = rnd.select(WallVariants::corruption);
     }
     for (int wallId :
          {WallID::Unsafe::snow,
@@ -63,9 +57,7 @@ void genCorruption(Random &rnd, World &world)
           WallID::Unsafe::mushroom,
           WallID::Unsafe::marble,
           WallID::Unsafe::granite}) {
-        corruptWalls[wallId] = rnd.select(
-            WallVariants::corruption.begin(),
-            WallVariants::corruption.end());
+        corruptWalls[wallId] = rnd.select(WallVariants::corruption);
     }
     for (int x = surfaceX - scanDist; x < surfaceX + scanDist; ++x) {
         for (int y = 0.4 * world.getUndergroundLevel();

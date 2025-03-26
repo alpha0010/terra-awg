@@ -18,9 +18,7 @@ void genSnow(Random &rnd, World &world)
         snowWalls[wallId] = rnd.select(
             {WallID::Unsafe::snow,
              WallID::Unsafe::ice,
-             rnd.select(
-                 WallVariants::stone.begin(),
-                 WallVariants::stone.end())});
+             rnd.select(WallVariants::stone)});
     }
     for (int x = center - scanDist; x < center + scanDist; ++x) {
         for (int y = 0; y < world.getUnderworldLevel(); ++y) {
