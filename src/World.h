@@ -7,7 +7,19 @@
 
 class Random;
 
-enum class Variant { none, corruption, crimson };
+enum class Variant {
+    none,
+    corruption,
+    crimson,
+    desert,
+    frozen,
+    gold,
+    goldLocked,
+    hallowed,
+    ice,
+    jungle,
+    lihzahrd
+};
 
 class World
 {
@@ -29,7 +41,7 @@ public:
     Tile &getTile(int x, int y);
     void
     placeFramedTile(int x, int y, int blockID, Variant type = Variant::none);
-    Chest &placeChest(int x, int y);
+    Chest &placeChest(int x, int y, Variant type);
 
     const std::vector<Chest> &getChests() const
     {

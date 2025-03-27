@@ -40,56 +40,76 @@ Tile &World::getTile(int x, int y)
 
 void World::placeFramedTile(int x, int y, int blockID, Variant type)
 {
-    switch (blockID) {
-    case TileID::lifeCrystal:
-    case TileID::chest:
-        for (int i = 0; i < 2; ++i) {
-            for (int j = 0; j < 2; ++j) {
-                Tile &tile = getTile(x + i, y + j);
-                tile.blockID = blockID;
-                tile.frameX = 18 * i;
-                tile.frameY = 18 * j;
-            }
+    int offsetX = 0;
+    int offsetY = 0;
+    int frameWidth = 2;
+    int frameHeight = 2;
+    switch (type) {
+    case Variant::corruption:
+        if (blockID == TileID::chest) {
+            offsetX = 864;
         }
         break;
-    case TileID::altar:
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 2; ++j) {
-                Tile &tile = getTile(x + i, y + j);
-                tile.blockID = blockID;
-                tile.frameX = 18 * i + (type == Variant::crimson ? 54 : 0);
-                tile.frameY = 18 * j;
-            }
+    case Variant::crimson:
+        if (blockID == TileID::altar) {
+            offsetX = 54;
+        } else if (blockID == TileID::orbHeart) {
+            offsetX = 36;
+        } else if (blockID == TileID::chest) {
+            offsetX = 900;
         }
         break;
-    case TileID::orbHeart:
-        for (int i = 0; i < 2; ++i) {
-            for (int j = 0; j < 2; ++j) {
-                Tile &tile = getTile(x + i, y + j);
-                tile.blockID = blockID;
-                tile.frameX = 18 * i + (type == Variant::crimson ? 36 : 0);
-                tile.frameY = 18 * j;
-            }
+    case Variant::desert:
+        if (blockID == TileID::chest) {
+            blockID = 467; // Chest group 2.
+            offsetX = 468;
         }
         break;
-    case TileID::larva:
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 3; ++j) {
-                Tile &tile = getTile(x + i, y + j);
-                tile.blockID = blockID;
-                tile.frameX = 18 * i;
-                tile.frameY = 18 * j;
-            }
-        }
+    case Variant::frozen:
+        offsetX = 792;
+        break;
+    case Variant::hallowed:
+        offsetX = 936;
+        break;
+    case Variant::jungle:
+        offsetX = 828;
+        break;
+    case Variant::gold:
+        offsetX = 36;
+        break;
+    case Variant::goldLocked:
+        offsetX = 72;
+        break;
+    case Variant::lihzahrd:
+        offsetX = 576;
         break;
     default:
         break;
     }
+    switch (blockID) {
+    case TileID::altar:
+        frameWidth = 3;
+        break;
+    case TileID::larva:
+        frameWidth = 3;
+        frameHeight = 3;
+        break;
+    default:
+        break;
+    }
+    for (int i = 0; i < frameWidth; ++i) {
+        for (int j = 0; j < frameHeight; ++j) {
+            Tile &tile = getTile(x + i, y + j);
+            tile.blockID = blockID;
+            tile.frameX = 18 * i + offsetX;
+            tile.frameY = 18 * j + offsetY;
+        }
+    }
 }
 
-Chest &World::placeChest(int x, int y)
+Chest &World::placeChest(int x, int y, Variant type)
 {
-    placeFramedTile(x, y, TileID::chest);
+    placeFramedTile(x, y, TileID::chest, type);
     return chests.emplace_back(x, y);
 }
 

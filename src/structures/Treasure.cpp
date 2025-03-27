@@ -3,6 +3,7 @@
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
+#include "structures/LootRules.h"
 #include <iostream>
 #include <map>
 #include <set>
@@ -219,18 +220,37 @@ void placeLarvae(LocationBins &locations, Random &rnd, World &world)
     }
 }
 
-void fillLoot(
-    Chest &chest,
-    Random &rnd,
-    std::initializer_list<std::pair<double, Item>> loot)
+Variant getChestType(int x, int y, World &world)
 {
-    int itemIndex = 0;
-    for (auto [probability, item] : loot) {
-        if (probability > rnd.getDouble(0, 1)) {
-            chest.items[itemIndex] = item;
-            ++itemIndex;
+    std::map<int, Variant> blockTypes{
+        {TileID::snow, Variant::frozen},
+        {TileID::ice, Variant::frozen},
+        {TileID::thinIce, Variant::frozen},
+        {TileID::slush, Variant::frozen}};
+    std::map<int, Variant> wallTypes{
+        {WallID::Unsafe::snow, Variant::frozen},
+        {WallID::Unsafe::ice, Variant::frozen}};
+    std::map<Variant, int> zoneCounts;
+    int radius = 5;
+    for (int i = -radius; i < radius; ++i) {
+        for (int j = -radius; j < radius; ++j) {
+            Tile &tile = world.getTile(x + i, y + j);
+            auto blockItr = blockTypes.find(tile.blockID);
+            if (blockItr != blockTypes.end()) {
+                zoneCounts[blockItr->second] += 1;
+            }
+            auto wallItr = wallTypes.find(tile.wallID);
+            if (wallItr != wallTypes.end()) {
+                zoneCounts[wallItr->second] += 1;
+            }
         }
     }
+    for (auto [type, count] : zoneCounts) {
+        if (count > radius * 4) {
+            return type;
+        }
+    }
+    return y < world.getUndergroundLevel() ? Variant::none : Variant::gold;
 }
 
 void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
@@ -242,75 +262,44 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
             continue;
         }
         auto [x, y] = rnd.select(locations[binId]);
-        if (isPlacementCandidate(x, y, world)) {
-            Chest &chest = world.placeChest(x, y - 2);
-            fillLoot(
+        if (!isPlacementCandidate(x, y, world)) {
+            continue;
+        }
+        Variant type = getChestType(x, y, world);
+        Chest &chest = world.placeChest(x, y - 2, type);
+        switch (type) {
+        case Variant::frozen:
+            if (y < world.getUndergroundLevel()) {
+                fillSurfaceFrozenChest(chest, rnd, world);
+            } else if (y < world.getCavernLevel()) {
+                fillUndergroundFrozenChest(chest, rnd, world);
+            } else {
+                fillCavernFrozenChest(chest, rnd, world);
+            }
+            break;
+        case Variant::goldLocked:
+            fillDungeonChest(chest, rnd, world);
+            break;
+        case Variant::jungle:
+            fillDungeonBiomeChest(
                 chest,
                 rnd,
-                {{1,
-                  rnd.select<Item>({
-                      {ItemID::spear, rnd.select(PrefixSet::universal), 1},
-                      {ItemID::blowpipe, rnd.select(PrefixSet::ranged), 1},
-                      {ItemID::woodenBoomerang,
-                       rnd.select(PrefixSet::universal),
-                       1},
-                      {ItemID::aglet, rnd.select(PrefixSet::accessory), 1},
-                      {ItemID::climbingClaws,
-                       rnd.select(PrefixSet::accessory),
-                       1},
-                      {ItemID::umbrella, rnd.select(PrefixSet::melee), 1},
-                      {ItemID::guideToPlantFiberCordage,
-                       rnd.select(PrefixSet::accessory),
-                       1},
-                      {ItemID::wandOfSparking, rnd.select(PrefixSet::magic), 1},
-                      {ItemID::radar, rnd.select(PrefixSet::accessory), 1},
-                      {ItemID::stepStool, rnd.select(PrefixSet::accessory), 1},
-                  })},
-                 {1.0 / 6,
-                  {ItemID::glowstick, Prefix::none, rnd.getInt(40, 75)}},
-                 {1.0 / 6,
-                  {ItemID::throwingKnife, Prefix::none, rnd.getInt(150, 300)}},
-                 {1.0 / 6, {ItemID::herbBag, Prefix::none, rnd.getInt(1, 4)}},
-                 {1.0 / 6,
-                  {ItemID::canOfWorms, Prefix::none, rnd.getInt(1, 4)}},
-                 {1.0 / 3, {ItemID::grenade, Prefix::none, rnd.getInt(3, 5)}},
-                 {0.5,
-                  {rnd.select({ItemID::copperBar, ItemID::tinBar}),
-                   Prefix::none,
-                   rnd.getInt(3, 10)}},
-                 {0.5,
-                  {rnd.select({ItemID::ironBar, ItemID::leadBar}),
-                   Prefix::none,
-                   rnd.getInt(3, 10)}},
-                 {0.5, {ItemID::rope, Prefix::none, rnd.getInt(50, 100)}},
-                 {2.0 / 3,
-                  {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
-                   Prefix::none,
-                   rnd.getInt(25, 50)}},
-                 {0.5,
-                  {ItemID::lesserHealingPotion,
-                   Prefix::none,
-                   rnd.getInt(3, 5)}},
-                 {2.0 / 3,
-                  {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
-                 {2.0 / 3,
-                  {rnd.select(
-                       {ItemID::ironskinPotion,
-                        ItemID::shinePotion,
-                        ItemID::nightOwlPotion,
-                        ItemID::swiftnessPotion,
-                        ItemID::miningPotion,
-                        ItemID::builderPotion}),
-                   Prefix::none,
-                   rnd.getInt(1, 2)}},
-                 {0.5,
-                  {rnd.select({ItemID::torch, ItemID::bottle}),
-                   Prefix::none,
-                   rnd.getInt(10, 20)}},
-                 {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
-                 {0.5, {ItemID::wood, Prefix::none, rnd.getInt(50, 99)}}});
-            --chestCount;
+                {ItemID::piranhaGun, rnd.select(PrefixSet::ranged), 1});
+            break;
+        case Variant::lihzahrd:
+            fillLihzahrdChest(chest, rnd);
+            break;
+        default:
+            if (y < world.getUndergroundLevel()) {
+                fillSurfaceChest(chest, rnd, world);
+            } else if (y < world.getCavernLevel()) {
+                fillUndergroundChest(chest, rnd, world);
+            } else {
+                fillCavernChest(chest, rnd, world);
+            }
+            break;
         }
+        --chestCount;
     }
 }
 
