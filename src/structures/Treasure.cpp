@@ -3,6 +3,9 @@
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
+#include "ids/ItemID.h"
+#include "ids/Prefix.h"
+#include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include <iostream>
 #include <map>
@@ -207,14 +210,21 @@ void placeLarvae(LocationBins &locations, Random &rnd, World &world)
         }
     }
     int larvaCount = rnd.getInt(3, 6);
+    int lastX = -1;
+    int lastY = -1;
     for (int numTries = 0; larvaCount > 0 && numTries < 100; ++numTries) {
         auto [x, y] = rnd.select(hiveLocations);
+        if (std::hypot(lastX - x, lastY - y) < 75) {
+            continue;
+        }
         Tile &tile = world.getTile(x, y - 1);
         if (tile.wallID == WallID::Unsafe::hive &&
             tile.liquid == Liquid::none &&
             isPlacementCandidate(x - 1, y, world) &&
             isPlacementCandidate(x + 2, y, world)) {
             world.placeFramedTile(x, y - 3, TileID::larva);
+            lastX = x;
+            lastY = y;
             --larvaCount;
         }
     }
@@ -222,14 +232,76 @@ void placeLarvae(LocationBins &locations, Random &rnd, World &world)
 
 Variant getChestType(int x, int y, World &world)
 {
+    if (y > world.getUnderworldLevel()) {
+        return Variant::shadow;
+    } else if (world.getTile(x, y - 1).wallID == WallID::Unsafe::hive) {
+        return Variant::honey;
+    } else if (world.getTile(x, y - 2).liquid == Liquid::water) {
+        return y < world.getUndergroundLevel() &&
+                       (x < 350 || x > world.getWidth() - 350)
+                   ? Variant::reef
+                   : Variant::water;
+    }
     std::map<int, Variant> blockTypes{
+        {TileID::crimstone, Variant::flesh},
+        {TileID::crimsonGrass, Variant::flesh},
+        {TileID::crimsand, Variant::flesh},
+        {TileID::crimsonJungleGrass, Variant::flesh},
+        {TileID::crimsonIce, Variant::flesh},
+        {TileID::crimsandstone, Variant::flesh},
+        {TileID::hardenedCrimsand, Variant::flesh},
         {TileID::snow, Variant::frozen},
         {TileID::ice, Variant::frozen},
         {TileID::thinIce, Variant::frozen},
-        {TileID::slush, Variant::frozen}};
+        {TileID::slush, Variant::frozen},
+        {TileID::ebonstone, Variant::lesion},
+        {TileID::corruptGrass, Variant::lesion},
+        {TileID::ebonsand, Variant::lesion},
+        {TileID::corruptJungleGrass, Variant::lesion},
+        {TileID::corruptIce, Variant::lesion},
+        {TileID::ebonsandstone, Variant::lesion},
+        {TileID::hardenedEbonsand, Variant::lesion},
+        {TileID::lesion, Variant::lesion},
+        {TileID::granite, Variant::granite},
+        {TileID::smoothGranite, Variant::granite},
+        {TileID::marble, Variant::marble},
+        {TileID::smoothMarble, Variant::marble},
+        {TileID::mushroomGrass, Variant::mushroom},
+        {TileID::jungleGrass, Variant::richMahogany},
+        {TileID::sand, Variant::sandstone},
+        {TileID::sandstone, Variant::sandstone},
+        {TileID::hardenedSand, Variant::sandstone},
+        {TileID::desertFossil, Variant::sandstone}};
     std::map<int, Variant> wallTypes{
+        {WallID::Unsafe::crimsonGrass, Variant::flesh},
+        {WallID::Unsafe::crimsandstone, Variant::flesh},
+        {WallID::Unsafe::hardenedCrimsand, Variant::flesh},
+        {WallID::Unsafe::crimstone, Variant::flesh},
+        {WallID::Unsafe::crimsonCrust, Variant::flesh},
+        {WallID::Unsafe::crimsonScab, Variant::flesh},
+        {WallID::Unsafe::crimsonTeeth, Variant::flesh},
+        {WallID::Unsafe::crimsonBlister, Variant::flesh},
         {WallID::Unsafe::snow, Variant::frozen},
-        {WallID::Unsafe::ice, Variant::frozen}};
+        {WallID::Unsafe::ice, Variant::frozen},
+        {WallID::Unsafe::corruptGrass, Variant::lesion},
+        {WallID::Unsafe::ebonsandstone, Variant::lesion},
+        {WallID::Unsafe::hardenedEbonsand, Variant::lesion},
+        {WallID::Unsafe::ebonstone, Variant::lesion},
+        {WallID::Unsafe::corruptGrowth, Variant::lesion},
+        {WallID::Unsafe::corruptMass, Variant::lesion},
+        {WallID::Unsafe::corruptPustule, Variant::lesion},
+        {WallID::Unsafe::corruptTendril, Variant::lesion},
+        {WallID::Unsafe::granite, Variant::granite},
+        {WallID::Unsafe::marble, Variant::marble},
+        {WallID::Unsafe::mushroom, Variant::mushroom},
+        {WallID::Unsafe::jungle, Variant::richMahogany},
+        {WallID::Unsafe::mud, Variant::richMahogany},
+        {WallID::Unsafe::lichenStone, Variant::richMahogany},
+        {WallID::Unsafe::leafyJungle, Variant::richMahogany},
+        {WallID::Unsafe::ivyStone, Variant::richMahogany},
+        {WallID::Unsafe::jungleVine, Variant::richMahogany},
+        {WallID::Unsafe::sandstone, Variant::sandstone},
+        {WallID::Unsafe::hardenedSand, Variant::sandstone}};
     std::map<Variant, int> zoneCounts;
     int radius = 5;
     for (int i = -radius; i < radius; ++i) {
@@ -247,15 +319,115 @@ Variant getChestType(int x, int y, World &world)
     }
     for (auto [type, count] : zoneCounts) {
         if (count > radius * 4) {
+            if (type == Variant::sandstone && y < world.getUndergroundLevel()) {
+                return Variant::palmWood;
+            }
             return type;
         }
     }
     return y < world.getUndergroundLevel() ? Variant::none : Variant::gold;
 }
 
+void placeChest(int x, int y, Variant type, Random &rnd, World &world)
+{
+    Chest &chest = world.placeChest(x, y - 2, type);
+    int torchID = ItemID::torch;
+    switch (type) {
+    case Variant::flesh:
+        torchID = ItemID::crimsonTorch;
+        break;
+    case Variant::frozen:
+        if (y < world.getUndergroundLevel()) {
+            fillSurfaceFrozenChest(chest, rnd, world);
+        } else if (y < world.getCavernLevel()) {
+            fillUndergroundFrozenChest(chest, rnd, world);
+        } else {
+            fillCavernFrozenChest(chest, rnd, world);
+        }
+        return;
+    case Variant::goldLocked:
+        fillDungeonChest(chest, rnd, world);
+        return;
+    case Variant::granite:
+        torchID = ItemID::blueTorch;
+        break;
+    case Variant::honey:
+        if (y < world.getCavernLevel()) {
+            fillUndergroundHoneyChest(chest, rnd, world);
+        } else {
+            fillCavernHoneyChest(chest, rnd, world);
+        }
+        return;
+    case Variant::jungle:
+        fillDungeonBiomeChest(
+            chest,
+            rnd,
+            {ItemID::piranhaGun, rnd.select(PrefixSet::ranged), 1});
+        return;
+    case Variant::lesion:
+        torchID = ItemID::corruptTorch;
+        break;
+    case Variant::lihzahrd:
+        fillLihzahrdChest(chest, rnd);
+        return;
+    case Variant::marble:
+        torchID = ItemID::whiteTorch;
+        break;
+    case Variant::mushroom:
+        if (y < world.getCavernLevel()) {
+            fillUndergroundMushroomChest(chest, rnd, world);
+        } else {
+            fillCavernMushroomChest(chest, rnd, world);
+        }
+        return;
+    case Variant::palmWood:
+        fillSurfacePalmWoodChest(chest, rnd, world);
+        return;
+    case Variant::reef:
+    case Variant::water:
+        if (y < world.getUndergroundLevel()) {
+            fillSurfaceWaterChest(chest, rnd, world);
+        } else if (y < world.getCavernLevel()) {
+            fillUndergroundWaterChest(chest, rnd, world);
+        } else {
+            fillCavernWaterChest(chest, rnd, world);
+        }
+        return;
+    case Variant::richMahogany:
+        if (y < world.getUndergroundLevel()) {
+            fillSurfaceRichMahoganyChest(chest, rnd, world);
+        } else if (y < world.getCavernLevel()) {
+            fillUndergroundRichMahoganyChest(chest, rnd, world);
+        } else {
+            fillCavernRichMahoganyChest(chest, rnd, world);
+        }
+        return;
+    case Variant::sandstone:
+        if (y < world.getCavernLevel()) {
+            fillUndergroundSandstoneChest(chest, rnd, world);
+        } else {
+            fillCavernSandstoneChest(chest, rnd, world);
+        }
+        return;
+    case Variant::shadow:
+        fillShadowChest(chest, rnd, world);
+        return;
+    default:
+        break;
+    }
+    if (y < world.getUndergroundLevel()) {
+        fillSurfaceChest(chest, torchID, rnd, world);
+    } else if (y < world.getCavernLevel()) {
+        fillUndergroundChest(chest, torchID, rnd, world);
+    } else {
+        fillCavernChest(chest, torchID, rnd, world);
+    }
+}
+
 void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
 {
     int chestCount = world.getWidth() * world.getHeight() / 50000;
+    LocationBins usedLocations;
     while (chestCount > 0) {
         int binId = rnd.getInt(0, maxBin);
         if (locations[binId].empty()) {
@@ -265,40 +437,19 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
         if (!isPlacementCandidate(x, y, world)) {
             continue;
         }
-        Variant type = getChestType(x, y, world);
-        Chest &chest = world.placeChest(x, y - 2, type);
-        switch (type) {
-        case Variant::frozen:
-            if (y < world.getUndergroundLevel()) {
-                fillSurfaceFrozenChest(chest, rnd, world);
-            } else if (y < world.getCavernLevel()) {
-                fillUndergroundFrozenChest(chest, rnd, world);
-            } else {
-                fillCavernFrozenChest(chest, rnd, world);
+        bool isNearOtherChests = false;
+        for (auto [usedX, usedY] : usedLocations[binId]) {
+            if (std::hypot(usedX - x, usedY - y) < 20) {
+                isNearOtherChests = true;
+                break;
             }
-            break;
-        case Variant::goldLocked:
-            fillDungeonChest(chest, rnd, world);
-            break;
-        case Variant::jungle:
-            fillDungeonBiomeChest(
-                chest,
-                rnd,
-                {ItemID::piranhaGun, rnd.select(PrefixSet::ranged), 1});
-            break;
-        case Variant::lihzahrd:
-            fillLihzahrdChest(chest, rnd);
-            break;
-        default:
-            if (y < world.getUndergroundLevel()) {
-                fillSurfaceChest(chest, rnd, world);
-            } else if (y < world.getCavernLevel()) {
-                fillUndergroundChest(chest, rnd, world);
-            } else {
-                fillCavernChest(chest, rnd, world);
-            }
-            break;
         }
+        if (isNearOtherChests) {
+            continue;
+        }
+        usedLocations[binId].emplace_back(x, y);
+        Variant type = getChestType(x, y, world);
+        placeChest(x, y, type, rnd, world);
         --chestCount;
     }
 }

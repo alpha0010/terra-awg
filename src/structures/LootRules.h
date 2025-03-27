@@ -6,12 +6,29 @@ class Item;
 class World;
 class Random;
 
-void fillSurfaceChest(Chest &chest, Random &rnd, World &world);
+void fillSurfaceChest(Chest &chest, int torchID, Random &rnd, World &world);
 void fillSurfaceFrozenChest(Chest &chest, Random &rnd, World &world);
-void fillUndergroundChest(Chest &chest, Random &rnd, World &world);
+void fillSurfacePalmWoodChest(Chest &chest, Random &rnd, World &world);
+void fillSurfaceRichMahoganyChest(Chest &chest, Random &rnd, World &world);
+void fillSurfaceWaterChest(Chest &chest, Random &rnd, World &world);
+
+void fillUndergroundChest(Chest &chest, int torchID, Random &rnd, World &world);
 void fillUndergroundFrozenChest(Chest &chest, Random &rnd, World &world);
-void fillCavernChest(Chest &chest, Random &rnd, World &world);
+void fillUndergroundHoneyChest(Chest &chest, Random &rnd, World &world);
+void fillUndergroundMushroomChest(Chest &chest, Random &rnd, World &world);
+void fillUndergroundSandstoneChest(Chest &chest, Random &rnd, World &world);
+void fillUndergroundRichMahoganyChest(Chest &chest, Random &rnd, World &world);
+void fillUndergroundWaterChest(Chest &chest, Random &rnd, World &world);
+
+void fillCavernChest(Chest &chest, int torchID, Random &rnd, World &world);
 void fillCavernFrozenChest(Chest &chest, Random &rnd, World &world);
+void fillCavernHoneyChest(Chest &chest, Random &rnd, World &world);
+void fillCavernMushroomChest(Chest &chest, Random &rnd, World &world);
+void fillCavernSandstoneChest(Chest &chest, Random &rnd, World &world);
+void fillCavernRichMahoganyChest(Chest &chest, Random &rnd, World &world);
+void fillCavernWaterChest(Chest &chest, Random &rnd, World &world);
+
+void fillShadowChest(Chest &chest, Random &rnd, World &world);
 void fillDungeonChest(Chest &chest, Random &rnd, World &world);
 void fillDungeonBiomeChest(Chest &chest, Random &rnd, Item &&primaryItem);
 void fillLihzahrdChest(Chest &chest, Random &rnd);

@@ -2,6 +2,7 @@
 
 #include "Random.h"
 #include "World.h"
+#include "ids/WallID.h"
 #include <iostream>
 
 std::pair<int, int> getHexCentroid(int x, int y)
@@ -98,7 +99,7 @@ void fillHive(Random &rnd, World &world)
 void genHive(Random &rnd, World &world)
 {
     std::cout << "Importing bees\n";
-    int numHives = rnd.getInt(1, 3);
+    int numHives = rnd.getInt(2, 4);
     for (int i = 0; i < numHives; ++i) {
         fillHive(rnd, world);
     }

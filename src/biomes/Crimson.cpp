@@ -3,6 +3,7 @@
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
+#include "ids/WallID.h"
 #include <algorithm>
 #include <iostream>
 #include <map>

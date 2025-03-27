@@ -2,6 +2,7 @@
 
 #include "Random.h"
 #include "World.h"
+#include "ids/WallID.h"
 #include <iostream>
 
 void applyAetherDistortion(int centerX, int centerY, double size, World &world)

@@ -3,6 +3,7 @@
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
+#include "ids/WallID.h"
 #include <iostream>
 
 void fillMarbleCave(int x, int y, Random &rnd, World &world)

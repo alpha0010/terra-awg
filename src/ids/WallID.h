@@ -1,0 +1,123 @@
+#ifndef WALLID_H
+#define WALLID_H
+
+#include <array>
+
+namespace WallID
+{
+enum { empty = 0 };
+
+namespace Unsafe
+{
+enum {
+    dirt = 2,
+    ebonstone = 3,
+    mud = 15,
+    snow = 40,
+    amethystStone = 48,
+    topazStone = 49,
+    sapphireStone = 50,
+    emeraldStone = 51,
+    rubyStone = 52,
+    diamondStone = 53,
+    rockyDirt = 59,
+    oldStone = 61,
+    spider = 62,
+    grass = 63,
+    jungle = 64,
+    flower = 65,
+    corruptGrass = 69,
+    ice = 71,
+    mushroom = 80,
+    crimsonGrass = 81,
+    crimstone = 83,
+    hive = 86,
+    caveDirt = 170,
+    roughDirt = 171,
+    marble = 178,
+    granite = 180,
+    craggyStone = 185,
+    sandstone = 187,
+    corruptGrowth = 188,
+    corruptMass = 189,
+    corruptPustule = 190,
+    corruptTendril = 191,
+    crimsonCrust = 192,
+    crimsonScab = 193,
+    crimsonTeeth = 194,
+    crimsonBlister = 195,
+    layeredDirt = 196,
+    crumblingDirt = 197,
+    crackedDirt = 198,
+    wavyDirt = 199,
+    lichenStone = 204,
+    leafyJungle = 205,
+    ivyStone = 206,
+    jungleVine = 207,
+    ember = 208,
+    cinder = 209,
+    magma = 210,
+    smoulderingStone = 211,
+    wornStone = 212,
+    stalactiteStone = 213,
+    mottledStone = 214,
+    fracturedStone = 215,
+    hardenedSand = 216,
+    hardenedEbonsand = 217,
+    hardenedCrimsand = 218,
+    ebonsandstone = 220,
+    crimsandstone = 221,
+    livingWood = 244,
+};
+}
+} // namespace WallID
+
+namespace WallVariants
+{
+inline std::array const dirt = {
+    WallID::Unsafe::dirt,
+    WallID::Unsafe::rockyDirt,
+    WallID::Unsafe::caveDirt,
+    WallID::Unsafe::roughDirt,
+    WallID::Unsafe::layeredDirt,
+    WallID::Unsafe::crumblingDirt,
+    WallID::Unsafe::crackedDirt,
+    WallID::Unsafe::wavyDirt};
+
+inline std::array const stone = {
+    WallID::Unsafe::oldStone,
+    WallID::Unsafe::craggyStone,
+    WallID::Unsafe::wornStone,
+    WallID::Unsafe::stalactiteStone,
+    WallID::Unsafe::mottledStone,
+    WallID::Unsafe::fracturedStone};
+
+inline std::array const jungle = {
+    WallID::Unsafe::mud,
+    WallID::Unsafe::lichenStone,
+    WallID::Unsafe::leafyJungle,
+    WallID::Unsafe::ivyStone,
+    WallID::Unsafe::jungleVine};
+
+// Excludes: crimsonBlister
+inline std::array const crimson = {
+    WallID::Unsafe::crimstone,
+    WallID::Unsafe::crimsonCrust,
+    WallID::Unsafe::crimsonScab,
+    WallID::Unsafe::crimsonTeeth};
+
+// Excludes: corruptTendril
+inline std::array const corruption = {
+    WallID::Unsafe::ebonstone,
+    WallID::Unsafe::corruptGrowth,
+    WallID::Unsafe::corruptMass,
+    WallID::Unsafe::corruptPustule};
+
+inline std::array const underworld = {
+    WallID::Unsafe::ember,
+    WallID::Unsafe::cinder,
+    WallID::Unsafe::magma,
+    WallID::Unsafe::smoulderingStone};
+} // namespace WallVariants
+
+#endif // WALLID_H

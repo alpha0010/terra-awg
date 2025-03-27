@@ -2,6 +2,7 @@
 
 #include "Util.h"
 #include "World.h"
+#include "ids/WallID.h"
 #include <iostream>
 #include <map>
 #include <set>

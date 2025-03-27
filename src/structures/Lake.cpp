@@ -2,6 +2,7 @@
 
 #include "Util.h"
 #include "World.h"
+#include "ids/WallID.h"
 #include <iostream>
 #include <set>
 
@@ -107,6 +108,13 @@ void simulateRain(World &world, int minX, int maxX)
                                       ? Liquid::honey
                                   : dropY > lavaLevel ? Liquid::lava
                                                       : Liquid::water;
+                    if (probeTile.blockID == TileID::hive &&
+                        tile.liquid != Liquid::honey) {
+                        tile.blockID = tile.liquid == Liquid::lava
+                                           ? TileID::crispyHoney
+                                           : TileID::honey;
+                        tile.liquid = Liquid::none;
+                    }
                 }
             }
         }

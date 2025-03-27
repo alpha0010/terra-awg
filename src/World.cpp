@@ -61,15 +61,21 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
         break;
     case Variant::desert:
         if (blockID == TileID::chest) {
-            blockID = 467; // Chest group 2.
+            blockID = TileID::chestGroup2;
             offsetX = 468;
         }
+        break;
+    case Variant::flesh:
+        offsetX = 1548;
         break;
     case Variant::frozen:
         offsetX = 792;
         break;
     case Variant::hallowed:
         offsetX = 936;
+        break;
+    case Variant::honey:
+        offsetX = 1044;
         break;
     case Variant::jungle:
         offsetX = 828;
@@ -80,8 +86,47 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
     case Variant::goldLocked:
         offsetX = 72;
         break;
+    case Variant::granite:
+        offsetX = 1800;
+        break;
+    case Variant::lesion:
+        if (blockID == TileID::chest) {
+            blockID = TileID::chestGroup2;
+            offsetX = 108;
+        }
+        break;
     case Variant::lihzahrd:
         offsetX = 576;
+        break;
+    case Variant::marble:
+        offsetX = 1836;
+        break;
+    case Variant::mushroom:
+        offsetX = 1152;
+        break;
+    case Variant::palmWood:
+        offsetX = 1116;
+        break;
+    case Variant::reef:
+        if (blockID == TileID::chest) {
+            blockID = TileID::chestGroup2;
+            offsetX = 504;
+        }
+        break;
+    case Variant::richMahogany:
+        offsetX = 288;
+        break;
+    case Variant::sandstone:
+        if (blockID == TileID::chest) {
+            blockID = TileID::chestGroup2;
+            offsetX = 360;
+        }
+        break;
+    case Variant::shadow:
+        offsetX = 144;
+        break;
+    case Variant::water:
+        offsetX = 612;
         break;
     default:
         break;

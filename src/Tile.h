@@ -1,7 +1,7 @@
 #ifndef TILE_H
 #define TILE_H
 
-#include "DataID.h"
+#include "ids/TileID.h"
 
 enum class Liquid { none, water, lava, honey, shimmer };
 

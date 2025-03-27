@@ -12,13 +12,25 @@ enum class Variant {
     corruption,
     crimson,
     desert,
+    flesh,
     frozen,
     gold,
     goldLocked,
+    granite,
     hallowed,
+    honey,
     ice,
     jungle,
-    lihzahrd
+    lesion,
+    lihzahrd,
+    marble,
+    mushroom,
+    palmWood,
+    reef,
+    richMahogany,
+    sandstone,
+    shadow,
+    water
 };
 
 class World
