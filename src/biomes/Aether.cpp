@@ -4,6 +4,36 @@
 #include "World.h"
 #include <iostream>
 
+void applyAetherDistortion(int centerX, int centerY, double size, World &world)
+{
+    for (int x = std::max(centerX - size, 0.0); x < centerX + size; ++x) {
+        int yMin = std::max(centerY - size, 0.0);
+        int yMax = centerY + size;
+        double distortion = 23 * std::sin(0.11 * x);
+        if (distortion > 0) {
+            for (int y = yMin; y < yMax; ++y) {
+                int delta = distortion *
+                            std::min(
+                                1 - std::hypot(x - centerX, y - centerY) / size,
+                                0.5);
+                if (delta > 0) {
+                    world.getTile(x, y) = world.getTile(x, y + delta);
+                }
+            }
+        } else {
+            for (int y = yMax; y > yMin; --y) {
+                int delta = distortion *
+                            std::min(
+                                1 - std::hypot(x - centerX, y - centerY) / size,
+                                0.5);
+                if (delta < 0) {
+                    world.getTile(x, y) = world.getTile(x, y + delta);
+                }
+            }
+        }
+    }
+}
+
 void genAether(Random &rnd, World &world)
 {
     std::cout << "Bridging realities\n";
@@ -17,6 +47,7 @@ void genAether(Random &rnd, World &world)
         (world.getCavernLevel() + 5 * world.getUnderworldLevel()) / 6);
     double size =
         world.getWidth() * world.getHeight() / rnd.getDouble(160000, 190000);
+    applyAetherDistortion(centerX, centerY, size * 3.2, world);
     int maxBubblePos = centerY;
     int maxEditPos = centerY;
     for (int x = centerX - size; x < centerX + size; ++x) {
