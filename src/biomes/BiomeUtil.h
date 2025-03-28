@@ -6,7 +6,15 @@
 class World;
 class Random;
 
-std::pair<int, int>
-findStoneCave(int yMin, int yMax, Random &rnd, World &world, int minSize = 6);
+typedef std::pair<int, int> Point;
+
+void fillLargeWallGaps(Point from, Point to, Random &rnd, World &world);
+
+Point findStoneCave(
+    int yMin,
+    int yMax,
+    Random &rnd,
+    World &world,
+    int minSize = 6);
 
 #endif // BIOMEUTIL_H

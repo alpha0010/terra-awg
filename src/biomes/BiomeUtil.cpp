@@ -2,9 +2,22 @@
 
 #include "Random.h"
 #include "World.h"
+#include "ids/WallID.h"
 
-std::pair<int, int>
-findStoneCave(int yMin, int yMax, Random &rnd, World &world, int minSize)
+void fillLargeWallGaps(Point from, Point to, Random &rnd, World &world)
+{
+    int yMax = std::min(to.second, world.getUnderworldLevel());
+    for (int x = from.first; x < to.first; ++x) {
+        for (int y = from.second; y < yMax; ++y) {
+            Tile &tile = world.getTile(x, y);
+            if (tile.wallID == WallID::empty && rnd.getFineNoise(x, y) < 0.55) {
+                tile.wallID = WallID::Unsafe::dirt;
+            }
+        }
+    }
+}
+
+Point findStoneCave(int yMin, int yMax, Random &rnd, World &world, int minSize)
 {
     int numTries = 0;
     while (true) {

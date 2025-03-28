@@ -79,7 +79,8 @@ void simulateRain(World &world, int minX, int maxX)
         WallID::Unsafe::crimsandstone};
     for (int x = minX; x < maxX; x += 4) {
         double pendingWater =
-            std::abs(x - world.jungleCenter) < 0.08 * world.getWidth() ? 15 : 2;
+            std::abs(x - world.jungleCenter) < 0.08 * world.getWidth() ? 15
+                                                                       : -4;
         for (int y = world.spawnY - 45; y < world.getUnderworldLevel();
              y += 3) {
             if (!isLiquidPathable(world, x, y) ||
@@ -89,7 +90,7 @@ void simulateRain(World &world, int minX, int maxX)
                 continue;
             }
             pendingWater +=
-                world.getTile(x, y).wallID == WallID::Unsafe::hive ? 1.9 : 1.1;
+                world.getTile(x, y).wallID == WallID::Unsafe::hive ? 1.9 : 1.3;
             auto [minDropX, maxDropX, dropY] =
                 followRainFrom(world, x, y, isLiquidPathable);
             if (maxDropX - minDropX < pendingWater) {

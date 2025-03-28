@@ -266,6 +266,8 @@ Variant getChestType(int x, int y, World &world)
         {TileID::smoothGranite, Variant::granite},
         {TileID::marble, Variant::marble},
         {TileID::smoothMarble, Variant::marble},
+        {TileID::heliumMossStone, Variant::meteorite},
+        {TileID::aetherium, Variant::meteorite},
         {TileID::mushroomGrass, Variant::mushroom},
         {TileID::jungleGrass, Variant::richMahogany},
         {TileID::sand, Variant::sandstone},
@@ -316,6 +318,9 @@ Variant getChestType(int x, int y, World &world)
                 zoneCounts[wallItr->second] += 1;
             }
         }
+    }
+    if (zoneCounts[Variant::meteorite] > 0) {
+        return Variant::meteorite;
     }
     for (auto [type, count] : zoneCounts) {
         if (count > radius * 4) {
@@ -372,6 +377,9 @@ void placeChest(int x, int y, Variant type, Random &rnd, World &world)
         return;
     case Variant::marble:
         torchID = ItemID::whiteTorch;
+        break;
+    case Variant::meteorite:
+        torchID = ItemID::aetherTorch;
         break;
     case Variant::mushroom:
         if (y < world.getCavernLevel()) {

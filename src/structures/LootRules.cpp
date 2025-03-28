@@ -260,6 +260,7 @@ void fillSurfaceRichMahoganyChest(Chest &chest, Random &rnd, World &world)
 
 void fillSurfaceWaterChest(Chest &chest, Random &rnd, World &world)
 {
+    bool nearEdge = chest.x < 350 || chest.x > world.getWidth() - 350;
     fillLoot(
         chest,
         rnd,
@@ -305,11 +306,14 @@ void fillSurfaceWaterChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(1, 2)}},
          {0.5,
-          {rnd.select({ItemID::coralTorch, ItemID::bottle}),
+          {rnd.select(
+               {nearEdge ? ItemID::coralTorch : ItemID::glowstick,
+                ItemID::bottle}),
            Prefix::none,
            rnd.getInt(10, 20)}},
          {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
-         {0.5, {ItemID::coral, Prefix::none, rnd.getInt(3, 5)}}});
+         {nearEdge ? 0.5 : 0,
+          {ItemID::coral, Prefix::none, rnd.getInt(3, 5)}}});
 }
 
 void fillUndergroundChest(Chest &chest, int torchID, Random &rnd, World &world)
@@ -664,6 +668,7 @@ void fillUndergroundRichMahoganyChest(Chest &chest, Random &rnd, World &world)
 
 void fillUndergroundWaterChest(Chest &chest, Random &rnd, World &world)
 {
+    bool nearEdge = chest.x < 350 || chest.x > world.getWidth() - 350;
     fillLoot(
         chest,
         rnd,
@@ -714,7 +719,8 @@ void fillUndergroundWaterChest(Chest &chest, Random &rnd, World &world)
                    ItemID::dangersensePotion}),
               Prefix::none,
               rnd.getInt(1, 2)}},
-            {0.5, {ItemID::coralTorch, Prefix::none, rnd.getInt(10, 20)}},
+            {nearEdge ? 0.5 : 0,
+             {ItemID::coralTorch, Prefix::none, rnd.getInt(10, 20)}},
             {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
             {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(50, 89)}},
         });
@@ -1148,6 +1154,7 @@ void fillCavernWaterChest(Chest &chest, Random &rnd, World &world)
 {
     int lavaLevel =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
+    bool nearEdge = chest.x < 350 || chest.x > world.getWidth() - 350;
     fillLoot(
         chest,
         rnd,
@@ -1208,7 +1215,7 @@ void fillCavernWaterChest(Chest &chest, Random &rnd, World &world)
               rnd.getInt(1, 2)}},
             {0.5, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
             {0.5,
-             {rnd.select({ItemID::coralTorch, ItemID::glowstick}),
+             {nearEdge ? ItemID::coralTorch : ItemID::glowstick,
               Prefix::none,
               rnd.getInt(15, 29)}},
             {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}},

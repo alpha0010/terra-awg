@@ -1,7 +1,8 @@
-#include "Snow.h"
+#include "Desert.h"
 
 #include "Random.h"
 #include "World.h"
+#include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
 #include <iostream>
 #include <map>
@@ -20,6 +21,11 @@ void genDesert(Random &rnd, World &world)
         sandWalls[wallId] = rnd.select(
             {WallID::Unsafe::sandstone, WallID::Unsafe::hardenedSand});
     }
+    fillLargeWallGaps(
+        {center - 0.9 * scanDist, 0.95 * world.getUndergroundLevel()},
+        {center + 0.9 * scanDist, 0.96 * desertFloor},
+        rnd,
+        world);
     for (int x = center - scanDist; x < center + scanDist; ++x) {
         for (int y = 0; y < world.getUnderworldLevel(); ++y) {
             double threshold = std::max(

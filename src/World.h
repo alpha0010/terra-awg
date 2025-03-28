@@ -24,6 +24,7 @@ enum class Variant {
     lesion,
     lihzahrd,
     marble,
+    meteorite,
     mushroom,
     palmWood,
     reef,

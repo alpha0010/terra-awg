@@ -53,7 +53,7 @@ void fillMushroomField(
                 case TileID::ice:
                 case TileID::sandstone:
                     tile.blockID =
-                        world.isExposed(x, y) || rnd.getInt(0, 100) == 0
+                        world.isExposed(x, y) || rnd.getInt(0, 35) == 0
                             ? TileID::mushroomGrass
                             : TileID::mud;
                     [[fallthrough]];

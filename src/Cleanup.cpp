@@ -124,6 +124,7 @@ void smoothSurfaces(World &world)
         TileID::hive,
         TileID::honey,
         TileID::crimsand,
+        TileID::coralstone,
         TileID::smoothMarble,
         TileID::marble,
         TileID::granite,

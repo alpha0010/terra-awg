@@ -69,7 +69,7 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
         offsetX = 1548;
         break;
     case Variant::frozen:
-        offsetX = 792;
+        offsetX = 396;
         break;
     case Variant::hallowed:
         offsetX = 936;
@@ -100,6 +100,9 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
         break;
     case Variant::marble:
         offsetX = 1836;
+        break;
+    case Variant::meteorite:
+        offsetX = 1764;
         break;
     case Variant::mushroom:
         offsetX = 1152;
