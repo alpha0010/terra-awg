@@ -32,7 +32,7 @@ void fillSurfaceChest(Chest &chest, int torchID, Random &rnd, World &world)
         chest,
         rnd,
         {{1,
-          rnd.select<Item>({
+          rnd.pool<Item>({
               {ItemID::spear, rnd.select(PrefixSet::universal), 1},
               {ItemID::blowpipe, rnd.select(PrefixSet::ranged), 1},
               {ItemID::woodenBoomerang, rnd.select(PrefixSet::universal), 1},
@@ -90,7 +90,7 @@ void fillSurfaceFrozenChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {{1,
-          rnd.select<Item>({
+          rnd.pool<Item>({
               {ItemID::iceBoomerang, rnd.select(PrefixSet::universal), 1},
               {ItemID::iceBlade, rnd.select(PrefixSet::melee), 1},
               {ItemID::iceSkates, rnd.select(PrefixSet::accessory), 1},
@@ -148,7 +148,7 @@ void fillSurfacePalmWoodChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {{1,
-          rnd.select<Item>({
+          rnd.pool<Item>({
               {ItemID::spear, rnd.select(PrefixSet::universal), 1},
               {ItemID::blowpipe, rnd.select(PrefixSet::ranged), 1},
               {ItemID::woodenBoomerang, rnd.select(PrefixSet::universal), 1},
@@ -205,7 +205,7 @@ void fillSurfaceRichMahoganyChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {{1,
-          rnd.select<Item>({
+          rnd.pool<Item>({
               {ItemID::spear, rnd.select(PrefixSet::universal), 1},
               {ItemID::blowpipe, rnd.select(PrefixSet::ranged), 1},
               {ItemID::woodenBoomerang, rnd.select(PrefixSet::universal), 1},
@@ -265,7 +265,7 @@ void fillSurfaceWaterChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {{1,
-          rnd.select<Item>({
+          rnd.pool<Item>({
               {ItemID::breathingReed, rnd.select(PrefixSet::melee), 1},
               {ItemID::flipper, rnd.select(PrefixSet::accessory), 1},
               {ItemID::trident, rnd.select(PrefixSet::universal), 1},
@@ -323,7 +323,7 @@ void fillUndergroundChest(Chest &chest, int torchID, Random &rnd, World &world)
         rnd,
         {
             {1,
-             rnd.select<Item>({
+             rnd.pool<Item>({
                  {ItemID::bandOfRegeneration,
                   rnd.select(PrefixSet::accessory),
                   1},
@@ -379,7 +379,7 @@ void fillUndergroundFrozenChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1,
-             rnd.select<Item>({
+             rnd.pool<Item>({
                  {ItemID::iceBoomerang, rnd.select(PrefixSet::universal), 1},
                  {ItemID::iceBlade, rnd.select(PrefixSet::melee), 1},
                  {ItemID::iceSkates, rnd.select(PrefixSet::accessory), 1},
@@ -439,7 +439,7 @@ void fillUndergroundHoneyChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1,
-             {rnd.select(
+             {rnd.pool(
                   {ItemID::abeemination,
                    ItemID::beeMinecart,
                    ItemID::hiveWand,
@@ -493,7 +493,7 @@ void fillUndergroundMushroomChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1,
-             rnd.select<Item>({
+             rnd.pool<Item>({
                  {ItemID::bandOfRegeneration,
                   rnd.select(PrefixSet::accessory),
                   1},
@@ -504,9 +504,9 @@ void fillUndergroundMushroomChest(Chest &chest, Random &rnd, World &world)
                  {ItemID::shoeSpikes, rnd.select(PrefixSet::accessory), 1},
              })},
             {1,
-             {rnd.select(
+             {rnd.pool(
                   {ItemID::shroomMinecart,
-                   rnd.select(
+                   rnd.pool(
                        {ItemID::mushroomHat,
                         ItemID::mushroomVest,
                         ItemID::mushroomPants})}),
@@ -558,7 +558,7 @@ void fillUndergroundSandstoneChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1,
-             rnd.select<Item>({
+             rnd.pool<Item>({
                  {ItemID::magicConch, Prefix::none, 1},
                  {ItemID::snakeCharmersFlute, Prefix::none, 1},
                  {ItemID::ancientChisel, rnd.select(PrefixSet::accessory), 1},
@@ -616,7 +616,7 @@ void fillUndergroundRichMahoganyChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1,
-             rnd.select<Item>({
+             rnd.pool<Item>({
                  {ItemID::bandOfRegeneration,
                   rnd.select(PrefixSet::accessory),
                   1},
@@ -674,7 +674,7 @@ void fillUndergroundWaterChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1,
-             rnd.select<Item>({
+             rnd.pool<Item>({
                  {ItemID::breathingReed, rnd.select(PrefixSet::melee), 1},
                  {ItemID::flipper, rnd.select(PrefixSet::accessory), 1},
                  {ItemID::trident, rnd.select(PrefixSet::universal), 1},
@@ -735,7 +735,7 @@ void fillCavernChest(Chest &chest, int torchID, Random &rnd, World &world)
         rnd,
         {
             {1,
-             rnd.select<Item>({
+             rnd.pool<Item>({
                  {ItemID::bandOfRegeneration,
                   rnd.select(PrefixSet::accessory),
                   1},
@@ -802,7 +802,7 @@ void fillCavernFrozenChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1,
-             rnd.select<Item>({
+             rnd.pool<Item>({
                  {ItemID::iceBoomerang, rnd.select(PrefixSet::universal), 1},
                  {ItemID::iceBlade, rnd.select(PrefixSet::melee), 1},
                  {ItemID::iceSkates, rnd.select(PrefixSet::accessory), 1},
@@ -872,7 +872,7 @@ void fillCavernHoneyChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1,
-             {rnd.select(
+             {rnd.pool(
                   {ItemID::abeemination,
                    ItemID::beeMinecart,
                    ItemID::hiveWand,
@@ -940,7 +940,7 @@ void fillCavernMushroomChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1,
-             rnd.select<Item>({
+             rnd.pool<Item>({
                  {ItemID::bandOfRegeneration,
                   rnd.select(PrefixSet::accessory),
                   1},
@@ -951,9 +951,9 @@ void fillCavernMushroomChest(Chest &chest, Random &rnd, World &world)
                  {ItemID::flareGun, Prefix::none, 1},
              })},
             {1,
-             {rnd.select(
+             {rnd.pool(
                   {ItemID::shroomMinecart,
-                   rnd.select(
+                   rnd.pool(
                        {ItemID::mushroomHat,
                         ItemID::mushroomVest,
                         ItemID::mushroomPants})}),
@@ -1018,7 +1018,7 @@ void fillCavernSandstoneChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1,
-             rnd.select<Item>({
+             rnd.pool<Item>({
                  {ItemID::stormSpear, rnd.select(PrefixSet::universal), 1},
                  {ItemID::thunderZapper, rnd.select(PrefixSet::magic), 1},
                  {ItemID::bastStatue, Prefix::none, 1},
@@ -1088,7 +1088,7 @@ void fillCavernRichMahoganyChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1,
-             rnd.select<Item>({
+             rnd.pool<Item>({
                  {ItemID::bandOfRegeneration,
                   rnd.select(PrefixSet::accessory),
                   1},
@@ -1160,7 +1160,7 @@ void fillCavernWaterChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1,
-             rnd.select<Item>({
+             rnd.pool<Item>({
                  {ItemID::breathingReed, rnd.select(PrefixSet::melee), 1},
                  {ItemID::flipper, rnd.select(PrefixSet::accessory), 1},
                  {ItemID::trident, rnd.select(PrefixSet::universal), 1},
@@ -1229,7 +1229,7 @@ void fillShadowChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1,
-             rnd.select<Item>({
+             rnd.pool<Item>({
                  {ItemID::sunfury, rnd.select(PrefixSet::universal), 1},
                  {ItemID::flowerOfFire, rnd.select(PrefixSet::magic), 1},
                  {ItemID::flamelash, rnd.select(PrefixSet::magic), 1},
@@ -1301,7 +1301,7 @@ void fillDungeonChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1,
-             rnd.select<Item>({
+             rnd.pool<Item>({
                  {ItemID::muramasa, rnd.select(PrefixSet::melee), 1},
                  {ItemID::cobaltShield, rnd.select(PrefixSet::accessory), 1},
                  {ItemID::aquaScepter, rnd.select(PrefixSet::magic), 1},

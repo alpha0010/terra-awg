@@ -84,7 +84,9 @@ void genCorruption(Random &rnd, World &world)
         parallelFor(
             std::views::iota(sourceX - scanDist, sourceX + scanDist),
             [&, scanDist, sourceX, sourceY](int x) {
-                for (int y = sourceY - scanDist; y < sourceY + scanDist; ++y) {
+                for (int y = std::max(sourceY - scanDist, 0);
+                     y < sourceY + scanDist;
+                     ++y) {
                     double threshold =
                         1 - std::sqrt(
                                 18 * std::hypot(x - sourceX, y - sourceY) /

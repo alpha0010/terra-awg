@@ -1,7 +1,9 @@
 #ifndef RANDOM_H
 #define RANDOM_H
 
+#include <map>
 #include <random>
+#include <source_location>
 #include <vector>
 
 class Random
@@ -16,9 +18,12 @@ private:
     int noiseDeltaY;
     int savedNoiseDeltaX;
     int savedNoiseDeltaY;
+    std::map<std::string, int> poolState;
     std::default_random_engine rnd;
 
     void computeBlurNoise();
+
+    int getPoolIndex(int size, std::source_location origin);
 
 public:
     Random();
@@ -36,6 +41,14 @@ public:
     double getCoarseNoise(int x, int y) const;
     double getFineNoise(int x, int y) const;
     std::vector<int> partitionRange(int numSegments, int range);
+
+    template <typename T>
+    T pool(
+        std::initializer_list<T> list,
+        std::source_location origin = std::source_location::current())
+    {
+        return *(list.begin() + getPoolIndex(list.size(), origin));
+    }
 
     template <typename T> T select(std::initializer_list<T> list)
     {

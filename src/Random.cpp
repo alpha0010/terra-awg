@@ -75,6 +75,18 @@ void Random::computeBlurNoise()
     });
 }
 
+int Random::getPoolIndex(int size, std::source_location origin)
+{
+    std::string key = std::to_string(origin.line()) + ':' +
+                      std::to_string(origin.column()) + ':' +
+                      origin.function_name();
+    if (!poolState.contains(key)) {
+        poolState[key] = getInt(0, size - 1);
+    }
+    ++poolState[key];
+    return poolState[key] % size;
+}
+
 void Random::shuffleNoise()
 {
     noiseDeltaX = getInt(0, noiseWidth);
