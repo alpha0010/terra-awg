@@ -75,6 +75,8 @@ public:
     double desertCenter;
     double jungleCenter;
     double snowCenter;
+    int surfaceEvilCenter;
+    int dungeonCenter;
 };
 
 #endif // WORLD_H

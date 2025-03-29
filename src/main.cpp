@@ -19,6 +19,7 @@
 #include "biomes/Snow.h"
 #include "biomes/SpiderNest.h"
 #include "biomes/Underworld.h"
+#include "structures/Dungeon.h"
 #include "structures/Lake.h"
 #include "structures/Treasure.h"
 #include <array>
@@ -109,6 +110,7 @@ int main()
     genGemCave(rnd, world);
     genSpiderNest(rnd, world);
     genGlowingMoss(rnd, world);
+    genDungeon(rnd, world);
     genLake(world);
     genTreasure(rnd, world);
     smoothSurfaces(world);
@@ -173,14 +175,14 @@ int main()
     w.putUint32(world.spawnY);         // Spawn Y.
     w.putFloat64(world.getUndergroundLevel());
     w.putFloat64(world.getCavernLevel());
-    w.putFloat64(13500);                // Time of day.
-    w.putBool(true);                    // Is day.
-    w.putUint32(0);                     // Moon phase.
-    w.putBool(false);                   // Blood moon.
-    w.putBool(false);                   // Eclipse.
-    w.putUint32(world.getWidth() / 4);  // Dungeon X.
-    w.putUint32(world.getHeight() / 2); // Dungeon Y.
-    w.putBool(world.isCrimson);         // Is crimson.
+    w.putFloat64(13500);              // Time of day.
+    w.putBool(true);                  // Is day.
+    w.putUint32(0);                   // Moon phase.
+    w.putBool(false);                 // Blood moon.
+    w.putBool(false);                 // Eclipse.
+    w.putUint32(world.dungeonCenter); // Dungeon X.
+    w.putUint32(world.spawnY);        // Dungeon Y.
+    w.putBool(world.isCrimson);       // Is crimson.
     for (int i = 0; i < 20; ++i) {
         w.putBool(false); // Bosses and npc saves.
     }
@@ -431,7 +433,7 @@ int main()
                             "Seth",   "Steve", "Tanner",  "Trent",   "Wyatt",
                             "Zach"}));       // NPC name.
     w.putFloat32(16 * world.getWidth() / 2); // NPC position X.
-    w.putFloat32(16 * world.spawnY);         // NPC position Y.
+    w.putFloat32(16 * (world.spawnY - 2));   // NPC position Y.
     w.putBool(true);                         // NPC is homeless.
     w.putUint32(world.getWidth() / 2);       // NPC home X.
     w.putUint32(world.spawnY);               // NPC home Y.

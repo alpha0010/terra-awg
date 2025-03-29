@@ -20,6 +20,7 @@ void genCrimson(Random &rnd, World &world)
     int surfaceY = rnd.getInt(
         0.95 * world.getUndergroundLevel(),
         (2 * world.getUndergroundLevel() + world.getCavernLevel()) / 3);
+    world.surfaceEvilCenter = surfaceX;
     int scanDist = 0.08 * world.getWidth();
     std::map<int, int> crimsonBlocks{
         {TileID::stone, TileID::crimstone},

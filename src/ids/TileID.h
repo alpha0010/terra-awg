@@ -20,6 +20,9 @@ enum {
     altar = 26,
     orbHeart = 31,
     clay = 40,
+    blueBrick = 41,
+    greenBrick = 43,
+    pinkBrick = 44,
     sand = 53,
     ash = 57,
     hellstone = 58,
@@ -86,6 +89,7 @@ enum {
     ashGrass = 633,
     corruptJungleGrass = 661,
     crimsonJungleGrass = 662,
+    lifeCrystalBoulder = 665,
     aetherium = 659
 };
 }

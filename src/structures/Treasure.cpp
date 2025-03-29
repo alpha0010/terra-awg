@@ -14,6 +14,12 @@
 
 typedef std::map<int, std::vector<std::pair<int, int>>> LocationBins;
 
+template <typename T, typename U>
+bool listContains(const T &list, const U &value)
+{
+    return std::find(std::begin(list), std::end(list), value) != std::end(list);
+}
+
 bool isSolid(int tileId)
 {
     return tileId != TileID::empty && tileId != TileID::thinIce &&
@@ -99,6 +105,7 @@ void placeLifeCrystals(
     World &world)
 {
     int lifeCrystalCount = world.getWidth() * world.getHeight() / 50000;
+    int maxDungeonPlacements = 3;
     while (lifeCrystalCount > 0) {
         int binId = rnd.getInt(0, maxBin);
         if (locations[binId].empty()) {
@@ -107,7 +114,18 @@ void placeLifeCrystals(
         auto [x, y] = rnd.select(locations[binId]);
         if (y > world.getUndergroundLevel() && y < world.getUnderworldLevel() &&
             isPlacementCandidate(x, y, world)) {
-            world.placeFramedTile(x, y - 2, TileID::lifeCrystal);
+            if (listContains(
+                    WallVariants::dungeon,
+                    world.getTile(x, y - 2).wallID)) {
+                if (maxDungeonPlacements > 0) {
+                    world.placeFramedTile(x, y - 2, TileID::lifeCrystalBoulder);
+                    --maxDungeonPlacements;
+                } else {
+                    continue;
+                }
+            } else {
+                world.placeFramedTile(x, y - 2, TileID::lifeCrystal);
+            }
             --lifeCrystalCount;
         }
     }
@@ -232,15 +250,18 @@ void placeLarvae(LocationBins &locations, Random &rnd, World &world)
 
 Variant getChestType(int x, int y, World &world)
 {
+    Tile &probeTile = world.getTile(x, y - 2);
     if (y > world.getUnderworldLevel()) {
         return Variant::shadow;
-    } else if (world.getTile(x, y - 1).wallID == WallID::Unsafe::hive) {
+    } else if (probeTile.wallID == WallID::Unsafe::hive) {
         return Variant::honey;
-    } else if (world.getTile(x, y - 2).liquid == Liquid::water) {
+    } else if (probeTile.liquid == Liquid::water) {
         return y < world.getUndergroundLevel() &&
                        (x < 350 || x > world.getWidth() - 350)
                    ? Variant::reef
                    : Variant::water;
+    } else if (listContains(WallVariants::dungeon, probeTile.wallID)) {
+        return Variant::goldLocked;
     }
     std::map<int, Variant> blockTypes{
         {TileID::crimstone, Variant::flesh},

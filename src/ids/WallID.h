@@ -12,6 +12,9 @@ namespace Unsafe
 enum {
     dirt = 2,
     ebonstone = 3,
+    blueBrick = 7,
+    greenBrick = 8,
+    pinkBrick = 9,
     mud = 15,
     snow = 40,
     amethystStone = 48,
@@ -32,6 +35,12 @@ enum {
     crimsonGrass = 81,
     crimstone = 83,
     hive = 86,
+    blueSlab = 94,
+    blueTiled = 95,
+    pinkSlab = 96,
+    pinkTiled = 97,
+    greenSlab = 98,
+    greenTiled = 99,
     caveDirt = 170,
     roughDirt = 171,
     marble = 178,
@@ -112,6 +121,17 @@ inline std::array const corruption = {
     WallID::Unsafe::corruptGrowth,
     WallID::Unsafe::corruptMass,
     WallID::Unsafe::corruptPustule};
+
+inline std::array const dungeon = {
+    WallID::Unsafe::blueBrick,
+    WallID::Unsafe::greenBrick,
+    WallID::Unsafe::pinkBrick,
+    WallID::Unsafe::blueSlab,
+    WallID::Unsafe::greenSlab,
+    WallID::Unsafe::pinkSlab,
+    WallID::Unsafe::blueTiled,
+    WallID::Unsafe::greenTiled,
+    WallID::Unsafe::pinkTiled};
 
 inline std::array const underworld = {
     WallID::Unsafe::ember,
