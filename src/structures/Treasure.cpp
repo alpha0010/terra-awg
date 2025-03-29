@@ -4,7 +4,6 @@
 #include "Util.h"
 #include "World.h"
 #include "ids/ItemID.h"
-#include "ids/Prefix.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include <iostream>
@@ -23,7 +22,8 @@ bool listContains(const T &list, const U &value)
 bool isSolid(int tileId)
 {
     return tileId != TileID::empty && tileId != TileID::thinIce &&
-           tileId != TileID::bubble;
+           tileId != TileID::bubble && tileId != TileID::chest &&
+           tileId != TileID::chestGroup2;
 }
 
 bool isPlacementCandidate(int x, int y, World &world)
@@ -351,6 +351,11 @@ Variant getChestType(int x, int y, World &world)
             return type;
         }
     }
+    for (auto evil : {Variant::flesh, Variant::lesion}) {
+        if (zoneCounts[evil] > 2) {
+            return evil;
+        }
+    }
     return y < world.getUndergroundLevel() ? Variant::none : Variant::gold;
 }
 
@@ -383,12 +388,6 @@ void placeChest(int x, int y, Variant type, Random &rnd, World &world)
         } else {
             fillCavernHoneyChest(chest, rnd, world);
         }
-        return;
-    case Variant::jungle:
-        fillDungeonBiomeChest(
-            chest,
-            rnd,
-            {ItemID::piranhaGun, rnd.select(PrefixSet::ranged), 1});
         return;
     case Variant::lesion:
         torchID = ItemID::corruptTorch;

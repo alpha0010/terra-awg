@@ -64,6 +64,11 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
             offsetY = 792 + 36 * ((x + y) % 3);
         }
         break;
+    case Variant::crystal:
+        if (blockID == TileID::lamp) {
+            offsetY = 1674;
+        }
+        break;
     case Variant::desert:
         if (blockID == TileID::chest) {
             blockID = TileID::chestGroup2;
@@ -74,24 +79,50 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
         }
         break;
     case Variant::dungeon:
-        offsetX = 36 * (y % 3);
-        offsetY = 360 + 36 * (x % 3);
+        if (blockID == TileID::pot) {
+            offsetX = 36 * (y % 3);
+            offsetY = 360 + 36 * (x % 3);
+        }
+        break;
+    case Variant::dynasty:
+        if (blockID == TileID::lamp) {
+            offsetY = 936;
+        }
         break;
     case Variant::flesh:
-        offsetX = 1548;
+        if (blockID == TileID::chest) {
+            offsetX = 1548;
+        } else if (blockID == TileID::lamp) {
+            offsetY = 162;
+        }
         break;
     case Variant::forest:
-        offsetX = 36 * (y % 3);
-        offsetY = 36 * (x % 4);
+        if (blockID == TileID::pot) {
+            offsetX = 36 * (y % 3);
+            offsetY = 36 * (x % 4);
+        }
         break;
     case Variant::frozen:
-        offsetX = 396;
+        if (blockID == TileID::chest) {
+            offsetX = 396;
+        } else if (blockID == TileID::lamp) {
+            offsetY = 270;
+        }
         break;
     case Variant::hallowed:
-        offsetX = 936;
+        if (blockID == TileID::chest) {
+            offsetX = 936;
+        }
         break;
     case Variant::honey:
-        offsetX = 1044;
+        if (blockID == TileID::chest) {
+            offsetX = 1044;
+        }
+        break;
+    case Variant::ice:
+        if (blockID == TileID::chest) {
+            offsetX = 972;
+        }
         break;
     case Variant::jungle:
         if (blockID == TileID::chest) {
@@ -102,18 +133,26 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
         }
         break;
     case Variant::gold:
-        offsetX = 36;
+        if (blockID == TileID::chest) {
+            offsetX = 36;
+        }
         break;
     case Variant::goldLocked:
-        offsetX = 72;
+        if (blockID == TileID::chest) {
+            offsetX = 72;
+        }
         break;
     case Variant::granite:
-        offsetX = 1800;
+        if (blockID == TileID::chest) {
+            offsetX = 1800;
+        }
         break;
     case Variant::lesion:
         if (blockID == TileID::chest) {
             blockID = TileID::chestGroup2;
             offsetX = 108;
+        } else if (blockID == TileID::lamp) {
+            offsetY = 1782;
         }
         break;
     case Variant::lihzahrd:
@@ -132,13 +171,19 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
         }
         break;
     case Variant::meteorite:
-        offsetX = 1764;
+        if (blockID == TileID::chest) {
+            offsetX = 1764;
+        }
         break;
     case Variant::mushroom:
-        offsetX = 1152;
+        if (blockID == TileID::chest) {
+            offsetX = 1152;
+        }
         break;
     case Variant::palmWood:
-        offsetX = 1116;
+        if (blockID == TileID::chest) {
+            offsetX = 1116;
+        }
         break;
     case Variant::reef:
         if (blockID == TileID::chest) {
@@ -147,31 +192,45 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
         }
         break;
     case Variant::richMahogany:
-        offsetX = 288;
+        if (blockID == TileID::chest) {
+            offsetX = 288;
+        }
         break;
     case Variant::sandstone:
         if (blockID == TileID::chest) {
             blockID = TileID::chestGroup2;
             offsetX = 360;
+        } else if (blockID == TileID::lamp) {
+            offsetY = 2052;
         }
         break;
     case Variant::shadow:
-        offsetX = 144;
+        if (blockID == TileID::chest) {
+            offsetX = 144;
+        }
         break;
     case Variant::spider:
-        offsetX = 36 * (y % 3);
-        offsetY = 684 + 36 * (x % 3);
+        if (blockID == TileID::pot) {
+            offsetX = 36 * (y % 3);
+            offsetY = 684 + 36 * (x % 3);
+        }
         break;
     case Variant::tundra:
-        offsetX = 36 * (y % 3);
-        offsetY = 144 + 36 * (x % 3);
+        if (blockID == TileID::pot) {
+            offsetX = 36 * (y % 3);
+            offsetY = 144 + 36 * (x % 3);
+        }
         break;
     case Variant::underworld:
-        offsetX = 36 * (y % 3);
-        offsetY = 468 + 36 * (x % 3);
+        if (blockID == TileID::pot) {
+            offsetX = 36 * (y % 3);
+            offsetY = 468 + 36 * (x % 3);
+        }
         break;
     case Variant::water:
-        offsetX = 612;
+        if (blockID == TileID::chest) {
+            offsetX = 612;
+        }
         break;
     default:
         break;
@@ -182,6 +241,10 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
         break;
     case TileID::larva:
         frameWidth = 3;
+        frameHeight = 3;
+        break;
+    case TileID::lamp:
+        frameWidth = 1;
         frameHeight = 3;
         break;
     default:

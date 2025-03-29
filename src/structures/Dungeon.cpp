@@ -2,7 +2,10 @@
 
 #include "Random.h"
 #include "World.h"
+#include "ids/ItemID.h"
+#include "ids/Prefix.h"
 #include "ids/WallID.h"
+#include "structures/LootRules.h"
 #include <algorithm>
 #include <iostream>
 #include <set>
@@ -99,6 +102,84 @@ private:
         }
     }
 
+    bool isValidPlacementLocation(int x, int y, int width, int height)
+    {
+        for (int i = 0; i < width; ++i) {
+            if (world.getTile(x + i, y + 1).blockID != TileID::blueBrick) {
+                return false;
+            }
+        }
+        for (int i = 0; i < width; ++i) {
+            for (int j = 0; j < height; ++j) {
+                Tile &tile = world.getTile(x + i, y - j);
+                if (tile.blockID != TileID::empty ||
+                    tile.wallID != WallID::Unsafe::blueBrick ||
+                    tile.liquid != Liquid::none) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    Point selectBiomeChestLocation(const std::vector<Point> &zones)
+    {
+        while (true) {
+            auto [x, y] = rnd.select(zones);
+            x += rnd.getInt(-6, 2);
+            while (world.getTile(x, y + 1).blockID == TileID::empty) {
+                ++y;
+            }
+            if (isValidPlacementLocation(x, y, 6, 5)) {
+                return {x, y};
+            }
+        }
+    }
+
+    void addBiomeChests(const std::vector<Point> &zones)
+    {
+        for (auto [chestType, lampType, platformBlock, item] :
+             {std::tuple{
+                  Variant::jungle,
+                  Variant::dynasty,
+                  TileID::mudstoneBrick,
+                  Item{ItemID::piranhaGun, rnd.select(PrefixSet::ranged), 1}},
+              {Variant::corruption,
+               Variant::lesion,
+               TileID::ebonstoneBrick,
+               {ItemID::scourgeOfTheCorruptor,
+                rnd.select(PrefixSet::common),
+                1}},
+              {Variant::crimson,
+               Variant::flesh,
+               TileID::crimstoneBrick,
+               {ItemID::vampireKnives, rnd.select(PrefixSet::common), 1}},
+              {Variant::hallowed,
+               Variant::crystal,
+               TileID::pearlstoneBrick,
+               {ItemID::rainbowGun, rnd.select(PrefixSet::magic), 1}},
+              {Variant::ice,
+               Variant::frozen,
+               TileID::iceBrick,
+               {ItemID::staffOfTheFrostHydra, rnd.select(PrefixSet::magic), 1}},
+              {Variant::desert,
+               Variant::sandstone,
+               TileID::sandstoneBrick,
+               {ItemID::desertTigerStaff, rnd.select(PrefixSet::magic), 1}}}) {
+            auto [x, y] = selectBiomeChestLocation(zones);
+            for (int i = 0; i < 6; ++i) {
+                world.getTile(x + i, y).blockID = platformBlock;
+            }
+            for (int i = 1; i < 5; ++i) {
+                world.getTile(x + i, y - 1).blockID = platformBlock;
+            }
+            Chest &chest = world.placeChest(x + 2, y - 3, chestType);
+            fillDungeonBiomeChest(chest, rnd, std::move(item));
+            world.placeFramedTile(x, y - 3, TileID::lamp, lampType);
+            world.placeFramedTile(x + 5, y - 3, TileID::lamp, lampType);
+        }
+    }
+
     void applyBrickTheme(
         const std::vector<Point> &zones,
         int dungeonCenter,
@@ -146,7 +227,7 @@ private:
             return;
         }
         for (int x = dungeonCenter - dungeonWidth;
-             x < dungeonCenter + dungeonWidth + roomSize + wallThickness;
+             x < dungeonCenter + dungeonWidth + 2 * roomSize;
              ++x) {
             for (int y = 0; y < world.getUnderworldLevel(); ++y) {
                 Tile &tile = world.getTile(x, y);
@@ -217,6 +298,7 @@ public:
                 }
             }
         }
+        addBiomeChests(zones);
         std::sort(
             zones.begin(),
             zones.end(),

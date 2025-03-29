@@ -152,7 +152,11 @@ void genWorldBase(Random &rnd, World &world)
     parallelFor(
         std::views::iota(0, world.getWidth()),
         [underworldHeight, &rnd, &world](int x) {
+            bool nearEdge = x < 350 || x > world.getWidth() - 350;
             for (int y = 0; y < world.getHeight(); ++y) {
+                if (nearEdge && y < 0.9 * world.getUndergroundLevel()) {
+                    continue;
+                }
                 double threshold =
                     y < world.getUndergroundLevel()
                         ? 2.94 - 3.1 * y / world.getUndergroundLevel()
