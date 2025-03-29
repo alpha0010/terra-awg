@@ -483,6 +483,53 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
     }
 }
 
+Variant getPotType(int x, int y, World &world)
+{
+    switch (getChestType(x, y, world)) {
+    case Variant::flesh:
+        return Variant::crimson;
+    case Variant::frozen:
+        return Variant::tundra;
+    case Variant::goldLocked:
+        return Variant::dungeon;
+    case Variant::honey:
+    case Variant::richMahogany:
+        return Variant::jungle;
+    case Variant::lesion:
+        return Variant::corruption;
+    case Variant::lihzahrd:
+        return Variant::lihzahrd;
+    case Variant::marble:
+        return Variant::marble;
+    case Variant::sandstone:
+        return Variant::desert;
+    case Variant::shadow:
+        return Variant::underworld;
+    case Variant::spider:
+        return Variant::spider;
+    default:
+        return Variant::forest;
+    }
+}
+
+void placePots(int maxBin, LocationBins &locations, Random &rnd, World &world)
+{
+    int potCount = world.getWidth() * world.getHeight() / 10000;
+    while (potCount > 0) {
+        int binId = rnd.getInt(0, maxBin);
+        if (locations[binId].empty()) {
+            continue;
+        }
+        auto [x, y] = rnd.select(locations[binId]);
+        if (y < 0.85 * world.getUndergroundLevel() ||
+            !isPlacementCandidate(x, y, world)) {
+            continue;
+        }
+        world.placeFramedTile(x, y - 2, TileID::pot, getPotType(x, y, world));
+        --potCount;
+    }
+}
+
 void genTreasure(Random &rnd, World &world)
 {
     std::cout << "Cataloging ground\n";
@@ -521,4 +568,5 @@ void genTreasure(Random &rnd, World &world)
     placeAltars(maxBin, flatLocations, rnd, world);
     placeOrbHearts(maxBin, orbHeartLocations, rnd, world);
     placeChests(maxBin, flatLocations, rnd, world);
+    placePots(maxBin, flatLocations, rnd, world);
 }

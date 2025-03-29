@@ -12,7 +12,9 @@ enum class Variant {
     corruption,
     crimson,
     desert,
+    dungeon,
     flesh,
+    forest,
     frozen,
     gold,
     goldLocked,
@@ -31,6 +33,9 @@ enum class Variant {
     richMahogany,
     sandstone,
     shadow,
+    spider,
+    tundra,
+    underworld,
     water
 };
 

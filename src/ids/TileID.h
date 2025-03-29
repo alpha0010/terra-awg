@@ -18,6 +18,7 @@ enum {
     corruptGrass = 23,
     ebonstone = 25,
     altar = 26,
+    pot = 28,
     orbHeart = 31,
     clay = 40,
     blueBrick = 41,
