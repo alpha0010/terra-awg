@@ -19,17 +19,21 @@ bool listContains(const T &list, const U &value)
     return std::find(std::begin(list), std::end(list), value) != std::end(list);
 }
 
-bool isSolid(int tileId)
-{
-    return tileId != TileID::empty && tileId != TileID::thinIce &&
-           tileId != TileID::bubble && tileId != TileID::chest &&
-           tileId != TileID::chestGroup2;
-}
+inline const std::set<int> nonSolidTiles{
+    TileID::empty,
+    TileID::alchemyTable,
+    TileID::bewitchingTable,
+    TileID::boneWelder,
+    TileID::bubble,
+    TileID::chest,
+    TileID::chestGroup2,
+    TileID::thinIce,
+};
 
 bool isPlacementCandidate(int x, int y, World &world)
 {
-    if (!isSolid(world.getTile(x, y).blockID) ||
-        !isSolid(world.getTile(x + 1, y).blockID)) {
+    if (nonSolidTiles.contains(world.getTile(x, y).blockID) ||
+        nonSolidTiles.contains(world.getTile(x + 1, y).blockID)) {
         return false;
     }
     for (int i = 0; i < 2; ++i) {

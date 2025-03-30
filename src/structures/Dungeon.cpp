@@ -102,11 +102,18 @@ private:
         }
     }
 
-    bool isValidPlacementLocation(int x, int y, int width, int height)
+    bool isValidPlacementLocation(
+        int x,
+        int y,
+        int width,
+        int height,
+        bool needsFloor)
     {
-        for (int i = 0; i < width; ++i) {
-            if (world.getTile(x + i, y + 1).blockID != TileID::blueBrick) {
-                return false;
+        if (needsFloor) {
+            for (int i = 0; i < width; ++i) {
+                if (world.getTile(x + i, y + 1).blockID != TileID::blueBrick) {
+                    return false;
+                }
             }
         }
         for (int i = 0; i < width; ++i) {
@@ -130,7 +137,7 @@ private:
             while (world.getTile(x, y + 1).blockID == TileID::empty) {
                 ++y;
             }
-            if (isValidPlacementLocation(x, y, 6, 5)) {
+            if (isValidPlacementLocation(x, y, 6, 5, true)) {
                 return {x, y};
             }
         }
@@ -177,6 +184,114 @@ private:
             fillDungeonBiomeChest(chest, rnd, std::move(item));
             world.placeFramedTile(x, y - 3, TileID::lamp, lampType);
             world.placeFramedTile(x + 5, y - 3, TileID::lamp, lampType);
+        }
+    }
+
+    Point selectPlatformLocation(const std::vector<Point> &zones)
+    {
+        while (true) {
+            auto [x, y] = rnd.select(zones);
+            if (isValidPlacementLocation(x, y, 1, roomSize, false)) {
+                y -= rnd.getInt(4, roomSize - 4);
+                return {x, y};
+            }
+        }
+    }
+
+    void addPlatforms(const std::vector<Point> &zones)
+    {
+        std::set<int> usedRows;
+        int maxPlatforms = world.getHeight() / 40;
+        for (int i = 0; i < maxPlatforms; ++i) {
+            auto [centerX, centerY] = selectPlatformLocation(zones);
+            if (usedRows.contains(centerY / 7)) {
+                continue;
+            }
+            usedRows.insert(centerY / 7);
+            int fromX = centerX - 4;
+            int toX = centerX + 4;
+            while (
+                isValidPlacementLocation(fromX - 2, centerY + 4, 2, 9, false)) {
+                fromX -= 2;
+            }
+            while (isValidPlacementLocation(toX, centerY + 4, 2, 9, false)) {
+                toX += 2;
+            }
+            if (toX - fromX < roomSize) {
+                continue;
+            }
+            auto partitions = rnd.partitionRange(rnd.getInt(2, 4), toX - fromX);
+            auto partItr = partitions.begin();
+            bool isDrawing = rnd.getBool();
+            for (int x = fromX; x < toX; ++x) {
+                if (partItr != partitions.end() && x - fromX == *partItr) {
+                    ++partItr;
+                    isDrawing = !isDrawing;
+                }
+                if (isDrawing) {
+                    for (int y = centerY; y < centerY + 2; ++y) {
+                        world.getTile(x, y).blockID = TileID::blueBrick;
+                    }
+                }
+            }
+        }
+    }
+
+    void addFurniture(int dungeonCenter, int dungeonWidth)
+    {
+        std::vector<Point> locations;
+        for (int x = dungeonCenter - dungeonWidth;
+             x < dungeonCenter + dungeonWidth + 2 * roomSize;
+             ++x) {
+            for (int y = world.getUndergroundLevel();
+                 y < world.getUnderworldLevel();
+                 ++y) {
+                if (isValidPlacementLocation(x, y, 3, 3, true)) {
+                    locations.emplace_back(x, y);
+                }
+            }
+        }
+        for (auto furnitureTile :
+             {TileID::alchemyTable,
+              TileID::bewitchingTable,
+              TileID::boneWelder}) {
+            int numPlacements = rnd.getInt(1, 4);
+            while (numPlacements > 0) {
+                auto [x, y] = rnd.select(locations);
+                if (isValidPlacementLocation(x, y, 3, 3, true)) {
+                    world.placeFramedTile(x, y - 2, furnitureTile);
+                    --numPlacements;
+                }
+            }
+        }
+        int numChests = world.getHeight() / 150;
+        while (numChests > 0) {
+            auto [x, y] = rnd.select(locations);
+            if (isValidPlacementLocation(x, y, 2, 3, true)) {
+                Chest &chest = world.placeChest(x, y - 1, Variant::goldLocked);
+                fillDungeonChest(chest, rnd, world);
+                --numChests;
+            }
+        }
+    }
+
+    void makeEntry(int dungeonCenter)
+    {
+        for (int x = dungeonCenter - 40; x < dungeonCenter + 40; ++x) {
+            for (int y = world.spawnY + 1; y < world.spawnY + wallThickness + 1;
+                 ++y) {
+                Tile &tile = world.getTile(x, y);
+                if (tile.wallID != WallID::Unsafe::blueBrick) {
+                    tile.blockID = TileID::blueBrick;
+                }
+            }
+        }
+        for (int x = dungeonCenter - 40; x < dungeonCenter + 40; ++x) {
+            for (int y = world.spawnY - 20; y < world.spawnY + 1; ++y) {
+                Tile &tile = world.getTile(x, y);
+                tile.blockID = TileID::empty;
+                tile.wallID = WallID::Unsafe::blueBrick;
+            }
         }
     }
 
@@ -274,7 +389,7 @@ public:
         for (auto [x, y] : zones) {
             if (connectedZones.empty()) {
                 findConnectedZones(x, y, connectedZones);
-                makeHallway({dungeonCenter, world.spawnY}, {x, y});
+                makeHallway({dungeonCenter - 5, world.spawnY}, {x, y});
                 continue;
             }
             Point closest = getClosestPoint(x, y, connectedZones);
@@ -299,6 +414,9 @@ public:
             }
         }
         addBiomeChests(zones);
+        addPlatforms(zones);
+        addFurniture(dungeonCenter, dungeonWidth);
+        makeEntry(dungeonCenter);
         std::sort(
             zones.begin(),
             zones.end(),

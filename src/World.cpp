@@ -46,8 +46,11 @@ struct FrameDetails {
 };
 
 inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
+    {{TileID::alchemyTable, Variant::none}, {3, 3, 0, 0}},
     {{TileID::altar, Variant::corruption}, {3, 2, 0, 0}},
     {{TileID::altar, Variant::crimson}, {3, 2, 54, 0}},
+    {{TileID::bewitchingTable, Variant::none}, {3, 3, 0, 0}},
+    {{TileID::boneWelder, Variant::none}, {3, 3, 0, 0}},
     {{TileID::chest, Variant::corruption}, {2, 2, 864, 0}},
     {{TileID::chest, Variant::crimson}, {2, 2, 900, 0}},
     {{TileID::chest, Variant::flesh}, {2, 2, 1548, 0}},
@@ -72,7 +75,7 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::chestGroup2, Variant::reef}, {2, 2, 504, 0}},
     {{TileID::chestGroup2, Variant::sandstone}, {2, 2, 360, 0}},
     {{TileID::lamp, Variant::crystal}, {1, 3, 0, 1674}},
-    {{TileID::lamp, Variant::dynasty}, {1, 3, 0, 936}},
+    {{TileID::lamp, Variant::dynasty}, {1, 3, 0, 918}},
     {{TileID::lamp, Variant::flesh}, {1, 3, 0, 162}},
     {{TileID::lamp, Variant::frozen}, {1, 3, 0, 270}},
     {{TileID::lamp, Variant::lesion}, {1, 3, 0, 1782}},
