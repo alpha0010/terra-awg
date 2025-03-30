@@ -38,217 +38,96 @@ Tile &World::getTile(int x, int y)
     return tiles[y + x * height];
 }
 
+struct FrameDetails {
+    int width;
+    int height;
+    int offsetX;
+    int offsetY;
+};
+
+inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
+    {{TileID::altar, Variant::corruption}, {3, 2, 0, 0}},
+    {{TileID::altar, Variant::crimson}, {3, 2, 54, 0}},
+    {{TileID::chest, Variant::corruption}, {2, 2, 864, 0}},
+    {{TileID::chest, Variant::crimson}, {2, 2, 900, 0}},
+    {{TileID::chest, Variant::flesh}, {2, 2, 1548, 0}},
+    {{TileID::chest, Variant::frozen}, {2, 2, 396, 0}},
+    {{TileID::chest, Variant::gold}, {2, 2, 36, 0}},
+    {{TileID::chest, Variant::goldLocked}, {2, 2, 72, 0}},
+    {{TileID::chest, Variant::granite}, {2, 2, 1800, 0}},
+    {{TileID::chest, Variant::hallowed}, {2, 2, 936, 0}},
+    {{TileID::chest, Variant::honey}, {2, 2, 1044, 0}},
+    {{TileID::chest, Variant::ice}, {2, 2, 972, 0}},
+    {{TileID::chest, Variant::jungle}, {2, 2, 828, 0}},
+    {{TileID::chest, Variant::lihzahrd}, {2, 2, 576, 0}},
+    {{TileID::chest, Variant::marble}, {2, 2, 1836, 0}},
+    {{TileID::chest, Variant::meteorite}, {2, 2, 1764, 0}},
+    {{TileID::chest, Variant::mushroom}, {2, 2, 1152, 0}},
+    {{TileID::chest, Variant::palmWood}, {2, 2, 1116, 0}},
+    {{TileID::chest, Variant::richMahogany}, {2, 2, 288, 0}},
+    {{TileID::chest, Variant::shadow}, {2, 2, 144, 0}},
+    {{TileID::chest, Variant::water}, {2, 2, 612, 0}},
+    {{TileID::chestGroup2, Variant::desert}, {2, 2, 468, 0}},
+    {{TileID::chestGroup2, Variant::lesion}, {2, 2, 108, 0}},
+    {{TileID::chestGroup2, Variant::reef}, {2, 2, 504, 0}},
+    {{TileID::chestGroup2, Variant::sandstone}, {2, 2, 360, 0}},
+    {{TileID::lamp, Variant::crystal}, {1, 3, 0, 1674}},
+    {{TileID::lamp, Variant::dynasty}, {1, 3, 0, 936}},
+    {{TileID::lamp, Variant::flesh}, {1, 3, 0, 162}},
+    {{TileID::lamp, Variant::frozen}, {1, 3, 0, 270}},
+    {{TileID::lamp, Variant::lesion}, {1, 3, 0, 1782}},
+    {{TileID::lamp, Variant::sandstone}, {1, 3, 0, 2052}},
+    {{TileID::larva, Variant::none}, {3, 3, 0, 0}},
+    {{TileID::orbHeart, Variant::crimson}, {2, 2, 36, 0}},
+    {{TileID::pot, Variant::corruption}, {2, 2, 0, 576}},
+    {{TileID::pot, Variant::crimson}, {2, 2, 0, 792}},
+    {{TileID::pot, Variant::desert}, {2, 2, 0, 1224}},
+    {{TileID::pot, Variant::dungeon}, {2, 2, 0, 360}},
+    {{TileID::pot, Variant::jungle}, {2, 2, 0, 252}},
+    {{TileID::pot, Variant::lihzahrd}, {2, 2, 0, 1008}},
+    {{TileID::pot, Variant::marble}, {2, 2, 0, 1116}},
+    {{TileID::pot, Variant::spider}, {2, 2, 0, 684}},
+    {{TileID::pot, Variant::tundra}, {2, 2, 0, 144}},
+    {{TileID::pot, Variant::underworld}, {2, 2, 0, 468}},
+};
+
 void World::placeFramedTile(int x, int y, int blockID, Variant type)
 {
+    if (blockID == TileID::chest &&
+        (type == Variant::desert || type == Variant::lesion ||
+         type == Variant::reef || type == Variant::sandstone)) {
+        blockID = TileID::chestGroup2;
+    }
     int offsetX = 0;
     int offsetY = 0;
     int frameWidth = 2;
     int frameHeight = 2;
-    switch (type) {
-    case Variant::corruption:
-        if (blockID == TileID::chest) {
-            offsetX = 864;
-        } else if (blockID == TileID::pot) {
-            offsetX = 36 * (y % 3);
-            offsetY = 576 + 36 * (x % 3);
-        }
-        break;
-    case Variant::crimson:
-        if (blockID == TileID::altar) {
-            offsetX = 54;
-        } else if (blockID == TileID::orbHeart) {
-            offsetX = 36;
-        } else if (blockID == TileID::chest) {
-            offsetX = 900;
-        } else if (blockID == TileID::pot) {
-            offsetY = 792 + 36 * ((x + y) % 3);
-        }
-        break;
-    case Variant::crystal:
-        if (blockID == TileID::lamp) {
-            offsetY = 1674;
-        }
-        break;
-    case Variant::desert:
-        if (blockID == TileID::chest) {
-            blockID = TileID::chestGroup2;
-            offsetX = 468;
-        } else if (blockID == TileID::pot) {
-            offsetX = 36 * (y % 3);
-            offsetY = 1224 + 36 * (x % 3);
-        }
-        break;
-    case Variant::dungeon:
-        if (blockID == TileID::pot) {
-            offsetX = 36 * (y % 3);
-            offsetY = 360 + 36 * (x % 3);
-        }
-        break;
-    case Variant::dynasty:
-        if (blockID == TileID::lamp) {
-            offsetY = 936;
-        }
-        break;
-    case Variant::flesh:
-        if (blockID == TileID::chest) {
-            offsetX = 1548;
-        } else if (blockID == TileID::lamp) {
-            offsetY = 162;
-        }
-        break;
-    case Variant::forest:
-        if (blockID == TileID::pot) {
-            offsetX = 36 * (y % 3);
-            offsetY = 36 * (x % 4);
-        }
-        break;
-    case Variant::frozen:
-        if (blockID == TileID::chest) {
-            offsetX = 396;
-        } else if (blockID == TileID::lamp) {
-            offsetY = 270;
-        }
-        break;
-    case Variant::hallowed:
-        if (blockID == TileID::chest) {
-            offsetX = 936;
-        }
-        break;
-    case Variant::honey:
-        if (blockID == TileID::chest) {
-            offsetX = 1044;
-        }
-        break;
-    case Variant::ice:
-        if (blockID == TileID::chest) {
-            offsetX = 972;
-        }
-        break;
-    case Variant::jungle:
-        if (blockID == TileID::chest) {
-            offsetX = 828;
-        } else if (blockID == TileID::pot) {
-            offsetX = 36 * (y % 3);
-            offsetY = 252 + 36 * (x % 3);
-        }
-        break;
-    case Variant::gold:
-        if (blockID == TileID::chest) {
-            offsetX = 36;
-        }
-        break;
-    case Variant::goldLocked:
-        if (blockID == TileID::chest) {
-            offsetX = 72;
-        }
-        break;
-    case Variant::granite:
-        if (blockID == TileID::chest) {
-            offsetX = 1800;
-        }
-        break;
-    case Variant::lesion:
-        if (blockID == TileID::chest) {
-            blockID = TileID::chestGroup2;
-            offsetX = 108;
-        } else if (blockID == TileID::lamp) {
-            offsetY = 1782;
-        }
-        break;
-    case Variant::lihzahrd:
-        if (blockID == TileID::chest) {
-            offsetX = 576;
-        } else if (blockID == TileID::pot) {
-            offsetX = 36 * (y % 2);
-            offsetY = 1008 + 36 * (x % 3);
-        }
-        break;
-    case Variant::marble:
-        if (blockID == TileID::chest) {
-            offsetX = 1836;
-        } else if (blockID == TileID::pot) {
-            offsetY = 1116 + 36 * ((x + y) % 3);
-        }
-        break;
-    case Variant::meteorite:
-        if (blockID == TileID::chest) {
-            offsetX = 1764;
-        }
-        break;
-    case Variant::mushroom:
-        if (blockID == TileID::chest) {
-            offsetX = 1152;
-        }
-        break;
-    case Variant::palmWood:
-        if (blockID == TileID::chest) {
-            offsetX = 1116;
-        }
-        break;
-    case Variant::reef:
-        if (blockID == TileID::chest) {
-            blockID = TileID::chestGroup2;
-            offsetX = 504;
-        }
-        break;
-    case Variant::richMahogany:
-        if (blockID == TileID::chest) {
-            offsetX = 288;
-        }
-        break;
-    case Variant::sandstone:
-        if (blockID == TileID::chest) {
-            blockID = TileID::chestGroup2;
-            offsetX = 360;
-        } else if (blockID == TileID::lamp) {
-            offsetY = 2052;
-        }
-        break;
-    case Variant::shadow:
-        if (blockID == TileID::chest) {
-            offsetX = 144;
-        }
-        break;
-    case Variant::spider:
-        if (blockID == TileID::pot) {
-            offsetX = 36 * (y % 3);
-            offsetY = 684 + 36 * (x % 3);
-        }
-        break;
-    case Variant::tundra:
-        if (blockID == TileID::pot) {
-            offsetX = 36 * (y % 3);
-            offsetY = 144 + 36 * (x % 3);
-        }
-        break;
-    case Variant::underworld:
-        if (blockID == TileID::pot) {
-            offsetX = 36 * (y % 3);
-            offsetY = 468 + 36 * (x % 3);
-        }
-        break;
-    case Variant::water:
-        if (blockID == TileID::chest) {
-            offsetX = 612;
-        }
-        break;
-    default:
-        break;
+    auto itr = tileFrameData.find({blockID, type});
+    if (itr != tileFrameData.end()) {
+        const FrameDetails &data = itr->second;
+        offsetX = data.offsetX;
+        offsetY = data.offsetY;
+        frameWidth = data.width;
+        frameHeight = data.height;
     }
-    switch (blockID) {
-    case TileID::altar:
-        frameWidth = 3;
-        break;
-    case TileID::larva:
-        frameWidth = 3;
-        frameHeight = 3;
-        break;
-    case TileID::lamp:
-        frameWidth = 1;
-        frameHeight = 3;
-        break;
-    default:
-        break;
+    if (blockID == TileID::pot) {
+        switch (type) {
+        case Variant::crimson:
+        case Variant::marble:
+            offsetY += 36 * ((x + y) % 3);
+            break;
+        case Variant::forest:
+            offsetX += 36 * (y % 3);
+            offsetY += 36 * (x % 4);
+            break;
+        case Variant::lihzahrd:
+            offsetX += 36 * (y % 2);
+            offsetY += 36 * (x % 3);
+            break;
+        default:
+            offsetX += 36 * (y % 3);
+            offsetY += 36 * (x % 3);
+        }
     }
     for (int i = 0; i < frameWidth; ++i) {
         for (int j = 0; j < frameHeight; ++j) {
