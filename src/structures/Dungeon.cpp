@@ -21,7 +21,12 @@ private:
     int hallSize;
     int wallThickness;
 
-    void drawRect(Point topLeft, Point bottomRight, double skewX, double skewY)
+    void drawRect(
+        Point topLeft,
+        Point bottomRight,
+        double skewX,
+        double skewY,
+        bool filled)
     {
         int width = bottomRight.first - topLeft.first;
         int height = bottomRight.second - topLeft.second;
@@ -36,17 +41,26 @@ private:
                         tile.blockID = TileID::blueBrick;
                     }
                 } else {
-                    tile.blockID = TileID::empty;
+                    if (filled && (tile.wallID != WallID::Unsafe::blueBrick ||
+                                   tile.blockID == TileID::blueBrick ||
+                                   tile.blockID == TileID::crackedBlueBrick)) {
+                        tile.blockID = TileID::crackedBlueBrick;
+                    } else {
+                        tile.blockID = TileID::empty;
+                    }
                 }
                 tile.wallID = WallID::Unsafe::blueBrick;
             }
         }
     }
 
-    void findConnectedZones(int x, int y, std::set<Point> &connectedZones)
+    void findConnectedZones(
+        int x,
+        int y,
+        std::set<Point> &connectedZones,
+        const std::set<Point> &allZones)
     {
-        if (connectedZones.contains({x, y}) ||
-            world.getTile(x, y).wallID != WallID::Unsafe::blueBrick) {
+        if (connectedZones.contains({x, y})) {
             return;
         }
         connectedZones.insert({x, y});
@@ -55,10 +69,8 @@ private:
               {roomSize, 0},
               {0, -roomSize},
               {0, roomSize}}) {
-            Tile &tile = world.getTile(x + i / 2, y + j / 2);
-            if (tile.blockID == TileID::empty &&
-                tile.wallID == WallID::Unsafe::blueBrick) {
-                findConnectedZones(x + i, y + j, connectedZones);
+            if (allZones.contains({x + i, y + j})) {
+                findConnectedZones(x + i, y + j, connectedZones, allZones);
             }
         }
     }
@@ -81,6 +93,9 @@ private:
     {
         int deltaX = std::abs(to.first - from.first);
         int deltaY = std::abs(to.second - from.second);
+        bool filled =
+            std::min(from.second, to.second) > world.getCavernLevel() &&
+            rnd.getInt(0, 5) == 0;
         if (deltaY > deltaX) {
             if (from.second > to.second) {
                 std::swap(from, to);
@@ -89,7 +104,8 @@ private:
                 {from.first - hallSize, from.second - hallSize},
                 {from.first + hallSize, to.second + hallSize},
                 (to.first - from.first) / (2.0 * hallSize + deltaY),
-                0);
+                0,
+                filled);
         } else {
             if (from.first > to.first) {
                 std::swap(from, to);
@@ -98,7 +114,8 @@ private:
                 {from.first - hallSize, from.second - hallSize},
                 {to.first + hallSize, from.second + hallSize},
                 0,
-                (to.second - from.second) / (2.0 * hallSize + deltaX));
+                (to.second - from.second) / (2.0 * hallSize + deltaX),
+                filled);
         }
     }
 
@@ -210,11 +227,15 @@ private:
             usedRows.insert(centerY / 7);
             int fromX = centerX - 4;
             int toX = centerX + 4;
-            while (
-                isValidPlacementLocation(fromX - 2, centerY + 4, 2, 9, false)) {
+            while (isValidPlacementLocation(
+                fromX - 2,
+                centerY + 5,
+                2,
+                10,
+                false)) {
                 fromX -= 2;
             }
-            while (isValidPlacementLocation(toX, centerY + 4, 2, 9, false)) {
+            while (isValidPlacementLocation(toX, centerY + 5, 2, 10, false)) {
                 toX += 2;
             }
             if (toX - fromX < roomSize) {
@@ -222,16 +243,23 @@ private:
             }
             auto partitions = rnd.partitionRange(rnd.getInt(2, 4), toX - fromX);
             auto partItr = partitions.begin();
-            bool isDrawing = rnd.getBool();
+            int drawTile = rnd.select(
+                {TileID::blueBrick,
+                 rnd.getInt(0, 9) == 0 ? TileID::crackedBlueBrick
+                                       : TileID::empty});
             for (int x = fromX; x < toX; ++x) {
                 if (partItr != partitions.end() && x - fromX == *partItr) {
                     ++partItr;
-                    isDrawing = !isDrawing;
-                }
-                if (isDrawing) {
-                    for (int y = centerY; y < centerY + 2; ++y) {
-                        world.getTile(x, y).blockID = TileID::blueBrick;
+                    if (drawTile == TileID::blueBrick) {
+                        drawTile = rnd.getInt(0, 9) == 0
+                                       ? TileID::crackedBlueBrick
+                                       : TileID::empty;
+                    } else {
+                        drawTile = TileID::blueBrick;
                     }
+                }
+                for (int y = centerY; y < centerY + 3; ++y) {
+                    world.getTile(x, y).blockID = drawTile;
                 }
             }
         }
@@ -302,14 +330,17 @@ private:
     {
         int themeBrick = rnd.select(
             {TileID::blueBrick, TileID::greenBrick, TileID::pinkBrick});
+        int crackedBrick = TileID::crackedBlueBrick;
         int brickWall = WallID::Unsafe::blueBrick;
         int slabWall = WallID::Unsafe::blueSlab;
         int tiledWall = WallID::Unsafe::blueTiled;
         if (themeBrick == TileID::greenBrick) {
+            crackedBrick = TileID::crackedGreenBrick;
             brickWall = WallID::Unsafe::greenBrick;
             slabWall = WallID::Unsafe::greenSlab;
             tiledWall = WallID::Unsafe::greenTiled;
         } else if (themeBrick == TileID::pinkBrick) {
+            crackedBrick = TileID::crackedPinkBrick;
             brickWall = WallID::Unsafe::pinkBrick;
             slabWall = WallID::Unsafe::pinkSlab;
             tiledWall = WallID::Unsafe::pinkTiled;
@@ -348,6 +379,8 @@ private:
                 Tile &tile = world.getTile(x, y);
                 if (tile.blockID == TileID::blueBrick) {
                     tile.blockID = themeBrick;
+                } else if (tile.blockID == TileID::crackedBlueBrick) {
+                    tile.blockID = crackedBrick;
                 }
                 if (tile.wallID == WallID::Unsafe::blueBrick) {
                     tile.wallID = brickWall;
@@ -380,20 +413,21 @@ public:
                     rnd.getCoarseNoise(x + shuffleX, y + shuffleY));
                 if (rnd.getCoarseNoise(1.5 * x, 3 * y) > threshold) {
                     int padded = roomSize + 2 * wallThickness;
-                    drawRect({x, y}, {x + padded, y + padded}, 0, 0);
+                    drawRect({x, y}, {x + padded, y + padded}, 0, 0, false);
                     zones.emplace_back(x + padded / 2, y + padded / 2);
                 }
             }
         }
         std::set<Point> connectedZones;
+        std::set<Point> allZones{zones.begin(), zones.end()};
         for (auto [x, y] : zones) {
             if (connectedZones.empty()) {
-                findConnectedZones(x, y, connectedZones);
+                findConnectedZones(x, y, connectedZones, allZones);
                 makeHallway({dungeonCenter - 5, world.spawnY}, {x, y});
                 continue;
             }
             Point closest = getClosestPoint(x, y, connectedZones);
-            findConnectedZones(x, y, connectedZones);
+            findConnectedZones(x, y, connectedZones, allZones);
             makeHallway({x, y}, closest);
         }
         for (int x = dungeonCenter - dungeonWidth;

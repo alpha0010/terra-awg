@@ -252,6 +252,30 @@ void placeLarvae(LocationBins &locations, Random &rnd, World &world)
     }
 }
 
+void placeManaCrystals(
+    int maxBin,
+    LocationBins &locations,
+    Random &rnd,
+    World &world)
+{
+    int manaCrystalCount = world.getWidth() * world.getHeight() / 250000;
+    while (manaCrystalCount > 0) {
+        int binId = rnd.getInt(0, maxBin);
+        if (locations[binId].empty()) {
+            continue;
+        }
+        auto [x, y] = rnd.select(locations[binId]);
+        if (y > world.getUndergroundLevel() && y < world.getUnderworldLevel() &&
+            isPlacementCandidate(x, y, world) &&
+            !listContains(
+                WallVariants::dungeon,
+                world.getTile(x, y - 2).wallID)) {
+            world.placeFramedTile(x, y - 2, TileID::manaCrystal);
+            --manaCrystalCount;
+        }
+    }
+}
+
 Variant getChestType(int x, int y, World &world)
 {
     Tile &probeTile = world.getTile(x, y - 2);
@@ -570,6 +594,7 @@ void genTreasure(Random &rnd, World &world)
     placeLifeCrystals(maxBin, flatLocations, rnd, world);
     placeAltars(maxBin, flatLocations, rnd, world);
     placeOrbHearts(maxBin, orbHeartLocations, rnd, world);
+    placeManaCrystals(maxBin, flatLocations, rnd, world);
     placeChests(maxBin, flatLocations, rnd, world);
     placePots(maxBin, flatLocations, rnd, world);
 }

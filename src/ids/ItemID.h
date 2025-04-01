@@ -86,6 +86,7 @@ enum {
     mechanicalEye = 544,
     mechanicalWorm = 556,
     mechanicalSkull = 557,
+    slimeCrown = 560,
     richMahogany = 620,
     fish = 669,
     iceBoomerang = 670,
