@@ -5,6 +5,7 @@
 #include "ids/WallID.h"
 #include "structures/data/Trees.h"
 #include <iostream>
+#include <span>
 
 bool isRegionEmpty(int x, int y, int width, int height, World &world)
 {
@@ -82,41 +83,53 @@ void growCactus(int x, int y, Random &rnd, World &world)
     if (sandCount < 15 || !isRegionEmpty(x - 1, y - 8, 3, 8, world)) {
         return;
     }
-    int cactusSize = rnd.getInt(3, 8);
+    int cactusSize = rnd.getInt(3, 7);
     for (int i = 0; i < cactusSize; ++i) {
         world.getTile(x, y - i - 1).blockID = TileID::cactusPlant;
         if (i > 0) {
-            if (rnd.getInt(0, 3) == 0) {
+            if (rnd.getInt(0, 4) <
+                (world.getTile(x - 1, y - i).blockID == TileID::cactusPlant
+                     ? 3
+                     : 1)) {
                 world.getTile(x - 1, y - i - 1).blockID = TileID::cactusPlant;
             }
-            if (rnd.getInt(0, 3) == 0) {
+            if (rnd.getInt(0, 4) <
+                (world.getTile(x + 1, y - i).blockID == TileID::cactusPlant
+                     ? 3
+                     : 1)) {
                 world.getTile(x + 1, y - i - 1).blockID = TileID::cactusPlant;
             }
         }
     }
 }
 
-void growTree(int x, int y, int groundTile, Data::Tree treeId, World &world)
+void growTree(
+    int x,
+    int y,
+    int groundTile,
+    std::span<const Data::Tree> templateTrees,
+    Random &rnd,
+    World &world)
 {
-    TileBuffer tree = Data::getTree(treeId, world.getFramedTiles());
-    for (int i = 0; i < tree.getWidth(); ++i) {
+    for (int i = 0; i < 3; ++i) {
         if (world.getTile(x + i, y).blockID != groundTile) {
             return;
         }
     }
-    if (!isRegionEmpty(
-            x,
-            y - 4 - tree.getHeight(),
-            tree.getWidth(),
-            tree.getHeight() + 4,
-            world)) {
+    int height = rnd.getInt(7, 15);
+    if (!isRegionEmpty(x, y - 4 - height, 3, height + 4, world)) {
         return;
     }
-    for (int i = 0; i < tree.getWidth(); ++i) {
-        for (int j = 0; j < tree.getHeight(); ++j) {
-            Tile &tile = world.getTile(x + i, y + j - tree.getHeight());
+    for (int j = 0; j < height; ++j) {
+        TileBuffer tree =
+            Data::getTree(rnd.select(templateTrees), world.getFramedTiles());
+        int treeRow = j == 0            ? 0
+                      : j == height - 1 ? tree.getHeight() - 1
+                                        : rnd.getInt(1, tree.getHeight() - 2);
+        for (int i = 0; i < tree.getWidth(); ++i) {
+            Tile &tile = world.getTile(x + i, y + j - height);
             int curWall = tile.wallID;
-            tile = tree.getTile(i, j);
+            tile = tree.getTile(i, treeRow);
             tile.wallID = curWall;
         }
     }
@@ -135,7 +148,21 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
                         x,
                         y,
                         TileID::ashGrass,
-                        rnd.select(Data::ashTrees),
+                        Data::ashTrees,
+                        rnd,
+                        world);
+                }
+                break;
+            case TileID::grass:
+                if (world.getTile(x, y - 1).liquid == Liquid::none &&
+                    world.getTile(x, y - 1).wallID == WallID::empty &&
+                    rnd.getDouble(0, 1) < 0.21) {
+                    growTree(
+                        x,
+                        y,
+                        TileID::grass,
+                        Data::forestTrees,
+                        rnd,
                         world);
                 }
                 break;
@@ -154,7 +181,8 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
                             x,
                             y,
                             TileID::jungleGrass,
-                            rnd.select(Data::mahoganyTrees),
+                            Data::mahoganyTrees,
+                            rnd,
                             world);
                     }
                 } else if (
@@ -164,7 +192,8 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
                         x,
                         y,
                         TileID::jungleGrass,
-                        rnd.select(Data::mahoganyUndergroundTrees),
+                        Data::mahoganyUndergroundTrees,
+                        rnd,
                         world);
                 }
                 break;
@@ -175,7 +204,8 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
                         x,
                         y,
                         TileID::mushroomGrass,
-                        rnd.select(Data::mushroomTrees),
+                        Data::mushroomTrees,
+                        rnd,
                         world);
                 }
                 break;
