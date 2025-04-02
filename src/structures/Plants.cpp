@@ -82,7 +82,7 @@ void growCactus(int x, int y, Random &rnd, World &world)
     if (sandCount < 15 || !isRegionEmpty(x - 1, y - 8, 3, 8, world)) {
         return;
     }
-    int cactusSize = rnd.getInt(3, 6);
+    int cactusSize = rnd.getInt(3, 8);
     for (int i = 0; i < cactusSize; ++i) {
         world.getTile(x, y - i - 1).blockID = TileID::cactusPlant;
         if (i > 0) {
@@ -96,15 +96,11 @@ void growCactus(int x, int y, Random &rnd, World &world)
     }
 }
 
-void growMushroomTree(int x, int y, Random &rnd, World &world)
+void growTree(int x, int y, int groundTile, Data::Tree treeId, World &world)
 {
-    if (rnd.getDouble(0, 1) > 0.35) {
-        return;
-    }
-    TileBuffer tree =
-        Data::getTree(rnd.select(Data::mushroomTrees), world.getFramedTiles());
+    TileBuffer tree = Data::getTree(treeId, world.getFramedTiles());
     for (int i = 0; i < tree.getWidth(); ++i) {
-        if (world.getTile(x + i, y).blockID != TileID::mushroomGrass) {
+        if (world.getTile(x + i, y).blockID != groundTile) {
             return;
         }
     }
@@ -132,19 +128,55 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
     for (const auto &bin : locations) {
         for (auto [x, y] : bin.second) {
             switch (world.getTile(x, y).blockID) {
+            case TileID::ashGrass:
+                if (world.getTile(x, y - 1).liquid == Liquid::none &&
+                    rnd.getDouble(0, 1) < 0.18) {
+                    growTree(
+                        x,
+                        y,
+                        TileID::ashGrass,
+                        rnd.select(Data::ashTrees),
+                        world);
+                }
+                break;
             case TileID::jungleGrass:
-                if (y < world.getUndergroundLevel() &&
-                    world.getTile(x, y - 1).liquid == Liquid::water) {
-                    growBamboo(x, y, rnd, world);
-                    if (world.getTile(x + 1, y).blockID ==
-                        TileID::jungleGrass) {
-                        growBamboo(x + 1, y, rnd, world);
+                if (y < world.getUndergroundLevel()) {
+                    if (world.getTile(x, y - 1).liquid == Liquid::water) {
+                        growBamboo(x, y, rnd, world);
+                        if (world.getTile(x + 1, y).blockID ==
+                            TileID::jungleGrass) {
+                            growBamboo(x + 1, y, rnd, world);
+                        }
+                    } else if (
+                        world.getTile(x, y - 1).wallID == WallID::empty &&
+                        rnd.getDouble(0, 1) < 0.2) {
+                        growTree(
+                            x,
+                            y,
+                            TileID::jungleGrass,
+                            rnd.select(Data::mahoganyTrees),
+                            world);
                     }
+                } else if (
+                    world.getTile(x, y - 1).liquid == Liquid::none &&
+                    rnd.getDouble(0, 1) < 0.09) {
+                    growTree(
+                        x,
+                        y,
+                        TileID::jungleGrass,
+                        rnd.select(Data::mahoganyUndergroundTrees),
+                        world);
                 }
                 break;
             case TileID::mushroomGrass:
-                if (world.getTile(x, y - 1).liquid == Liquid::none) {
-                    growMushroomTree(x, y, rnd, world);
+                if (world.getTile(x, y - 1).liquid == Liquid::none &&
+                    rnd.getDouble(0, 1) < 0.35) {
+                    growTree(
+                        x,
+                        y,
+                        TileID::mushroomGrass,
+                        rnd.select(Data::mushroomTrees),
+                        world);
                 }
                 break;
             case TileID::sand:

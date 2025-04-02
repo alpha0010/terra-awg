@@ -8,16 +8,12 @@
 class TileBuffer
 {
 private:
-    std::vector<Tile> tiles;
     int width;
     int height;
+    std::vector<Tile> tiles;
 
 public:
-    TileBuffer(
-        int w,
-        int h,
-        const uint16_t *data,
-        const std::vector<bool> &framedTiles);
+    TileBuffer(const uint16_t *data, const std::vector<bool> &framedTiles);
 
     Tile &getTile(int x, int y);
 

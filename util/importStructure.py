@@ -46,7 +46,7 @@ def loadTiles(filename):
         framedTiles = readBitVec(f)
         width = readUint32(f)
         height = readUint32(f)
-        print(width, height)
+        assert width < 0xff and height < 0xff, f'Structure too large {width}x{height}'
         tiles = [[{} for y in range(height)] for x in range(width)]
         for x in range(width):
             rle = 0
@@ -160,9 +160,9 @@ def serializeTile(tile, framedTiles):
     return data
 
 (tiles, framedTiles) = loadTiles(sys.argv[1])
-data = []
+data = [len(tiles) << 8 | len(tiles[0])]
 prevTile = []
-rleIndex = 0
+rleIndex = len(data)
 for column in tiles:
     for tile in column:
         curTile = serializeTile(tile, framedTiles)

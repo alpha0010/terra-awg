@@ -1,12 +1,11 @@
 #include "TileBuffer.h"
 
 TileBuffer::TileBuffer(
-    int w,
-    int h,
     const uint16_t *data,
     const std::vector<bool> &framedTiles)
-    : tiles(w * h), width(w), height(h)
+    : width(*data >> 8), height(*data & 0xff), tiles(width * height)
 {
+    ++data;
     int rle = 0;
     for (size_t i = 0; i < tiles.size(); ++i) {
         if (rle > 0) {
