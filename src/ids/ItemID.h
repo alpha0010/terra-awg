@@ -218,6 +218,7 @@ enum {
     tungstenBullet = 4915,
     treasureMagnet = 5010,
     mace = 5011,
+    remnantsOfDevotion = 5234,
     mushroomTorch = 5293,
     aetherTorch = 5353,
 };

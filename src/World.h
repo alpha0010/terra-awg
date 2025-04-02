@@ -49,6 +49,7 @@ private:
     Tile scratchTile;
     std::vector<Tile> tiles;
     std::vector<Chest> chests;
+    std::vector<bool> framedTiles;
 
 public:
     World();
@@ -66,6 +67,11 @@ public:
     const std::vector<Chest> &getChests() const
     {
         return chests;
+    }
+
+    const std::vector<bool> &getFramedTiles() const
+    {
+        return framedTiles;
     }
 
     bool isExposed(int x, int y) const;

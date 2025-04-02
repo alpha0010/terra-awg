@@ -6,12 +6,9 @@
 #include "ids/ItemID.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
+#include "structures/Plants.h"
 #include <iostream>
-#include <map>
 #include <set>
-#include <vector>
-
-typedef std::map<int, std::vector<std::pair<int, int>>> LocationBins;
 
 template <typename T, typename U>
 bool listContains(const T &list, const U &value)
@@ -597,4 +594,5 @@ void genTreasure(Random &rnd, World &world)
     placeManaCrystals(maxBin, flatLocations, rnd, world);
     placeChests(maxBin, flatLocations, rnd, world);
     placePots(maxBin, flatLocations, rnd, world);
+    genPlants(flatLocations, rnd, world);
 }

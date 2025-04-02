@@ -95,7 +95,7 @@ private:
         int deltaY = std::abs(to.second - from.second);
         bool filled =
             std::min(from.second, to.second) > world.getCavernLevel() &&
-            rnd.getInt(0, 5) == 0;
+            rnd.getInt(0, 4) == 0;
         if (deltaY > deltaX) {
             if (from.second > to.second) {
                 std::swap(from, to);

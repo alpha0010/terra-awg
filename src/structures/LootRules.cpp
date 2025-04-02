@@ -1388,6 +1388,7 @@ void fillDungeonBiomeChest(Chest &chest, Random &rnd, Item &&primaryItem)
                 ItemID::endurancePotion}),
            Prefix::none,
            rnd.getInt(1, 2)}},
+         {0.5, {ItemID::remnantsOfDevotion, Prefix::none, 1}},
          {1,
           {rnd.select(
                {ItemID::blueBrick, ItemID::greenBrick, ItemID::pinkBrick}),

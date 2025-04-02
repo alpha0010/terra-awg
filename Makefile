@@ -3,7 +3,7 @@
 CXXFLAGS := -Wall -Wextra -pedantic -Werror -std=c++20 -O2
 
 SRCS := $(wildcard src/*.cpp) $(wildcard src/biomes/*.cpp) \
-    $(wildcard src/structures/*.cpp)
+    $(wildcard src/structures/*.cpp)  $(wildcard src/structures/data/*.cpp)
 OUT := terra-awg
 
 BUILD_DIR := build
