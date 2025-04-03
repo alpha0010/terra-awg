@@ -21,6 +21,7 @@
 #include "biomes/Underworld.h"
 #include "structures/Dungeon.h"
 #include "structures/Lake.h"
+#include "structures/Temple.h"
 #include "structures/Treasure.h"
 #include <array>
 #include <chrono>
@@ -72,6 +73,7 @@ int main()
     genSpiderNest(rnd, world);
     genGlowingMoss(rnd, world);
     genDungeon(rnd, world);
+    genTemple(rnd, world);
     genLake(world);
     genTreasure(rnd, world);
     smoothSurfaces(world);

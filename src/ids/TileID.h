@@ -13,6 +13,7 @@ enum {
     copperOre = 7,
     goldOre = 8,
     silverOre = 9,
+    door = 10,
     lifeCrystal = 12,
     chest = 21,
     demonite = 22,

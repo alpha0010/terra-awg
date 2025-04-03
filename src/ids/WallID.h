@@ -35,6 +35,7 @@ enum {
     crimsonGrass = 81,
     crimstone = 83,
     hive = 86,
+    lihzahrdBrick = 87,
     blueSlab = 94,
     blueTiled = 95,
     pinkSlab = 96,

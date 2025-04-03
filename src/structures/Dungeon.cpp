@@ -20,6 +20,7 @@ private:
     int roomSize;
     int hallSize;
     int wallThickness;
+    std::vector<Point> requestedDoors;
 
     void drawRect(
         Point topLeft,
@@ -96,6 +97,14 @@ private:
         bool filled =
             std::min(from.second, to.second) > world.getCavernLevel() &&
             rnd.getInt(0, 4) == 0;
+        if (deltaY == 0 && !filled) {
+            requestedDoors.emplace_back(
+                std::min(from.first, to.first) + 1 + roomSize / 2,
+                from.second - hallSize / 2);
+            requestedDoors.emplace_back(
+                std::max(from.first, to.first) - 2 - roomSize / 2,
+                from.second - hallSize / 2);
+        }
         if (deltaY > deltaX) {
             if (from.second > to.second) {
                 std::swap(from, to);
@@ -265,6 +274,43 @@ private:
         }
     }
 
+    void addDoors()
+    {
+        for (auto [x, y] : requestedDoors) {
+            int floor = 0;
+            for (int j = 0; j < hallSize + 1; ++j) {
+                Tile &tile = world.getTile(x, y + j);
+                if (tile.blockID != TileID::empty) {
+                    if (tile.blockID == TileID::blueBrick) {
+                        floor = j;
+                    }
+                    break;
+                }
+            }
+            for (int j = 0; j < floor; ++j) {
+                if (j < floor - 3) {
+                    for (int i = -1; i < 2; ++i) {
+                        Tile &tile = world.getTile(x + i, y + j);
+                        tile.blockID = TileID::blueBrick;
+                        if (j == floor - 4) {
+                            if (i == -1) {
+                                tile.slope = Slope::bottomLeft;
+                            } else if (i == 1) {
+                                tile.slope = Slope::bottomRight;
+                            }
+                        }
+                    }
+                } else if (j == floor - 3) {
+                    world.placeFramedTile(
+                        x,
+                        y + j,
+                        TileID::door,
+                        Variant::dungeon);
+                }
+            }
+        }
+    }
+
     void addFurniture(int dungeonCenter, int dungeonWidth)
     {
         std::vector<Point> locations;
@@ -425,6 +471,8 @@ public:
                 findConnectedZones(x, y, connectedZones, allZones);
                 makeHallway({dungeonCenter - 5, world.spawnY}, {x, y});
                 continue;
+            } else if (connectedZones.contains({x, y})) {
+                continue;
             }
             Point closest = getClosestPoint(x, y, connectedZones);
             findConnectedZones(x, y, connectedZones, allZones);
@@ -449,6 +497,7 @@ public:
         }
         addBiomeChests(zones);
         addPlatforms(zones);
+        addDoors();
         addFurniture(dungeonCenter, dungeonWidth);
         makeEntry(dungeonCenter);
         std::sort(

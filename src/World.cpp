@@ -116,6 +116,7 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::chestGroup2, Variant::lesion}, {2, 2, 108, 0}},
     {{TileID::chestGroup2, Variant::reef}, {2, 2, 504, 0}},
     {{TileID::chestGroup2, Variant::sandstone}, {2, 2, 360, 0}},
+    {{TileID::door, Variant::dungeon}, {1, 3, 0, 702}},
     {{TileID::lamp, Variant::crystal}, {1, 3, 0, 1674}},
     {{TileID::lamp, Variant::dynasty}, {1, 3, 0, 918}},
     {{TileID::lamp, Variant::flesh}, {1, 3, 0, 162}},
