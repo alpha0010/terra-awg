@@ -8,14 +8,9 @@
 bool isSolidArea(int x, int y, int size, World &world)
 {
     std::set<int> allowedTiles{TileID::dirt, TileID::stone, TileID::clay};
-    for (int i = 0; i < size; ++i) {
-        for (int j = 0; j < size; ++j) {
-            if (!allowedTiles.contains(world.getTile(x + i, y + j).blockID)) {
-                return false;
-            }
-        }
-    }
-    return true;
+    return world.regionPasses(x, y, size, size, [&allowedTiles](Tile &tile) {
+        return allowedTiles.contains(tile.blockID);
+    });
 }
 
 std::pair<int, int> findSolidArea(int minY, int maxY, Random &rnd, World &world)

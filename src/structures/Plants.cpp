@@ -9,14 +9,9 @@
 
 bool isRegionEmpty(int x, int y, int width, int height, World &world)
 {
-    for (int i = 0; i < width; ++i) {
-        for (int j = 0; j < height; ++j) {
-            if (world.getTile(x + i, y + j).blockID != TileID::empty) {
-                return false;
-            }
-        }
-    }
-    return true;
+    return world.regionPasses(x, y, width, height, [](Tile &tile) {
+        return tile.blockID == TileID::empty;
+    });
 }
 
 void growBamboo(int x, int y, Random &rnd, World &world)

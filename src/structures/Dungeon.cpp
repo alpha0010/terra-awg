@@ -6,6 +6,7 @@
 #include "ids/Prefix.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
+#include "structures/Platforms.h"
 #include <algorithm>
 #include <iostream>
 #include <set>
@@ -142,17 +143,12 @@ private:
                 }
             }
         }
-        for (int i = 0; i < width; ++i) {
-            for (int j = 0; j < height; ++j) {
-                Tile &tile = world.getTile(x + i, y - j);
-                if (tile.blockID != TileID::empty ||
-                    tile.wallID != WallID::Unsafe::blueBrick ||
-                    tile.liquid != Liquid::none) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return world
+            .regionPasses(x, y + 1 - height, width, height, [](Tile &tile) {
+                return tile.blockID == TileID::empty &&
+                       tile.wallID == WallID::Unsafe::blueBrick &&
+                       tile.liquid == Liquid::none;
+            });
     }
 
     Point selectBiomeChestLocation(const std::vector<Point> &zones)
@@ -308,6 +304,80 @@ private:
                         Variant::dungeon);
                 }
             }
+        }
+    }
+
+    void addShelves(int dungeonCenter, int dungeonWidth)
+    {
+        rnd.shuffleNoise();
+        for (int x = dungeonCenter - dungeonWidth;
+             x < dungeonCenter + dungeonWidth + 2 * roomSize;
+             ++x) {
+            for (int y = world.getUndergroundLevel();
+                 y < world.getUnderworldLevel();
+                 ++y) {
+                if (world.getTile(x, y).blockID != TileID::blueBrick ||
+                    rnd.getCoarseNoise(x, y) < 0.15 ||
+                    rnd.getDouble(0, 1) < 0.8) {
+                    continue;
+                }
+                int shelfStyle;
+                switch ((y / 40) % 4) {
+                case 0:
+                    shelfStyle = Platform::metalShelf;
+                    break;
+                case 1:
+                    shelfStyle = Platform::brassShelf;
+                    break;
+                case 2:
+                    shelfStyle = Platform::woodShelf;
+                    break;
+                default:
+                    shelfStyle = Platform::dungeonShelf;
+                    break;
+                }
+                if (isValidPlacementLocation(x + 1, y + 3, 5, 7, false)) {
+                    for (int i = 0; i < 3; ++i) {
+                        placePlatform(x + 1 + i, y, shelfStyle, world);
+                        placeShelfItem(x + 1 + i, y - 1);
+                    }
+                } else if (isValidPlacementLocation(
+                               x - 5,
+                               y + 3,
+                               5,
+                               7,
+                               false)) {
+                    for (int i = 0; i < 3; ++i) {
+                        placePlatform(x - 3 + i, y, shelfStyle, world);
+                        placeShelfItem(x - 3 + i, y - 1);
+                    }
+                }
+            }
+        }
+    }
+
+    void placeShelfItem(int x, int y)
+    {
+        switch (rnd.getInt(0, 15)) {
+        case 0:
+        case 1:
+            return;
+        case 2:
+            world.placeFramedTile(x, y, TileID::bottle, Variant::health);
+            return;
+        case 3:
+            world.placeFramedTile(x, y, TileID::bottle, Variant::mana);
+            return;
+        case 4:
+            world.getTile(x, y).blockID = TileID::waterCandle;
+            return;
+        }
+        Tile &tile = world.getTile(x, y);
+        tile.blockID = TileID::book;
+        if (rnd.getInt(0, 40) == 0) {
+            tile.frameX = 90; // Water Bolt.
+        } else {
+            tile.frameX = 18 * rnd.getInt(0, 4);
         }
     }
 
@@ -498,6 +568,7 @@ public:
         addBiomeChests(zones);
         addPlatforms(zones);
         addDoors();
+        addShelves(dungeonCenter, dungeonWidth);
         addFurniture(dungeonCenter, dungeonWidth);
         makeEntry(dungeonCenter);
         std::sort(

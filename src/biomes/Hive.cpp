@@ -36,14 +36,9 @@ bool isHiveEdge(int x, int y, World &world)
     if (world.getTile(x, y).wallID != WallID::Unsafe::hive) {
         return false;
     }
-    for (int i = -1; i < 2; ++i) {
-        for (int j = -1; j < 2; ++j) {
-            if (world.getTile(x + i, y + j).wallID != WallID::Unsafe::hive) {
-                return true;
-            }
-        }
-    }
-    return false;
+    return !world.regionPasses(x - 1, y - 1, 3, 3, [](Tile &tile) {
+        return tile.wallID == WallID::Unsafe::hive;
+    });
 }
 
 void fillHive(Random &rnd, World &world)

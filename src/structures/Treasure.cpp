@@ -21,10 +21,14 @@ inline const std::set<int> nonSolidTiles{
     TileID::alchemyTable,
     TileID::bewitchingTable,
     TileID::boneWelder,
+    TileID::book,
+    TileID::bottle,
     TileID::bubble,
     TileID::chest,
     TileID::chestGroup2,
+    TileID::lihzahrdAltar,
     TileID::thinIce,
+    TileID::waterCandle,
 };
 
 bool isPlacementCandidate(int x, int y, World &world)
@@ -33,16 +37,10 @@ bool isPlacementCandidate(int x, int y, World &world)
         nonSolidTiles.contains(world.getTile(x + 1, y).blockID)) {
         return false;
     }
-    for (int i = 0; i < 2; ++i) {
-        for (int j = -3; j < 0; ++j) {
-            Tile &tile = world.getTile(x + i, y + j);
-            if (tile.blockID != TileID::empty || tile.liquid == Liquid::lava ||
-                tile.liquid == Liquid::shimmer) {
-                return false;
-            }
-        }
-    }
-    return true;
+    return world.regionPasses(x, y - 3, 2, 3, [](Tile &tile) {
+        return tile.blockID == TileID::empty && tile.liquid != Liquid::lava &&
+               tile.liquid != Liquid::shimmer;
+    });
 }
 
 int testOrbHeartCandidate(int x, int y, World &world)
@@ -287,6 +285,8 @@ Variant getChestType(int x, int y, World &world)
                    : Variant::water;
     } else if (listContains(WallVariants::dungeon, probeTile.wallID)) {
         return Variant::goldLocked;
+    } else if (probeTile.wallID == WallID::Unsafe::lihzahrdBrick) {
+        return Variant::lihzahrd;
     }
     std::map<int, Variant> blockTypes{
         {TileID::crimstone, Variant::flesh},

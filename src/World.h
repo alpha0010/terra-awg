@@ -22,11 +22,13 @@ enum class Variant {
     goldLocked,
     granite,
     hallowed,
+    health,
     honey,
     ice,
     jungle,
     lesion,
     lihzahrd,
+    mana,
     marble,
     meteorite,
     mushroom,
@@ -72,6 +74,19 @@ public:
     const std::vector<bool> &getFramedTiles() const
     {
         return framedTiles;
+    }
+
+    template <typename Func>
+    bool regionPasses(int x, int y, int width, int height, Func f)
+    {
+        for (int i = 0; i < width; ++i) {
+            for (int j = 0; j < height; ++j) {
+                if (!f(getTile(x + i, y + j))) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     bool isExposed(int x, int y) const;
