@@ -13,6 +13,9 @@ private:
     std::vector<Tile> tiles;
 
 public:
+    /**
+     * Max dimensions supported by data format are 255x255 tiles.
+     */
     TileBuffer(const uint16_t *data, const std::vector<bool> &framedTiles);
 
     Tile &getTile(int x, int y);

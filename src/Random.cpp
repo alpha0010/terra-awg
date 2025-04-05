@@ -31,6 +31,7 @@ void Random::initNoise(int width, int height, double scale)
                 double tY = 2 * std::numbers::pi * y / height;
                 double y1 = radiusY * std::cos(tY);
                 double y2 = radiusY * std::sin(tY);
+                // Seamless looping 2d noise with fractal details.
                 fineNoise[x * height + y] =
                     noise.Evaluate(x1, x2, y1, y2) +
                     0.5 * noise.Evaluate(2 * x1, 2 * x2, 2 * y1, 2 * y2) +
@@ -53,6 +54,8 @@ void Random::computeBlurNoise()
 {
     std::cout << "Blurring noise\n";
     blurNoise.resize(coarseNoise.size());
+    // Fast approximate Gaussian blur via horizontal/vertical smearing with
+    // rolling averages.
     parallelFor(std::views::iota(0, noiseWidth), [this](int x) {
         double accu = 0;
         for (int y = noiseHeight - 40; y < noiseHeight; ++y) {
@@ -129,6 +132,7 @@ int Random::getInt(int min, int max)
 
 double Random::getBlurNoise(int x, int y) const
 {
+    // Note: positive out-of-bounds is fine, negative may crash.
     return blurNoise
         [noiseHeight * ((x + noiseDeltaX) % noiseWidth) +
          ((y + noiseDeltaY) % noiseHeight)];
@@ -136,6 +140,7 @@ double Random::getBlurNoise(int x, int y) const
 
 double Random::getCoarseNoise(int x, int y) const
 {
+    // Note: positive out-of-bounds is fine, negative may crash.
     return coarseNoise
         [noiseHeight * ((x + noiseDeltaX) % noiseWidth) +
          ((y + noiseDeltaY) % noiseHeight)];
@@ -143,6 +148,7 @@ double Random::getCoarseNoise(int x, int y) const
 
 double Random::getFineNoise(int x, int y) const
 {
+    // Note: positive out-of-bounds is fine, negative may crash.
     return fineNoise
         [noiseHeight * ((x + noiseDeltaX) % noiseWidth) +
          ((y + noiseDeltaY) % noiseHeight)];

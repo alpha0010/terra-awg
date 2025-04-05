@@ -28,20 +28,65 @@ private:
 public:
     Random();
 
+    /**
+     * Precompute noise samples for other noise functions.
+     */
     void initNoise(int width, int height, double scale);
+    /**
+     * Shift cached noise samples, effectively producing new noise samples,
+     * cheaply.
+     */
     void shuffleNoise();
+    /**
+     * Save current noise offsets.
+     */
     void saveShuffleState();
+    /**
+     * Restore saved noise offsets, allowing to query matching an earlier noise
+     * state before shuffling.
+     */
     void restoreShuffleState();
 
+    /**
+     * Random boolean value.
+     */
     bool getBool();
+    /**
+     * Random byte.
+     */
     uint8_t getByte();
+    /**
+     * Random floating point in range.
+     */
     double getDouble(double min, double max);
+    /**
+     * Random integer in range. Range includes both `min` and `max`.
+     */
     int getInt(int min, int max);
+    /**
+     * Get a sample of the blurred noise at the specified location.
+     */
     double getBlurNoise(int x, int y) const;
+    /**
+     * Get a sample of the coarse sized noise at the specified location.
+     */
     double getCoarseNoise(int x, int y) const;
+    /**
+     * Get a sample of the fine detailed noise at the specified location.
+     */
     double getFineNoise(int x, int y) const;
+    /**
+     * Randomly select integers in a range to split the range into segments.
+     */
     std::vector<int> partitionRange(int numSegments, int range);
 
+    /**
+     * Select a random value from a list. Repeatedly calling will loop through
+     * the list in order, following the first selected item.
+     *
+     * Repeats are keyed on call site source location; intended use is within a
+     * loop/wrapper function.
+     */
     template <typename T>
     T pool(
         std::initializer_list<T> list,
@@ -50,6 +95,9 @@ public:
         return *(list.begin() + getPoolIndex(list.size(), origin));
     }
 
+    /**
+     * Select a random value from a list.
+     */
     template <typename T> T select(std::initializer_list<T> list)
     {
         return *(list.begin() + getInt(0, list.size() - 1));

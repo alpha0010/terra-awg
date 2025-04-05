@@ -75,6 +75,7 @@ int World::getUnderworldLevel() const
 Tile &World::getTile(int x, int y)
 {
     if (x < 0 || x >= width || y < 0 || y >= height) {
+        // Handle out-of-bounds request with junk data.
         return scratchTile;
     }
     return tiles[y + x * height];
@@ -160,6 +161,7 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
         frameHeight = data.height;
     }
     if (blockID == TileID::pot) {
+        // Cycle pot variations based on world coordinates.
         switch (type) {
         case Variant::crimson:
         case Variant::marble:

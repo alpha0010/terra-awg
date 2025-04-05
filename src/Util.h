@@ -5,6 +5,23 @@
 #include <thread>
 #include <vector>
 
+/**
+ * Automatic thread management for parallel loop execution.
+ *
+ * Before:
+ * @code
+ * for (int i = 0; i < 100; ++i) {
+ *     handleData(i);
+ * }
+ * @endcode
+ *
+ * After:
+ * @code
+ * parallelFor(std::views::iota(0, 100), [](int i) {
+ *     handleData(i);
+ * });
+ * @endcode
+ */
 template <std::ranges::input_range R, class UnaryFunc>
 constexpr void parallelFor(R &&r, UnaryFunc f)
 {

@@ -156,6 +156,8 @@ void smoothSurfaces(World &world)
                     continue;
                 }
                 if (tile.wallID != WallID::empty) {
+                    // Blend with surrounding walls by matching wall type
+                    // used/blank in orthogonal non-block-covered space.
                     tile.wallID = getAttachedOpenWall(world, x, y);
                 }
                 if (isIsolated(world, x, y)) {
@@ -163,6 +165,7 @@ void smoothSurfaces(World &world)
                     continue;
                 }
                 if (world.getTile(x, y + 1).blockID == TileID::empty) {
+                    // Stop falling sand.
                     auto itr = stablizeBlocks.find(tile.blockID);
                     if (itr != stablizeBlocks.end()) {
                         tile.blockID = itr->second;

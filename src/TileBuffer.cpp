@@ -9,6 +9,7 @@ TileBuffer::TileBuffer(
     int rle = 0;
     for (size_t i = 0; i < tiles.size(); ++i) {
         if (rle > 0) {
+            // Copy previous tile to handle run-length encoding compression.
             tiles[i] = tiles[i - 1];
             --rle;
             continue;

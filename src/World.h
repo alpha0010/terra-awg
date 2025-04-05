@@ -76,6 +76,9 @@ public:
         return framedTiles;
     }
 
+    /**
+     * Check if all tiles in the area pass a predicate.
+     */
     template <typename Func>
     bool regionPasses(int x, int y, int width, int height, Func f)
     {
@@ -89,7 +92,13 @@ public:
         return true;
     }
 
+    /**
+     * Check if the given location is not solidly surrounded by tiles.
+     */
     bool isExposed(int x, int y) const;
+    /**
+     * Select desert, jungle, and snow locations.
+     */
     void planBiomes(Random &rnd);
 
     bool isCrimson;

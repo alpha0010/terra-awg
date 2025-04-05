@@ -5,6 +5,8 @@
 
 enum class Liquid { none, water, lava, honey, shimmer };
 
+// Described location is the portion of the block that will display as empty
+// space.
 enum class Slope { none = 0, half, topRight, topLeft, bottomRight, bottomLeft };
 
 class Tile
@@ -28,6 +30,10 @@ public:
     bool echoCoatWall : 1;
     bool illuminantBlock : 1;
     bool illuminantWall : 1;
+    /**
+     * Flag this tile for cooperative protection against overwrites/cleanup
+     * changes.
+     */
     bool guarded : 1;
 
     bool operator==(const Tile &) const = default;
