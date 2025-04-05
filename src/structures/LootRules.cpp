@@ -21,6 +21,12 @@ void fillLoot(
                     Prefix::none,
                     rnd.getInt(25, 50)};
                 ++itemIndex;
+            } else if (item.id == ItemID::livingMahoganyWand) {
+                chest.items[itemIndex] = {
+                    ItemID::richMahoganyLeafWand,
+                    Prefix::none,
+                    1};
+                ++itemIndex;
             }
         }
     }
@@ -496,6 +502,67 @@ void fillUndergroundHoneyChest(Chest &chest, Random &rnd, World &world)
         });
 }
 
+void fillUndergroundIvyChest(Chest &chest, Random &rnd, World &world)
+{
+    fillLoot(
+        chest,
+        rnd,
+        {
+            {1,
+             rnd.pool<Item>({
+                 {ItemID::feralClaws, rnd.select(PrefixSet::accessory), 1},
+                 {ItemID::ankletOfTheWind, rnd.select(PrefixSet::accessory), 1},
+                 {ItemID::staffOfRegrowth, rnd.select(PrefixSet::melee), 1},
+                 {ItemID::boomstick, rnd.select(PrefixSet::ranged), 1},
+                 rnd.select<Item>(
+                     {{ItemID::flowerBoots,
+                       rnd.select(PrefixSet::accessory),
+                       1},
+                      {ItemID::fiberglassFishingPole, Prefix::none, 1}}),
+             })},
+            {1.0 / 6, {ItemID::livingMahoganyWand, Prefix::none, 1}},
+            {0.1, {ItemID::beeMinecart, Prefix::none, 1}},
+            {0.2, {ItemID::honeyDispenser, Prefix::none, 1}},
+            {0.05, {ItemID::extractinator, Prefix::none, 1}},
+            {0.05, {ItemID::flareGun, Prefix::none, 1}},
+            {1.0 / 3, {ItemID::bomb, Prefix::none, rnd.getInt(10, 19)}},
+            {0.2, {ItemID::angelStatue, Prefix::none, 1}},
+            {1.0 / 3, {ItemID::vineRope, Prefix::none, rnd.getInt(50, 100)}},
+            {0.5,
+             {rnd.select(
+                  {world.ironVariant == TileID::ironOre ? ItemID::ironBar
+                                                        : ItemID::leadBar,
+                   world.silverVariant == TileID::silverOre
+                       ? ItemID::silverBar
+                       : ItemID::tungstenBar}),
+              Prefix::none,
+              rnd.getInt(5, 14)}},
+            {0.5,
+             {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
+              Prefix::none,
+              rnd.getInt(25, 49)}},
+            {0.5, {ItemID::bottledHoney, Prefix::none, rnd.getInt(3, 5)}},
+            {2.0 / 3,
+             {rnd.select(
+                  {ItemID::regenerationPotion,
+                   ItemID::shinePotion,
+                   ItemID::nightOwlPotion,
+                   ItemID::swiftnessPotion,
+                   ItemID::archeryPotion,
+                   ItemID::gillsPotion,
+                   ItemID::hunterPotion,
+                   ItemID::miningPotion,
+                   ItemID::dangersensePotion,
+                   ItemID::ammoReservationPotion,
+                   ItemID::summoningPotion}),
+              Prefix::none,
+              rnd.getInt(1, 2)}},
+            {0.5, {ItemID::jungleTorch, Prefix::none, rnd.getInt(10, 20)}},
+            {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
+            {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(50, 89)}},
+        });
+}
+
 void fillUndergroundMushroomChest(Chest &chest, Random &rnd, World &world)
 {
     fillLoot(
@@ -755,7 +822,7 @@ void fillCavernChest(Chest &chest, int torchID, Random &rnd, World &world)
                  {ItemID::shoeSpikes, rnd.select(PrefixSet::accessory), 1},
                  {ItemID::flareGun, Prefix::none, 1},
              })},
-            {0.05,
+            {chest.y < lavaLevel ? 0.05 : 0.15,
              {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
               Prefix::none,
               1}},
@@ -890,11 +957,86 @@ void fillCavernHoneyChest(Chest &chest, Random &rnd, World &world)
               Prefix::none,
               1}},
             {1.0 / 3, {ItemID::honeyBomb, Prefix::none, rnd.getInt(3, 5)}},
-            {0.05,
+            {chest.y < lavaLevel ? 0.05 : 0.15,
              {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
               Prefix::none,
               1}},
             {0.2, {ItemID::suspiciousLookingEye, Prefix::none, 1}},
+            {0.25, {ItemID::jestersArrow, Prefix::none, rnd.getInt(25, 50)}},
+            {0.5,
+             {rnd.select(
+                  {world.silverVariant == TileID::silverOre
+                       ? ItemID::silverBar
+                       : ItemID::tungstenBar,
+                   world.goldVariant == TileID::goldOre ? ItemID::goldBar
+                                                        : ItemID::platinumBar}),
+              Prefix::none,
+              rnd.getInt(3, 10)}},
+            {0.5,
+             {rnd.select({ItemID::flamingArrow, ItemID::poisonedKnife}),
+              Prefix::none,
+              rnd.getInt(25, 50)}},
+            {0.5, {ItemID::bottledHoney, Prefix::none, rnd.getInt(3, 5)}},
+            {2.0 / 3,
+             {rnd.select(
+                  {ItemID::spelunkerPotion,
+                   ItemID::featherfallPotion,
+                   ItemID::nightOwlPotion,
+                   ItemID::waterWalkingPotion,
+                   ItemID::archeryPotion,
+                   ItemID::gravitationPotion,
+                   ItemID::ammoReservationPotion,
+                   ItemID::summoningPotion}),
+              Prefix::none,
+              rnd.getInt(1, 2)}},
+            {1.0 / 3,
+             {rnd.select(
+                  {ItemID::thornsPotion,
+                   ItemID::waterWalkingPotion,
+                   ItemID::invisibilityPotion,
+                   ItemID::hunterPotion,
+                   ItemID::dangersensePotion,
+                   ItemID::teleportationPotion}),
+              Prefix::none,
+              rnd.getInt(1, 2)}},
+            {0.5, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
+            {0.5,
+             {rnd.select({ItemID::jungleTorch, ItemID::glowstick}),
+              Prefix::none,
+              rnd.getInt(15, 29)}},
+            {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}},
+        });
+}
+
+void fillCavernIvyChest(Chest &chest, Random &rnd, World &world)
+{
+    int lavaLevel =
+        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
+    fillLoot(
+        chest,
+        rnd,
+        {
+            {1,
+             rnd.pool<Item>({
+                 {ItemID::feralClaws, rnd.select(PrefixSet::accessory), 1},
+                 {ItemID::ankletOfTheWind, rnd.select(PrefixSet::accessory), 1},
+                 {ItemID::staffOfRegrowth, rnd.select(PrefixSet::melee), 1},
+                 {ItemID::boomstick, rnd.select(PrefixSet::ranged), 1},
+                 rnd.select<Item>(
+                     {{ItemID::flowerBoots,
+                       rnd.select(PrefixSet::accessory),
+                       1},
+                      {ItemID::fiberglassFishingPole, Prefix::none, 1}}),
+             })},
+            {1.0 / 6, {ItemID::livingMahoganyWand, Prefix::none, 1}},
+            {0.1, {ItemID::beeMinecart, Prefix::none, 1}},
+            {0.2, {ItemID::honeyDispenser, Prefix::none, 1}},
+            {chest.y < lavaLevel ? 0.05 : 0.15,
+             {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
+              Prefix::none,
+              1}},
+            {0.2, {ItemID::suspiciousLookingEye, Prefix::none, 1}},
+            {1.0 / 3, {ItemID::dynamite, Prefix::none, 1}},
             {0.25, {ItemID::jestersArrow, Prefix::none, rnd.getInt(25, 50)}},
             {0.5,
              {rnd.select(
@@ -969,7 +1111,7 @@ void fillCavernMushroomChest(Chest &chest, Random &rnd, World &world)
                         ItemID::mushroomPants})}),
               Prefix::none,
               1}},
-            {0.05,
+            {chest.y < lavaLevel ? 0.05 : 0.15,
              {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
               Prefix::none,
               1}},
@@ -1039,7 +1181,7 @@ void fillCavernSandstoneChest(Chest &chest, Random &rnd, World &world)
               1}},
             {1.0 / 15, {ItemID::desertMinecart, Prefix::none, 1}},
             {1.0 / 7, {ItemID::encumberingStone, Prefix::none, 1}},
-            {0.05,
+            {chest.y < lavaLevel ? 0.05 : 0.15,
              {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
               Prefix::none,
               1}},
@@ -1108,7 +1250,7 @@ void fillCavernRichMahoganyChest(Chest &chest, Random &rnd, World &world)
                  {ItemID::shoeSpikes, rnd.select(PrefixSet::accessory), 1},
                  {ItemID::flareGun, Prefix::none, 1},
              })},
-            {0.05,
+            {chest.y < lavaLevel ? 0.05 : 0.15,
              {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
               Prefix::none,
               1}},

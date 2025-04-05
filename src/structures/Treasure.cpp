@@ -4,9 +4,11 @@
 #include "Util.h"
 #include "World.h"
 #include "ids/ItemID.h"
+#include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/Plants.h"
+#include "structures/data/Shrines.h"
 #include <iostream>
 #include <set>
 
@@ -30,6 +32,7 @@ inline const std::set<int> nonSolidTiles{
     TileID::lihzahrdAltar,
     TileID::painting3x3,
     TileID::rope,
+    TileID::silverCoin,
     TileID::statue,
     TileID::thinIce,
     TileID::waterCandle,
@@ -223,7 +226,7 @@ void placeOrbHearts(
 
 void placeLarvae(LocationBins &locations, Random &rnd, World &world)
 {
-    std::vector<std::pair<int, int>> hiveLocations;
+    std::vector<Point> hiveLocations;
     for (const auto &locBin : locations) {
         for (auto [x, y] : locBin.second) {
             if (world.getTile(x, y - 1).wallID == WallID::Unsafe::hive) {
@@ -273,6 +276,167 @@ void placeManaCrystals(
             world.placeFramedTile(x, y - 2, TileID::manaCrystal);
             --manaCrystalCount;
         }
+    }
+}
+
+Point selectShrineLocation(TileBuffer &shrine, Random &rnd, World &world)
+{
+    int minOpenHeight = -1;
+    for (int j = 0; j < shrine.getHeight(); ++j) {
+        if (shrine.getTile(0, j).blockPaint == Paint::red ||
+            shrine.getTile(shrine.getWidth() - 1, j).blockPaint == Paint::red) {
+            minOpenHeight = j;
+            break;
+        }
+    }
+    if (minOpenHeight == -1) {
+        minOpenHeight = shrine.getHeight();
+    }
+    std::set<int> clearableTiles{
+        TileID::empty,
+        TileID::dirt,
+        TileID::mud,
+        TileID::jungleGrass,
+        TileID::stone,
+        TileID::clay,
+        TileID::silt,
+        TileID::copperOre,
+        TileID::tinOre,
+        TileID::ironOre,
+        TileID::leadOre,
+        TileID::silverOre,
+        TileID::tungstenOre,
+        TileID::goldOre,
+        TileID::platinumOre};
+    while (true) {
+        int x = rnd.getInt(
+            world.jungleCenter - 0.09 * world.getWidth(),
+            world.jungleCenter + 0.09 * world.getWidth());
+        int y =
+            rnd.getInt(world.getUndergroundLevel(), world.getUnderworldLevel());
+        if (!world.regionPasses(
+                x,
+                y,
+                shrine.getWidth(),
+                std::max(minOpenHeight, 3),
+                [](Tile &tile) {
+                    return tile.blockID == TileID::empty &&
+                           (tile.wallID == WallID::empty ||
+                            listContains(WallVariants::jungle, tile.wallID));
+                })) {
+            continue;
+        }
+        if (minOpenHeight == shrine.getHeight()) {
+            // Floating shrine.
+            if (!world.regionPasses(
+                    x,
+                    y,
+                    shrine.getWidth(),
+                    shrine.getHeight(),
+                    [](Tile &tile) {
+                        return !tile.guarded && tile.wallID != WallID::empty;
+                    })) {
+                continue;
+            }
+            return {x, y};
+        }
+        std::vector<int> groundLevel;
+        for (int i = 0; i < shrine.getWidth(); ++i) {
+            for (int j = minOpenHeight; j < 150; ++j) {
+                if (world.getTile(x + i, y + j).blockID != TileID::empty) {
+                    groundLevel.push_back(y + j);
+                    break;
+                }
+            }
+        }
+        if (static_cast<int>(groundLevel.size()) != shrine.getWidth()) {
+            // Ground out of scan range.
+            continue;
+        }
+        for (; y <= groundLevel[0]; ++y) {
+            bool isValid = true;
+            for (int i = 0; i < shrine.getWidth(); ++i) {
+                int j = groundLevel[i] - y;
+                if (j < 0 || j >= shrine.getHeight() ||
+                    ((i == 0 || i == shrine.getWidth() - 1) &&
+                     shrine.getTile(i, j).blockPaint != Paint::red)) {
+                    isValid = false;
+                    break;
+                }
+            }
+            if (!isValid) {
+                continue;
+            }
+            if ( // Ground too thin.
+                !world.regionPasses(
+                    x,
+                    y + shrine.getHeight() - 1,
+                    shrine.getWidth(),
+                    1,
+                    [](Tile &tile) { return tile.blockID != TileID::empty; }) ||
+                // Restricted tiles.
+                !world.regionPasses(
+                    x,
+                    y,
+                    shrine.getWidth(),
+                    shrine.getHeight(),
+                    [&clearableTiles](Tile &tile) {
+                        return !tile.guarded &&
+                               clearableTiles.contains(tile.blockID);
+                    })) {
+                break;
+            }
+            return {x, y};
+        }
+    }
+}
+
+void placeJungleShrines(Random &rnd, World &world)
+{
+    int shrineCount = world.getWidth() * world.getHeight() / 600000;
+    while (shrineCount > 0) {
+        TileBuffer shrine =
+            Data::getShrine(rnd.select(Data::shrines), world.getFramedTiles());
+        auto [x, y] = selectShrineLocation(shrine, rnd, world);
+        std::set<Point> chests;
+        for (int i = 0; i < shrine.getWidth(); ++i) {
+            for (int j = 0; j < shrine.getHeight(); ++j) {
+                Tile &shrineTile = shrine.getTile(i, j);
+                if (shrineTile.blockID == TileID::cloud) {
+                    continue;
+                }
+                Tile &tile = world.getTile(x + i, y + j);
+                if (shrineTile.blockID == TileID::chest &&
+                    !chests.contains({i - 1, j}) &&
+                    !chests.contains({i, j - 1}) &&
+                    !chests.contains({i - 1, j - 1})) {
+                    chests.emplace(i, j);
+                }
+                if (shrineTile.wallID == WallID::empty) {
+                    shrineTile.wallID = tile.wallID;
+                }
+                tile = shrineTile;
+                tile.guarded = true;
+            }
+        }
+        for (int i = 0; i < shrine.getWidth(); ++i) {
+            for (int j = 0; j < shrine.getHeight(); ++j) {
+                Tile &tile = world.getTile(x + i, y + j);
+                if (tile.blockID == TileID::mud &&
+                    world.isExposed(x + i, y + j)) {
+                    tile.blockID = TileID::jungleGrass;
+                }
+            }
+        }
+        for (auto [i, j] : chests) {
+            Chest &chest = world.placeChest(x + i, y + j, Variant::ivy);
+            if (y < world.getCavernLevel()) {
+                fillUndergroundIvyChest(chest, rnd, world);
+            } else {
+                fillCavernIvyChest(chest, rnd, world);
+            }
+        }
+        --shrineCount;
     }
 }
 
@@ -486,6 +650,10 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
 {
     int chestCount = world.getWidth() * world.getHeight() / 50000;
     LocationBins usedLocations;
+    for (auto &chest : world.getChests()) {
+        usedLocations[binLocation(chest.x, chest.y, world.getHeight())]
+            .emplace_back(chest.x, chest.y);
+    }
     while (chestCount > 0) {
         int binId = rnd.getInt(0, maxBin);
         if (locations[binId].empty()) {
@@ -562,8 +730,7 @@ void placePots(int maxBin, LocationBins &locations, Random &rnd, World &world)
 void genTreasure(Random &rnd, World &world)
 {
     std::cout << "Cataloging ground\n";
-    std::vector<std::vector<std::pair<int, int>>> rawLocations(
-        world.getWidth());
+    std::vector<std::vector<Point>> rawLocations(world.getWidth());
     parallelFor(
         std::views::iota(50, world.getWidth() - 50),
         [&rawLocations, &world](int x) {
@@ -592,6 +759,7 @@ void genTreasure(Random &rnd, World &world)
     std::cout << "Placing treasures\n";
     int maxBin =
         binLocation(world.getWidth(), world.getHeight(), world.getHeight());
+    placeJungleShrines(rnd, world);
     placeLarvae(flatLocations, rnd, world);
     placeLifeCrystals(maxBin, flatLocations, rnd, world);
     placeAltars(maxBin, flatLocations, rnd, world);

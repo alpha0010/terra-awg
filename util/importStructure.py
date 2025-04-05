@@ -159,22 +159,23 @@ def serializeTile(tile, framedTiles):
         data.append(flags)
     return data
 
-(tiles, framedTiles) = loadTiles(sys.argv[1])
-data = [len(tiles) << 8 | len(tiles[0])]
-prevTile = []
-rleIndex = len(data)
-for column in tiles:
-    for tile in column:
-        curTile = serializeTile(tile, framedTiles)
-        if prevTile == curTile:
-            data[rleIndex] += 1
-        else:
-            rleIndex = len(data)
-            data += curTile
-            prevTile = curTile
-print('\n'.join(textwrap.wrap(
-    ', '.join([str(val) for val in data]),
-    width=79,
-    initial_indent='    ',
-    subsequent_indent='    '
-)))
+for filename in sys.argv[1:]:
+    (tiles, framedTiles) = loadTiles(filename)
+    data = [len(tiles) << 8 | len(tiles[0])]
+    prevTile = []
+    rleIndex = len(data)
+    for column in tiles:
+        for tile in column:
+            curTile = serializeTile(tile, framedTiles)
+            if prevTile == curTile:
+                data[rleIndex] += 1
+            else:
+                rleIndex = len(data)
+                data += curTile
+                prevTile = curTile
+    print('\n'.join(textwrap.wrap(
+        ', '.join([str(val) for val in data]),
+        width=79,
+        initial_indent='    ',
+        subsequent_indent='    '
+    )))

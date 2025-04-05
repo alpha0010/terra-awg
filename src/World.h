@@ -25,6 +25,7 @@ enum class Variant {
     health,
     honey,
     ice,
+    ivy,
     jungle,
     lesion,
     lihzahrd,

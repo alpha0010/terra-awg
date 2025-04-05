@@ -87,6 +87,7 @@ enum {
     coralstone = 315,
     borealWood = 321,
     palmTree = 323,
+    silverCoin = 331,
     bewitchingTable = 354,
     alchemyTable = 355,
     smoothMarble = 357,

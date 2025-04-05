@@ -7,7 +7,8 @@
 class World;
 class Random;
 
-typedef std::map<int, std::vector<std::pair<int, int>>> LocationBins;
+typedef std::pair<int, int> Point;
+typedef std::map<int, std::vector<Point>> LocationBins;
 
 void genPlants(const LocationBins &locations, Random &rnd, World &world);
 
