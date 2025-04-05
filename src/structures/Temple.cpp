@@ -10,7 +10,7 @@ typedef std::pair<int, int> Point;
 
 template <typename Func> void iterateTemple(Point center, World &world, Func f)
 {
-    int scanX = 0.025 * world.getWidth();
+    int scanX = 0.029 * world.getWidth();
     int scanY = 0.45 * scanX;
     int startScanY = scanY;
     int stepCtrl = -1;
@@ -66,14 +66,53 @@ bool testTempleSelection(Point center, World &world)
 
 Point selectTempleCenter(Random &rnd, World &world)
 {
-    int xMin = world.jungleCenter - 0.083 * world.getWidth();
-    int xMax = world.jungleCenter + 0.083 * world.getWidth();
+    int xMin = world.jungleCenter - 0.079 * world.getWidth();
+    int xMax = world.jungleCenter + 0.079 * world.getWidth();
     int yMin = (world.getUndergroundLevel() + world.getCavernLevel()) / 2;
     while (true) {
         int x = rnd.getInt(xMin, xMax);
         int y = rnd.getInt(yMin, world.getUnderworldLevel());
         if (testTempleSelection({x, y}, world)) {
             return {x, y};
+        }
+    }
+}
+
+void clearTempleSurface(Point center, Random &rnd, World &world)
+{
+    rnd.shuffleNoise();
+    std::set<int> clearableTiles{
+        TileID::dirt,
+        TileID::mud,
+        TileID::jungleGrass,
+        TileID::stone,
+        TileID::clay,
+        TileID::silt,
+        TileID::copperOre,
+        TileID::tinOre,
+        TileID::ironOre,
+        TileID::leadOre,
+        TileID::silverOre,
+        TileID::tungstenOre,
+        TileID::goldOre,
+        TileID::platinumOre};
+    int scanDist = 0.019 * world.getWidth();
+    for (int x = center.first - scanDist; x < center.first + scanDist; ++x) {
+        for (int y = center.second - scanDist; y < center.second + scanDist;
+             ++y) {
+            double threshold =
+                3 * std::hypot(x - center.first, y - center.second) / scanDist -
+                2;
+            Tile &tile = world.getTile(x, y);
+            if (rnd.getFineNoise(x, y) > threshold) {
+                if (tile.blockID == TileID::lihzahrdBrick) {
+                    break;
+                } else if (clearableTiles.contains(tile.blockID)) {
+                    tile.blockID = TileID::empty;
+                }
+            } else if (tile.blockID == TileID::mud && world.isExposed(x, y)) {
+                tile.blockID = TileID::jungleGrass;
+            }
         }
     }
 }
@@ -114,6 +153,7 @@ void genTemple(Random &rnd, World &world)
         tile.wallID = WallID::Unsafe::lihzahrdBrick;
         return true;
     });
+    clearTempleSurface(center, rnd, world);
     int wallThickness = 4;
     int roomSize = 7;
     int roomStep = roomSize + wallThickness;
@@ -141,19 +181,13 @@ void genTemple(Random &rnd, World &world)
         }
         return true;
     });
-    std::vector<Point> throneRoom{
-        {centerRoomX - roomStep, maxRoomY - roomStep},
-        {centerRoomX, maxRoomY - roomStep},
-        {centerRoomX + roomStep, maxRoomY - roomStep},
-        {centerRoomX - roomStep, maxRoomY},
-        {centerRoomX, maxRoomY},
-        {centerRoomX + roomStep, maxRoomY},
-    };
-    for (Point room : throneRoom) {
-        rooms.erase(room);
+    for (int i = -2; i < 3; ++i) {
+        for (int j = -2; j < 1; ++j) {
+            rooms.erase({centerRoomX + i * roomStep, maxRoomY + j * roomStep});
+        }
     }
     rooms.emplace(
-        rnd.select({centerRoomX - roomStep, centerRoomX + roomStep}),
+        rnd.select({centerRoomX - 2 * roomStep, centerRoomX + 2 * roomStep}),
         maxRoomY);
     Point agent = *rooms.begin();
     std::set<Point> connectedRooms{agent};
@@ -199,14 +233,15 @@ void genTemple(Random &rnd, World &world)
             }
         }
     }
-    for (int x = centerRoomX - roomStep; x < centerRoomX + roomStep + roomSize;
+    for (int x = centerRoomX - 2 * roomStep;
+         x < centerRoomX + 2 * roomStep + roomSize;
          ++x) {
-        for (int y = maxRoomY - roomStep; y < maxRoomY + roomSize; ++y) {
+        for (int y = maxRoomY - 2 * roomStep; y < maxRoomY + roomSize; ++y) {
             world.getTile(x, y).blockID = TileID::empty;
         }
     }
     world.placeFramedTile(
-        centerRoomX + roomStep / 2 - 1,
+        centerRoomX + roomSize / 2 - 1,
         maxRoomY + roomSize - 2,
         TileID::lihzahrdAltar);
 }

@@ -151,7 +151,8 @@ void smoothSurfaces(World &world)
         [&stablizeBlocks, &slopedTiles, &world](int x) {
             for (int y = 0; y < world.getHeight(); ++y) {
                 Tile &tile = world.getTile(x, y);
-                if (tile.blockID == TileID::empty || !world.isExposed(x, y)) {
+                if (tile.blockID == TileID::empty || tile.guarded ||
+                    !world.isExposed(x, y)) {
                     continue;
                 }
                 if (tile.wallID != WallID::empty) {

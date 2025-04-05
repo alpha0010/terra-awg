@@ -19,6 +19,7 @@
 #include "biomes/Snow.h"
 #include "biomes/SpiderNest.h"
 #include "biomes/Underworld.h"
+#include "structures/BuriedBoat.h"
 #include "structures/Dungeon.h"
 #include "structures/Lake.h"
 #include "structures/Temple.h"
@@ -74,6 +75,7 @@ int main()
     genGlowingMoss(rnd, world);
     genDungeon(rnd, world);
     genTemple(rnd, world);
+    genBuriedBoat(rnd, world);
     genLake(world);
     genTreasure(rnd, world);
     smoothSurfaces(world);

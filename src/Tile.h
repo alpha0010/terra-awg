@@ -28,6 +28,7 @@ public:
     bool echoCoatWall : 1;
     bool illuminantBlock : 1;
     bool illuminantWall : 1;
+    bool guarded : 1;
 
     bool operator==(const Tile &) const = default;
 };

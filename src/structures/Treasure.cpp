@@ -19,6 +19,7 @@ bool listContains(const T &list, const U &value)
 inline const std::set<int> nonSolidTiles{
     TileID::empty,
     TileID::alchemyTable,
+    TileID::bench,
     TileID::bewitchingTable,
     TileID::boneWelder,
     TileID::book,
@@ -27,6 +28,9 @@ inline const std::set<int> nonSolidTiles{
     TileID::chest,
     TileID::chestGroup2,
     TileID::lihzahrdAltar,
+    TileID::painting3x3,
+    TileID::rope,
+    TileID::statue,
     TileID::thinIce,
     TileID::waterCandle,
 };
@@ -113,15 +117,16 @@ void placeLifeCrystals(
         auto [x, y] = rnd.select(locations[binId]);
         if (y > world.getUndergroundLevel() && y < world.getUnderworldLevel() &&
             isPlacementCandidate(x, y, world)) {
-            if (listContains(
-                    WallVariants::dungeon,
-                    world.getTile(x, y - 2).wallID)) {
+            int probeWall = world.getTile(x, y - 2).wallID;
+            if (listContains(WallVariants::dungeon, probeWall)) {
                 if (maxDungeonPlacements > 0) {
                     world.placeFramedTile(x, y - 2, TileID::lifeCrystalBoulder);
                     --maxDungeonPlacements;
                 } else {
                     continue;
                 }
+            } else if (probeWall == WallID::Unsafe::lihzahrdBrick) {
+                continue;
             } else {
                 world.placeFramedTile(x, y - 2, TileID::lifeCrystal);
             }
@@ -260,11 +265,11 @@ void placeManaCrystals(
             continue;
         }
         auto [x, y] = rnd.select(locations[binId]);
+        int probeWall = world.getTile(x, y - 2).wallID;
         if (y > world.getUndergroundLevel() && y < world.getUnderworldLevel() &&
             isPlacementCandidate(x, y, world) &&
-            !listContains(
-                WallVariants::dungeon,
-                world.getTile(x, y - 2).wallID)) {
+            !listContains(WallVariants::dungeon, probeWall) &&
+            probeWall != WallID::Unsafe::lihzahrdBrick) {
             world.placeFramedTile(x, y - 2, TileID::manaCrystal);
             --manaCrystalCount;
         }
