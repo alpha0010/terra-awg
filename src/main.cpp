@@ -26,6 +26,7 @@
 #include "structures/Treasure.h"
 #include <array>
 #include <chrono>
+#include <iostream>
 
 #define FOREST_BACKGROUNDS 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 31, 51, 71, 72, 73
 #define SNOW_BACKGROUNDS 0, 1, 2, 3, 4, 5, 6, 7, 21, 22, 31, 32, 41, 42
@@ -41,17 +42,8 @@ uint64_t getBinaryTime()
     return ms * 10000 + 621355968000000000ull;
 }
 
-int main()
+void doWorldGen(Random &rnd, World &world)
 {
-    Random rnd;
-    World world;
-
-    world.isCrimson = rnd.getBool();
-    world.copperVariant = rnd.select({TileID::copperOre, TileID::tinOre});
-    world.ironVariant = rnd.select({TileID::ironOre, TileID::leadOre});
-    world.silverVariant = rnd.select({TileID::silverOre, TileID::tungstenOre});
-    world.goldVariant = rnd.select({TileID::goldOre, TileID::platinumOre});
-
     genWorldBase(rnd, world);
     genOceans(rnd, world);
     genMarbleCave(rnd, world);
@@ -79,7 +71,10 @@ int main()
     genLake(world);
     genTreasure(rnd, world);
     smoothSurfaces(world);
+}
 
+void saveWorldFile(Random &rnd, World &world)
+{
     Writer w;
     w.putUint32(279); // File format version.
     w.write("relogic", 7);
@@ -451,5 +446,29 @@ int main()
     for (auto ptr : sectionPointers) {
         w.putUint32(ptr);
     }
+}
+
+int main()
+{
+    auto mainStart = std::chrono::high_resolution_clock::now();
+
+    Random rnd;
+    World world;
+
+    world.isCrimson = rnd.getBool();
+    world.copperVariant = rnd.select({TileID::copperOre, TileID::tinOre});
+    world.ironVariant = rnd.select({TileID::ironOre, TileID::leadOre});
+    world.silverVariant = rnd.select({TileID::silverOre, TileID::tungstenOre});
+    world.goldVariant = rnd.select({TileID::goldOre, TileID::platinumOre});
+
+    doWorldGen(rnd, world);
+    saveWorldFile(rnd, world);
+
+    auto mainEnd = std::chrono::high_resolution_clock::now();
+    std::cout << "\nComplete in: "
+              << 0.001 * std::chrono::duration_cast<std::chrono::milliseconds>(
+                             mainEnd - mainStart)
+                             .count()
+              << "s\n";
     return 0;
 }
