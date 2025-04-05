@@ -3,6 +3,7 @@
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
+#include "structures/Platforms.h"
 #include <iostream>
 #include <set>
 
@@ -143,6 +144,100 @@ void applyRoomConnection(Point from, Point to, int roomSize, World &world)
     }
 }
 
+void addTempleEntry(int centerX, int minY, World &world)
+{
+    int doorOffset = 29;
+    int x = centerX;
+    while (world.getTile(x - 1, minY + doorOffset).wallID ==
+           WallID::Unsafe::lihzahrdBrick) {
+        --x;
+    }
+    world
+        .placeFramedTile(x, minY + doorOffset, TileID::door, Variant::lihzahrd);
+    world.placeFramedTile(
+        x - 2,
+        minY + doorOffset,
+        TileID::lamp,
+        Variant::lihzahrd);
+    world.placeFramedTile(
+        x + 2,
+        minY + doorOffset + 1,
+        TileID::pot,
+        Variant::lihzahrd);
+    int clearedGap = 0;
+    for (++x; x < centerX; ++x) {
+        for (int i = 0; i < 3; ++i) {
+            Tile &tile = world.getTile(x, minY + doorOffset + i);
+            if (tile.blockID == TileID::lihzahrdBrick) {
+                tile.blockID = TileID::empty;
+            }
+        }
+        if (world.getTile(x, minY + doorOffset - 1).blockID == TileID::empty ||
+            world.getTile(x, minY + doorOffset + 3).blockID == TileID::empty) {
+            ++clearedGap;
+            if (clearedGap > 1) {
+                break;
+            }
+        }
+    }
+    x = centerX;
+    while (world.getTile(x + 1, minY + doorOffset).wallID ==
+           WallID::Unsafe::lihzahrdBrick) {
+        ++x;
+    }
+    world
+        .placeFramedTile(x, minY + doorOffset, TileID::door, Variant::lihzahrd);
+    world.placeFramedTile(
+        x + 2,
+        minY + doorOffset,
+        TileID::lamp,
+        Variant::lihzahrd);
+    world.placeFramedTile(
+        x - 3,
+        minY + doorOffset + 1,
+        TileID::pot,
+        Variant::lihzahrd);
+    clearedGap = 0;
+    for (--x; x > centerX; --x) {
+        for (int i = 0; i < 3; ++i) {
+            Tile &tile = world.getTile(x, minY + doorOffset + i);
+            if (tile.blockID == TileID::lihzahrdBrick) {
+                tile.blockID = TileID::empty;
+            }
+        }
+        if (world.getTile(x, minY + doorOffset - 1).blockID == TileID::empty ||
+            world.getTile(x, minY + doorOffset + 3).blockID == TileID::empty) {
+            ++clearedGap;
+            if (clearedGap > 1) {
+                break;
+            }
+        }
+    }
+}
+
+void addDeadEndPlatforms(
+    int roomSize,
+    const std::set<Point> &rooms,
+    World &world)
+{
+    for (auto [x, y] : rooms) {
+        bool isVertDeadEnd = true;
+        for (auto [i, j] :
+             {std::pair{-1, 0}, {0, -1}, {roomSize - 1, -1}, {roomSize, 0}}) {
+            if (world.getTile(x + i, y + j).blockID != TileID::lihzahrdBrick) {
+                isVertDeadEnd = false;
+                break;
+            }
+        }
+        if (!isVertDeadEnd) {
+            continue;
+        }
+        for (int i = 0; i < roomSize; ++i) {
+            placePlatform(x + i, y + roomSize - 1, Platform::lihzahrd, world);
+        }
+    }
+}
+
 void genTemple(Random &rnd, World &world)
 {
     std::cout << "Training acolytes\n";
@@ -162,7 +257,9 @@ void genTemple(Random &rnd, World &world)
     int modTargetY = center.second % roomStep;
     int centerRoomX = 0;
     int maxRoomY = 0;
+    int minY = center.second;
     iterateTemple(center, world, [&](int x, int y) {
+        minY = std::min(y, minY);
         if (x % roomStep == modTargetX && y % roomStep == modTargetY &&
             world.regionPasses(
                 x - wallThickness,
@@ -240,6 +337,8 @@ void genTemple(Random &rnd, World &world)
             world.getTile(x, y).blockID = TileID::empty;
         }
     }
+    addTempleEntry(center.first, minY, world);
+    addDeadEndPlatforms(roomSize, rooms, world);
     world.placeFramedTile(
         centerRoomX + roomSize / 2 - 1,
         maxRoomY + roomSize - 2,

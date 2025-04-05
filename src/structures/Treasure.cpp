@@ -279,7 +279,11 @@ void placeManaCrystals(
     }
 }
 
-Point selectShrineLocation(TileBuffer &shrine, Random &rnd, World &world)
+Point selectShrineLocation(
+    TileBuffer &shrine,
+    std::vector<Point> &usedLocations,
+    Random &rnd,
+    World &world)
 {
     int minOpenHeight = -1;
     for (int j = 0; j < shrine.getHeight(); ++j) {
@@ -308,6 +312,14 @@ Point selectShrineLocation(TileBuffer &shrine, Random &rnd, World &world)
         TileID::tungstenOre,
         TileID::goldOre,
         TileID::platinumOre};
+    auto isLocationUsed = [&usedLocations](int x, int y) {
+        for (auto [usedX, usedY] : usedLocations) {
+            if (std::hypot(usedX - x, usedY - y) < 20) {
+                return true;
+            }
+        }
+        return false;
+    };
     while (true) {
         int x = rnd.getInt(
             world.jungleCenter - 0.09 * world.getWidth(),
@@ -335,7 +347,8 @@ Point selectShrineLocation(TileBuffer &shrine, Random &rnd, World &world)
                     shrine.getHeight(),
                     [](Tile &tile) {
                         return !tile.guarded && tile.wallID != WallID::empty;
-                    })) {
+                    }) ||
+                isLocationUsed(x, y)) {
                 continue;
             }
             return {x, y};
@@ -374,6 +387,8 @@ Point selectShrineLocation(TileBuffer &shrine, Random &rnd, World &world)
                     shrine.getWidth(),
                     1,
                     [](Tile &tile) { return tile.blockID != TileID::empty; }) ||
+                // Near other shrines.
+                isLocationUsed(x, y) ||
                 // Restricted tiles.
                 !world.regionPasses(
                     x,
@@ -394,10 +409,12 @@ Point selectShrineLocation(TileBuffer &shrine, Random &rnd, World &world)
 void placeJungleShrines(Random &rnd, World &world)
 {
     int shrineCount = world.getWidth() * world.getHeight() / 600000;
+    std::vector<Point> usedLocations;
     while (shrineCount > 0) {
         TileBuffer shrine =
             Data::getShrine(rnd.select(Data::shrines), world.getFramedTiles());
-        auto [x, y] = selectShrineLocation(shrine, rnd, world);
+        auto [x, y] = selectShrineLocation(shrine, usedLocations, rnd, world);
+        usedLocations.emplace_back(x, y);
         std::set<Point> chests;
         for (int i = 0; i < shrine.getWidth(); ++i) {
             for (int j = 0; j < shrine.getHeight(); ++j) {

@@ -465,7 +465,7 @@ int main()
     saveWorldFile(rnd, world);
 
     auto mainEnd = std::chrono::high_resolution_clock::now();
-    std::cout << "\nComplete in: "
+    std::cout << "\nTime: "
               << 0.001 * std::chrono::duration_cast<std::chrono::milliseconds>(
                              mainEnd - mainStart)
                              .count()
