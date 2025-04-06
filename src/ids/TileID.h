@@ -28,6 +28,7 @@ enum {
     blueBrick = 41,
     greenBrick = 43,
     pinkBrick = 44,
+    spike = 48,
     waterCandle = 49,
     book = 50,
     vines = 52,

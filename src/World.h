@@ -63,6 +63,10 @@ public:
     int getCavernLevel() const;
     int getUnderworldLevel() const;
     Tile &getTile(int x, int y);
+    Tile &getTile(std::pair<int, int> pt)
+    {
+        return getTile(pt.first, pt.second);
+    }
     void
     placeFramedTile(int x, int y, int blockID, Variant type = Variant::none);
     Chest &placeChest(int x, int y, Variant type);
