@@ -261,7 +261,7 @@ void placeManaCrystals(
     Random &rnd,
     World &world)
 {
-    int manaCrystalCount = world.getWidth() * world.getHeight() / 250000;
+    int manaCrystalCount = world.getWidth() * world.getHeight() / 310000;
     while (manaCrystalCount > 0) {
         int binId = rnd.getInt(0, maxBin);
         if (locations[binId].empty()) {

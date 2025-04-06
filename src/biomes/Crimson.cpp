@@ -38,6 +38,7 @@ void genCrimson(Random &rnd, World &world)
         {TileID::jungleGrass, TileID::crimsonJungleGrass},
         {TileID::mushroomGrass, TileID::crimsonJungleGrass},
         {TileID::silt, TileID::crimstone},
+        {TileID::slime, TileID::crimstone},
         {TileID::ice, TileID::crimsonIce},
         {TileID::slush, TileID::crimstone},
         {TileID::sandstone, TileID::crimsandstone},

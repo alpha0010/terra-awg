@@ -37,6 +37,7 @@ void genCorruption(Random &rnd, World &world)
         {TileID::jungleGrass, TileID::corruptJungleGrass},
         {TileID::mushroomGrass, TileID::corruptJungleGrass},
         {TileID::silt, TileID::ebonstone},
+        {TileID::slime, TileID::ebonstone},
         {TileID::ice, TileID::corruptIce},
         {TileID::slush, TileID::ebonstone},
         {TileID::sandstone, TileID::ebonsandstone},

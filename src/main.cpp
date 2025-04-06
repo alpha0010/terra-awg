@@ -24,6 +24,7 @@
 #include "structures/Lake.h"
 #include "structures/Temple.h"
 #include "structures/Treasure.h"
+#include "structures/Vines.h"
 #include <array>
 #include <chrono>
 #include <iostream>
@@ -71,6 +72,7 @@ void doWorldGen(Random &rnd, World &world)
     genLake(world);
     genTreasure(rnd, world);
     smoothSurfaces(world);
+    genVines(rnd, world);
 }
 
 void saveWorldFile(Random &rnd, World &world)

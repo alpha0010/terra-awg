@@ -14,6 +14,7 @@ void fillMushroomField(
 {
     rnd.shuffleNoise();
     int centerY = fieldFloor - 0.35 * fieldSize;
+    int secondaryBlock = rnd.select({TileID::silt, TileID::slime});
     for (int x = centerX - 1.4 * fieldSize; x < centerX + 1.4 * fieldSize;
          ++x) {
         int lastTileID = TileID::empty;
@@ -63,7 +64,7 @@ void fillMushroomField(
                     }
                     break;
                 case TileID::dirt:
-                    tile.blockID = TileID::silt;
+                    tile.blockID = secondaryBlock;
                 default:
                     break;
                 }

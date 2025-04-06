@@ -2,6 +2,7 @@
 
 #include "Util.h"
 #include "World.h"
+#include "ids/Paint.h"
 #include "ids/WallID.h"
 #include <iostream>
 #include <map>
@@ -22,15 +23,15 @@ bool isIsolated(World &world, int x, int y)
     return true;
 }
 
-int getAttachedOpenWall(World &world, int x, int y)
+std::pair<int, int> getAttachedOpenWall(World &world, int x, int y)
 {
     for (auto [i, j] : {std::pair{-1, 0}, {1, 0}, {0, -1}, {0, 1}}) {
         Tile &tile = world.getTile(x + i, y + j);
         if (tile.blockID == TileID::empty && tile.wallID != WallID::empty) {
-            return tile.wallID;
+            return {tile.wallID, tile.wallPaint};
         }
     }
-    return WallID::empty;
+    return {WallID::empty, Paint::none};
 }
 
 Slope computeSlope(World &world, int x, int y)
@@ -116,6 +117,7 @@ void smoothSurfaces(World &world)
         TileID::snow,
         TileID::ice,
         TileID::corruptIce,
+        TileID::slime,
         TileID::flesh,
         TileID::crimsonGrass,
         TileID::crimsonIce,
@@ -158,7 +160,8 @@ void smoothSurfaces(World &world)
                 if (tile.wallID != WallID::empty) {
                     // Blend with surrounding walls by matching wall type
                     // used/blank in orthogonal non-block-covered space.
-                    tile.wallID = getAttachedOpenWall(world, x, y);
+                    std::tie(tile.wallID, tile.wallPaint) =
+                        getAttachedOpenWall(world, x, y);
                 }
                 if (isIsolated(world, x, y)) {
                     tile.blockID = TileID::empty;
