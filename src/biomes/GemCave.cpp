@@ -6,6 +6,10 @@
 #include "ids/WallID.h"
 #include <iostream>
 
+/**
+ * Concentrated deposits of two gem types, and associated gem walls for added
+ * visibility.
+ */
 void fillGemCave(
     int x,
     int y,
@@ -21,6 +25,7 @@ void fillGemCave(
         for (int j = -caveSize; j < caveSize; ++j) {
             double threshold = std::max(std::hypot(i, j) / caveSize, 0.35);
             Tile &tile = world.getTile(x + i, y + j);
+            // Intermix regular stone within gem deposits.
             int dispersal =
                 static_cast<int>(99999 * (1 + rnd.getFineNoise(x + i, y + j))) %
                 5;
@@ -47,6 +52,7 @@ void genGemCave(Random &rnd, World &world)
 {
     std::cout << "Burying gems\n";
     rnd.shuffleNoise();
+    // Place higher value gems deeper. Excludes amber.
     std::vector<std::pair<int, int>> gemTypes{
         {TileID::amethystStone, WallID::Unsafe::amethystStone},
         {TileID::amethystStone, WallID::Unsafe::amethystStone},

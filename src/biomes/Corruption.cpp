@@ -12,6 +12,7 @@ void genCorruption(Random &rnd, World &world)
 {
     std::cout << "Corrupting the world\n";
     rnd.shuffleNoise();
+    // Avoid selecting too near spawn.
     int surfaceX = world.getWidth() * rnd.getDouble(0.12, 0.39);
     if (rnd.getBool()) {
         surfaceX = world.getWidth() - surfaceX;
@@ -19,8 +20,10 @@ void genCorruption(Random &rnd, World &world)
     int surfaceY = rnd.getInt(
         0.95 * world.getUndergroundLevel(),
         (2 * world.getUndergroundLevel() + world.getCavernLevel()) / 3);
+    // Register location for use in other generators.
     world.surfaceEvilCenter = surfaceX;
     int scanDist = 0.08 * world.getWidth();
+    // Conversion mappings.
     std::map<int, int> corruptBlocks{
         {TileID::stone, TileID::ebonstone},
         {TileID::grass, TileID::corruptGrass},
@@ -61,6 +64,7 @@ void genCorruption(Random &rnd, World &world)
           WallID::Unsafe::granite}) {
         corruptWalls[wallId] = rnd.select(WallVariants::corruption);
     }
+    // Dig surface chasms, edged with ebonstone.
     for (int x = surfaceX - scanDist; x < surfaceX + scanDist; ++x) {
         for (int y = 0.4 * world.getUndergroundLevel();
              y < world.getCavernLevel();
@@ -99,6 +103,9 @@ void genCorruption(Random &rnd, World &world)
                                         world.getWidth(),
                                     0.04);
                         if (std::abs(rnd.getCoarseNoise(x, y)) < threshold) {
+                            // Corruption spreads from tendrils of lesion
+                            // blocks. Fill the core of central tendrils with
+                            // demonite.
                             tile.blockID = std::abs(rnd.getCoarseNoise(x, y)) <
                                                    threshold - 0.065
                                                ? y > world.getUndergroundLevel()
@@ -108,6 +115,7 @@ void genCorruption(Random &rnd, World &world)
                             if (tile.wallID != WallID::empty) {
                                 tile.wallID = WallID::Unsafe::corruptTendril;
                             }
+                            // Handle aether bubble.
                             tile.echoCoatBlock = false;
                         } else {
                             auto blockItr = corruptBlocks.find(tile.blockID);
@@ -123,12 +131,15 @@ void genCorruption(Random &rnd, World &world)
                 }
             });
     };
+    // Surface corruption.
     applyCorruption(surfaceX, surfaceY);
+    // Underground corruption.
     applyCorruption(
         world.getWidth() * rnd.getDouble(0.08, 0.92),
         rnd.getInt(
             (2 * world.getCavernLevel() + world.getUnderworldLevel()) / 3,
             world.getUnderworldLevel()));
+    // Remove high above surface unconnected tendrils.
     bool clearFloating = false;
     for (int y = 0.8 * world.getUndergroundLevel(); y > 0; --y) {
         bool foundBlock = false;

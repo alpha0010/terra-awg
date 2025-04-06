@@ -5,6 +5,9 @@
 #include "ids/WallID.h"
 #include <iostream>
 
+/**
+ * Distort nearby tiles in a wave pattern.
+ */
 void applyAetherDistortion(int centerX, int centerY, double size, World &world)
 {
     for (int x = std::max(centerX - size, 0.0); x < centerX + size; ++x) {
@@ -62,11 +65,13 @@ void genAether(Random &rnd, World &world)
                 std::min(1.0, 3 * (1 - centralPropo));
             Tile &tile = world.getTile(x, y);
             if (noiseVal > 0.45) {
+                // Solid bubbles.
                 tile.blockID = TileID::bubble;
                 maxBubblePos = std::max(maxBubblePos, y);
             } else if (noiseVal > 0.09) {
                 tile.blockID = TileID::empty;
             } else if (noiseVal > 0.02) {
+                // Seal entrances with aetherium.
                 tile.blockID = tile.blockID == TileID::empty ? TileID::aetherium
                                : centralPropo < 0.6 ? TileID::heliumMossStone
                                                     : TileID::stone;
@@ -81,10 +86,12 @@ void genAether(Random &rnd, World &world)
         for (int y = centerY - size; y < centerY + size; ++y) {
             Tile &tile = world.getTile(x, y);
             if (tile.blockID == TileID::bubble && world.isExposed(x, y)) {
+                // Find bubble edges.
                 tile.echoCoatBlock = true;
             } else if (
                 tile.blockID == TileID::heliumMossStone &&
                 !world.isExposed(x, y)) {
+                // Remove interior moss tiles.
                 tile.blockID = TileID::stone;
             }
         }
@@ -93,6 +100,7 @@ void genAether(Random &rnd, World &world)
         for (int y = centerY - size; y < centerY + size; ++y) {
             Tile &tile = world.getTile(x, y);
             if (tile.blockID == TileID::bubble && !tile.echoCoatBlock) {
+                // Replace bubble interiors with shimmer.
                 tile.blockID = TileID::empty;
                 tile.liquid = Liquid::shimmer;
             }
@@ -103,6 +111,7 @@ void genAether(Random &rnd, World &world)
             Tile &tile = world.getTile(x, y);
             if (tile.blockID == TileID::empty) {
                 if (std::hypot(x - centerX, y - centerY) < size - 2) {
+                    // Shimmer pool adjacent to the lowest bubble.
                     tile.liquid = Liquid::shimmer;
                 } else {
                     Tile &prevTile = world.getTile(x, y - 1);

@@ -9,6 +9,7 @@ void genForest(Random &rnd, World &world)
 {
     std::cout << "Nurturing forests\n";
     rnd.shuffleNoise();
+    // Basically just growing grass, for now.
     for (int x = 0; x < world.getWidth(); ++x) {
         for (int y = 0; y < world.getUndergroundLevel(); ++y) {
             Tile &tile = world.getTile(x, y);

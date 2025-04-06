@@ -44,6 +44,8 @@ void fillGlowingMossCave(Random &rnd, World &world)
                         std::abs(rnd.getBlurNoise(5 * x, 5 * y)),
                         std::abs(rnd.getBlurNoise(7 * x, 7 * y))) >
                     std::max(threshold, 0.53)) {
+                    // Dig small pockets in the stone for more moss edge
+                    // targets.
                     tile.blockID = TileID::empty;
                 }
             }
@@ -65,6 +67,7 @@ void fillGlowingMossCave(Random &rnd, World &world)
             if (rnd.getFineNoise(x, y) > threshold) {
                 Tile &tile = world.getTile(x, y);
                 if (tile.blockID == TileID::stone && world.isExposed(x, y)) {
+                    // Coat edges in moss.
                     tile.blockID = mossType;
                 }
             }

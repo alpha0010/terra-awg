@@ -58,6 +58,9 @@ void genWorldBase(Random &rnd, World &world)
             wallId);
     }
     world.spawnY = surfaceLevel + 15 * rnd.getCoarseNoise(center, 0) - 1;
+    // Fill the world with dirt and stone; mostly dirt near the surface,
+    // transitioning to mostly stone deeper down. Keep surface terrain mostly
+    // level near spawn and oceans.
     parallelFor(
         std::views::iota(0, world.getWidth()),
         [center, surfaceLevel, &rnd, &wallVarNoise, &world](int x) {
@@ -79,6 +82,7 @@ void genWorldBase(Random &rnd, World &world)
                                    ? TileID::dirt
                                    : TileID::stone;
                 for (auto [i, j, wallId] : wallVarNoise) {
+                    // Patches of dirt wall variants.
                     if (std::abs(rnd.getCoarseNoise(x + i, y + j)) < 0.07) {
                         tile.wallID = wallId;
                         break;
@@ -112,6 +116,8 @@ void genWorldBase(Random &rnd, World &world)
         for (int y = world.getUnderworldLevel() + 20 * rnd.getCoarseNoise(x, 0);
              y < world.getHeight();
              ++y) {
+            // Fill underworld with ash, with an empty band across the entire
+            // middle.
             Tile &tile = world.getTile(x, y);
             tile.blockID = y < underworldRoof || y > underworldFloor
                                ? TileID::ash
@@ -121,6 +127,8 @@ void genWorldBase(Random &rnd, World &world)
     }
 
     std::cout << "Generating ore veins\n";
+    // Add ore deposits in overlapping bands; more valuable ore bands are
+    // deeper.
     genOreVeins(
         rnd,
         world,
@@ -148,6 +156,7 @@ void genWorldBase(Random &rnd, World &world)
 
     std::cout << "Digging caves\n";
     rnd.shuffleNoise();
+    // Save so later generators can match cave structures.
     rnd.saveShuffleState();
     parallelFor(
         std::views::iota(0, world.getWidth()),
@@ -167,6 +176,7 @@ void genWorldBase(Random &rnd, World &world)
                         : -0.16;
                 if (std::abs(rnd.getCoarseNoise(x, 2 * y) + 0.1) < 0.15 &&
                     rnd.getFineNoise(x, y) > threshold) {
+                    // Strings of nearly connected caves, with horizontal bias.
                     Tile &tile = world.getTile(x, y);
                     tile.blockID = TileID::empty;
                 }
