@@ -8,6 +8,7 @@ class Random;
 
 void fillSurfaceChest(Chest &chest, int torchID, Random &rnd, World &world);
 void fillSurfaceFrozenChest(Chest &chest, Random &rnd, World &world);
+void fillSurfaceLivingWoodChest(Chest &chest, Random &rnd, World &world);
 void fillSurfacePalmWoodChest(Chest &chest, Random &rnd, World &world);
 void fillSurfaceRichMahoganyChest(Chest &chest, Random &rnd, World &world);
 void fillSurfaceWaterChest(Chest &chest, Random &rnd, World &world);

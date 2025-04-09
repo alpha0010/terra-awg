@@ -773,6 +773,9 @@ void genTreasure(Random &rnd, World &world)
         }
     }
     std::cout << "Placing treasures\n";
+    for (const auto &applyQueuedTreasure : world.queuedTreasures) {
+        applyQueuedTreasure(rnd, world);
+    }
     int maxBin =
         binLocation(world.getWidth(), world.getHeight(), world.getHeight());
     placeJungleShrines(rnd, world);

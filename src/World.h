@@ -3,6 +3,7 @@
 
 #include "Chest.h"
 #include "Tile.h"
+#include <functional>
 #include <vector>
 
 class Random;
@@ -29,6 +30,7 @@ enum class Variant {
     jungle,
     lesion,
     lihzahrd,
+    livingWood,
     mana,
     marble,
     meteorite,
@@ -119,6 +121,8 @@ public:
     double snowCenter;
     int surfaceEvilCenter;
     int dungeonCenter;
+
+    std::vector<std::function<void(Random &, World &)>> queuedTreasures;
 };
 
 #endif // WORLD_H

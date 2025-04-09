@@ -2,7 +2,9 @@
 
 #include "Random.h"
 #include "World.h"
+#include "ids/Paint.h"
 #include "ids/WallID.h"
+#include "structures/LootRules.h"
 #include <iostream>
 
 typedef std::pair<double, double> Pointf;
@@ -190,6 +192,23 @@ void growLivingTree(double x, double y, Random &rnd, World &world)
             std::numbers::pi / 2,
         rnd,
         world);
+    // TODO: Put chests in the root system.
+    world.queuedTreasures.emplace_back([x, y](Random &rnd, World &world) {
+        if (!world.regionPasses(x - 3, y - 5, 6, 5, [](Tile &tile) {
+                return tile.blockID == TileID::livingWood;
+            })) {
+            return;
+        }
+        for (int i = 0; i < 4; ++i) {
+            for (int j = 0; j < 4; ++j) {
+                Tile &tile = world.getTile(x - 2 + i, y - 5 + j);
+                tile.blockID = TileID::empty;
+                tile.blockPaint = Paint::none;
+            }
+        }
+        Chest &chest = world.placeChest(x - 1, y - 3, Variant::livingWood);
+        fillSurfaceLivingWoodChest(chest, rnd, world);
+    });
 }
 
 void growLivingTrees(Random &rnd, World &world)

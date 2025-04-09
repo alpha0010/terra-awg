@@ -21,6 +21,9 @@ void fillLoot(
                     Prefix::none,
                     rnd.getInt(25, 50)};
                 ++itemIndex;
+            } else if (item.id == ItemID::livingWoodWand) {
+                chest.items[itemIndex] = {ItemID::leafWand, Prefix::none, 1};
+                ++itemIndex;
             } else if (item.id == ItemID::livingMahoganyWand) {
                 chest.items[itemIndex] = {
                     ItemID::richMahoganyLeafWand,
@@ -150,6 +153,61 @@ void fillSurfaceFrozenChest(Chest &chest, Random &rnd, World &world)
            rnd.getInt(10, 20)}},
          {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
          {0.5, {ItemID::borealWood, Prefix::none, rnd.getInt(50, 99)}}});
+}
+
+void fillSurfaceLivingWoodChest(Chest &chest, Random &rnd, World &world)
+{
+    fillLoot(
+        chest,
+        rnd,
+        {{1,
+          rnd.pool<Item>({
+              {ItemID::livingWoodWand, Prefix::none, 1},
+              {ItemID::livingWoodWand, Prefix::none, 1},
+              {ItemID::finchStaff, rnd.select(PrefixSet::magic), 1},
+          })},
+         {0.1,
+          {rnd.select({ItemID::sunflowerMinecart, ItemID::ladybugMinecart}),
+           Prefix::none,
+           1}},
+         {1.0 / 6, {ItemID::glowstick, Prefix::none, rnd.getInt(40, 75)}},
+         {1.0 / 6, {ItemID::throwingKnife, Prefix::none, rnd.getInt(150, 300)}},
+         {0.2,
+          {rnd.select({ItemID::herbBag, ItemID::canOfWorms}),
+           Prefix::none,
+           rnd.getInt(1, 4)}},
+         {1.0 / 3, {ItemID::grenade, Prefix::none, rnd.getInt(3, 5)}},
+         {0.5,
+          {rnd.select(
+               {world.copperVariant == TileID::copperOre ? ItemID::copperBar
+                                                         : ItemID::tinBar,
+                world.ironVariant == TileID::ironOre ? ItemID::ironBar
+                                                     : ItemID::leadBar}),
+           Prefix::none,
+           rnd.getInt(3, 10)}},
+         {0.5, {ItemID::vineRope, Prefix::none, rnd.getInt(50, 100)}},
+         {2.0 / 3,
+          {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
+           Prefix::none,
+           rnd.getInt(25, 50)}},
+         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {2.0 / 3,
+          {rnd.select(
+               {ItemID::ironskinPotion,
+                ItemID::shinePotion,
+                ItemID::nightOwlPotion,
+                ItemID::swiftnessPotion,
+                ItemID::miningPotion,
+                ItemID::builderPotion}),
+           Prefix::none,
+           rnd.getInt(1, 2)}},
+         {0.5,
+          {rnd.select({ItemID::torch, ItemID::bottle}),
+           Prefix::none,
+           rnd.getInt(10, 20)}},
+         {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
+         {0.5, {ItemID::wood, Prefix::none, rnd.getInt(50, 99)}}});
 }
 
 void fillSurfacePalmWoodChest(Chest &chest, Random &rnd, World &world)
