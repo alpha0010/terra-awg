@@ -7,6 +7,13 @@ namespace WallID
 {
 enum { empty = 0 };
 
+namespace Safe
+{
+enum {
+    cloud = 73,
+};
+}
+
 namespace Unsafe
 {
 enum {

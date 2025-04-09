@@ -9,6 +9,7 @@
 #include "structures/LootRules.h"
 #include "structures/Plants.h"
 #include "structures/data/Shrines.h"
+#include <algorithm>
 #include <iostream>
 #include <set>
 
@@ -320,7 +321,7 @@ Point selectShrineLocation(
         }
         return false;
     };
-    while (true) {
+    for (int numTries = 0; numTries < 10000; ++numTries) {
         int x = rnd.getInt(
             world.jungleCenter - 0.09 * world.getWidth(),
             world.jungleCenter + 0.09 * world.getWidth());
@@ -404,16 +405,22 @@ Point selectShrineLocation(
             return {x, y};
         }
     }
+    return {-1, -1};
 }
 
 void placeJungleShrines(Random &rnd, World &world)
 {
-    int shrineCount = world.getWidth() * world.getHeight() / 600000;
+    int shrineCount = world.getWidth() * world.getHeight() / 750000;
     std::vector<Point> usedLocations;
+    std::vector<int> shrines(Data::shrines.begin(), Data::shrines.end());
+    std::shuffle(shrines.begin(), shrines.end(), rnd.getPRNG());
     while (shrineCount > 0) {
         TileBuffer shrine =
-            Data::getShrine(rnd.select(Data::shrines), world.getFramedTiles());
+            Data::getShrine(rnd.pool(shrines), world.getFramedTiles());
         auto [x, y] = selectShrineLocation(shrine, usedLocations, rnd, world);
+        if (x == -1) {
+            continue;
+        }
         usedLocations.emplace_back(x, y);
         std::set<Point> chests;
         for (int i = 0; i < shrine.getWidth(); ++i) {
@@ -431,6 +438,8 @@ void placeJungleShrines(Random &rnd, World &world)
                 }
                 if (shrineTile.wallID == WallID::empty) {
                     shrineTile.wallID = tile.wallID;
+                } else if (shrineTile.wallID == WallID::Safe::cloud) {
+                    shrineTile.wallID = WallID::empty;
                 }
                 tile = shrineTile;
                 tile.guarded = true;

@@ -28,6 +28,11 @@ private:
 public:
     Random();
 
+    std::default_random_engine &getPRNG()
+    {
+        return rnd;
+    }
+
     /**
      * Precompute noise samples for other noise functions.
      */
@@ -91,6 +96,12 @@ public:
     T pool(
         std::initializer_list<T> list,
         std::source_location origin = std::source_location::current())
+    {
+        return *(list.begin() + getPoolIndex(list.size(), origin));
+    }
+    template <typename T>
+    auto
+    pool(T list, std::source_location origin = std::source_location::current())
     {
         return *(list.begin() + getPoolIndex(list.size(), origin));
     }
