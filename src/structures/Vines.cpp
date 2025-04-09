@@ -11,6 +11,7 @@ void genVines(Random &rnd, World &world)
     std::cout << "Growing vines\n";
     std::map<int, int> vineTypes{
         {TileID::grass, TileID::vines},
+        {TileID::leaf, TileID::vines},
         {TileID::jungleGrass, TileID::jungleVines},
         {TileID::corruptGrass, TileID::corruptVines},
         {TileID::corruptJungleGrass, TileID::corruptVines},

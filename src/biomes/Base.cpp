@@ -64,6 +64,8 @@ void genWorldBase(Random &rnd, World &world)
     parallelFor(
         std::views::iota(0, world.getWidth()),
         [center, surfaceLevel, &rnd, &wallVarNoise, &world](int x) {
+            // Skip background wall for the first tile in every column.
+            bool placeWalls = false;
             for (int y = surfaceLevel +
                          std::min(
                              {0.1 * std::abs(center - x) + 15,
@@ -81,18 +83,22 @@ void genWorldBase(Random &rnd, World &world)
                 tile.blockID = rnd.getFineNoise(x, y) > threshold
                                    ? TileID::dirt
                                    : TileID::stone;
-                for (auto [i, j, wallId] : wallVarNoise) {
-                    // Patches of dirt wall variants.
-                    if (std::abs(rnd.getCoarseNoise(x + i, y + j)) < 0.07) {
-                        tile.wallID = wallId;
-                        break;
+                if (placeWalls) {
+                    for (auto [i, j, wallId] : wallVarNoise) {
+                        // Patches of dirt wall variants.
+                        if (std::abs(rnd.getCoarseNoise(x + i, y + j)) < 0.07) {
+                            tile.wallID = wallId;
+                            break;
+                        }
                     }
-                }
-                if (tile.wallID == WallID::empty &&
-                    y < world.getUndergroundLevel()) {
-                    tile.wallID = tile.blockID == TileID::stone
-                                      ? WallID::Unsafe::rockyDirt
-                                      : WallID::Unsafe::dirt;
+                    if (tile.wallID == WallID::empty &&
+                        y < world.getUndergroundLevel()) {
+                        tile.wallID = tile.blockID == TileID::stone
+                                          ? WallID::Unsafe::rockyDirt
+                                          : WallID::Unsafe::dirt;
+                    }
+                } else {
+                    placeWalls = true;
                 }
             }
         });

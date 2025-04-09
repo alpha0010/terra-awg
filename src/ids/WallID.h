@@ -10,6 +10,7 @@ enum { empty = 0 };
 namespace Safe
 {
 enum {
+    livingLeaf = 60,
     cloud = 73,
 };
 }

@@ -3,6 +3,7 @@
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
+#include "ids/Paint.h"
 #include "ids/WallID.h"
 #include <algorithm>
 #include <iostream>
@@ -33,6 +34,7 @@ void genCorruption(Random &rnd, World &world)
         {TileID::tungstenOre, TileID::demonite},
         {TileID::goldOre, TileID::demonite},
         {TileID::platinumOre, TileID::demonite},
+        {TileID::leaf, TileID::empty},
         {TileID::sand, TileID::ebonsand},
         {TileID::jungleGrass, TileID::corruptJungleGrass},
         {TileID::mushroomGrass, TileID::corruptJungleGrass},
@@ -43,6 +45,7 @@ void genCorruption(Random &rnd, World &world)
         {TileID::sandstone, TileID::ebonsandstone},
         {TileID::hardenedSand, TileID::hardenedEbonsand}};
     std::map<int, int> corruptWalls{
+        {WallID::Safe::livingLeaf, WallID::empty},
         {WallID::Unsafe::grass, WallID::Unsafe::corruptGrass},
         {WallID::Unsafe::flower, WallID::Unsafe::corruptGrass},
         {WallID::Unsafe::jungle, WallID::Unsafe::corruptGrass},
@@ -76,6 +79,10 @@ void genCorruption(Random &rnd, World &world)
                  0.16});
             if (std::abs(rnd.getCoarseNoise(3 * x, y) + 0.1) < threshold) {
                 Tile &tile = world.getTile(x, y);
+                if (tile.blockID == TileID::livingWood ||
+                    tile.blockID == TileID::leaf) {
+                    continue;
+                }
                 if (std::abs(rnd.getCoarseNoise(3 * x, y) + 0.1) <
                     threshold - 0.07) {
                     tile.blockID = TileID::empty;
@@ -122,10 +129,15 @@ void genCorruption(Random &rnd, World &world)
                             auto blockItr = corruptBlocks.find(tile.blockID);
                             if (blockItr != corruptBlocks.end()) {
                                 tile.blockID = blockItr->second;
+                            } else if (tile.blockID == TileID::livingWood) {
+                                tile.blockPaint = Paint::purple;
                             }
                             auto wallItr = corruptWalls.find(tile.wallID);
                             if (wallItr != corruptWalls.end()) {
                                 tile.wallID = wallItr->second;
+                            } else if (
+                                tile.wallID == WallID::Unsafe::livingWood) {
+                                tile.wallPaint = Paint::purple;
                             }
                         }
                     }

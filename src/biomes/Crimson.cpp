@@ -3,6 +3,7 @@
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
+#include "ids/Paint.h"
 #include "ids/WallID.h"
 #include <algorithm>
 #include <iostream>
@@ -34,6 +35,7 @@ void genCrimson(Random &rnd, World &world)
         {TileID::tungstenOre, TileID::crimtane},
         {TileID::goldOre, TileID::crimtane},
         {TileID::platinumOre, TileID::crimtane},
+        {TileID::leaf, TileID::empty},
         {TileID::sand, TileID::crimsand},
         {TileID::jungleGrass, TileID::crimsonJungleGrass},
         {TileID::mushroomGrass, TileID::crimsonJungleGrass},
@@ -44,6 +46,7 @@ void genCrimson(Random &rnd, World &world)
         {TileID::sandstone, TileID::crimsandstone},
         {TileID::hardenedSand, TileID::hardenedCrimsand}};
     std::map<int, int> crimsonWalls{
+        {WallID::Safe::livingLeaf, WallID::empty},
         {WallID::Unsafe::grass, WallID::Unsafe::crimsonGrass},
         {WallID::Unsafe::flower, WallID::Unsafe::crimsonGrass},
         {WallID::Unsafe::jungle, WallID::Unsafe::crimsonGrass},
@@ -83,6 +86,10 @@ void genCrimson(Random &rnd, World &world)
                  0.16});
             if (std::abs(rnd.getBlurNoise(2 * x, 2 * y) + 0.1) < threshold) {
                 Tile &tile = world.getTile(x, y);
+                if (tile.blockID == TileID::livingWood ||
+                    tile.blockID == TileID::leaf) {
+                    continue;
+                }
                 if (std::abs(rnd.getBlurNoise(2 * x, 2 * y) + 0.1) <
                     threshold - 0.07) {
                     tile.blockID = TileID::empty;
@@ -128,10 +135,15 @@ void genCrimson(Random &rnd, World &world)
                             auto blockItr = crimsonBlocks.find(tile.blockID);
                             if (blockItr != crimsonBlocks.end()) {
                                 tile.blockID = blockItr->second;
+                            } else if (tile.blockID == TileID::livingWood) {
+                                tile.blockPaint = Paint::red;
                             }
                             auto wallItr = crimsonWalls.find(tile.wallID);
                             if (wallItr != crimsonWalls.end()) {
                                 tile.wallID = wallItr->second;
+                            } else if (
+                                tile.wallID == WallID::Unsafe::livingWood) {
+                                tile.wallPaint = Paint::red;
                             }
                         }
                     }

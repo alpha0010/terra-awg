@@ -20,22 +20,12 @@ bool listContains(const T &list, const U &value)
 }
 
 inline const std::set<int> nonSolidTiles{
-    TileID::empty,
-    TileID::alchemyTable,
-    TileID::bench,
-    TileID::bewitchingTable,
-    TileID::boneWelder,
-    TileID::book,
-    TileID::bottle,
-    TileID::bubble,
-    TileID::chest,
-    TileID::chestGroup2,
-    TileID::lihzahrdAltar,
-    TileID::painting3x3,
-    TileID::rope,
-    TileID::silverCoin,
-    TileID::statue,
-    TileID::thinIce,
+    TileID::empty,           TileID::alchemyTable, TileID::bench,
+    TileID::bewitchingTable, TileID::boneWelder,   TileID::book,
+    TileID::bottle,          TileID::bubble,       TileID::chest,
+    TileID::chestGroup2,     TileID::leaf,         TileID::lihzahrdAltar,
+    TileID::livingWood,      TileID::painting3x3,  TileID::rope,
+    TileID::silverCoin,      TileID::statue,       TileID::thinIce,
     TileID::waterCandle,
 };
 

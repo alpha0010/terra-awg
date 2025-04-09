@@ -117,6 +117,8 @@ void smoothSurfaces(World &world)
         TileID::snow,
         TileID::ice,
         TileID::corruptIce,
+        TileID::livingWood,
+        TileID::leaf,
         TileID::slime,
         TileID::flesh,
         TileID::crimsonGrass,
