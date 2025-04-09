@@ -16,7 +16,8 @@ void genDesert(Random &rnd, World &world)
     double desertFloor =
         (world.getCavernLevel() + 4 * world.getUnderworldLevel()) / 5;
     std::map<int, int> sandWalls{
-        {WallID::Unsafe::marble, WallID::Unsafe::marble}};
+        {WallID::Unsafe::marble, WallID::Unsafe::marble},
+        {WallID::Safe::cloud, WallID::Safe::cloud}};
     for (int wallId : WallVariants::dirt) {
         sandWalls[wallId] = rnd.select(
             {WallID::Unsafe::sandstone, WallID::Unsafe::hardenedSand});

@@ -4,6 +4,7 @@
 #include "Writer.h"
 #include "biomes/Aether.h"
 #include "biomes/Base.h"
+#include "biomes/Cloud.h"
 #include "biomes/Corruption.h"
 #include "biomes/Crimson.h"
 #include "biomes/Desert.h"
@@ -47,6 +48,7 @@ void doWorldGen(Random &rnd, World &world)
 {
     genWorldBase(rnd, world);
     genOceans(rnd, world);
+    genCloud(rnd, world);
     genMarbleCave(rnd, world);
     world.planBiomes(rnd);
     genSnow(rnd, world);

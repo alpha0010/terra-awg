@@ -12,7 +12,8 @@ void genJungle(Random &rnd, World &world)
     rnd.shuffleNoise();
     double center = world.jungleCenter;
     double scanDist = 0.11 * world.getWidth();
-    std::map<int, int> surfaceJungleWalls{{WallID::empty, WallID::empty}};
+    std::map<int, int> surfaceJungleWalls{
+        {WallID::Safe::cloud, WallID::Safe::cloud}};
     for (int wallId : WallVariants::dirt) {
         surfaceJungleWalls[wallId] = rnd.select(
             {WallID::Unsafe::jungle,

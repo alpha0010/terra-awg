@@ -70,7 +70,7 @@ void genCorruption(Random &rnd, World &world)
     }
     // Dig surface chasms, edged with ebonstone.
     for (int x = surfaceX - scanDist; x < surfaceX + scanDist; ++x) {
-        for (int y = 0.4 * world.getUndergroundLevel();
+        for (int y = 0.45 * world.getUndergroundLevel();
              y < world.getCavernLevel();
              ++y) {
             double threshold = std::min(

@@ -102,8 +102,8 @@ inline std::array const dirt = {
     WallID::Unsafe::crackedDirt,
     WallID::Unsafe::wavyDirt};
 
+// Excludes: oldStone
 inline std::array const stone = {
-    WallID::Unsafe::oldStone,
     WallID::Unsafe::craggyStone,
     WallID::Unsafe::wornStone,
     WallID::Unsafe::stalactiteStone,

@@ -14,10 +14,12 @@ void genSnow(Random &rnd, World &world)
     double scanDist = 0.08 * world.getWidth();
     double snowFloor =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
-    std::map<int, int> snowWalls;
+    std::map<int, int> snowWalls{{WallID::Safe::cloud, WallID::Safe::cloud}};
     for (int wallId : WallVariants::dirt) {
         snowWalls[wallId] = rnd.select(
             {WallID::Unsafe::snow,
+             WallID::Unsafe::snow,
+             WallID::Unsafe::ice,
              WallID::Unsafe::ice,
              rnd.select(WallVariants::stone)});
     }
