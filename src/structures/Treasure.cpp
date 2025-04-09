@@ -305,7 +305,7 @@ Point selectShrineLocation(
         TileID::platinumOre};
     auto isLocationUsed = [&usedLocations](int x, int y) {
         for (auto [usedX, usedY] : usedLocations) {
-            if (std::hypot(usedX - x, usedY - y) < 20) {
+            if (std::hypot(usedX - x, usedY - y) < 40) {
                 return true;
             }
         }
@@ -664,7 +664,8 @@ void placeChest(int x, int y, Variant type, Random &rnd, World &world)
 
 void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
 {
-    int chestCount = world.getWidth() * world.getHeight() / 50000;
+    int chestCount =
+        world.getWidth() * world.getHeight() / 50000 - world.getChests().size();
     LocationBins usedLocations;
     for (auto &chest : world.getChests()) {
         usedLocations[binLocation(chest.x, chest.y, world.getHeight())]

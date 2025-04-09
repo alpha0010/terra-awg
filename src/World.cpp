@@ -143,6 +143,7 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::pot, Variant::spider}, {2, 2, 0, 684}},
     {{TileID::pot, Variant::tundra}, {2, 2, 0, 144}},
     {{TileID::pot, Variant::underworld}, {2, 2, 0, 468}},
+    {{TileID::statue, Variant::lihzahrd}, {2, 3, 1548, 0}},
 };
 
 void World::placeFramedTile(int x, int y, int blockID, Variant type)
@@ -183,6 +184,9 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
             offsetX += 36 * (y % 3);
             offsetY += 36 * (x % 3);
         }
+    } else if (blockID == TileID::statue && type == Variant::lihzahrd) {
+        offsetX += 36 * ((x + y) % 3);
+        offsetY += 162 * ((x + y) % 2);
     }
     for (int i = 0; i < frameWidth; ++i) {
         for (int j = 0; j < frameHeight; ++j) {

@@ -3,6 +3,7 @@
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
+#include "structures/LootRules.h"
 #include "structures/Platforms.h"
 #include <iostream>
 #include <set>
@@ -238,6 +239,74 @@ void addDeadEndPlatforms(
     }
 }
 
+bool canPlaceTempleTreasureAt(int x, int y, World &world)
+{
+    std::set<int> baseTiles{TileID::lihzahrdBrick, TileID::platform};
+    return baseTiles.contains(world.getTile(x, y).blockID) &&
+           baseTiles.contains(world.getTile(x + 1, y).blockID) &&
+           world.regionPasses(x, y - 4, 2, 4, [](Tile &tile) {
+               return tile.blockID == TileID::empty &&
+                      tile.wallID == WallID::Unsafe::lihzahrdBrick;
+           });
+}
+
+void addTempleTreasures(Point center, int numRooms, Random &rnd, World &world)
+{
+    std::vector<Point> locations;
+    iterateTemple(center, world, [&](int x, int y) {
+        if (canPlaceTempleTreasureAt(x, y, world)) {
+            locations.emplace_back(x, y);
+            if (world.getTile(x, y).blockID == TileID::platform) {
+                for (int i = 0; i < 14; ++i) {
+                    locations.emplace_back(x, y);
+                }
+            }
+        }
+        return true;
+    });
+    int numChests = numRooms / 17.5;
+    std::vector<Point> usedLocations;
+    while (numChests > 0) {
+        auto [x, y] = rnd.select(locations);
+        if (!canPlaceTempleTreasureAt(x, y, world)) {
+            continue;
+        }
+        bool isNearOtherChests = false;
+        for (auto [usedX, usedY] : usedLocations) {
+            if (std::hypot(usedX - x, usedY - y) < 12) {
+                isNearOtherChests = true;
+                break;
+            }
+        }
+        if (isNearOtherChests) {
+            continue;
+        }
+        usedLocations.emplace_back(x, y);
+        Chest &chest = world.placeChest(x, y - 2, Variant::lihzahrd);
+        fillLihzahrdChest(chest, rnd);
+        --numChests;
+    }
+    int numPots = numRooms / 14;
+    while (numPots > 0) {
+        auto [x, y] = rnd.select(locations);
+        if (!canPlaceTempleTreasureAt(x, y, world)) {
+            continue;
+        }
+        world.placeFramedTile(x, y - 2, TileID::pot, Variant::lihzahrd);
+        --numPots;
+    }
+    int numStatues = numRooms / 12;
+    while (numStatues > 0) {
+        auto [x, y] = rnd.select(locations);
+        if (!canPlaceTempleTreasureAt(x - 1, y, world) ||
+            !canPlaceTempleTreasureAt(x + 1, y, world)) {
+            continue;
+        }
+        world.placeFramedTile(x, y - 3, TileID::statue, Variant::lihzahrd);
+        --numStatues;
+    }
+}
+
 void genTemple(Random &rnd, World &world)
 {
     std::cout << "Training acolytes\n";
@@ -343,4 +412,5 @@ void genTemple(Random &rnd, World &world)
         centerRoomX + roomSize / 2 - 1,
         maxRoomY + roomSize - 2,
         TileID::lihzahrdAltar);
+    addTempleTreasures(center, rooms.size(), rnd, world);
 }

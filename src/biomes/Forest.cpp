@@ -201,6 +201,9 @@ void growLivingTree(double x, double y, Random &rnd, World &world)
         }
         for (int i = 0; i < 4; ++i) {
             for (int j = 0; j < 4; ++j) {
+                if (j == 0 && (i == 0 || i == 3)) {
+                    continue;
+                }
                 Tile &tile = world.getTile(x - 2 + i, y - 5 + j);
                 tile.blockID = TileID::empty;
                 tile.blockPaint = Paint::none;
