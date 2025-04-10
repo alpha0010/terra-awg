@@ -459,7 +459,9 @@ void placeJungleShrines(Random &rnd, World &world)
 Variant getChestType(int x, int y, World &world)
 {
     Tile &probeTile = world.getTile(x, y - 2);
-    if (y > world.getUnderworldLevel()) {
+    if (y < 0.45 * world.getUndergroundLevel()) {
+        return Variant::skyware;
+    } else if (y > world.getUnderworldLevel()) {
         return Variant::shadow;
     } else if (probeTile.wallID == WallID::Unsafe::hive) {
         return Variant::honey;
@@ -649,6 +651,9 @@ void placeChest(int x, int y, Variant type, Random &rnd, World &world)
         return;
     case Variant::shadow:
         fillShadowChest(chest, rnd, world);
+        return;
+    case Variant::skyware:
+        fillSkywareChest(chest, rnd, world);
         return;
     default:
         break;

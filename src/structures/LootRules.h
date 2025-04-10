@@ -31,6 +31,7 @@ void fillCavernSandstoneChest(Chest &chest, Random &rnd, World &world);
 void fillCavernRichMahoganyChest(Chest &chest, Random &rnd, World &world);
 void fillCavernWaterChest(Chest &chest, Random &rnd, World &world);
 
+void fillSkywareChest(Chest &chest, Random &rnd, World &world);
 void fillShadowChest(Chest &chest, Random &rnd, World &world);
 void fillDungeonChest(Chest &chest, Random &rnd, World &world);
 void fillDungeonBiomeChest(Chest &chest, Random &rnd, Item &&primaryItem);

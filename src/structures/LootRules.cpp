@@ -1432,6 +1432,66 @@ void fillCavernWaterChest(Chest &chest, Random &rnd, World &world)
         });
 }
 
+void fillSkywareChest(Chest &chest, Random &rnd, World &world)
+{
+    fillLoot(
+        chest,
+        rnd,
+        {{1,
+          rnd.pool<Item>({
+              {ItemID::shinyRedBalloon, rnd.select(PrefixSet::accessory), 1},
+              {ItemID::starfury, rnd.select(PrefixSet::melee), 1},
+              {ItemID::luckyHorseshoe, rnd.select(PrefixSet::accessory), 1},
+              {ItemID::celestialMagnet, rnd.select(PrefixSet::accessory), 1},
+          })},
+         {1.0 / 3, {ItemID::skyMill, Prefix::none, 1}},
+         {0.025, {ItemID::fledglingWings, rnd.select(PrefixSet::accessory), 1}},
+         {1,
+          {rnd.pool(
+               {ItemID::highPitch,
+                ItemID::blessingFromTheHeavens,
+                ItemID::constellation,
+                ItemID::seeTheWorldForWhatItIs,
+                ItemID::loveIsInTheTrashSlot,
+                ItemID::eyeOfTheSun}),
+           Prefix::none,
+           1}},
+         {1, {ItemID::cloud, Prefix::none, rnd.getInt(50, 100)}},
+         {0.5, {ItemID::fallenStar, Prefix::none, rnd.getInt(3, 5)}},
+         {0.2,
+          {rnd.select({ItemID::herbBag, ItemID::canOfWorms}),
+           Prefix::none,
+           rnd.getInt(1, 4)}},
+         {0.5,
+          {rnd.select(
+               {world.copperVariant == TileID::copperOre ? ItemID::copperBar
+                                                         : ItemID::tinBar,
+                world.ironVariant == TileID::ironOre ? ItemID::ironBar
+                                                     : ItemID::leadBar}),
+           Prefix::none,
+           rnd.getInt(3, 10)}},
+         {0.5, {ItemID::rope, Prefix::none, rnd.getInt(50, 100)}},
+         {2.0 / 3,
+          {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
+           Prefix::none,
+           rnd.getInt(25, 50)}},
+         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {2.0 / 3,
+          {rnd.select(
+               {ItemID::featherfallPotion,
+                ItemID::shinePotion,
+                ItemID::nightOwlPotion,
+                ItemID::swiftnessPotion}),
+           Prefix::none,
+           rnd.getInt(1, 2)}},
+         {0.5,
+          {rnd.select({ItemID::torch, ItemID::bottle}),
+           Prefix::none,
+           rnd.getInt(10, 20)}},
+         {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}}});
+}
+
 void fillShadowChest(Chest &chest, Random &rnd, World &world)
 {
     fillLoot(

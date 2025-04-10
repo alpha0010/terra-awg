@@ -116,6 +116,7 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::chest, Variant::palmWood}, {2, 2, 1116, 0}},
     {{TileID::chest, Variant::richMahogany}, {2, 2, 288, 0}},
     {{TileID::chest, Variant::shadow}, {2, 2, 144, 0}},
+    {{TileID::chest, Variant::skyware}, {2, 2, 468, 0}},
     {{TileID::chest, Variant::water}, {2, 2, 612, 0}},
     {{TileID::chestGroup2, Variant::desert}, {2, 2, 468, 0}},
     {{TileID::chestGroup2, Variant::lesion}, {2, 2, 108, 0}},

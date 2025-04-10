@@ -40,6 +40,7 @@ enum class Variant {
     richMahogany,
     sandstone,
     shadow,
+    skyware,
     spider,
     tundra,
     underworld,
