@@ -238,9 +238,14 @@ void saveWorldFile(Random &rnd, World &world)
     w.putUint8(0); // Moondial cooldown.
     sectionPointers.push_back(w.tellp());
 
+    std::vector<std::pair<int, int>> sensors;
+
     for (int x = 0; x < world.getWidth(); ++x) {
         for (int y = 0; y < world.getHeight(); ++y) {
             Tile &tile = world.getTile(x, y);
+            if (tile.blockID == TileID::sensor) {
+                sensors.emplace_back(x, y);
+            }
 
             int rle = 0;
             while (y + rle + 1 < world.getHeight() &&
@@ -408,7 +413,17 @@ void saveWorldFile(Random &rnd, World &world)
     w.putBool(false);                        // End pillar records.
     sectionPointers.push_back(w.tellp());
 
-    w.putUint32(0); // Number of tile entities.
+    w.putUint32(sensors.size()); // Number of tile entities.
+    for (size_t i = 0; i < sensors.size(); ++i) {
+        auto [x, y] = sensors[i];
+        Tile &tile = world.getTile(x, y);
+        w.putUint8(2);                    // Type: sensor.
+        w.putUint32(i);                   // Tile entity ID.
+        w.putUint16(x);                   // Tile entity position X.
+        w.putUint16(y);                   // Tile entity position Y.
+        w.putUint8(1 + tile.frameY / 18); // Sensor type.
+        w.putBool(false);                 // Sensor active.
+    }
     sectionPointers.push_back(w.tellp());
 
     w.putUint32(0); // Number of weighted pressure plates.

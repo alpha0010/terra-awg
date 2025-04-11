@@ -111,11 +111,29 @@ void applyGravity(int x, int y, int width, int height, World &world)
     }
 }
 
+Point findLinkingCave(int x, int y, World &world)
+{
+    for (int j = 0; j < 200; ++j) {
+        for (int iSwap = 0; iSwap < j; ++iSwap) {
+            int i = iSwap / 2;
+            if (iSwap % 2 == 0) {
+                i = -i;
+            }
+            if (world.regionPasses(x + i - 2, y + j, 5, 4, [](Tile &tile) {
+                    return tile.blockID == TileID::empty;
+                })) {
+                return {x + i, y + j};
+            }
+        }
+    }
+    return {-1, -1};
+}
+
 void genPyramid(Random &rnd, World &world)
 {
     std::cout << "Building monuments\n";
     int size = 80;
-    double scanDist = 0.072 * world.getWidth() - size;
+    double scanDist = 0.07 * world.getWidth() - size;
     int x = world.surfaceEvilCenter;
     while (std::abs(x - world.surfaceEvilCenter) < 1.5 * size ||
            std::abs(x - world.getWidth() / 2) < 2 * size) {
@@ -172,4 +190,26 @@ void genPyramid(Random &rnd, World &world)
     std::tie(x, y) = fillTreasureRoom(x, y, rnd, world);
     std::tie(x, y) = makeHall(x, y, 18, {-1, 0}, world);
     std::tie(x, y) = makeHall(x, y, 30, {1, 1}, world);
+    x -= 3;
+    ++y;
+    Point cave = findLinkingCave(x, y, world);
+    if (cave.first != -1 && cave.second > y + 2) {
+        std::set<int> clearTiles{
+            TileID::sand,
+            TileID::hardenedSand,
+            TileID::sandstone,
+            TileID::ebonsand,
+            TileID::crimsand};
+        double aspect = static_cast<double>(cave.first - x) / (cave.second - y);
+        for (int j = 0; y + j < cave.second; ++j) {
+            int minI = aspect * j - 3 + 4 * rnd.getFineNoise(0, j);
+            int maxI = aspect * j + 3 + 4 * rnd.getFineNoise(x, j);
+            for (int i = minI; i < maxI; ++i) {
+                Tile &tile = world.getTile(x + i, y + j);
+                if (clearTiles.contains(tile.blockID)) {
+                    tile.blockID = TileID::empty;
+                }
+            }
+        }
+    }
 }

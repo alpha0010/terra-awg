@@ -25,13 +25,19 @@ bool isIsolated(World &world, int x, int y)
 
 std::pair<int, int> getAttachedOpenWall(World &world, int x, int y)
 {
-    for (auto [i, j] : {std::pair{-1, 0}, {1, 0}, {0, -1}, {0, 1}}) {
+    Tile &origin = world.getTile(x, y);
+    std::pair<int, int> res{origin.wallID, origin.wallPaint};
+    for (auto [i, j] : {std::pair{0, -1}, {0, 1}, {-1, 0}, {1, 0}}) {
         Tile &tile = world.getTile(x + i, y + j);
-        if (tile.blockID == TileID::empty && tile.wallID != WallID::empty) {
-            return {tile.wallID, tile.wallPaint};
+        if (tile.blockID == TileID::empty) {
+            if (tile.wallID == WallID::empty) {
+                return {WallID::empty, Paint::none};
+            } else {
+                res = {tile.wallID, tile.wallPaint};
+            }
         }
     }
-    return {WallID::empty, Paint::none};
+    return res;
 }
 
 Slope computeSlope(World &world, int x, int y)

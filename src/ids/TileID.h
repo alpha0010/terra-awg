@@ -109,6 +109,7 @@ enum {
     ebonsandstone = 400,
     crimsandstone = 401,
     desertFossil = 404,
+    sensor = 423,
     snowCloud = 460,
     chestGroup2 = 467,
     lesion = 474,
