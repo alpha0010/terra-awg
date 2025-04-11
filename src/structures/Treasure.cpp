@@ -20,13 +20,16 @@ bool listContains(const T &list, const U &value)
 }
 
 inline const std::set<int> nonSolidTiles{
-    TileID::empty,           TileID::alchemyTable, TileID::bench,
-    TileID::bewitchingTable, TileID::boneWelder,   TileID::book,
-    TileID::bottle,          TileID::bubble,       TileID::chest,
-    TileID::chestGroup2,     TileID::leaf,         TileID::lihzahrdAltar,
-    TileID::livingWood,      TileID::painting3x3,  TileID::rope,
-    TileID::silverCoin,      TileID::statue,       TileID::thinIce,
-    TileID::waterCandle,
+    TileID::empty,      TileID::alchemyTable,
+    TileID::bench,      TileID::bewitchingTable,
+    TileID::boneWelder, TileID::book,
+    TileID::bottle,     TileID::bubble,
+    TileID::chest,      TileID::chestGroup2,
+    TileID::leaf,       TileID::lihzahrdAltar,
+    TileID::livingWood, TileID::painting3x3,
+    TileID::pot,        TileID::rope,
+    TileID::silverCoin, TileID::statue,
+    TileID::thinIce,    TileID::waterCandle,
 };
 
 bool isPlacementCandidate(int x, int y, World &world)
@@ -505,6 +508,7 @@ Variant getChestType(int x, int y, World &world)
         {TileID::jungleGrass, Variant::richMahogany},
         {TileID::sand, Variant::sandstone},
         {TileID::sandstone, Variant::sandstone},
+        {TileID::sandstoneBrick, Variant::sandstone},
         {TileID::hardenedSand, Variant::sandstone},
         {TileID::desertFossil, Variant::sandstone}};
     std::map<int, Variant> wallTypes{
@@ -536,6 +540,7 @@ Variant getChestType(int x, int y, World &world)
         {WallID::Unsafe::ivyStone, Variant::richMahogany},
         {WallID::Unsafe::jungleVine, Variant::richMahogany},
         {WallID::Unsafe::sandstone, Variant::sandstone},
+        {WallID::Safe::sandstoneBrick, Variant::sandstone},
         {WallID::Unsafe::hardenedSand, Variant::sandstone}};
     std::map<Variant, int> zoneCounts;
     int radius = 5;

@@ -36,6 +36,7 @@ enum class Variant {
     meteorite,
     mushroom,
     palmWood,
+    pyramid,
     reef,
     richMahogany,
     sandstone,

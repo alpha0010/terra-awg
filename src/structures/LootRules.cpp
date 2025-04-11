@@ -30,6 +30,12 @@ void fillLoot(
                     Prefix::none,
                     1};
                 ++itemIndex;
+            } else if (item.id == ItemID::pharaohsMask) {
+                chest.items[itemIndex] = {
+                    ItemID::pharaohsRobe,
+                    Prefix::none,
+                    1};
+                ++itemIndex;
             }
         }
     }
@@ -1561,6 +1567,58 @@ void fillShadowChest(Chest &chest, Random &rnd, World &world)
               Prefix::none,
               rnd.getInt(15, 29)}},
             {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(2, 4)}},
+        });
+}
+
+void fillPyramidChest(Chest &chest, Random &rnd, World &world)
+{
+    fillLoot(
+        chest,
+        rnd,
+        {
+            {1,
+             {rnd.pool({ItemID::flyingCarpet, ItemID::sandstormInABottle}),
+              rnd.select(PrefixSet::accessory),
+              1}},
+            {0.1, {ItemID::pharaohsMask, Prefix::none, 1}},
+            {1.0 / 15, {ItemID::desertMinecart, Prefix::none, 1}},
+            {1.0 / 7, {ItemID::encumberingStone, Prefix::none, 1}},
+            {0.05, {ItemID::extractinator, Prefix::none, 1}},
+            {0.05, {ItemID::flareGun, Prefix::none, 1}},
+            {1.0 / 3, {ItemID::scarabBomb, Prefix::none, rnd.getInt(10, 19)}},
+            {0.2, {ItemID::angelStatue, Prefix::none, 1}},
+            {1.0 / 3, {ItemID::rope, Prefix::none, rnd.getInt(50, 100)}},
+            {0.5,
+             {rnd.select(
+                  {world.ironVariant == TileID::ironOre ? ItemID::ironBar
+                                                        : ItemID::leadBar,
+                   world.silverVariant == TileID::silverOre
+                       ? ItemID::silverBar
+                       : ItemID::tungstenBar}),
+              Prefix::none,
+              rnd.getInt(5, 14)}},
+            {0.5,
+             {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
+              Prefix::none,
+              rnd.getInt(25, 49)}},
+            {0.5,
+             {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
+            {2.0 / 3,
+             {rnd.select(
+                  {ItemID::regenerationPotion,
+                   ItemID::shinePotion,
+                   ItemID::nightOwlPotion,
+                   ItemID::swiftnessPotion,
+                   ItemID::archeryPotion,
+                   ItemID::gillsPotion,
+                   ItemID::hunterPotion,
+                   ItemID::miningPotion,
+                   ItemID::dangersensePotion}),
+              Prefix::none,
+              rnd.getInt(1, 2)}},
+            {0.5, {ItemID::desertTorch, Prefix::none, rnd.getInt(10, 20)}},
+            {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
+            {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(50, 89)}},
         });
 }
 

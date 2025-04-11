@@ -1,0 +1,175 @@
+#include "structures/Pyramid.h"
+
+#include "Random.h"
+#include "World.h"
+#include "ids/WallID.h"
+#include "structures/LootRules.h"
+#include "structures/data/Rooms.h"
+#include <iostream>
+#include <map>
+#include <set>
+
+typedef std::pair<int, int> Point;
+
+Point makeHall(int x, int y, int steps, Point delta, World &world)
+{
+    std::map<int, int> accent1{
+        {WallID::Safe::sandstoneBrick, WallID::Safe::smoothSandstone},
+        {WallID::Safe::ebonstoneBrick, WallID::Unsafe::ebonsandstone},
+        {WallID::Safe::crimstoneBrick, WallID::Unsafe::crimsandstone}};
+    std::map<int, int> accent2{
+        {WallID::Safe::sandstoneBrick, WallID::Safe::goldBrick},
+        {WallID::Safe::ebonstoneBrick, WallID::Safe::demoniteBrick},
+        {WallID::Safe::crimstoneBrick, WallID::Safe::crimtaneBrick}};
+    std::set<int> validBlocks{
+        TileID::sandstoneBrick,
+        TileID::ebonstoneBrick,
+        TileID::crimstoneBrick};
+    for (; steps > 0; --steps, x += delta.first, y += delta.second) {
+        for (int j = 0; j < 7; ++j) {
+            Tile &tile = world.getTile(x, y + j);
+            if (validBlocks.contains(tile.blockID)) {
+                tile.blockID = TileID::empty;
+                if (j == 0) {
+                    tile.wallID = accent1[tile.wallID];
+                } else if (j == 1) {
+                    tile.wallID = accent2[tile.wallID];
+                }
+            }
+        }
+    }
+    return {x, y};
+}
+
+Point fillTreasureRoom(int x, int y, Random &rnd, World &world)
+{
+    TileBuffer treasureRoom =
+        Data::getRoom(rnd.select(Data::pyramidRooms), world.getFramedTiles());
+    x -= treasureRoom.getWidth() - 1;
+    int align = 0;
+    for (int j = 0; j < treasureRoom.getHeight(); ++j) {
+        if (treasureRoom.getTile(0, j).wallID ==
+            WallID::Safe::smoothSandstone) {
+            align = -j;
+            break;
+        }
+    }
+    std::set<Point> chests;
+    for (int i = 0; i < treasureRoom.getWidth(); ++i) {
+        for (int j = 0; j < treasureRoom.getHeight(); ++j) {
+            Tile &roomTile = treasureRoom.getTile(i, j);
+            if (roomTile.blockID == TileID::chest &&
+                !chests.contains({i - 1, j}) && !chests.contains({i, j - 1}) &&
+                !chests.contains({i - 1, j - 1})) {
+                chests.emplace(i, j);
+            }
+            world.getTile(x + i, y + j + align) = roomTile;
+        }
+    }
+    for (auto [i, j] : chests) {
+        Chest &chest = world.placeChest(x + i, y + j + align, Variant::gold);
+        fillPyramidChest(chest, rnd, world);
+    }
+    for (int i = 0; i < treasureRoom.getWidth(); ++i) {
+        if (world.regionPasses(
+                x + i,
+                y + 5,
+                2,
+                2,
+                [](Tile &tile) { return tile.blockID == TileID::empty; }) &&
+            rnd.getDouble(0, 1) < 0.9) {
+            world.placeFramedTile(x + i, y + 5, TileID::pot, Variant::pyramid);
+        }
+    }
+    return {x - 1, y};
+}
+
+void applyGravity(int x, int y, int width, int height, World &world)
+{
+    std::set<int> unstableBlocks{
+        TileID::sand,
+        TileID::ebonsand,
+        TileID::crimsand};
+    for (int i = 0; i < width; ++i) {
+        int lastGap = -1;
+        for (int j = height; j > -1; --j) {
+            Tile &tile = world.getTile(x + i, y + j);
+            if (tile.blockID == TileID::empty) {
+                if (lastGap == -1) {
+                    lastGap = j;
+                }
+            } else if (unstableBlocks.contains(tile.blockID)) {
+                if (lastGap != -1) {
+                    world.getTile(x + i, y + lastGap).blockID = tile.blockID;
+                    tile.blockID = TileID::empty;
+                    --lastGap;
+                }
+            } else {
+                lastGap = -1;
+            }
+        }
+    }
+}
+
+void genPyramid(Random &rnd, World &world)
+{
+    std::cout << "Building monuments\n";
+    int size = 80;
+    double scanDist = 0.072 * world.getWidth() - size;
+    int x = world.surfaceEvilCenter;
+    while (std::abs(x - world.surfaceEvilCenter) < 1.5 * size ||
+           std::abs(x - world.getWidth() / 2) < 2 * size) {
+        x = rnd.getInt(
+            world.desertCenter - scanDist,
+            world.desertCenter + scanDist);
+    }
+    int y = 0.6 * world.getUndergroundLevel();
+    std::set<int> ignoreBlocks{TileID::empty, TileID::lesion, TileID::flesh};
+    while (ignoreBlocks.contains(world.getTile(x, y).blockID) &&
+           y < 0.85 * world.getUndergroundLevel()) {
+        ++y;
+    }
+    x -= size;
+    y -= 5;
+    std::map<int, int> convertTiles{
+        {TileID::ebonstone, TileID::ebonstoneBrick},
+        {TileID::ebonsand, TileID::ebonstoneBrick},
+        {TileID::ebonsandstone, TileID::ebonstoneBrick},
+        {TileID::hardenedEbonsand, TileID::ebonstoneBrick},
+        {TileID::crimstone, TileID::crimstoneBrick},
+        {TileID::crimsand, TileID::crimstoneBrick},
+        {TileID::crimsandstone, TileID::crimstoneBrick},
+        {TileID::hardenedCrimsand, TileID::crimstoneBrick}};
+    std::set<int> skipTiles{
+        TileID::demonite,
+        TileID::lesion,
+        TileID::crimtane,
+        TileID::flesh};
+    for (int i = 0; i < 2 * size; ++i) {
+        for (int j = std::abs(i - size); j < size; ++j) {
+            Tile &tile = world.getTile(x + i, y + j);
+            if (skipTiles.contains(tile.blockID)) {
+                continue;
+            }
+            auto itr = convertTiles.find(tile.blockID);
+            if (itr == convertTiles.end()) {
+                tile.blockID = TileID::sandstoneBrick;
+                tile.wallID = WallID::Safe::sandstoneBrick;
+            } else {
+                tile.blockID = itr->second;
+                tile.wallID = itr->second == TileID::ebonstoneBrick
+                                  ? WallID::Safe::ebonstoneBrick
+                                  : WallID::Safe::crimstoneBrick;
+            }
+        }
+    }
+    std::tie(x, y) = makeHall(x + size - 16, y + 10, 10, {1, 0}, world);
+    applyGravity(x - 12, y - 20, 12, 30, world);
+    std::tie(x, y) = makeHall(x, y, 25, {1, 1}, world);
+    std::tie(x, y) = makeHall(x, y, 12, {1, 0}, world);
+    std::tie(x, y) = makeHall(x, y, 14, {-1, 1}, world);
+    std::tie(x, y) = makeHall(x, y, 5, {-1, 0}, world);
+    std::tie(x, y) = fillTreasureRoom(x, y, rnd, world);
+    std::tie(x, y) = makeHall(x, y, 18, {-1, 0}, world);
+    std::tie(x, y) = makeHall(x, y, 30, {1, 1}, world);
+}

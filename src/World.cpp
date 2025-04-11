@@ -141,6 +141,7 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::pot, Variant::jungle}, {2, 2, 0, 252}},
     {{TileID::pot, Variant::lihzahrd}, {2, 2, 0, 1008}},
     {{TileID::pot, Variant::marble}, {2, 2, 0, 1116}},
+    {{TileID::pot, Variant::pyramid}, {2, 2, 0, 900}},
     {{TileID::pot, Variant::spider}, {2, 2, 0, 684}},
     {{TileID::pot, Variant::tundra}, {2, 2, 0, 144}},
     {{TileID::pot, Variant::underworld}, {2, 2, 0, 468}},
@@ -171,6 +172,7 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
         switch (type) {
         case Variant::crimson:
         case Variant::marble:
+        case Variant::pyramid:
             offsetY += 36 * ((x + y) % 3);
             break;
         case Variant::forest:

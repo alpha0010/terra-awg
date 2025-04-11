@@ -10,8 +10,15 @@ enum { empty = 0 };
 namespace Safe
 {
 enum {
+    goldBrick = 10,
+    demoniteBrick = 33,
+    sandstoneBrick = 34,
+    ebonstoneBrick = 35,
     livingLeaf = 60,
     cloud = 73,
+    crimtaneBrick = 174,
+    crimstoneBrick = 234,
+    smoothSandstone = 235,
 };
 }
 

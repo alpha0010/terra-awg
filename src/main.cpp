@@ -23,6 +23,7 @@
 #include "structures/BuriedBoat.h"
 #include "structures/Dungeon.h"
 #include "structures/Lake.h"
+#include "structures/Pyramid.h"
 #include "structures/Temple.h"
 #include "structures/Treasure.h"
 #include "structures/Vines.h"
@@ -70,6 +71,7 @@ void doWorldGen(Random &rnd, World &world)
     genGlowingMoss(rnd, world);
     genDungeon(rnd, world);
     genTemple(rnd, world);
+    genPyramid(rnd, world);
     genBuriedBoat(rnd, world);
     genLake(world);
     genTreasure(rnd, world);
