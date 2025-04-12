@@ -63,7 +63,29 @@ Point fillTreasureRoom(int x, int y, Random &rnd, World &world)
                 !chests.contains({i - 1, j - 1})) {
                 chests.emplace(i, j);
             }
-            world.getTile(x + i, y + j + align) = roomTile;
+            Tile &tile = world.getTile(x + i, y + j + align);
+            std::map<int, int> blockMap{{roomTile.blockID, roomTile.blockID}};
+            std::map<int, int> wallMap{{roomTile.wallID, roomTile.wallID}};
+            if (tile.blockID == TileID::ebonstoneBrick) {
+                blockMap[TileID::sand] = TileID::ebonsand;
+                blockMap[TileID::sandstoneBrick] = TileID::ebonstoneBrick;
+                wallMap[WallID::Safe::smoothSandstone] =
+                    WallID::Unsafe::ebonsandstone;
+                wallMap[WallID::Safe::goldBrick] = WallID::Safe::demoniteBrick;
+                wallMap[WallID::Safe::sandstoneBrick] =
+                    WallID::Safe::ebonstoneBrick;
+            } else if (tile.blockID == TileID::crimstoneBrick) {
+                blockMap[TileID::sand] = TileID::crimsand;
+                blockMap[TileID::sandstoneBrick] = TileID::crimstoneBrick;
+                wallMap[WallID::Safe::smoothSandstone] =
+                    WallID::Unsafe::crimsandstone;
+                wallMap[WallID::Safe::goldBrick] = WallID::Safe::crimtaneBrick;
+                wallMap[WallID::Safe::sandstoneBrick] =
+                    WallID::Safe::crimstoneBrick;
+            }
+            roomTile.blockID = blockMap[roomTile.blockID];
+            roomTile.wallID = wallMap[roomTile.wallID];
+            tile = roomTile;
         }
     }
     for (auto [i, j] : chests) {
@@ -156,7 +178,7 @@ void genPyramid(Random &rnd, World &world)
 {
     std::cout << "Building monuments\n";
     int size = 80;
-    double scanDist = 0.07 * world.getWidth() - size;
+    double scanDist = 0.064 * world.getWidth() - size;
     int x = world.surfaceEvilCenter;
     while (std::abs(x - world.surfaceEvilCenter) < 1.5 * size ||
            std::abs(x - world.getWidth() / 2) < 2 * size) {
