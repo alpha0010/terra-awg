@@ -178,7 +178,7 @@ void genPyramid(Random &rnd, World &world)
 {
     std::cout << "Building monuments\n";
     int size = 80;
-    double scanDist = 0.064 * world.getWidth() - size;
+    double scanDist = 0.061 * world.getWidth() - size;
     int x = world.surfaceEvilCenter;
     while (std::abs(x - world.surfaceEvilCenter) < 1.5 * size ||
            std::abs(x - world.getWidth() / 2) < 2 * size) {

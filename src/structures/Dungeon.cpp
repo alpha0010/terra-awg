@@ -7,6 +7,7 @@
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/Platforms.h"
+#include "structures/StructureUtil.h"
 #include <algorithm>
 #include <iostream>
 #include <set>
@@ -151,30 +152,12 @@ private:
             });
     }
 
-    Point addPts(Point a, Point b)
-    {
-        return {a.first + b.first, a.second + b.second};
-    }
-
-    Point subPts(Point a, Point b)
-    {
-        return {a.first - b.first, a.second - b.second};
-    }
-
-    Point scanWhileEmpty(Point from, Point delta)
-    {
-        while (world.getTile(addPts(from, delta)).blockID == TileID::empty) {
-            from = addPts(from, delta);
-        }
-        return from;
-    }
-
     Point selectBiomeChestLocation(const std::vector<Point> &zones)
     {
         while (true) {
             auto [x, y] = rnd.select(zones);
             x += rnd.getInt(-6, 2);
-            y = scanWhileEmpty({x, y}, {0, 1}).second;
+            y = scanWhileEmpty({x, y}, {0, 1}, world).second;
             if (isValidPlacementLocation(x, y, 6, 5, true)) {
                 return {x, y};
             }
@@ -404,7 +387,7 @@ private:
              --numPatches) {
             Point delta =
                 rnd.select({std::pair{1, 0}, {-1, 0}, {0, 1}, {0, -1}});
-            Point wall = scanWhileEmpty(rnd.select(zones), delta);
+            Point wall = scanWhileEmpty(rnd.select(zones), delta, world);
             Point incr = delta.first == 0 ? std::pair{1, 0} : std::pair{0, 1};
             int patchSize = rnd.getInt(0.15 * roomSize, 0.6 * roomSize);
             Point patchIncr{patchSize * incr.first, patchSize * incr.second};

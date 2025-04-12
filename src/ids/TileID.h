@@ -95,6 +95,7 @@ enum {
     borealWood = 321,
     palmTree = 323,
     silverCoin = 331,
+    pressurePlate = 135,
     bewitchingTable = 354,
     alchemyTable = 355,
     smoothMarble = 357,

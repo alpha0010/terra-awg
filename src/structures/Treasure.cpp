@@ -87,15 +87,6 @@ int testOrbHeartCandidate(int x, int y, World &world)
     return tendrilID;
 }
 
-int binLocation(int x, int y, int maxY)
-{
-    int factor = 128;
-    x /= factor;
-    y /= factor;
-    maxY /= factor;
-    return x * maxY + y;
-}
-
 void placeLifeCrystals(
     int maxBin,
     LocationBins &locations,
