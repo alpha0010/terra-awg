@@ -8,7 +8,7 @@ namespace Data
 {
 
 inline auto pyramidRooms = std::views::iota(0, 4);
-inline auto treeRooms = std::views::iota(4, 9);
+inline auto treeRooms = std::views::iota(4, 14);
 
 TileBuffer getRoom(int roomId, const std::vector<bool> &framedTiles);
 
