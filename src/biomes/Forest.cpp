@@ -5,7 +5,9 @@
 #include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
+#include "structures/data/Rooms.h"
 #include <iostream>
+#include <set>
 
 typedef std::pair<double, double> Pointf;
 
@@ -80,6 +82,7 @@ void growLeaves(Pointf from, Pointf to, double leafSpan, World &world)
 void growBranch(
     Pointf from,
     double weight,
+    double stretch,
     double angle,
     Random &rnd,
     World &world)
@@ -89,10 +92,10 @@ void growBranch(
     }
     angle = (3 * angle - std::numbers::pi / 2) / 4;
     Pointf to{
-        from.first + 2.1 * weight * std::cos(angle),
-        from.second + 2.1 * weight * std::sin(angle)};
+        from.first + stretch * weight * std::cos(angle),
+        from.second + stretch * weight * std::sin(angle)};
     drawLine(from, to, weight / 2, world);
-    if (weight < 2.6) {
+    if (weight < 2.3) {
         growLeaves(from, to, std::max(5.5, 4 * weight), world);
     }
     double threshold = rnd.getDouble(0, 1);
@@ -100,6 +103,7 @@ void growBranch(
         growBranch(
             to,
             rnd.getDouble(0.75, 0.88) * weight,
+            stretch,
             angle + rnd.getDouble(-std::numbers::pi / 8, std::numbers::pi / 8),
             rnd,
             world);
@@ -107,6 +111,7 @@ void growBranch(
             growBranch(
                 to,
                 rnd.getDouble(0.3, 0.5) * weight,
+                stretch,
                 angle + (threshold < 0.16 ? std::numbers::pi / 2
                                           : -std::numbers::pi / 2),
                 rnd,
@@ -117,12 +122,14 @@ void growBranch(
         growBranch(
             to,
             branchDistr * weight,
+            stretch,
             angle + rnd.getDouble(-std::numbers::pi / 2, -std::numbers::pi / 4),
             rnd,
             world);
         growBranch(
             to,
             (1.3 - branchDistr) * weight,
+            stretch,
             angle + rnd.getDouble(std::numbers::pi / 4, std::numbers::pi / 2),
             rnd,
             world);
@@ -168,12 +175,169 @@ void growRoot(
     }
 }
 
-void growLivingTree(double x, double y, Random &rnd, World &world)
+std::pair<int, int> findDoor(TileBuffer &room)
+{
+    for (int i = 0; i < room.getWidth(); ++i) {
+        for (int j = 0; j < room.getHeight(); ++j) {
+            if (room.getTile(i, j).blockID == TileID::door) {
+                return {i, j};
+            }
+        }
+    }
+    return {0, 0};
+}
+
+void growTapRoot(double x, double y, int roomId, Random &rnd, World &world)
+{
+    if (world.regionPasses(x - 3, y - 5, 6, 5, [](Tile &tile) {
+            return tile.blockID == TileID::livingWood;
+        })) {
+        for (int i = 0; i < 4; ++i) {
+            for (int j = 0; j < 4; ++j) {
+                if (j == 0 && (i == 0 || i == 3)) {
+                    continue;
+                }
+                Tile &tile = world.getTile(x - 2 + i, y - 5 + j);
+                tile.blockID = TileID::empty;
+            }
+        }
+    }
+    int tunnelDepth = 150;
+    while (world.getTile(x, y + tunnelDepth).blockID != TileID::empty) {
+        ++tunnelDepth;
+    }
+    int anchorX;
+    int anchorY;
+    for (int numTries = 0; numTries < 100; ++numTries) {
+        anchorY = y + tunnelDepth * rnd.getDouble(0.4, 0.7);
+        anchorX = x + 2.8 * rnd.getFineNoise(x, anchorY - y);
+        int scanX = numTries < 50 ? 12 : 8;
+        if (world.regionPasses(
+                anchorX - scanX,
+                anchorY,
+                2 * scanX,
+                numTries < 50 ? 8 : 6,
+                [](Tile &tile) { return tile.blockID != TileID::empty; })) {
+            break;
+        }
+    }
+    for (int j = 0; j < tunnelDepth; ++j) {
+        int iMin = 2 * rnd.getFineNoise(x + 100, j) - 4;
+        int iMax = 2 * rnd.getFineNoise(x + 200, j) + 5;
+        for (int i = iMin; i < iMax; ++i) {
+            Tile &tile =
+                world.getTile(x + i + 2.8 * rnd.getFineNoise(x, j), y + j);
+            if (tile.blockID == TileID::livingWood ||
+                tile.blockID == TileID::empty) {
+                continue;
+            }
+            tile.wallID = WallID::Unsafe::livingWood;
+            if (i < iMin + 2 || i > iMax - 3) {
+                tile.blockID = tile.blockID == TileID::grass ||
+                                       tile.blockID == TileID::jungleGrass
+                                   ? TileID::leaf
+                                   : TileID::livingWood;
+            } else {
+                tile.blockID = TileID::empty;
+            }
+        }
+    }
+    world.queuedTreasures.emplace_back([anchorX,
+                                        anchorY,
+                                        roomId](Random &rnd, World &world) {
+        if (world.getTile(anchorX, anchorY).wallID !=
+            WallID::Unsafe::livingWood) {
+            return;
+        }
+        TileBuffer room = Data::getRoom(roomId, world.getFramedTiles());
+        auto [doorI, doorJ] = findDoor(room);
+        bool placeOnRight = doorI < room.getWidth() / 2;
+        int x = anchorX;
+        while (world.getTile(x, anchorY).wallID == WallID::Unsafe::livingWood) {
+            if (placeOnRight) {
+                ++x;
+            } else {
+                --x;
+            }
+        }
+        if (!placeOnRight) {
+            x -= room.getWidth();
+        }
+        std::set<int> clearableTiles{
+            TileID::dirt,
+            TileID::grass,
+            TileID::stone,
+            TileID::livingWood,
+            TileID::leaf,
+            TileID::corruptGrass,
+            TileID::corruptJungleGrass,
+            TileID::crimsonGrass,
+            TileID::crimsonJungleGrass,
+            TileID::mud,
+            TileID::jungleGrass,
+            TileID::clay,
+            TileID::sand,
+            TileID::sandstone,
+            TileID::hardenedSand,
+            TileID::snow,
+            TileID::ice,
+            TileID::copperOre,
+            TileID::tinOre,
+            TileID::ironOre,
+            TileID::leadOre};
+        if (!world.regionPasses(
+                x,
+                anchorY,
+                room.getWidth(),
+                room.getHeight(),
+                [&clearableTiles](Tile &tile) {
+                    return !tile.guarded &&
+                           clearableTiles.contains(tile.blockID);
+                })) {
+            return;
+        }
+        for (int hallX = std::min(x + doorI, anchorX);
+             hallX < std::max(x + doorI, anchorX);
+             ++hallX) {
+            for (int hallY = anchorY + doorJ; hallY < anchorY + doorJ + 3;
+                 ++hallY) {
+                Tile &tile = world.getTile(hallX, hallY);
+                tile.blockID = TileID::empty;
+                tile.wallID = WallID::Unsafe::livingWood;
+            }
+        }
+        std::set<std::pair<int, int>> chests;
+        for (int i = 0; i < room.getWidth(); ++i) {
+            for (int j = 0; j < room.getHeight(); ++j) {
+                Tile &roomTile = room.getTile(i, j);
+                if (roomTile.blockID == TileID::cloud) {
+                    continue;
+                }
+                if (roomTile.blockID == TileID::chest &&
+                    !chests.contains({i - 1, j}) &&
+                    !chests.contains({i, j - 1}) &&
+                    !chests.contains({i - 1, j - 1})) {
+                    chests.emplace(i, j);
+                }
+                roomTile.guarded = true;
+                world.getTile(x + i, anchorY + j) = roomTile;
+            }
+        }
+        for (auto [i, j] : chests) {
+            Chest &chest =
+                world.placeChest(x + i, anchorY + j, Variant::livingWood);
+            fillSurfaceLivingWoodChest(chest, rnd, world);
+        }
+    });
+}
+
+void growLivingTree(double x, double y, int roomId, Random &rnd, World &world)
 {
     double weight = rnd.getDouble(5, 10);
     growBranch(
         {x, y},
         weight,
+        rnd.getDouble(2.1, 2.7),
         rnd.getDouble(-std::numbers::pi / 8, std::numbers::pi / 8) -
             std::numbers::pi / 2,
         rnd,
@@ -192,32 +356,15 @@ void growLivingTree(double x, double y, Random &rnd, World &world)
             std::numbers::pi / 2,
         rnd,
         world);
-    // TODO: Put chests in the root system.
-    world.queuedTreasures.emplace_back([x, y](Random &rnd, World &world) {
-        if (!world.regionPasses(x - 3, y - 5, 6, 5, [](Tile &tile) {
-                return tile.blockID == TileID::livingWood;
-            })) {
-            return;
-        }
-        for (int i = 0; i < 4; ++i) {
-            for (int j = 0; j < 4; ++j) {
-                if (j == 0 && (i == 0 || i == 3)) {
-                    continue;
-                }
-                Tile &tile = world.getTile(x - 2 + i, y - 5 + j);
-                tile.blockID = TileID::empty;
-                tile.blockPaint = Paint::none;
-            }
-        }
-        Chest &chest = world.placeChest(x - 1, y - 3, Variant::livingWood);
-        fillSurfaceLivingWoodChest(chest, rnd, world);
-    });
+    growTapRoot(x, y, roomId, rnd, world);
 }
 
 void growLivingTrees(Random &rnd, World &world)
 {
     auto partitions =
         rnd.partitionRange(world.getWidth() / 1280, world.getWidth());
+    std::vector<int> rooms(Data::treeRooms.begin(), Data::treeRooms.end());
+    std::shuffle(rooms.begin(), rooms.end(), rnd.getPRNG());
     for (int partition : partitions) {
         int numTrees = rnd.getInt(3, 6);
         for (int x = partition - 25 * numTrees; numTrees > 0;
@@ -234,7 +381,7 @@ void growLivingTrees(Random &rnd, World &world)
                 ++y;
             }
             if (world.getTile(x, y).blockID == TileID::grass) {
-                growLivingTree(x, y, rnd, world);
+                growLivingTree(x, y, rnd.pool(rooms), rnd, world);
             }
         }
     }
