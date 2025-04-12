@@ -97,7 +97,7 @@ void simulateRain(World &world, int minX, int maxX)
                 continue;
             }
             pendingWater +=
-                world.getTile(x, y).wallID == WallID::Unsafe::hive ? 1.9 : 1.3;
+                world.getTile(x, y).wallID == WallID::Unsafe::hive ? 2.4 : 1.6;
             auto [minDropX, maxDropX, dropY] =
                 followRainFrom(world, x, y, isLiquidPathable);
             if (maxDropX - minDropX < pendingWater) {

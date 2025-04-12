@@ -78,7 +78,30 @@ Point fillTreasureRoom(int x, int y, Random &rnd, World &world)
                 2,
                 [](Tile &tile) { return tile.blockID == TileID::empty; }) &&
             rnd.getDouble(0, 1) < 0.9) {
-            world.placeFramedTile(x + i, y + 5, TileID::pot, Variant::pyramid);
+            if (rnd.getDouble(0, 1) < 0.1) {
+                world.placeFramedTile(
+                    x + i,
+                    y + 6,
+                    TileID::smallPile,
+                    Variant::gold);
+            } else {
+                world.placeFramedTile(
+                    x + i,
+                    y + 5,
+                    TileID::pot,
+                    Variant::pyramid);
+            }
+        }
+    }
+    for (int i : {1, 3, 10, 12, 23, 25, 32, 34}) {
+        if (world.regionPasses(x + i, y, 1, 3, [](Tile &tile) {
+                return tile.blockID == TileID::empty;
+            })) {
+            world.placeFramedTile(
+                x + i,
+                y,
+                TileID::banner,
+                rnd.select({Variant::ankh, Variant::omega, Variant::snake}));
         }
     }
     return {x - 1, y};

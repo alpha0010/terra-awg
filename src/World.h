@@ -10,6 +10,7 @@ class Random;
 
 enum class Variant {
     none,
+    ankh,
     corruption,
     crimson,
     crystal,
@@ -35,6 +36,7 @@ enum class Variant {
     marble,
     meteorite,
     mushroom,
+    omega,
     palmWood,
     pyramid,
     reef,
@@ -42,6 +44,7 @@ enum class Variant {
     sandstone,
     shadow,
     skyware,
+    snake,
     spider,
     tundra,
     underworld,

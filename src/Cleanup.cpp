@@ -27,17 +27,27 @@ std::pair<int, int> getAttachedOpenWall(World &world, int x, int y)
 {
     Tile &origin = world.getTile(x, y);
     std::pair<int, int> res{origin.wallID, origin.wallPaint};
-    for (auto [i, j] : {std::pair{0, -1}, {0, 1}, {-1, 0}, {1, 0}}) {
-        Tile &tile = world.getTile(x + i, y + j);
-        if (tile.blockID == TileID::empty) {
-            if (tile.wallID == WallID::empty) {
-                return {WallID::empty, Paint::none};
-            } else {
-                res = {tile.wallID, tile.wallPaint};
+    bool keepOrigin = false;
+    for (int i = -1; i < 2; ++i) {
+        for (int j = -1; j < 2; ++j) {
+            if (i == 0 && j == 0) {
+                continue;
+            }
+            Tile &tile = world.getTile(x + i, y + j);
+            if (tile.blockID == TileID::empty) {
+                if (tile.wallID == WallID::empty) {
+                    return {WallID::empty, Paint::none};
+                } else if (!keepOrigin) {
+                    if (tile.wallID == origin.wallID) {
+                        keepOrigin = true;
+                    } else {
+                        res = {tile.wallID, tile.wallPaint};
+                    }
+                }
             }
         }
     }
-    return res;
+    return keepOrigin ? std::pair{origin.wallID, origin.wallPaint} : res;
 }
 
 Slope computeSlope(World &world, int x, int y)

@@ -92,6 +92,9 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::alchemyTable, Variant::none}, {3, 3, 0, 0}},
     {{TileID::altar, Variant::corruption}, {3, 2, 0, 0}},
     {{TileID::altar, Variant::crimson}, {3, 2, 54, 0}},
+    {{TileID::banner, Variant::ankh}, {1, 3, 72, 0}},
+    {{TileID::banner, Variant::omega}, {1, 3, 108, 0}},
+    {{TileID::banner, Variant::snake}, {1, 3, 90, 0}},
     {{TileID::bewitchingTable, Variant::none}, {3, 3, 0, 0}},
     {{TileID::boneWelder, Variant::none}, {3, 3, 0, 0}},
     {{TileID::bottle, Variant::health}, {1, 1, 18, 0}},
@@ -145,6 +148,7 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::pot, Variant::spider}, {2, 2, 0, 684}},
     {{TileID::pot, Variant::tundra}, {2, 2, 0, 144}},
     {{TileID::pot, Variant::underworld}, {2, 2, 0, 468}},
+    {{TileID::smallPile, Variant::gold}, {2, 1, 648, 18}},
     {{TileID::statue, Variant::lihzahrd}, {2, 3, 1548, 0}},
 };
 

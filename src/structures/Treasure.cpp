@@ -20,16 +20,14 @@ bool listContains(const T &list, const U &value)
 }
 
 inline const std::set<int> nonSolidTiles{
-    TileID::empty,      TileID::alchemyTable,
-    TileID::bench,      TileID::bewitchingTable,
-    TileID::boneWelder, TileID::book,
-    TileID::bottle,     TileID::bubble,
-    TileID::chest,      TileID::chestGroup2,
-    TileID::leaf,       TileID::lihzahrdAltar,
-    TileID::livingWood, TileID::painting3x3,
-    TileID::pot,        TileID::rope,
-    TileID::silverCoin, TileID::statue,
-    TileID::thinIce,    TileID::waterCandle,
+    TileID::empty,           TileID::alchemyTable, TileID::bench,
+    TileID::bewitchingTable, TileID::boneWelder,   TileID::book,
+    TileID::bottle,          TileID::bubble,       TileID::chest,
+    TileID::chestGroup2,     TileID::leaf,         TileID::lihzahrdAltar,
+    TileID::livingWood,      TileID::painting3x3,  TileID::pot,
+    TileID::rollingCactus,   TileID::rope,         TileID::silverCoin,
+    TileID::smallPile,       TileID::statue,       TileID::thinIce,
+    TileID::waterCandle,
 };
 
 bool isPlacementCandidate(int x, int y, World &world)
@@ -328,7 +326,9 @@ Point selectShrineLocation(
                 [](Tile &tile) {
                     return tile.blockID == TileID::empty &&
                            (tile.wallID == WallID::empty ||
-                            listContains(WallVariants::jungle, tile.wallID));
+                            listContains(WallVariants::jungle, tile.wallID)) &&
+                           (tile.liquid == Liquid::none ||
+                            tile.liquid == Liquid::water);
                 })) {
             continue;
         }
@@ -391,7 +391,9 @@ Point selectShrineLocation(
                     shrine.getHeight(),
                     [&clearableTiles](Tile &tile) {
                         return !tile.guarded &&
-                               clearableTiles.contains(tile.blockID);
+                               clearableTiles.contains(tile.blockID) &&
+                               (tile.liquid == Liquid::none ||
+                                tile.liquid == Liquid::water);
                     })) {
                 break;
             }
