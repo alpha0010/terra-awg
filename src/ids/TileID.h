@@ -54,6 +54,7 @@ enum {
     pearlstoneBrick = 118,
     mudstoneBrick = 120,
     silt = 123,
+    boulder = 138,
     snow = 147,
     sandstoneBrick = 151,
     ebonstoneBrick = 152,

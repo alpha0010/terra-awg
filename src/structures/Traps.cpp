@@ -25,9 +25,8 @@ void placeWire(Point from, Point to, World &world)
     }
 }
 
-void genTraps(Random &rnd, World &world)
+void placeSandTraps(Random &rnd, World &world)
 {
-    std::cout << "Arming traps\n";
     double scanDist = 0.065 * world.getWidth();
     LocationBins locations;
     for (int x = world.desertCenter - scanDist;
@@ -107,4 +106,108 @@ void genTraps(Random &rnd, World &world)
         }
         --numSandTraps;
     }
+}
+
+bool isValidBoulderPlacement(int x, int y, World &world)
+{
+    return world.regionPasses(x, y, 6, 6, [](Tile &tile) {
+        return !tile.guarded && tile.blockID == TileID::stone;
+    });
+}
+
+Point selectBoulderLocation(Random &rnd, World &world)
+{
+    while (true) {
+        int x = rnd.getInt(100, world.getWidth() - 100);
+        int y = rnd.getInt(
+            0.85 * world.getUndergroundLevel(),
+            world.getUnderworldLevel() - 100);
+        if (isValidBoulderPlacement(x, y, world)) {
+            while (isValidBoulderPlacement(x, y + 1, world)) {
+                ++y;
+            }
+            return {x + 2, y + 2};
+        }
+    }
+}
+
+void placeBoulderTraps(Random &rnd, World &world)
+{
+    int numBoulders =
+        world.getWidth() * world.getHeight() / rnd.getInt(57600, 64000);
+    std::set<int> allowedTiles{
+        TileID::empty,
+        TileID::dirt,
+        TileID::stone,
+        TileID::grass,
+        TileID::corruptGrass,
+        TileID::ebonstone,
+        TileID::clay,
+        TileID::mud,
+        TileID::jungleGrass,
+        TileID::mushroomGrass,
+        TileID::snow,
+        TileID::ice,
+        TileID::corruptIce,
+        TileID::slime,
+        TileID::crimsonGrass,
+        TileID::crimsonIce,
+        TileID::crimstone,
+        TileID::smoothMarble,
+        TileID::marble,
+        TileID::granite,
+        TileID::smoothGranite,
+        TileID::lavaMossStone,
+        TileID::kryptonMossStone,
+        TileID::xenonMossStone,
+        TileID::argonMossStone,
+        TileID::neonMossStone,
+        TileID::corruptJungleGrass,
+        TileID::crimsonJungleGrass};
+    while (numBoulders > 0) {
+        auto [x, y] = selectBoulderLocation(rnd, world);
+        int trapFloor = y + 4;
+        while (!world.regionPasses(x, trapFloor, 2, 3, [](Tile &tile) {
+            return tile.blockID == TileID::empty;
+        })) {
+            ++trapFloor;
+        }
+        int trapX = rnd.select({x, x + 1});
+        trapFloor = scanWhileEmpty({trapX, trapFloor}, {0, 1}, world).second;
+        if (trapFloor > world.getUnderworldLevel() || trapFloor - y > 25 ||
+            !world.regionPasses(
+                x,
+                y,
+                2,
+                trapFloor - y + 2,
+                [&allowedTiles](Tile &tile) {
+                    return !tile.guarded && tile.liquid == Liquid::none &&
+                           allowedTiles.contains(tile.blockID);
+                })) {
+            continue;
+        }
+        world.placeFramedTile(x, y, TileID::boulder);
+        for (int i = 0; i < 2; ++i) {
+            for (int j = 2; j < trapFloor - y; ++j) {
+                Tile &tile = world.getTile(x + i, y + j);
+                if (tile.blockID != TileID::empty) {
+                    tile.actuator = true;
+                    tile.wireRed = true;
+                } else if (x + i == trapX) {
+                    tile.wireRed = true;
+                }
+            }
+        }
+        Tile &pressureTile = world.getTile(trapX, trapFloor);
+        pressureTile.blockID = TileID::pressurePlate;
+        pressureTile.frameY = 126;
+        --numBoulders;
+    }
+}
+
+void genTraps(Random &rnd, World &world)
+{
+    std::cout << "Arming traps\n";
+    placeSandTraps(rnd, world);
+    placeBoulderTraps(rnd, world);
 }
