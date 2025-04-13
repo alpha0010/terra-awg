@@ -124,6 +124,7 @@ void smoothSurfaces(World &world)
         TileID::ebonstone,
         TileID::clay,
         TileID::sand,
+        TileID::obsidian,
         TileID::ash,
         TileID::mud,
         TileID::jungleGrass,

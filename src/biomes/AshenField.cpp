@@ -1,0 +1,99 @@
+#include "AshenField.h"
+
+#include "Random.h"
+#include "World.h"
+#include "ids/WallID.h"
+#include "structures/StructureUtil.h"
+#include <iostream>
+#include <set>
+
+void genAshenField(Random &rnd, World &world)
+{
+    double width = rnd.getInt(175, 200);
+    int minX = world.getWidth() / 2 - width;
+    int maxX = world.getWidth() / 2 + width;
+    int minY = world.spawnY - 20;
+    int maxY = std::midpoint<double>(minY + width, world.getUndergroundLevel());
+    std::set<int> avoidTiles{
+        TileID::snow,
+        TileID::sandstone,
+        TileID::livingWood};
+    if (!world.regionPasses(
+            minX,
+            minY,
+            maxX - minX,
+            maxY - minY,
+            [&avoidTiles](Tile &tile) {
+                return !avoidTiles.contains(tile.blockID);
+            })) {
+        return;
+    }
+    std::cout << "Managing wildfire\n";
+    rnd.shuffleNoise();
+    std::map<int, int> underworldWalls;
+    for (int wallId : WallVariants::dirt) {
+        underworldWalls[wallId] = rnd.select(WallVariants::underworld);
+    }
+    std::map<int, int> stoneWalls;
+    for (int wallId : WallVariants::dirt) {
+        stoneWalls[wallId] = rnd.select(WallVariants::stone);
+    }
+    double height = maxY - world.spawnY;
+    for (int x = minX; x < maxX; ++x) {
+        int surface = std::lerp(
+            world.spawnY,
+            scanWhileEmpty({x, minY}, {0, 1}, world).second,
+            std::abs(x - world.getWidth() / 2) / width);
+        for (int y = minY; y < maxY; ++y) {
+            double threshold = std::hypot(
+                (x - world.getWidth() / 2) / width,
+                (y - world.spawnY) / height);
+            if (rnd.getFineNoise(x, y) < 9 * threshold - 8) {
+                continue;
+            }
+            Tile &tile = world.getTile(x, y);
+            if (y <= surface) {
+                tile.blockID = TileID::empty;
+                tile.wallID = WallID::empty;
+                continue;
+            }
+            if (threshold > 0.2 && std::abs(rnd.getCoarseNoise(3 * x, 3 * y)) <
+                                       std::min(1.0, 5.8 - 7 * threshold) *
+                                           (0.05 + 0.4 * (y - minY) / height)) {
+                tile.blockID = TileID::empty;
+                tile.wallID = y > surface + 2 ? underworldWalls[tile.wallID]
+                                              : WallID::empty;
+                if (y > surface + 1) {
+                    tile.liquid = Liquid::lava;
+                }
+                continue;
+            }
+            switch (tile.blockID) {
+            case TileID::dirt:
+            case TileID::grass:
+                tile.blockID = TileID::ash;
+                break;
+            case TileID::empty:
+            case TileID::stone:
+            case TileID::mud:
+            case TileID::sand:
+            case TileID::clay:
+                tile.blockID =
+                    y > world.spawnY + 10 ? TileID::obsidian : TileID::ash;
+                break;
+            default:
+                break;
+            }
+            if (tile.blockID == TileID::ash) {
+                if (y - 3 < surface &&
+                    world.getTile(x, y - 1).blockID == TileID::empty) {
+                    tile.blockID = TileID::ashGrass;
+                } else {
+                    tile.wallID = underworldWalls[tile.wallID];
+                }
+            } else if (tile.blockID == TileID::obsidian) {
+                tile.wallID = stoneWalls[tile.wallID];
+            }
+        }
+    }
+}

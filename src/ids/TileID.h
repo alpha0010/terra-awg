@@ -33,6 +33,7 @@ enum {
     book = 50,
     vines = 52,
     sand = 53,
+    obsidian = 56,
     ash = 57,
     hellstone = 58,
     mud = 59,

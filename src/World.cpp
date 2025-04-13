@@ -121,6 +121,7 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::chest, Variant::shadow}, {2, 2, 144, 0}},
     {{TileID::chest, Variant::skyware}, {2, 2, 468, 0}},
     {{TileID::chest, Variant::water}, {2, 2, 612, 0}},
+    {{TileID::chestGroup2, Variant::ashWood}, {2, 2, 576, 0}},
     {{TileID::chestGroup2, Variant::desert}, {2, 2, 468, 0}},
     {{TileID::chestGroup2, Variant::lesion}, {2, 2, 108, 0}},
     {{TileID::chestGroup2, Variant::reef}, {2, 2, 504, 0}},
@@ -155,8 +156,9 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
 void World::placeFramedTile(int x, int y, int blockID, Variant type)
 {
     if (blockID == TileID::chest &&
-        (type == Variant::desert || type == Variant::lesion ||
-         type == Variant::reef || type == Variant::sandstone)) {
+        (type == Variant::ashWood || type == Variant::desert ||
+         type == Variant::lesion || type == Variant::reef ||
+         type == Variant::sandstone)) {
         blockID = TileID::chestGroup2;
     }
     int offsetX = 0;

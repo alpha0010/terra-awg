@@ -472,6 +472,9 @@ Variant getChestType(int x, int y, World &world)
         return Variant::lihzahrd;
     }
     std::map<int, Variant> blockTypes{
+        {TileID::ash, Variant::ashWood},
+        {TileID::ashGrass, Variant::ashWood},
+        {TileID::obsidian, Variant::ashWood},
         {TileID::crimstone, Variant::flesh},
         {TileID::crimsonGrass, Variant::flesh},
         {TileID::crimsand, Variant::flesh},
@@ -505,6 +508,10 @@ Variant getChestType(int x, int y, World &world)
         {TileID::hardenedSand, Variant::sandstone},
         {TileID::desertFossil, Variant::sandstone}};
     std::map<int, Variant> wallTypes{
+        {WallID::Unsafe::ember, Variant::ashWood},
+        {WallID::Unsafe::cinder, Variant::ashWood},
+        {WallID::Unsafe::magma, Variant::ashWood},
+        {WallID::Unsafe::smoulderingStone, Variant::ashWood},
         {WallID::Unsafe::crimsonGrass, Variant::flesh},
         {WallID::Unsafe::crimsandstone, Variant::flesh},
         {WallID::Unsafe::hardenedCrimsand, Variant::flesh},
@@ -574,6 +581,9 @@ void placeChest(int x, int y, Variant type, Random &rnd, World &world)
     Chest &chest = world.placeChest(x, y - 2, type);
     int torchID = ItemID::torch;
     switch (type) {
+    case Variant::ashWood:
+        fillSurfaceAshWoodChest(chest, rnd, world);
+        return;
     case Variant::flesh:
         torchID = ItemID::crimsonTorch;
         break;

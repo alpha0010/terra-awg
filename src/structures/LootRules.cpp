@@ -41,26 +41,28 @@ void fillLoot(
     }
 }
 
+Item getSurfacePrimaryLoot(Random &rnd)
+{
+    return rnd.pool<Item>({
+        {ItemID::spear, rnd.select(PrefixSet::universal), 1},
+        {ItemID::blowpipe, rnd.select(PrefixSet::ranged), 1},
+        {ItemID::woodenBoomerang, rnd.select(PrefixSet::universal), 1},
+        {ItemID::aglet, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::climbingClaws, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::umbrella, rnd.select(PrefixSet::melee), 1},
+        {ItemID::guideToPlantFiberCordage, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::wandOfSparking, rnd.select(PrefixSet::magic), 1},
+        {ItemID::radar, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::stepStool, rnd.select(PrefixSet::accessory), 1},
+    });
+}
+
 void fillSurfaceChest(Chest &chest, int torchID, Random &rnd, World &world)
 {
     fillLoot(
         chest,
         rnd,
-        {{1,
-          rnd.pool<Item>({
-              {ItemID::spear, rnd.select(PrefixSet::universal), 1},
-              {ItemID::blowpipe, rnd.select(PrefixSet::ranged), 1},
-              {ItemID::woodenBoomerang, rnd.select(PrefixSet::universal), 1},
-              {ItemID::aglet, rnd.select(PrefixSet::accessory), 1},
-              {ItemID::climbingClaws, rnd.select(PrefixSet::accessory), 1},
-              {ItemID::umbrella, rnd.select(PrefixSet::melee), 1},
-              {ItemID::guideToPlantFiberCordage,
-               rnd.select(PrefixSet::accessory),
-               1},
-              {ItemID::wandOfSparking, rnd.select(PrefixSet::magic), 1},
-              {ItemID::radar, rnd.select(PrefixSet::accessory), 1},
-              {ItemID::stepStool, rnd.select(PrefixSet::accessory), 1},
-          })},
+        {{1, getSurfacePrimaryLoot(rnd)},
          {1.0 / 6, {ItemID::glowstick, Prefix::none, rnd.getInt(40, 75)}},
          {1.0 / 6, {ItemID::throwingKnife, Prefix::none, rnd.getInt(150, 300)}},
          {0.2,
@@ -99,6 +101,52 @@ void fillSurfaceChest(Chest &chest, int torchID, Random &rnd, World &world)
            rnd.getInt(10, 20)}},
          {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
          {0.5, {ItemID::wood, Prefix::none, rnd.getInt(50, 99)}}});
+}
+
+void fillSurfaceAshWoodChest(Chest &chest, Random &rnd, World &world)
+{
+    fillLoot(
+        chest,
+        rnd,
+        {{1, getSurfacePrimaryLoot(rnd)},
+         {1.0 / 6, {ItemID::glowstick, Prefix::none, rnd.getInt(40, 75)}},
+         {1.0 / 6, {ItemID::throwingKnife, Prefix::none, rnd.getInt(150, 300)}},
+         {0.2,
+          {rnd.select({ItemID::herbBag, ItemID::canOfWorms}),
+           Prefix::none,
+           rnd.getInt(1, 4)}},
+         {1.0 / 3, {ItemID::grenade, Prefix::none, rnd.getInt(3, 5)}},
+         {0.5,
+          {rnd.select(
+               {world.copperVariant == TileID::copperOre ? ItemID::copperBar
+                                                         : ItemID::tinBar,
+                world.ironVariant == TileID::ironOre ? ItemID::ironBar
+                                                     : ItemID::leadBar}),
+           Prefix::none,
+           rnd.getInt(3, 10)}},
+         {0.5, {ItemID::rope, Prefix::none, rnd.getInt(50, 100)}},
+         {2.0 / 3,
+          {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
+           Prefix::none,
+           rnd.getInt(25, 50)}},
+         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {2.0 / 3,
+          {rnd.select(
+               {ItemID::ironskinPotion,
+                ItemID::shinePotion,
+                ItemID::nightOwlPotion,
+                ItemID::swiftnessPotion,
+                ItemID::miningPotion,
+                ItemID::builderPotion}),
+           Prefix::none,
+           rnd.getInt(1, 2)}},
+         {0.5,
+          {rnd.select<int>({ItemID::torch, ItemID::bottle}),
+           Prefix::none,
+           rnd.getInt(10, 20)}},
+         {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
+         {0.5, {ItemID::ashWood, Prefix::none, rnd.getInt(50, 99)}}});
 }
 
 void fillSurfaceFrozenChest(Chest &chest, Random &rnd, World &world)
@@ -280,21 +328,7 @@ void fillSurfaceRichMahoganyChest(Chest &chest, Random &rnd, World &world)
     fillLoot(
         chest,
         rnd,
-        {{1,
-          rnd.pool<Item>({
-              {ItemID::spear, rnd.select(PrefixSet::universal), 1},
-              {ItemID::blowpipe, rnd.select(PrefixSet::ranged), 1},
-              {ItemID::woodenBoomerang, rnd.select(PrefixSet::universal), 1},
-              {ItemID::aglet, rnd.select(PrefixSet::accessory), 1},
-              {ItemID::climbingClaws, rnd.select(PrefixSet::accessory), 1},
-              {ItemID::umbrella, rnd.select(PrefixSet::melee), 1},
-              {ItemID::guideToPlantFiberCordage,
-               rnd.select(PrefixSet::accessory),
-               1},
-              {ItemID::wandOfSparking, rnd.select(PrefixSet::magic), 1},
-              {ItemID::radar, rnd.select(PrefixSet::accessory), 1},
-              {ItemID::stepStool, rnd.select(PrefixSet::accessory), 1},
-          })},
+        {{1, getSurfacePrimaryLoot(rnd)},
          {1.0 / 6, {ItemID::glowstick, Prefix::none, rnd.getInt(40, 75)}},
          {1.0 / 6, {ItemID::poisonedKnife, Prefix::none, rnd.getInt(150, 300)}},
          {0.2,

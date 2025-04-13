@@ -201,6 +201,7 @@ void placeBoulderTraps(Random &rnd, World &world)
         Tile &pressureTile = world.getTile(trapX, trapFloor);
         pressureTile.blockID = TileID::pressurePlate;
         pressureTile.frameY = 126;
+        pressureTile.wireRed = true;
         --numBoulders;
     }
 }

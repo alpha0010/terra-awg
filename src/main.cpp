@@ -3,6 +3,7 @@
 #include "World.h"
 #include "Writer.h"
 #include "biomes/Aether.h"
+#include "biomes/AshenField.h"
 #include "biomes/Base.h"
 #include "biomes/Cloud.h"
 #include "biomes/Corruption.h"
@@ -57,6 +58,7 @@ void doWorldGen(Random &rnd, World &world)
     genDesert(rnd, world);
     genJungle(rnd, world);
     genForest(rnd, world);
+    genAshenField(rnd, world);
     genUnderworld(rnd, world);
     genGlowingMushroom(rnd, world);
     genGraniteCave(rnd, world);

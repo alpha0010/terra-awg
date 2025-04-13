@@ -72,6 +72,7 @@ void simulateRain(World &world, int minX, int maxX)
         TileID::crimsonJungleGrass,
         TileID::livingWood,
         TileID::leaf,
+        TileID::ashGrass,
         TileID::sandstoneBrick,
         TileID::ebonstoneBrick,
         TileID::crimstoneBrick};
@@ -107,7 +108,8 @@ void simulateRain(World &world, int minX, int maxX)
                 if (probeTile.liquid == Liquid::shimmer ||
                     probeTile.blockID == TileID::bubble ||
                     (y < world.getUndergroundLevel() &&
-                     surfaceDryBlocks.contains(probeTile.blockID))) {
+                     (surfaceDryBlocks.contains(probeTile.blockID) ||
+                      probeTile.liquid == Liquid::lava))) {
                     continue;
                 }
                 for (int dropX = minDropX; dropX < maxDropX; ++dropX) {
@@ -134,7 +136,9 @@ void evaporateSmallPools(World &world, int minX, int maxX)
     for (int x = minX; x < maxX; ++x) {
         for (int y = 0; y < world.getUnderworldLevel(); ++y) {
             Tile &tile = world.getTile(x, y);
-            if (tile.liquid != Liquid::water && tile.liquid != Liquid::lava) {
+            if (tile.liquid != Liquid::water &&
+                (tile.liquid != Liquid::lava ||
+                 y < world.getUndergroundLevel())) {
                 continue;
             }
             int poolDepth = std::get<2>(

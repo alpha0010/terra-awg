@@ -226,6 +226,7 @@ enum {
     fledglingWings = 4978,
     treasureMagnet = 5010,
     mace = 5011,
+    ashWood = 5215,
     highPitch = 5226,
     remnantsOfDevotion = 5234,
     constellation = 5238,

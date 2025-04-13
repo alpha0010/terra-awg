@@ -11,6 +11,7 @@ class Random;
 enum class Variant {
     none,
     ankh,
+    ashWood,
     corruption,
     crimson,
     crystal,
