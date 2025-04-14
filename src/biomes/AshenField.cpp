@@ -59,7 +59,7 @@ void genAshenField(Random &rnd, World &world)
             }
             if (threshold > 0.2 && std::abs(rnd.getCoarseNoise(3 * x, 3 * y)) <
                                        std::min(1.0, 5.8 - 7 * threshold) *
-                                           (0.05 + 0.4 * (y - minY) / height)) {
+                                           (0.05 + 0.3 * (y - minY) / height)) {
                 tile.blockID = TileID::empty;
                 tile.wallID = y > surface + 2 ? underworldWalls[tile.wallID]
                                               : WallID::empty;
