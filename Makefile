@@ -1,9 +1,10 @@
 # Config values
 
-CXXFLAGS := -Wall -Wextra -pedantic -Werror -std=c++20 -O2
+CXXFLAGS := -Wall -Wextra -pedantic -Werror -std=c++20 -O2 -msse4.1 -mpclmul
 
 SRCS := $(wildcard src/*.cpp) $(wildcard src/biomes/*.cpp) \
-    $(wildcard src/structures/*.cpp)  $(wildcard src/structures/data/*.cpp)
+    $(wildcard src/map/*.cpp) $(wildcard src/structures/*.cpp) \
+    $(wildcard src/structures/data/*.cpp) $(wildcard src/vendor/*.cpp)
 OUT := terra-awg
 
 BUILD_DIR := build

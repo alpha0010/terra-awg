@@ -21,6 +21,7 @@
 #include "biomes/Snow.h"
 #include "biomes/SpiderNest.h"
 #include "biomes/Underworld.h"
+#include "map/ImgWriter.h"
 #include "structures/BuriedBoat.h"
 #include "structures/Dungeon.h"
 #include "structures/Lake.h"
@@ -494,6 +495,8 @@ int main()
               << 0.001 * std::chrono::duration_cast<std::chrono::milliseconds>(
                              mainEnd - mainStart)
                              .count()
-              << "s\n";
+              << "s\n\nRendering map preview\n";
+
+    savePreviewImage(world);
     return 0;
 }
