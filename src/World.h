@@ -128,6 +128,7 @@ public:
     int surfaceEvilCenter;
     int dungeonCenter;
 
+    std::vector<std::function<void(Random &, World &)>> queuedTraps;
     std::vector<std::function<void(Random &, World &)>> queuedTreasures;
 };
 

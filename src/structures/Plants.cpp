@@ -153,11 +153,14 @@ void growRollingCactus(int x, int y, World &world)
     Tile &probeTile = world.getTile(x, y - 1);
     if ((probeTile.wallID != WallID::Unsafe::sandstone &&
          probeTile.wallID != WallID::Unsafe::hardenedSand) ||
-        !isRegionEmpty(x - 1, y - 3, 4, 3, world) ||
         probeTile.liquid != Liquid::none) {
         return;
     }
-    world.placeFramedTile(x, y - 2, TileID::rollingCactus);
+    world.queuedTraps.emplace_back([x, y](Random &, World &world) {
+        if (isRegionEmpty(x - 1, y - 3, 4, 3, world)) {
+            world.placeFramedTile(x, y - 2, TileID::rollingCactus);
+        }
+    });
 }
 
 void growTree(
@@ -305,7 +308,7 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
             case TileID::hardenedSand:
             case TileID::sandstone:
                 if (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
-                        35 ==
+                        11 ==
                     0) {
                     growRollingCactus(x, y, world);
                 }
