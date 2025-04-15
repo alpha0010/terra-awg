@@ -126,7 +126,8 @@ public:
     double jungleCenter;
     double snowCenter;
     int surfaceEvilCenter;
-    int dungeonCenter;
+    int dungeonX;
+    int dungeonY;
 
     std::vector<std::function<void(Random &, World &)>> queuedTraps;
     std::vector<std::function<void(Random &, World &)>> queuedTreasures;

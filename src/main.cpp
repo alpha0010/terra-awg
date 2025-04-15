@@ -145,14 +145,14 @@ void saveWorldFile(Random &rnd, World &world)
     w.putUint32(world.spawnY);         // Spawn Y.
     w.putFloat64(world.getUndergroundLevel());
     w.putFloat64(world.getCavernLevel());
-    w.putFloat64(13500);              // Time of day.
-    w.putBool(true);                  // Is day.
-    w.putUint32(0);                   // Moon phase.
-    w.putBool(false);                 // Blood moon.
-    w.putBool(false);                 // Eclipse.
-    w.putUint32(world.dungeonCenter); // Dungeon X.
-    w.putUint32(world.spawnY);        // Dungeon Y.
-    w.putBool(world.isCrimson);       // Is crimson.
+    w.putFloat64(13500);         // Time of day.
+    w.putBool(true);             // Is day.
+    w.putUint32(0);              // Moon phase.
+    w.putBool(false);            // Blood moon.
+    w.putBool(false);            // Eclipse.
+    w.putUint32(world.dungeonX); // Dungeon X.
+    w.putUint32(world.dungeonY); // Dungeon Y.
+    w.putBool(world.isCrimson);  // Is crimson.
     for (int i = 0; i < 20; ++i) {
         w.putBool(false); // Bosses and npc saves.
     }

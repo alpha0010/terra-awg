@@ -461,10 +461,44 @@ private:
         }
     }
 
-    void makeEntry(int dungeonCenter)
+    void selectEntry(int dungeonCenter)
     {
-        for (int x = dungeonCenter - 40; x < dungeonCenter + 40; ++x) {
-            for (int y = world.spawnY + 1; y < world.spawnY + wallThickness + 1;
+        int scanDist = 0.1 * world.getWidth();
+        world.dungeonX = dungeonCenter;
+        world.dungeonY = world.spawnY;
+        int minSurface = 0.7 * world.getUndergroundLevel() - 100;
+        for (int swapI = 0; swapI < scanDist; ++swapI) {
+            int i = swapI / 2;
+            if (swapI % 2 == 0) {
+                i = -i;
+            }
+            if (world.regionPasses(
+                    dungeonCenter + i - 55,
+                    world.dungeonY,
+                    110,
+                    1,
+                    [](Tile &tile) {
+                        return tile.blockID != TileID::livingWood;
+                    })) {
+                world.dungeonX = dungeonCenter + i;
+                break;
+            }
+        }
+        std::vector<int> surface;
+        for (int i = -26; i < 26; ++i) {
+            surface.push_back(
+                scanWhileEmpty({world.dungeonX + i, minSurface}, {0, 1}, world)
+                    .second);
+        }
+        std::sort(surface.begin(), surface.end());
+        world.dungeonY = surface[0.3 * surface.size()];
+    }
+
+    void makeEntry()
+    {
+        for (int x = world.dungeonX - 35; x < world.dungeonX + 35; ++x) {
+            for (int y = world.dungeonY + 1;
+                 y < world.dungeonY + wallThickness + 1;
                  ++y) {
                 Tile &tile = world.getTile(x, y);
                 if (tile.wallID != WallID::Unsafe::blueBrick) {
@@ -472,8 +506,8 @@ private:
                 }
             }
         }
-        for (int x = dungeonCenter - 40; x < dungeonCenter + 40; ++x) {
-            for (int y = world.spawnY - 20; y < world.spawnY + 1; ++y) {
+        for (int x = world.dungeonX - 35; x < world.dungeonX + 35; ++x) {
+            for (int y = world.dungeonY - 20; y < world.dungeonY + 1; ++y) {
                 Tile &tile = world.getTile(x, y);
                 tile.blockID = TileID::empty;
                 tile.wallID = WallID::Unsafe::blueBrick;
@@ -555,6 +589,7 @@ public:
 
     void gen(int dungeonCenter)
     {
+        selectEntry(dungeonCenter);
         int dungeonWidth = rnd.getDouble(0.029, 0.034) * world.getWidth();
         int dungeonHeight = rnd.getDouble(0.35, 0.4) * world.getHeight();
         int yMin =
@@ -581,7 +616,11 @@ public:
         for (auto [x, y] : zones) {
             if (connectedZones.empty()) {
                 findConnectedZones(x, y, connectedZones, allZones);
-                makeHallway({dungeonCenter - 5, world.spawnY}, {x, y});
+                makeHallway(
+                    {world.dungeonX +
+                         (world.dungeonX > world.getWidth() / 2 ? 5 : -5),
+                     world.dungeonY},
+                    {x, y});
                 continue;
             } else if (connectedZones.contains({x, y})) {
                 continue;
@@ -613,7 +652,7 @@ public:
         addShelves(dungeonCenter, dungeonWidth);
         addFurniture(dungeonCenter, dungeonWidth);
         addSpikes(zones);
-        makeEntry(dungeonCenter);
+        makeEntry();
         std::sort(
             zones.begin(),
             zones.end(),
@@ -651,7 +690,6 @@ void genDungeon(Random &rnd, World &world)
             dungeonCenter = avoidPoints[i] + span / 2;
         }
     }
-    world.dungeonCenter = dungeonCenter;
     Dungeon structure(rnd, world);
     structure.gen(dungeonCenter);
 }
