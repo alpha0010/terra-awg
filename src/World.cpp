@@ -220,7 +220,8 @@ bool World::isExposed(int x, int y) const
     }
     for (int i = -1; i < 2; ++i) {
         for (int j = -1; j < 2; ++j) {
-            if (tiles[(y + j) + (x + i) * height].blockID == TileID::empty) {
+            int tileId = tiles[(y + j) + (x + i) * height].blockID;
+            if (tileId == TileID::empty || tileId == TileID::minecartTrack) {
                 return true;
             }
         }

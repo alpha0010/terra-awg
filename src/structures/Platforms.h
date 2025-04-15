@@ -11,6 +11,7 @@ enum {
     woodShelf = 198,
     dungeonShelf = 216,
     lihzahrd = 594,
+    stone = 774,
 };
 }
 

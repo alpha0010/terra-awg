@@ -7,6 +7,7 @@ enum {
     none = 0,
     red = 1,
     purple = 10,
+    brown = 28,
 };
 }
 

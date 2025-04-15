@@ -16,6 +16,7 @@ enum {
     ebonstoneBrick = 35,
     livingLeaf = 60,
     cloud = 73,
+    palmWood = 151,
     crimtaneBrick = 174,
     crimstoneBrick = 234,
     smoothSandstone = 235,

@@ -197,6 +197,11 @@ void placeBoulderTraps(Random &rnd, World &world)
             continue;
         }
         world.placeFramedTile(x, y, TileID::boulder);
+        for (int i = -2; i < 4; ++i) {
+            for (int j = -2; j < 4; ++j) {
+                world.getTile(x + i, y + j).guarded = true;
+            }
+        }
         for (int i = 0; i < 2; ++i) {
             for (int j = 2; j < trapFloor - y; ++j) {
                 Tile &tile = world.getTile(x + i, y + j);
@@ -291,6 +296,9 @@ void placeLavaTraps(Random &rnd, World &world)
             tile.wireRed = true;
             if (tile.blockID != TileID::empty) {
                 tile.actuator = true;
+                if (j < 2) {
+                    tile.guarded = true;
+                }
             }
         }
         auto [plateX, plateY] = rnd.select(plateLocs);

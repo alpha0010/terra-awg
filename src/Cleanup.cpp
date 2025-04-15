@@ -52,18 +52,19 @@ std::pair<int, int> getAttachedOpenWall(World &world, int x, int y)
 
 Slope computeSlope(World &world, int x, int y)
 {
-    // Bit layout
+    // Bit layout:
     // 035
     // 1 6
     // 247
     size_t flags = 0;
+    std::set<int> emptyIds{TileID::empty, TileID::minecartTrack};
     for (int i = -1; i < 2; ++i) {
         for (int j = -1; j < 2; ++j) {
             if (i == 0 && j == 0) {
                 continue;
             }
             flags <<= 1;
-            if (world.getTile(x + i, y + j).blockID == TileID::empty) {
+            if (emptyIds.contains(world.getTile(x + i, y + j).blockID)) {
                 flags |= 1;
             }
         }

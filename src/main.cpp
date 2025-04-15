@@ -25,6 +25,7 @@
 #include "structures/BuriedBoat.h"
 #include "structures/Dungeon.h"
 #include "structures/Lake.h"
+#include "structures/MinecartTracks.h"
 #include "structures/Pyramid.h"
 #include "structures/Temple.h"
 #include "structures/Traps.h"
@@ -80,6 +81,7 @@ void doWorldGen(Random &rnd, World &world)
     genLake(world);
     genTreasure(rnd, world);
     genTraps(rnd, world);
+    genTracks(rnd, world);
     smoothSurfaces(world);
     genVines(rnd, world);
 }
