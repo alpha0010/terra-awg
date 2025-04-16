@@ -20,14 +20,18 @@ bool listContains(const T &list, const U &value)
 }
 
 inline const std::set<int> nonSolidTiles{
-    TileID::empty,           TileID::alchemyTable, TileID::bench,
-    TileID::bewitchingTable, TileID::boneWelder,   TileID::book,
-    TileID::bottle,          TileID::bubble,       TileID::chest,
-    TileID::chestGroup2,     TileID::leaf,         TileID::lihzahrdAltar,
-    TileID::livingWood,      TileID::painting3x3,  TileID::pot,
-    TileID::rollingCactus,   TileID::rope,         TileID::silverCoin,
-    TileID::smallPile,       TileID::statue,       TileID::thinIce,
-    TileID::waterCandle,
+    TileID::empty,         TileID::alchemyTable,
+    TileID::bench,         TileID::bewitchingTable,
+    TileID::boneWelder,    TileID::book,
+    TileID::bottle,        TileID::bubble,
+    TileID::catacomb,      TileID::chest,
+    TileID::chestGroup2,   TileID::leaf,
+    TileID::lihzahrdAltar, TileID::livingWood,
+    TileID::painting3x3,   TileID::painting6x4,
+    TileID::pot,           TileID::rollingCactus,
+    TileID::rope,          TileID::silverCoin,
+    TileID::smallPile,     TileID::statue,
+    TileID::thinIce,       TileID::waterCandle,
 };
 
 bool isPlacementCandidate(int x, int y, World &world)
@@ -295,14 +299,6 @@ Point selectShrineLocation(
         TileID::tungstenOre,
         TileID::goldOre,
         TileID::platinumOre};
-    auto isLocationUsed = [&usedLocations](int x, int y) {
-        for (auto [usedX, usedY] : usedLocations) {
-            if (std::hypot(usedX - x, usedY - y) < 40) {
-                return true;
-            }
-        }
-        return false;
-    };
     for (int numTries = 0; numTries < 10000; ++numTries) {
         int x = rnd.getInt(
             world.jungleCenter - 0.09 * world.getWidth(),
@@ -333,7 +329,7 @@ Point selectShrineLocation(
                     [](Tile &tile) {
                         return !tile.guarded && tile.wallID != WallID::empty;
                     }) ||
-                isLocationUsed(x, y)) {
+                isLocationUsed(x, y, 40, usedLocations)) {
                 continue;
             }
             return {x, y};
@@ -373,7 +369,7 @@ Point selectShrineLocation(
                     1,
                     [](Tile &tile) { return tile.blockID != TileID::empty; }) ||
                 // Near other shrines.
-                isLocationUsed(x, y) ||
+                isLocationUsed(x, y, 40, usedLocations) ||
                 // Restricted tiles.
                 !world.regionPasses(
                     x,
@@ -690,17 +686,8 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
             continue;
         }
         auto [x, y] = rnd.select(locations[binId]);
-        if (!isPlacementCandidate(x, y, world)) {
-            continue;
-        }
-        bool isNearOtherChests = false;
-        for (auto [usedX, usedY] : usedLocations[binId]) {
-            if (std::hypot(usedX - x, usedY - y) < 20) {
-                isNearOtherChests = true;
-                break;
-            }
-        }
-        if (isNearOtherChests) {
+        if (!isPlacementCandidate(x, y, world) ||
+            isLocationUsed(x, y, 20, usedLocations[binId])) {
             continue;
         }
         usedLocations[binId].emplace_back(x, y);

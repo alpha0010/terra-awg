@@ -11,6 +11,12 @@ typedef std::map<int, std::vector<Point>> LocationBins;
 
 int binLocation(int x, int y, int maxY);
 
+bool isLocationUsed(
+    int x,
+    int y,
+    int radius,
+    const std::vector<Point> &usedLocations);
+
 Point addPts(Point a, Point b);
 
 Point subPts(Point a, Point b);

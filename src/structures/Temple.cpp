@@ -5,6 +5,7 @@
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/Platforms.h"
+#include "structures/StructureUtil.h"
 #include <iostream>
 #include <set>
 
@@ -268,17 +269,8 @@ void addTempleTreasures(Point center, int numRooms, Random &rnd, World &world)
     std::vector<Point> usedLocations;
     while (numChests > 0) {
         auto [x, y] = rnd.select(locations);
-        if (!canPlaceTempleTreasureAt(x, y, world)) {
-            continue;
-        }
-        bool isNearOtherChests = false;
-        for (auto [usedX, usedY] : usedLocations) {
-            if (std::hypot(usedX - x, usedY - y) < 12) {
-                isNearOtherChests = true;
-                break;
-            }
-        }
-        if (isNearOtherChests) {
+        if (!canPlaceTempleTreasureAt(x, y, world) ||
+            isLocationUsed(x, y, 12, usedLocations)) {
             continue;
         }
         usedLocations.emplace_back(x, y);

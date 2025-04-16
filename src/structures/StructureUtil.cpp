@@ -1,6 +1,7 @@
 #include "structures/StructureUtil.h"
 
 #include "World.h"
+#include <cmath>
 
 int binLocation(int x, int y, int maxY)
 {
@@ -9,6 +10,20 @@ int binLocation(int x, int y, int maxY)
     y /= factor;
     maxY /= factor;
     return x * maxY + y;
+}
+
+bool isLocationUsed(
+    int x,
+    int y,
+    int radius,
+    const std::vector<Point> &usedLocations)
+{
+    for (auto [usedX, usedY] : usedLocations) {
+        if (std::hypot(x - usedX, y - usedY) < radius) {
+            return true;
+        }
+    }
+    return false;
 }
 
 Point addPts(Point a, Point b)

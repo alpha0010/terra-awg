@@ -531,6 +531,102 @@ private:
         }
     }
 
+    Point selectPaintingLocation(
+        int dungeonCenter,
+        int dungeonWidth,
+        int width,
+        int height,
+        const std::vector<Point> &usedLocations)
+    {
+        while (true) {
+            int x = rnd.getInt(
+                dungeonCenter - dungeonWidth,
+                dungeonCenter + dungeonWidth + 2 * roomSize);
+            int y = rnd.getInt(
+                world.getUndergroundLevel(),
+                world.getUnderworldLevel());
+            if (isValidPlacementLocation(x, y, width + 4, height + 4, false) &&
+                !isLocationUsed(x, y, 40, usedLocations)) {
+                return {x, y};
+            }
+        }
+    }
+
+    void addPaintings(int dungeonCenter, int dungeonWidth)
+    {
+        int numPaintings =
+            world.getWidth() * world.getHeight() / rnd.getInt(640000, 960000);
+        std::array dungeonPaintings{
+            Painting::bloodMoonRising,
+            Painting::boneWarp,
+            Painting::gloryOfTheFire,
+            Painting::skellingtonJSkellingsworth,
+            Painting::theCursedMan,
+            Painting::theGuardiansGaze,
+            Painting::theHangedMan,
+            Painting::dryadisque,
+            Painting::facingTheCerebralMastermind,
+            Painting::goblinsPlayingPoker,
+            Painting::greatWave,
+            Painting::impact,
+            Painting::poweredByBirds,
+            Painting::somethingEvilIsWatchingYou,
+            Painting::sparky,
+            Painting::starryNight,
+            Painting::theCreationOfTheGuide,
+            Painting::theDestroyer,
+            Painting::theEyeSeesTheEnd,
+            Painting::thePersistencyOfEyes,
+            Painting::theScreamer,
+            Painting::theTwinsHaveAwoken,
+            Painting::trioSuperHeroes,
+            Painting::unicornCrossingTheHallows,
+        };
+        std::shuffle(
+            dungeonPaintings.begin(),
+            dungeonPaintings.end(),
+            rnd.getPRNG());
+        std::vector<Point> usedLocations;
+        for (int i = 0; i < numPaintings; ++i) {
+            Painting curPainting = rnd.pool(dungeonPaintings);
+            auto [width, height] = world.getPaintingDims(curPainting);
+            auto [x, y] = selectPaintingLocation(
+                dungeonCenter,
+                dungeonWidth,
+                width,
+                height,
+                usedLocations);
+            usedLocations.emplace_back(x, y);
+            world.placePainting(x + 2, y - height - 2, curPainting);
+        }
+        numPaintings *= 0.8;
+        for (int i = 0; i < numPaintings; ++i) {
+            Painting curPainting =
+                rnd.getBool()
+                    ? rnd.select(
+                          {Painting::hangingSkeleton, Painting::wallSkeleton})
+                    : rnd.select(
+                          {Painting::catacomb1,
+                           Painting::catacomb2,
+                           Painting::catacomb3,
+                           Painting::catacomb4,
+                           Painting::catacomb5,
+                           Painting::catacomb6,
+                           Painting::catacomb7,
+                           Painting::catacomb8,
+                           Painting::catacomb9});
+            auto [width, height] = world.getPaintingDims(curPainting);
+            auto [x, y] = selectPaintingLocation(
+                dungeonCenter,
+                dungeonWidth,
+                width,
+                height,
+                usedLocations);
+            usedLocations.emplace_back(x, y);
+            world.placePainting(x + 2, y - height - 2, curPainting);
+        }
+    }
+
     void selectEntry(int dungeonCenter)
     {
         int scanDist = 0.1 * world.getWidth();
@@ -687,6 +783,7 @@ public:
         addFurniture(dungeonCenter, dungeonWidth);
         addSpikes(zones);
         makeEntry();
+        addPaintings(dungeonCenter, dungeonWidth);
         std::sort(
             zones.begin(),
             zones.end(),

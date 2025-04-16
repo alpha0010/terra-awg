@@ -3,56 +3,11 @@
 
 #include "Chest.h"
 #include "Tile.h"
+#include "ids/TileVariant.h"
 #include <functional>
 #include <vector>
 
 class Random;
-
-enum class Variant {
-    none,
-    ankh,
-    ashWood,
-    corruption,
-    crimson,
-    crystal,
-    dartLeft,
-    dartRight,
-    desert,
-    dungeon,
-    dynasty,
-    flesh,
-    forest,
-    frozen,
-    gold,
-    goldLocked,
-    granite,
-    hallowed,
-    health,
-    honey,
-    ice,
-    ivy,
-    jungle,
-    lesion,
-    lihzahrd,
-    livingWood,
-    mana,
-    marble,
-    meteorite,
-    mushroom,
-    omega,
-    palmWood,
-    pyramid,
-    reef,
-    richMahogany,
-    sandstone,
-    shadow,
-    skyware,
-    snake,
-    spider,
-    tundra,
-    underworld,
-    water
-};
 
 class World
 {
@@ -79,6 +34,8 @@ public:
     }
     void
     placeFramedTile(int x, int y, int blockID, Variant type = Variant::none);
+    void placePainting(int x, int y, Painting painting);
+    std::pair<int, int> getPaintingDims(Painting painting);
     Chest &placeChest(int x, int y, Variant type);
 
     const std::vector<Chest> &getChests() const

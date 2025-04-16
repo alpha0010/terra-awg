@@ -41,6 +41,20 @@ constexpr std::vector<bool> genFramedTileLookup()
     return table;
 }
 
+std::pair<int, int> framedTileToDims(int tileID)
+{
+    switch (tileID) {
+    case TileID::catacomb:
+        return {4, 3};
+    case TileID::painting3x3:
+        return {3, 3};
+    case TileID::painting6x4:
+        return {6, 4};
+    default:
+        return {1, 1};
+    }
+}
+
 World::World()
     : width(6400), height(1800), tiles(width * height),
       framedTiles(genFramedTileLookup())
@@ -207,6 +221,78 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
             tile.frameY = 18 * j + offsetY;
         }
     }
+}
+
+struct PaintingDetails {
+    int blockID;
+    int offsetX;
+    int offsetY;
+};
+
+inline const std::map<Painting, PaintingDetails> paintingData{
+    {Painting::bloodMoonRising, {TileID::painting3x3, 648, 0}},
+    {Painting::boneWarp, {TileID::painting3x3, 810, 0}},
+    {Painting::gloryOfTheFire, {TileID::painting3x3, 756, 0}},
+    {Painting::hangingSkeleton, {TileID::painting3x3, 918, 0}},
+    {Painting::skellingtonJSkellingsworth, {TileID::painting3x3, 972, 0}},
+    {Painting::theCursedMan, {TileID::painting3x3, 1026, 0}},
+    {Painting::theGuardiansGaze, {TileID::painting3x3, 1242, 0}},
+    {Painting::theHangedMan, {TileID::painting3x3, 702, 0}},
+    {Painting::wallSkeleton, {TileID::painting3x3, 864, 0}},
+    {Painting::catacomb1, {TileID::catacomb, 0, 0}},
+    {Painting::catacomb2, {TileID::catacomb, 0, 54}},
+    {Painting::catacomb3, {TileID::catacomb, 0, 108}},
+    {Painting::catacomb4, {TileID::catacomb, 0, 162}},
+    {Painting::catacomb5, {TileID::catacomb, 0, 216}},
+    {Painting::catacomb6, {TileID::catacomb, 0, 270}},
+    {Painting::catacomb7, {TileID::catacomb, 0, 324}},
+    {Painting::catacomb8, {TileID::catacomb, 0, 378}},
+    {Painting::catacomb9, {TileID::catacomb, 0, 432}},
+    {Painting::dryadisque, {TileID::painting6x4, 0, 360}},
+    {Painting::facingTheCerebralMastermind, {TileID::painting6x4, 0, 936}},
+    {Painting::goblinsPlayingPoker, {TileID::painting6x4, 0, 288}},
+    {Painting::greatWave, {TileID::painting6x4, 0, 792}},
+    {Painting::impact, {TileID::painting6x4, 0, 432}},
+    {Painting::poweredByBirds, {TileID::painting6x4, 0, 504}},
+    {Painting::somethingEvilIsWatchingYou, {TileID::painting6x4, 0, 72}},
+    {Painting::sparky, {TileID::painting6x4, 108, 216}},
+    {Painting::starryNight, {TileID::painting6x4, 0, 864}},
+    {Painting::theCreationOfTheGuide, {TileID::painting6x4, 0, 1152}},
+    {Painting::theDestroyer, {TileID::painting6x4, 0, 576}},
+    {Painting::theEyeSeesTheEnd, {TileID::painting6x4, 0, 0}},
+    {Painting::thePersistencyOfEyes, {TileID::painting6x4, 0, 648}},
+    {Painting::theScreamer, {TileID::painting6x4, 0, 216}},
+    {Painting::theTwinsHaveAwoken, {TileID::painting6x4, 0, 144}},
+    {Painting::trioSuperHeroes, {TileID::painting6x4, 0, 1080}},
+    {Painting::unicornCrossingTheHallows, {TileID::painting6x4, 0, 720}},
+};
+
+void World::placePainting(int x, int y, Painting painting)
+{
+    auto itr = paintingData.find(painting);
+    if (itr == paintingData.end()) {
+        std::cout << "Failed to find painting data\n";
+        return;
+    }
+    auto [blockID, offsetX, offsetY] = itr->second;
+    auto [frameWidth, frameHeight] = framedTileToDims(blockID);
+    for (int i = 0; i < frameWidth; ++i) {
+        for (int j = 0; j < frameHeight; ++j) {
+            Tile &tile = getTile(x + i, y + j);
+            tile.blockID = blockID;
+            tile.frameX = 18 * i + offsetX;
+            tile.frameY = 18 * j + offsetY;
+        }
+    }
+}
+
+std::pair<int, int> World::getPaintingDims(Painting painting)
+{
+    auto itr = paintingData.find(painting);
+    if (itr == paintingData.end()) {
+        return {0, 0};
+    }
+    return framedTileToDims(itr->second.blockID);
 }
 
 Chest &World::placeChest(int x, int y, Variant type)

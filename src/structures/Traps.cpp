@@ -226,14 +226,7 @@ void placeLavaTraps(Random &rnd, World &world)
         world.getWidth() * world.getHeight() / rnd.getInt(164000, 230400);
     while (numLavaTraps > 0) {
         auto [x, y] = rnd.select(locations);
-        bool isUsed = false;
-        for (auto [usedX, usedY] : usedLocations) {
-            if (std::hypot(x - usedX, y - usedY) < 15) {
-                isUsed = true;
-                break;
-            }
-        }
-        if (isUsed) {
+        if (isLocationUsed(x, y, 15, usedLocations)) {
             numLavaTraps -= 0.1;
             continue;
         }

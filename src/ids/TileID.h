@@ -94,6 +94,8 @@ enum {
     crimsand = 234,
     lihzahrdAltar = 237,
     painting3x3 = 240,
+    catacomb = 241,
+    painting6x4 = 242,
     boneWelder = 300,
     minecartTrack = 314,
     coralstone = 315,
