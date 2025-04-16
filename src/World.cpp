@@ -151,6 +151,8 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::pot, Variant::underworld}, {2, 2, 0, 468}},
     {{TileID::smallPile, Variant::gold}, {2, 1, 648, 18}},
     {{TileID::statue, Variant::lihzahrd}, {2, 3, 1548, 0}},
+    {{TileID::trap, Variant::dartLeft}, {1, 1, 0, 0}},
+    {{TileID::trap, Variant::dartRight}, {1, 1, 18, 0}},
 };
 
 void World::placeFramedTile(int x, int y, int blockID, Variant type)

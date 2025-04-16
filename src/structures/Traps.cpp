@@ -48,25 +48,6 @@ bool isTrappable(Tile &tile)
     return !tile.guarded && trappableTiles.contains(tile.blockID);
 }
 
-void placeWire(Point from, Point to, World &world)
-{
-    world.getTile(from.first, from.second).wireRed = true;
-    while (from != to) {
-        if (from.first < to.first) {
-            ++from.first;
-        } else if (from.first > to.first) {
-            --from.first;
-        }
-        world.getTile(from.first, from.second).wireRed = true;
-        if (from.second < to.second) {
-            ++from.second;
-        } else if (from.second > to.second) {
-            --from.second;
-        }
-        world.getTile(from.first, from.second).wireRed = true;
-    }
-}
-
 void placeSandTraps(Random &rnd, World &world)
 {
     double scanDist = 0.065 * world.getWidth();

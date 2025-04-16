@@ -12,7 +12,34 @@
 #include <iostream>
 #include <set>
 
-typedef std::pair<int, int> Point;
+struct DungeonTheme {
+    int brick;
+    int crackedBrick;
+    int brickWall;
+    int slabWall;
+    int tiledWall;
+
+    void apply(int themeBrick)
+    {
+        brick = themeBrick;
+        if (themeBrick == TileID::blueBrick) {
+            crackedBrick = TileID::crackedBlueBrick;
+            brickWall = WallID::Unsafe::blueBrick;
+            slabWall = WallID::Unsafe::blueSlab;
+            tiledWall = WallID::Unsafe::blueTiled;
+        } else if (themeBrick == TileID::greenBrick) {
+            crackedBrick = TileID::crackedGreenBrick;
+            brickWall = WallID::Unsafe::greenBrick;
+            slabWall = WallID::Unsafe::greenSlab;
+            tiledWall = WallID::Unsafe::greenTiled;
+        } else {
+            crackedBrick = TileID::crackedPinkBrick;
+            brickWall = WallID::Unsafe::pinkBrick;
+            slabWall = WallID::Unsafe::pinkSlab;
+            tiledWall = WallID::Unsafe::pinkTiled;
+        }
+    }
+};
 
 class Dungeon
 {
@@ -22,6 +49,7 @@ private:
     int roomSize;
     int hallSize;
     int wallThickness;
+    DungeonTheme theme;
     std::vector<Point> requestedDoors;
 
     void drawRect(
@@ -40,19 +68,19 @@ private:
                     topLeft.second + j + skewY * i);
                 if (i < wallThickness || j < wallThickness ||
                     width - i <= wallThickness || height - j <= wallThickness) {
-                    if (tile.wallID != WallID::Unsafe::blueBrick) {
-                        tile.blockID = TileID::blueBrick;
+                    if (tile.wallID != theme.brickWall) {
+                        tile.blockID = theme.brick;
                     }
                 } else {
-                    if (filled && (tile.wallID != WallID::Unsafe::blueBrick ||
-                                   tile.blockID == TileID::blueBrick ||
-                                   tile.blockID == TileID::crackedBlueBrick)) {
-                        tile.blockID = TileID::crackedBlueBrick;
+                    if (filled && (tile.wallID != theme.brickWall ||
+                                   tile.blockID == theme.brick ||
+                                   tile.blockID == theme.crackedBrick)) {
+                        tile.blockID = theme.crackedBrick;
                     } else {
                         tile.blockID = TileID::empty;
                     }
                 }
-                tile.wallID = WallID::Unsafe::blueBrick;
+                tile.wallID = theme.brickWall;
             }
         }
     }
@@ -139,15 +167,15 @@ private:
     {
         if (needsFloor) {
             for (int i = 0; i < width; ++i) {
-                if (world.getTile(x + i, y + 1).blockID != TileID::blueBrick) {
+                if (world.getTile(x + i, y + 1).blockID != theme.brick) {
                     return false;
                 }
             }
         }
         return world
-            .regionPasses(x, y + 1 - height, width, height, [](Tile &tile) {
+            .regionPasses(x, y + 1 - height, width, height, [this](Tile &tile) {
                 return tile.blockID == TileID::empty &&
-                       tile.wallID == WallID::Unsafe::blueBrick &&
+                       tile.wallID == theme.brickWall &&
                        tile.liquid == Liquid::none;
             });
     }
@@ -248,18 +276,16 @@ private:
             auto partitions = rnd.partitionRange(rnd.getInt(2, 4), toX - fromX);
             auto partItr = partitions.begin();
             int drawTile = rnd.select(
-                {TileID::blueBrick,
-                 rnd.getInt(0, 9) == 0 ? TileID::crackedBlueBrick
-                                       : TileID::empty});
+                {theme.brick,
+                 rnd.getInt(0, 9) == 0 ? theme.crackedBrick : TileID::empty});
             for (int x = fromX; x < toX; ++x) {
                 if (partItr != partitions.end() && x - fromX == *partItr) {
                     ++partItr;
-                    if (drawTile == TileID::blueBrick) {
-                        drawTile = rnd.getInt(0, 9) == 0
-                                       ? TileID::crackedBlueBrick
-                                       : TileID::empty;
+                    if (drawTile == theme.brick) {
+                        drawTile = rnd.getInt(0, 9) == 0 ? theme.crackedBrick
+                                                         : TileID::empty;
                     } else {
-                        drawTile = TileID::blueBrick;
+                        drawTile = theme.brick;
                     }
                 }
                 for (int y = centerY; y < centerY + 3; ++y) {
@@ -276,7 +302,7 @@ private:
             for (int j = 0; j < hallSize + 1; ++j) {
                 Tile &tile = world.getTile(x, y + j);
                 if (tile.blockID != TileID::empty) {
-                    if (tile.blockID == TileID::blueBrick) {
+                    if (tile.blockID == theme.brick) {
                         floor = j;
                     }
                     break;
@@ -286,7 +312,7 @@ private:
                 if (j < floor - 3) {
                     for (int i = -1; i < 2; ++i) {
                         Tile &tile = world.getTile(x + i, y + j);
-                        tile.blockID = TileID::blueBrick;
+                        tile.blockID = theme.brick;
                         if (j == floor - 4) {
                             if (i == -1) {
                                 tile.slope = Slope::bottomLeft;
@@ -315,7 +341,7 @@ private:
             for (int y = world.getUndergroundLevel();
                  y < world.getUnderworldLevel();
                  ++y) {
-                if (world.getTile(x, y).blockID != TileID::blueBrick ||
+                if (world.getTile(x, y).blockID != theme.brick ||
                     rnd.getCoarseNoise(x, y) < 0.15 ||
                     rnd.getDouble(0, 1) < 0.8) {
                     continue;
@@ -382,7 +408,7 @@ private:
 
     void addSpikes(const std::vector<Point> &zones)
     {
-        std::set<int> attachTiles{TileID::blueBrick, TileID::crackedBlueBrick};
+        std::set<int> attachTiles{theme.brick, theme.crackedBrick};
         for (int numPatches = 0.7 * zones.size(); numPatches > 0;
              --numPatches) {
             Point delta =
@@ -423,6 +449,49 @@ private:
         }
     }
 
+    void addDartTraps(const std::vector<Point> &locations)
+    {
+        int numTraps =
+            world.getWidth() * world.getHeight() / rnd.getInt(384000, 576000);
+        while (numTraps > 0) {
+            auto [x, y] = rnd.select(locations);
+            if (!isValidPlacementLocation(x, y, 1, 4, true)) {
+                continue;
+            }
+            std::vector<Point> traps;
+            for (int j = 0; j < 4; ++j) {
+                for (int dir : {-1, 1}) {
+                    Point trap = scanWhileEmpty({x, y - j}, {dir, 0}, world);
+                    double dist = std::hypot(x - trap.first, y - trap.second);
+                    if (dist > 3 && dist < 40 &&
+                        (world.getTile(trap.first, trap.second + 1).blockID ==
+                             theme.brick ||
+                         world.getTile(trap.first + dir, trap.second).blockID ==
+                             theme.brick)) {
+                        traps.push_back(trap);
+                    }
+                }
+            }
+            if (traps.empty()) {
+                continue;
+            }
+            std::shuffle(traps.begin(), traps.end(), rnd.getPRNG());
+            traps.resize(rnd.getInt(1, std::min<int>(traps.size(), 3)));
+            for (auto trap : traps) {
+                placeWire(trap, {x, y}, world);
+                world.placeFramedTile(
+                    trap.first,
+                    trap.second,
+                    TileID::trap,
+                    trap.first > x ? Variant::dartLeft : Variant::dartRight);
+            }
+            Tile &tile = world.getTile(x, y);
+            tile.blockID = TileID::pressurePlate;
+            tile.frameY = 36;
+            --numTraps;
+        }
+    }
+
     void addFurniture(int dungeonCenter, int dungeonWidth)
     {
         std::vector<Point> locations;
@@ -437,6 +506,7 @@ private:
                 }
             }
         }
+        addDartTraps(locations);
         for (auto furnitureTile :
              {TileID::alchemyTable,
               TileID::bewitchingTable,
@@ -501,8 +571,8 @@ private:
                  y < world.dungeonY + wallThickness + 1;
                  ++y) {
                 Tile &tile = world.getTile(x, y);
-                if (tile.wallID != WallID::Unsafe::blueBrick) {
-                    tile.blockID = TileID::blueBrick;
+                if (tile.wallID != theme.brickWall) {
+                    tile.blockID = theme.brick;
                 }
             }
         }
@@ -510,33 +580,13 @@ private:
             for (int y = world.dungeonY - 20; y < world.dungeonY + 1; ++y) {
                 Tile &tile = world.getTile(x, y);
                 tile.blockID = TileID::empty;
-                tile.wallID = WallID::Unsafe::blueBrick;
+                tile.wallID = theme.brickWall;
             }
         }
     }
 
-    void applyBrickTheme(
-        const std::vector<Point> &zones,
-        int dungeonCenter,
-        int dungeonWidth)
+    void applyWallVariety(const std::vector<Point> &zones)
     {
-        int themeBrick = rnd.select(
-            {TileID::blueBrick, TileID::greenBrick, TileID::pinkBrick});
-        int crackedBrick = TileID::crackedBlueBrick;
-        int brickWall = WallID::Unsafe::blueBrick;
-        int slabWall = WallID::Unsafe::blueSlab;
-        int tiledWall = WallID::Unsafe::blueTiled;
-        if (themeBrick == TileID::greenBrick) {
-            crackedBrick = TileID::crackedGreenBrick;
-            brickWall = WallID::Unsafe::greenBrick;
-            slabWall = WallID::Unsafe::greenSlab;
-            tiledWall = WallID::Unsafe::greenTiled;
-        } else if (themeBrick == TileID::pinkBrick) {
-            crackedBrick = TileID::crackedPinkBrick;
-            brickWall = WallID::Unsafe::pinkBrick;
-            slabWall = WallID::Unsafe::pinkSlab;
-            tiledWall = WallID::Unsafe::pinkTiled;
-        }
         size_t zonePortion = zones.size() / 3;
         int roomSpan = roomSize / 2 + wallThickness;
         for (size_t idx = 0; idx < zonePortion; ++idx) {
@@ -544,8 +594,8 @@ private:
             for (int i = -roomSpan; i < roomSpan; ++i) {
                 for (int j = -roomSpan; j < roomSpan; ++j) {
                     Tile &tile = world.getTile(x + i, y + j);
-                    if (tile.wallID == WallID::Unsafe::blueBrick) {
-                        tile.wallID = slabWall;
+                    if (tile.wallID == theme.brickWall) {
+                        tile.wallID = theme.slabWall;
                     }
                 }
             }
@@ -555,27 +605,9 @@ private:
             for (int i = -roomSpan; i < roomSpan; ++i) {
                 for (int j = -roomSpan; j < roomSpan; ++j) {
                     Tile &tile = world.getTile(x + i, y + j);
-                    if (tile.wallID == WallID::Unsafe::blueBrick) {
-                        tile.wallID = tiledWall;
+                    if (tile.wallID == theme.brickWall) {
+                        tile.wallID = theme.tiledWall;
                     }
-                }
-            }
-        }
-        if (themeBrick == TileID::blueBrick) {
-            return;
-        }
-        for (int x = dungeonCenter - dungeonWidth;
-             x < dungeonCenter + dungeonWidth + 2 * roomSize;
-             ++x) {
-            for (int y = 0; y < world.getUnderworldLevel(); ++y) {
-                Tile &tile = world.getTile(x, y);
-                if (tile.blockID == TileID::blueBrick) {
-                    tile.blockID = themeBrick;
-                } else if (tile.blockID == TileID::crackedBlueBrick) {
-                    tile.blockID = crackedBrick;
-                }
-                if (tile.wallID == WallID::Unsafe::blueBrick) {
-                    tile.wallID = brickWall;
                 }
             }
         }
@@ -585,6 +617,8 @@ public:
     Dungeon(Random &r, World &w)
         : rnd(r), world(w), roomSize(16), hallSize(9), wallThickness(5)
     {
+        theme.apply(rnd.select(
+            {TileID::blueBrick, TileID::greenBrick, TileID::pinkBrick}));
     }
 
     void gen(int dungeonCenter)
@@ -636,10 +670,10 @@ public:
             for (int y = yMin; y < world.getUnderworldLevel(); ++y) {
                 Tile &tile = world.getTile(x, y);
                 if (prevWasDungeon && tile.blockID == TileID::empty &&
-                    tile.wallID != WallID::Unsafe::blueBrick) {
-                    tile.blockID = TileID::blueBrick;
+                    tile.wallID != theme.brickWall) {
+                    tile.blockID = theme.brick;
                     tile.actuated = true;
-                } else if (tile.blockID == TileID::blueBrick) {
+                } else if (tile.blockID == theme.brick) {
                     prevWasDungeon = true;
                 } else {
                     prevWasDungeon = false;
@@ -664,7 +698,7 @@ public:
                            b.first + shuffleX,
                            b.second + shuffleY);
             });
-        applyBrickTheme(zones, dungeonCenter, dungeonWidth);
+        applyWallVariety(zones);
     }
 };
 

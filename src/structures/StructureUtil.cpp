@@ -28,3 +28,22 @@ Point scanWhileEmpty(Point from, Point delta, World &world)
     }
     return from;
 }
+
+void placeWire(Point from, Point to, World &world)
+{
+    world.getTile(from.first, from.second).wireRed = true;
+    while (from != to) {
+        if (from.first < to.first) {
+            ++from.first;
+        } else if (from.first > to.first) {
+            --from.first;
+        }
+        world.getTile(from.first, from.second).wireRed = true;
+        if (from.second < to.second) {
+            ++from.second;
+        } else if (from.second > to.second) {
+            --from.second;
+        }
+        world.getTile(from.first, from.second).wireRed = true;
+    }
+}

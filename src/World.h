@@ -15,6 +15,8 @@ enum class Variant {
     corruption,
     crimson,
     crystal,
+    dartLeft,
+    dartRight,
     desert,
     dungeon,
     dynasty,
