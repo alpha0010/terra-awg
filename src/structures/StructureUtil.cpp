@@ -2,6 +2,7 @@
 
 #include "World.h"
 #include <cmath>
+#include <set>
 
 int binLocation(int x, int y, int maxY)
 {
@@ -24,6 +25,22 @@ bool isLocationUsed(
         }
     }
     return false;
+}
+
+inline const std::set<int> nonSolidTiles{
+    TileID::empty,           TileID::alchemyTable, TileID::bench,
+    TileID::bewitchingTable, TileID::boneWelder,   TileID::book,
+    TileID::bottle,          TileID::bubble,       TileID::catacomb,
+    TileID::chest,           TileID::chestGroup2,  TileID::lihzahrdAltar,
+    TileID::painting3x3,     TileID::painting6x4,  TileID::pot,
+    TileID::rollingCactus,   TileID::rope,         TileID::silverCoin,
+    TileID::smallPile,       TileID::statue,       TileID::waterCandle,
+    TileID::woodenBeam,
+};
+
+bool isSolidBlock(int tileId)
+{
+    return !nonSolidTiles.contains(tileId);
 }
 
 Point addPts(Point a, Point b)

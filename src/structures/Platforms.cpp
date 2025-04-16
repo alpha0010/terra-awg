@@ -1,6 +1,7 @@
 #include "structures/Platforms.h"
 
 #include "World.h"
+#include "structures/StructureUtil.h"
 
 namespace Anchor
 {
@@ -24,27 +25,27 @@ void updatePlatformAnchor(int x, int y, World &world)
     }
     Tile &prev = world.getTile(x - 1, y);
     Tile &next = world.getTile(x + 1, y);
-    if (prev.blockID == TileID::empty) {
-        if (next.blockID == TileID::empty) {
-            cur.frameX = Anchor::single;
-        } else if (next.blockID == TileID::platform) {
-            cur.frameX = Anchor::endcapLeft;
-        } else {
-            cur.frameX = Anchor::attachRightEndcap;
-        }
-    } else if (prev.blockID == TileID::platform) {
-        if (next.blockID == TileID::empty) {
-            cur.frameX = Anchor::endcapRight;
-        } else if (next.blockID == TileID::platform) {
+    if (prev.blockID == TileID::platform) {
+        if (next.blockID == TileID::platform) {
             cur.frameX = Anchor::flat;
-        } else {
+        } else if (isSolidBlock(next.blockID)) {
             cur.frameX = Anchor::attachRight;
+        } else {
+            cur.frameX = Anchor::endcapRight;
+        }
+    } else if (isSolidBlock(prev.blockID)) {
+        if (next.blockID == TileID::platform) {
+            cur.frameX = Anchor::attachLeft;
+        } else if (isSolidBlock(next.blockID)) {
+            cur.frameX = Anchor::single;
+        } else {
+            cur.frameX = Anchor::attachLeftEndcap;
         }
     } else {
-        if (next.blockID == TileID::empty) {
-            cur.frameX = Anchor::attachLeftEndcap;
-        } else if (next.blockID == TileID::platform) {
-            cur.frameX = Anchor::attachLeft;
+        if (next.blockID == TileID::platform) {
+            cur.frameX = Anchor::endcapLeft;
+        } else if (isSolidBlock(next.blockID)) {
+            cur.frameX = Anchor::attachRightEndcap;
         } else {
             cur.frameX = Anchor::single;
         }

@@ -248,6 +248,7 @@ inline const std::map<Painting, PaintingDetails> paintingData{
     {Painting::catacomb7, {TileID::catacomb, 0, 324}},
     {Painting::catacomb8, {TileID::catacomb, 0, 378}},
     {Painting::catacomb9, {TileID::catacomb, 0, 432}},
+    {Painting::ancientTablet, {TileID::painting6x4, 108, 936}},
     {Painting::dryadisque, {TileID::painting6x4, 0, 360}},
     {Painting::facingTheCerebralMastermind, {TileID::painting6x4, 0, 936}},
     {Painting::goblinsPlayingPoker, {TileID::painting6x4, 0, 288}},

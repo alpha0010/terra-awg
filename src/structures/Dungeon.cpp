@@ -536,6 +536,7 @@ private:
         int dungeonWidth,
         int width,
         int height,
+        int radius,
         const std::vector<Point> &usedLocations)
     {
         while (true) {
@@ -546,7 +547,7 @@ private:
                 world.getUndergroundLevel(),
                 world.getUnderworldLevel());
             if (isValidPlacementLocation(x, y, width + 4, height + 4, false) &&
-                !isLocationUsed(x, y, 40, usedLocations)) {
+                !isLocationUsed(x, y, radius, usedLocations)) {
                 return {x, y};
             }
         }
@@ -595,14 +596,15 @@ private:
                 dungeonWidth,
                 width,
                 height,
+                40,
                 usedLocations);
             usedLocations.emplace_back(x, y);
-            world.placePainting(x + 2, y - height - 2, curPainting);
+            world.placePainting(x + 2, y - height - 1, curPainting);
         }
-        numPaintings *= 0.8;
+        numPaintings *= 2;
         for (int i = 0; i < numPaintings; ++i) {
             Painting curPainting =
-                rnd.getBool()
+                rnd.getInt(0, 3) != 0
                     ? rnd.select(
                           {Painting::hangingSkeleton, Painting::wallSkeleton})
                     : rnd.select(
@@ -621,9 +623,10 @@ private:
                 dungeonWidth,
                 width,
                 height,
+                25,
                 usedLocations);
             usedLocations.emplace_back(x, y);
-            world.placePainting(x + 2, y - height - 2, curPainting);
+            world.placePainting(x + 2, y - height - 1, curPainting);
         }
     }
 

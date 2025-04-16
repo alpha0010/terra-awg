@@ -17,6 +17,8 @@ bool isLocationUsed(
     int radius,
     const std::vector<Point> &usedLocations);
 
+bool isSolidBlock(int tileId);
+
 Point addPts(Point a, Point b);
 
 Point subPts(Point a, Point b);

@@ -69,6 +69,7 @@ enum class Painting {
     catacomb8,
     catacomb9,
     // 6x4
+    ancientTablet,
     dryadisque,
     facingTheCerebralMastermind,
     goblinsPlayingPoker,

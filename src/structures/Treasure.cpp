@@ -19,31 +19,24 @@ bool listContains(const T &list, const U &value)
     return std::find(std::begin(list), std::end(list), value) != std::end(list);
 }
 
-inline const std::set<int> nonSolidTiles{
-    TileID::empty,         TileID::alchemyTable,
-    TileID::bench,         TileID::bewitchingTable,
-    TileID::boneWelder,    TileID::book,
-    TileID::bottle,        TileID::bubble,
-    TileID::catacomb,      TileID::chest,
-    TileID::chestGroup2,   TileID::leaf,
-    TileID::lihzahrdAltar, TileID::livingWood,
-    TileID::painting3x3,   TileID::painting6x4,
-    TileID::pot,           TileID::rollingCactus,
-    TileID::rope,          TileID::silverCoin,
-    TileID::smallPile,     TileID::statue,
-    TileID::thinIce,       TileID::waterCandle,
+inline const std::set<int> placementAvoidTiles{
+    TileID::leaf,
+    TileID::livingWood,
+    TileID::thinIce,
 };
 
 bool isPlacementCandidate(int x, int y, World &world)
 {
-    if (nonSolidTiles.contains(world.getTile(x, y).blockID) ||
-        nonSolidTiles.contains(world.getTile(x + 1, y).blockID)) {
-        return false;
-    }
-    return world.regionPasses(x, y - 3, 2, 3, [](Tile &tile) {
-        return tile.blockID == TileID::empty && tile.liquid != Liquid::lava &&
-               tile.liquid != Liquid::shimmer;
-    });
+    int floorLeft = world.getTile(x, y).blockID;
+    int floorRight = world.getTile(x + 1, y).blockID;
+    return isSolidBlock(floorLeft) && isSolidBlock(floorRight) &&
+           !placementAvoidTiles.contains(floorLeft) &&
+           !placementAvoidTiles.contains(floorRight) &&
+           world.regionPasses(x, y - 3, 2, 3, [](Tile &tile) {
+               return tile.blockID == TileID::empty &&
+                      tile.liquid != Liquid::lava &&
+                      tile.liquid != Liquid::shimmer;
+           });
 }
 
 int testOrbHeartCandidate(int x, int y, World &world)

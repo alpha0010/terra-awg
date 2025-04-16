@@ -232,6 +232,9 @@ void genPyramid(Random &rnd, World &world)
     std::tie(x, y) = makeHall(x, y, 12, {1, 0}, world);
     std::tie(x, y) = makeHall(x, y, 14, {-1, 1}, world);
     std::tie(x, y) = makeHall(x, y, 5, {-1, 0}, world);
+    if (rnd.getBool()) {
+        world.placePainting(x + 11, y - 13, Painting::ancientTablet);
+    }
     std::tie(x, y) = fillTreasureRoom(x, y, rnd, world);
     std::tie(x, y) = makeHall(x, y, 18, {-1, 0}, world);
     std::tie(x, y) = makeHall(x, y, 30, {1, 1}, world);
