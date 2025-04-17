@@ -3,6 +3,8 @@
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
+#include "structures/LootRules.h"
+#include "structures/StructureUtil.h"
 #include <iostream>
 
 std::pair<int, int> getHexCentroid(int x, int y)
@@ -39,6 +41,43 @@ bool isHiveEdge(int x, int y, World &world)
     return !world.regionPasses(x - 1, y - 1, 3, 3, [](Tile &tile) {
         return tile.wallID == WallID::Unsafe::hive;
     });
+}
+
+Point selectLarvaeLocation(
+    int hiveX,
+    int hiveY,
+    int size,
+    std::vector<Point> &usedLocations,
+    Random &rnd,
+    World &world)
+{
+    for (int numTries = 0; numTries < 100; ++numTries) {
+        int x = rnd.getInt(hiveX - size, hiveX + size);
+        int y = rnd.getInt(hiveY - size, hiveY + size);
+        if (world.getTile(x, y).blockID == TileID::empty) {
+            y = scanWhileEmpty({x, y}, {0, 1}, world).second;
+        }
+        if (world.getTile(x + 1, y).wallID == WallID::Unsafe::hive &&
+            world.regionPasses(
+                x,
+                y - 2,
+                3,
+                3,
+                [](Tile &tile) {
+                    return tile.blockID == TileID::empty &&
+                           tile.liquid == Liquid::none;
+                }) &&
+            world.regionPasses(
+                x,
+                y + 1,
+                3,
+                1,
+                [](Tile &tile) { return tile.blockID == TileID::hive; }) &&
+            !isLocationUsed(x, y, 35, usedLocations)) {
+            return {x, y};
+        }
+    }
+    return {-1, -1};
 }
 
 void fillHive(Random &rnd, World &world)
@@ -89,12 +128,49 @@ void fillHive(Random &rnd, World &world)
             }
         }
     }
+    world.queuedTreasures.emplace_back(
+        [hiveX, hiveY, size](Random &rnd, World &world) {
+            std::vector<Point> usedLocations;
+            for (int larvaCount = rnd.getInt(1, std::max(2.0, size / 25));
+                 larvaCount > 0;
+                 --larvaCount) {
+                auto [x, y] = selectLarvaeLocation(
+                    hiveX,
+                    hiveY,
+                    size,
+                    usedLocations,
+                    rnd,
+                    world);
+                if (x != -1) {
+                    usedLocations.emplace_back(x, y);
+                    world.placeFramedTile(x, y - 2, TileID::larva);
+                }
+            }
+            if (rnd.getDouble(0, 1) > 0.4) {
+                auto [x, y] = selectLarvaeLocation(
+                    hiveX,
+                    hiveY,
+                    size,
+                    usedLocations,
+                    rnd,
+                    world);
+                if (x != -1) {
+                    Chest &chest = world.placeChest(x, y - 1, Variant::honey);
+                    if (y < world.getCavernLevel()) {
+                        fillUndergroundHoneyChest(chest, rnd, world);
+                    } else {
+                        fillCavernHoneyChest(chest, rnd, world);
+                    }
+                }
+            }
+        });
 }
 
 void genHive(Random &rnd, World &world)
 {
     std::cout << "Importing bees\n";
-    int numHives = rnd.getInt(2, 4);
+    int bonusHives = world.getWidth() * world.getHeight() / 5750000;
+    int numHives = bonusHives > 0 ? 2 + rnd.getInt(0, bonusHives) : 2;
     for (int i = 0; i < numHives; ++i) {
         fillHive(rnd, world);
     }

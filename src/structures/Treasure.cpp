@@ -204,37 +204,6 @@ void placeOrbHearts(
     }
 }
 
-void placeLarvae(LocationBins &locations, Random &rnd, World &world)
-{
-    std::vector<Point> hiveLocations;
-    for (const auto &locBin : locations) {
-        for (auto [x, y] : locBin.second) {
-            if (world.getTile(x, y - 1).wallID == WallID::Unsafe::hive) {
-                hiveLocations.emplace_back(x, y);
-            }
-        }
-    }
-    int larvaCount = rnd.getInt(3, 6);
-    int lastX = -1;
-    int lastY = -1;
-    for (int numTries = 0; larvaCount > 0 && numTries < 100; ++numTries) {
-        auto [x, y] = rnd.select(hiveLocations);
-        if (std::hypot(lastX - x, lastY - y) < 75) {
-            continue;
-        }
-        Tile &tile = world.getTile(x, y - 1);
-        if (tile.wallID == WallID::Unsafe::hive &&
-            tile.liquid == Liquid::none &&
-            isPlacementCandidate(x - 1, y, world) &&
-            isPlacementCandidate(x + 2, y, world)) {
-            world.placeFramedTile(x, y - 3, TileID::larva);
-            lastX = x;
-            lastY = y;
-            --larvaCount;
-        }
-    }
-}
-
 void placeManaCrystals(
     int maxBin,
     LocationBins &locations,
@@ -773,7 +742,6 @@ void genTreasure(Random &rnd, World &world)
     int maxBin =
         binLocation(world.getWidth(), world.getHeight(), world.getHeight());
     placeJungleShrines(rnd, world);
-    placeLarvae(flatLocations, rnd, world);
     placeLifeCrystals(maxBin, flatLocations, rnd, world);
     placeAltars(maxBin, flatLocations, rnd, world);
     placeOrbHearts(maxBin, orbHeartLocations, rnd, world);

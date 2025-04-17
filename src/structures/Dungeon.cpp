@@ -710,7 +710,7 @@ private:
 
     void addFurniture(int dungeonCenter, int dungeonWidth)
     {
-        int numPlacements =
+        double numPlacements =
             world.getWidth() * world.getHeight() / rnd.getInt(144000, 192000);
         std::vector<Point> usedLocations;
         while (numPlacements > 0) {
@@ -724,6 +724,7 @@ private:
                 data,
                 usedLocations);
             if (x == -1) {
+                numPlacements -= 0.1;
                 continue;
             }
             usedLocations.emplace_back(x, y);
