@@ -8,6 +8,7 @@
 #include "structures/LootRules.h"
 #include "structures/Platforms.h"
 #include "structures/StructureUtil.h"
+#include "structures/data/Furniture.h"
 #include <algorithm>
 #include <iostream>
 #include <set>
@@ -18,6 +19,7 @@ struct DungeonTheme {
     int brickWall;
     int slabWall;
     int tiledWall;
+    Data::Variant furniture;
 
     void apply(int themeBrick)
     {
@@ -27,16 +29,19 @@ struct DungeonTheme {
             brickWall = WallID::Unsafe::blueBrick;
             slabWall = WallID::Unsafe::blueSlab;
             tiledWall = WallID::Unsafe::blueTiled;
+            furniture = Data::Variant::blueDungeon;
         } else if (themeBrick == TileID::greenBrick) {
             crackedBrick = TileID::crackedGreenBrick;
             brickWall = WallID::Unsafe::greenBrick;
             slabWall = WallID::Unsafe::greenSlab;
             tiledWall = WallID::Unsafe::greenTiled;
+            furniture = Data::Variant::greenDungeon;
         } else {
             crackedBrick = TileID::crackedPinkBrick;
             brickWall = WallID::Unsafe::pinkBrick;
             slabWall = WallID::Unsafe::pinkSlab;
             tiledWall = WallID::Unsafe::pinkTiled;
+            furniture = Data::Variant::pinkDungeon;
         }
     }
 };
@@ -492,7 +497,7 @@ private:
         }
     }
 
-    void addFurniture(int dungeonCenter, int dungeonWidth)
+    void addFunctionalFurniture(int dungeonCenter, int dungeonWidth)
     {
         std::vector<Point> locations;
         for (int x = dungeonCenter - dungeonWidth;
@@ -627,6 +632,115 @@ private:
                 usedLocations);
             usedLocations.emplace_back(x, y);
             world.placePainting(x + 2, y - height - 1, curPainting);
+        }
+    }
+
+    bool canPlaceFurniture(int x, int y, TileBuffer &data)
+    {
+        for (int i = 0; i < data.getWidth(); ++i) {
+            for (int j = 0; j < data.getHeight(); ++j) {
+                Tile &tile = world.getTile(x + i, y + j);
+                if (tile.wallID != theme.brickWall) {
+                    return false;
+                }
+                switch (data.getTile(i, j).blockID) {
+                case TileID::empty:
+                    if (isSolidBlock(tile.blockID)) {
+                        return false;
+                    }
+                    break;
+                case TileID::cloud:
+                    if (tile.blockID != theme.brick &&
+                        tile.blockID != theme.crackedBrick) {
+                        return false;
+                    }
+                    break;
+                default:
+                    if (tile.blockID != TileID::empty) {
+                        return false;
+                    }
+                    break;
+                }
+            }
+        }
+        return true;
+    }
+
+    Point selectFurnitureLocation(
+        int dungeonCenter,
+        int dungeonWidth,
+        TileBuffer &data,
+        const std::vector<Point> &usedLocations)
+    {
+        bool anchorTop =
+            data.getWidth() > 1 && data.getTile(1, 0).blockID == TileID::cloud;
+        bool anchorBot =
+            data.getWidth() > 1 &&
+            data.getTile(1, data.getHeight() - 1).blockID == TileID::cloud;
+        for (int tries = 0; tries < 10000; ++tries) {
+            int x = rnd.getInt(
+                dungeonCenter - dungeonWidth,
+                dungeonCenter + dungeonWidth + 2 * roomSize);
+            int y = rnd.getInt(
+                world.getUndergroundLevel(),
+                world.getUnderworldLevel());
+            if (world.getTile(x, y).wallID != theme.brickWall) {
+                continue;
+            }
+            if (anchorTop && world.getTile(x + 1, y).blockID == TileID::empty) {
+                y = scanWhileEmpty({x + 1, y}, {0, -1}, world).second - 1;
+            } else if (
+                anchorBot &&
+                world.getTile(x + 1, y + data.getHeight() - 1).blockID ==
+                    TileID::empty) {
+                y = scanWhileEmpty(
+                        {x + 1, y + data.getHeight() - 1},
+                        {0, 1},
+                        world)
+                        .second -
+                    data.getHeight() + 2;
+            }
+            if (canPlaceFurniture(x, y, data) &&
+                !isLocationUsed(x, y, 12, usedLocations)) {
+                return {x, y};
+            }
+        }
+        return {-1, -1};
+    }
+
+    void addFurniture(int dungeonCenter, int dungeonWidth)
+    {
+        int numPlacements =
+            world.getWidth() * world.getHeight() / rnd.getInt(144000, 192000);
+        std::vector<Point> usedLocations;
+        while (numPlacements > 0) {
+            TileBuffer data = getFurniture(
+                rnd.select(Data::furnitureLayouts),
+                theme.furniture,
+                world.getFramedTiles());
+            auto [x, y] = selectFurnitureLocation(
+                dungeonCenter,
+                dungeonWidth,
+                data,
+                usedLocations);
+            if (x == -1) {
+                continue;
+            }
+            usedLocations.emplace_back(x, y);
+            for (int i = 0; i < data.getWidth(); ++i) {
+                for (int j = 0; j < data.getHeight(); ++j) {
+                    Tile &dataTile = data.getTile(i, j);
+                    if (dataTile.blockID == TileID::empty ||
+                        dataTile.blockID == TileID::cloud) {
+                        continue;
+                    }
+                    Tile &tile = world.getTile(x + i, y + j);
+                    tile.blockID = dataTile.blockID;
+                    tile.frameX = dataTile.frameX;
+                    tile.frameY = dataTile.frameY;
+                }
+            }
+            --numPlacements;
         }
     }
 
@@ -783,10 +897,11 @@ public:
         addPlatforms(zones);
         addDoors();
         addShelves(dungeonCenter, dungeonWidth);
-        addFurniture(dungeonCenter, dungeonWidth);
+        addFunctionalFurniture(dungeonCenter, dungeonWidth);
         addSpikes(zones);
         makeEntry();
         addPaintings(dungeonCenter, dungeonWidth);
+        addFurniture(dungeonCenter, dungeonWidth);
         std::sort(
             zones.begin(),
             zones.end(),

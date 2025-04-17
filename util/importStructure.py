@@ -3,6 +3,11 @@
 import sys
 import textwrap
 
+try:
+    from natsort import natsorted
+except ModuleNotFoundError:
+    natsorted = sorted
+
 def readUint8(f):
     return int.from_bytes(f.read(1))
 
@@ -40,7 +45,7 @@ def readBitVec(f):
 
 def loadTiles(filename):
     with open(filename, mode='rb') as f:
-        print(readString(f))
+        print('//', readString(f))
         version = readUint32(f)
         assert version == 10279, f'Unknown file version {version}'
         framedTiles = readBitVec(f)
@@ -159,7 +164,7 @@ def serializeTile(tile, framedTiles):
         data.append(flags)
     return data
 
-for filename in sys.argv[1:]:
+for filename in natsorted(sys.argv[1:]):
     (tiles, framedTiles) = loadTiles(filename)
     data = [len(tiles) << 8 | len(tiles[0])]
     prevTile = []
@@ -173,9 +178,11 @@ for filename in sys.argv[1:]:
                 rleIndex = len(data)
                 data += curTile
                 prevTile = curTile
+    print('{')
     print('\n'.join(textwrap.wrap(
         ', '.join([str(val) for val in data]),
         width=79,
         initial_indent='    ',
         subsequent_indent='    '
     )))
+    print('},')
