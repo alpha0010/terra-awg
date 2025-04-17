@@ -55,8 +55,8 @@ std::pair<int, int> framedTileToDims(int tileID)
     }
 }
 
-World::World()
-    : width(6400), height(1800), tiles(width * height),
+World::World(int w, int h)
+    : width(w), height(h), tiles(width * height),
       framedTiles(genFramedTileLookup())
 {
 }

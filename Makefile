@@ -1,10 +1,12 @@
 # Config values
 
+CFLAGS := -Wall -Wextra -pedantic -Werror -O2 -msse4.1 -mpclmul
 CXXFLAGS := -Wall -Wextra -pedantic -Werror -std=c++20 -O2 -msse4.1 -mpclmul
 
 SRCS := $(wildcard src/*.cpp) $(wildcard src/biomes/*.cpp) \
     $(wildcard src/map/*.cpp) $(wildcard src/structures/*.cpp) \
-    $(wildcard src/structures/data/*.cpp) $(wildcard src/vendor/*.cpp)
+    $(wildcard src/structures/data/*.cpp) $(wildcard src/vendor/*.c) \
+    $(wildcard src/vendor/*.cpp)
 OUT := terra-awg
 
 BUILD_DIR := build
@@ -14,12 +16,16 @@ BUILD_DIR := build
 
 CPPFLAGS := -Isrc
 
-OBJS := $(SRCS:%.cpp=$(BUILD_DIR)/%.o)
+OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 
 $(BUILD_DIR)/$(OUT): $(OBJS)
 	$(CXX) $(OBJS) -o $@ $(LDFLAGS)
 
-$(BUILD_DIR)/%.o: %.cpp
+$(BUILD_DIR)/%.c.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/%.cpp.o: %.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 

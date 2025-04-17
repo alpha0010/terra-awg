@@ -16,7 +16,7 @@ void writeLittleEndian(std::ostream &out, NumberType val)
 
 } // namespace
 
-Writer::Writer() : out("test.wld", std::ios::binary) {}
+Writer::Writer(const std::string &filename) : out(filename, std::ios::binary) {}
 
 void Writer::putBitVec(const std::vector<bool> &vec)
 {

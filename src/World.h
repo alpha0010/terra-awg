@@ -20,7 +20,7 @@ private:
     std::vector<bool> framedTiles;
 
 public:
-    World();
+    World(int w, int h);
 
     int getWidth() const;
     int getHeight() const;

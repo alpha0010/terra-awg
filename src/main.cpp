@@ -1,4 +1,5 @@
 #include "Cleanup.h"
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "Writer.h"
@@ -51,11 +52,12 @@ uint64_t getBinaryTime()
 
 void doWorldGen(Random &rnd, World &world)
 {
+    world.planBiomes(rnd);
+    rnd.initNoise(world.getWidth(), world.getHeight(), 0.07);
     genWorldBase(rnd, world);
     genOceans(rnd, world);
     genCloud(rnd, world);
     genMarbleCave(rnd, world);
-    world.planBiomes(rnd);
     genSnow(rnd, world);
     genDesert(rnd, world);
     genJungle(rnd, world);
@@ -86,9 +88,16 @@ void doWorldGen(Random &rnd, World &world)
     genVines(rnd, world);
 }
 
-void saveWorldFile(Random &rnd, World &world)
+void saveWorldFile(Config &conf, Random &rnd, World &world)
 {
-    Writer w;
+    std::string filename(conf.name);
+    for (char &c : filename) {
+        if (!std::isalnum(c)) {
+            c = '_';
+        }
+    }
+    filename += ".wld";
+    Writer w(filename);
     w.putUint32(279); // File format version.
     w.write("relogic", 7);
     w.putUint8(2);    // File type "world".
@@ -102,32 +111,31 @@ void saveWorldFile(Random &rnd, World &world)
     w.putBitVec(world.getFramedTiles());
     std::vector<uint32_t> sectionPointers{w.tellp()};
 
-    const char *mapName = "test";
-    w.putString(mapName); // Map name.
-    w.putString("AWG");   // Seed.
-    w.skipBytes(8);       // Generator version. (Is this needed?)
+    w.putString(conf.name); // Map name.
+    w.putString("AWG");     // Seed.
+    w.skipBytes(8);         // Generator version. (Is this needed?)
     for (int i = 0; i < 16; ++i) {
         w.putUint8(rnd.getByte()); // GUID.
     }
     int worldID = rnd.getInt(0, std::numeric_limits<int32_t>::max());
-    w.putUint32(worldID);                // World ID.
-    w.putUint32(0);                      // Map left pixel.
-    w.putUint32(16 * world.getWidth());  // Map right pixel.
-    w.putUint32(0);                      // Map top pixel.
-    w.putUint32(16 * world.getHeight()); // Map bottom pixel.
-    w.putUint32(world.getHeight());      // Vertical tiles.
-    w.putUint32(world.getWidth());       // Horizontal tiles.
-    w.putUint32(0);                      // Game mode.
-    w.putBool(false);                    // Drunk world.
-    w.putBool(false);                    // For the worthy.
-    w.putBool(false);                    // Celebrationmk10.
-    w.putBool(false);                    // The constant.
-    w.putBool(false);                    // Not the bees.
-    w.putBool(false);                    // Don't dig up.
-    w.putBool(false);                    // No traps.
-    w.putBool(false);                    // Get fixed boi.
-    w.putUint64(getBinaryTime());        // Creation time.
-    w.putUint8(rnd.getInt(0, 8));        // Moon type.
+    w.putUint32(worldID);                          // World ID.
+    w.putUint32(0);                                // Map left pixel.
+    w.putUint32(16 * world.getWidth());            // Map right pixel.
+    w.putUint32(0);                                // Map top pixel.
+    w.putUint32(16 * world.getHeight());           // Map bottom pixel.
+    w.putUint32(world.getHeight());                // Vertical tiles.
+    w.putUint32(world.getWidth());                 // Horizontal tiles.
+    w.putUint32(static_cast<uint32_t>(conf.mode)); // Game mode.
+    w.putBool(false);                              // Drunk world.
+    w.putBool(false);                              // For the worthy.
+    w.putBool(false);                              // Celebrationmk10.
+    w.putBool(false);                              // The constant.
+    w.putBool(false);                              // Not the bees.
+    w.putBool(false);                              // Don't dig up.
+    w.putBool(false);                              // No traps.
+    w.putBool(false);                              // Get fixed boi.
+    w.putUint64(getBinaryTime());                  // Creation time.
+    w.putUint8(rnd.getInt(0, 8));                  // Moon type.
     for (auto part : rnd.partitionRange(4, world.getWidth())) {
         w.putUint32(part); // Tree style change locations.
     }
@@ -466,7 +474,7 @@ void saveWorldFile(Random &rnd, World &world)
     sectionPointers.push_back(w.tellp());
 
     w.putBool(true); // Begin footer.
-    w.putString(mapName);
+    w.putString(conf.name);
     w.putUint32(worldID);
 
     // Finalize.
@@ -480,8 +488,10 @@ int main()
 {
     auto mainStart = std::chrono::high_resolution_clock::now();
 
+    Config conf = readConfig();
+
     Random rnd;
-    World world;
+    World world{conf.width, conf.height};
 
     world.isCrimson = rnd.getBool();
     world.copperVariant = rnd.select({TileID::copperOre, TileID::tinOre});
@@ -490,15 +500,18 @@ int main()
     world.goldVariant = rnd.select({TileID::goldOre, TileID::platinumOre});
 
     doWorldGen(rnd, world);
-    saveWorldFile(rnd, world);
+    saveWorldFile(conf, rnd, world);
 
     auto mainEnd = std::chrono::high_resolution_clock::now();
     std::cout << "\nTime: "
               << 0.001 * std::chrono::duration_cast<std::chrono::milliseconds>(
                              mainEnd - mainStart)
                              .count()
-              << "s\n\nRendering map preview\n";
+              << "s\n\n";
 
-    savePreviewImage(world);
+    if (conf.mapPreview) {
+        std::cout << "Rendering map preview\n";
+        savePreviewImage(world);
+    }
     return 0;
 }

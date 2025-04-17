@@ -749,7 +749,6 @@ private:
         int scanDist = 0.1 * world.getWidth();
         world.dungeonX = dungeonCenter;
         world.dungeonY = world.spawnY;
-        int minSurface = 0.7 * world.getUndergroundLevel() - 100;
         for (int swapI = 0; swapI < scanDist; ++swapI) {
             int i = swapI / 2;
             if (swapI % 2 == 0) {
@@ -767,6 +766,7 @@ private:
                 break;
             }
         }
+        int minSurface = 0.6 * world.getUndergroundLevel();
         std::vector<int> surface;
         for (int i = -26; i < 26; ++i) {
             surface.push_back(

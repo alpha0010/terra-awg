@@ -15,7 +15,7 @@ private:
     std::ofstream out;
 
 public:
-    Writer();
+    Writer(const std::string &filename);
 
     void putBitVec(const std::vector<bool> &vec);
     void putBool(bool val);

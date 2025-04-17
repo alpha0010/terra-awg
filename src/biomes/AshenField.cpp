@@ -9,7 +9,7 @@
 
 void genAshenField(Random &rnd, World &world)
 {
-    double width = rnd.getInt(175, 200);
+    double width = 100 + world.getWidth() / rnd.getInt(64, 85);
     int minX = world.getWidth() / 2 - width;
     int maxX = world.getWidth() / 2 + width;
     int minY = world.spawnY - 20;

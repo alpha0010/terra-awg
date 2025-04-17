@@ -44,7 +44,6 @@ void genOreVeins(Random &rnd, World &world, int oreRoof, int oreFloor, int ore)
 
 void genWorldBase(Random &rnd, World &world)
 {
-    rnd.initNoise(world.getWidth(), world.getHeight(), 0.07);
     std::cout << "Generating base terrain\n";
     double surfaceLevel = rnd.getDouble(
         0.7 * world.getUndergroundLevel(),
