@@ -85,6 +85,7 @@ void doWorldGen(Random &rnd, World &world)
     genTraps(rnd, world);
     genTracks(rnd, world);
     smoothSurfaces(world);
+    finalizeWalls(rnd, world);
     genVines(rnd, world);
 }
 

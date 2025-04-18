@@ -1,5 +1,6 @@
 #include "Cleanup.h"
 
+#include "Random.h"
 #include "Util.h"
 #include "World.h"
 #include "ids/Paint.h"
@@ -201,6 +202,32 @@ void smoothSurfaces(World &world)
                 }
                 if (slopedTiles.contains(tile.blockID)) {
                     tile.slope = computeSlope(world, x, y);
+                }
+            }
+        });
+}
+
+void finalizeWalls(Random &rnd, World &world)
+{
+    std::cout << "Hardening walls\n";
+    std::map<int, int> stoneWalls;
+    for (int wallId : WallVariants::dirt) {
+        stoneWalls[wallId] = rnd.select(WallVariants::stone);
+    }
+    double bound =
+        (4 * world.getCavernLevel() + world.getUnderworldLevel()) / 5;
+    parallelFor(
+        std::views::iota(0, world.getWidth()),
+        [bound, &stoneWalls, &rnd, &world](int x) {
+            for (int y = world.getCavernLevel(); y < world.getHeight(); ++y) {
+                double threshold = 15 * (bound - y) / world.getHeight();
+                if (rnd.getCoarseNoise(x, y) < threshold) {
+                    continue;
+                }
+                Tile &tile = world.getTile(x, y);
+                auto itr = stoneWalls.find(tile.wallID);
+                if (tile.blockID != TileID::dirt && itr != stoneWalls.end()) {
+                    tile.wallID = itr->second;
                 }
             }
         });
