@@ -36,6 +36,7 @@ void genCrimson(Random &rnd, World &world)
         {TileID::goldOre, TileID::crimtane},
         {TileID::platinumOre, TileID::crimtane},
         {TileID::leaf, TileID::empty},
+        {TileID::mahoganyLeaf, TileID::empty},
         {TileID::sand, TileID::crimsand},
         {TileID::jungleGrass, TileID::crimsonJungleGrass},
         {TileID::mushroomGrass, TileID::crimsonJungleGrass},
@@ -75,6 +76,11 @@ void genCrimson(Random &rnd, World &world)
         TileID::leadOre,
         TileID::silverOre,
         TileID::tungstenOre};
+    std::set<int> tunnelSkipTiles{
+        TileID::livingWood,
+        TileID::leaf,
+        TileID::livingMahogany,
+        TileID::mahoganyLeaf};
     // Dig surface smooth tunnel network, edged with crimstone.
     for (int x = surfaceX - scanDist; x < surfaceX + scanDist; ++x) {
         for (int y = 0.45 * world.getUndergroundLevel();
@@ -86,8 +92,8 @@ void genCrimson(Random &rnd, World &world)
                  0.16});
             if (std::abs(rnd.getBlurNoise(2 * x, 2 * y) + 0.1) < threshold) {
                 Tile &tile = world.getTile(x, y);
-                if (tile.blockID == TileID::livingWood ||
-                    tile.blockID == TileID::leaf) {
+                if (tunnelSkipTiles.contains(tile.blockID) ||
+                    tile.wallID == WallID::Unsafe::livingWood) {
                     continue;
                 }
                 if (std::abs(rnd.getBlurNoise(2 * x, 2 * y) + 0.1) <
@@ -135,7 +141,9 @@ void genCrimson(Random &rnd, World &world)
                             auto blockItr = crimsonBlocks.find(tile.blockID);
                             if (blockItr != crimsonBlocks.end()) {
                                 tile.blockID = blockItr->second;
-                            } else if (tile.blockID == TileID::livingWood) {
+                            } else if (
+                                tile.blockID == TileID::livingWood ||
+                                tile.blockID == TileID::livingMahogany) {
                                 tile.blockPaint = Paint::red;
                             }
                             auto wallItr = crimsonWalls.find(tile.wallID);

@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <iostream>
 #include <map>
+#include <set>
 
 void genCorruption(Random &rnd, World &world)
 {
@@ -35,6 +36,7 @@ void genCorruption(Random &rnd, World &world)
         {TileID::goldOre, TileID::demonite},
         {TileID::platinumOre, TileID::demonite},
         {TileID::leaf, TileID::empty},
+        {TileID::mahoganyLeaf, TileID::empty},
         {TileID::sand, TileID::ebonsand},
         {TileID::jungleGrass, TileID::corruptJungleGrass},
         {TileID::mushroomGrass, TileID::corruptJungleGrass},
@@ -68,6 +70,11 @@ void genCorruption(Random &rnd, World &world)
           WallID::Unsafe::granite}) {
         corruptWalls[wallId] = rnd.select(WallVariants::corruption);
     }
+    std::set<int> chasmSkipTiles{
+        TileID::livingWood,
+        TileID::leaf,
+        TileID::livingMahogany,
+        TileID::mahoganyLeaf};
     // Dig surface chasms, edged with ebonstone.
     for (int x = surfaceX - scanDist; x < surfaceX + scanDist; ++x) {
         for (int y = 0.45 * world.getUndergroundLevel();
@@ -79,8 +86,8 @@ void genCorruption(Random &rnd, World &world)
                  0.16});
             if (std::abs(rnd.getCoarseNoise(3 * x, y) + 0.1) < threshold) {
                 Tile &tile = world.getTile(x, y);
-                if (tile.blockID == TileID::livingWood ||
-                    tile.blockID == TileID::leaf) {
+                if (chasmSkipTiles.contains(tile.blockID) ||
+                    tile.wallID == WallID::Unsafe::livingWood) {
                     continue;
                 }
                 if (std::abs(rnd.getCoarseNoise(3 * x, y) + 0.1) <
@@ -129,7 +136,9 @@ void genCorruption(Random &rnd, World &world)
                             auto blockItr = corruptBlocks.find(tile.blockID);
                             if (blockItr != corruptBlocks.end()) {
                                 tile.blockID = blockItr->second;
-                            } else if (tile.blockID == TileID::livingWood) {
+                            } else if (
+                                tile.blockID == TileID::livingWood ||
+                                tile.blockID == TileID::livingMahogany) {
                                 tile.blockPaint = Paint::purple;
                             }
                             auto wallItr = corruptWalls.find(tile.wallID);

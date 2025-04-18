@@ -154,6 +154,8 @@ void smoothSurfaces(World &world)
         TileID::granite,
         TileID::smoothGranite,
         TileID::lavaMossStone,
+        TileID::livingMahogany,
+        TileID::mahoganyLeaf,
         TileID::sandstone,
         TileID::hardenedSand,
         TileID::hardenedEbonsand,

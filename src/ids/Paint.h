@@ -6,6 +6,7 @@ namespace Paint
 enum {
     none = 0,
     red = 1,
+    lime = 4,
     purple = 10,
     brown = 28,
 };

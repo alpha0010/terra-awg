@@ -3,13 +3,185 @@
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
+#include "structures/StructureUtil.h"
+#include <algorithm>
 #include <iostream>
 #include <map>
+#include <set>
+
+typedef std::pair<double, double> Pointf;
+
+int levitateIsland(int center, int width, Random &rnd, World &world)
+{
+    int yMin = 0.45 * world.getUndergroundLevel();
+    int xMin = center - width;
+    int xMax = center + width;
+    int minSurface = world.getHeight();
+    for (int x = xMin; x < xMax; x += 7) {
+        minSurface = std::min(
+            scanWhileEmpty({x, yMin}, {0, 1}, world).second,
+            minSurface);
+    }
+    int floatHeight = rnd.getDouble(0.07, 0.2) * world.getUndergroundLevel();
+    yMin = minSurface - floatHeight - 5;
+    for (int x = xMin; x < xMax; ++x) {
+        int yMax = yMin - 1.9 * (x - xMin) * (x - xMax) / width +
+                   37 * rnd.getFineNoise(x, 0);
+        for (int y = yMin; y < yMax; ++y) {
+            std::swap(world.getTile(x, y), world.getTile(x, y + floatHeight));
+        }
+    }
+    return minSurface;
+}
+
+bool drawMahoganySegment(Pointf from, Pointf to, double width, World &world)
+{
+    std::set<Point> fillTiles;
+    for (double t = 0; t <= 1; t += 0.1) {
+        double centerX = std::lerp(from.first, to.first, t);
+        double centerY = std::lerp(from.second, to.second, t);
+        for (int x = centerX - width; x < centerX + width; ++x) {
+            for (int y = centerY - width; y < centerY + width; ++y) {
+                if (std::hypot(x - centerX, y - centerY) < width) {
+                    fillTiles.emplace(x, y);
+                }
+            }
+        }
+    }
+    size_t numCrossed = 0;
+    for (auto [x, y] : fillTiles) {
+        Tile &tile = world.getTile(x, y);
+        if (tile.blockID == TileID::livingMahogany) {
+            ++numCrossed;
+        } else {
+            tile.blockID = TileID::livingMahogany;
+            tile.wallID = WallID::Unsafe::livingWood;
+        }
+    }
+    return 2 * numCrossed > fillTiles.size();
+}
+
+void growMahoganyVine(
+    Pointf from,
+    double weight,
+    double angle,
+    Random &rnd,
+    World &world)
+{
+    if (weight < 0.6) {
+        return;
+    }
+    angle += std::clamp(
+        1.8 * rnd.getFineNoise(from.first, from.second),
+        -std::numbers::pi / 3,
+        std::numbers::pi / 3);
+    Pointf to{
+        from.first + 3.9 * weight * std::cos(angle),
+        from.second + 3.9 * weight * std::sin(angle)};
+    bool crossedSegment = drawMahoganySegment(from, to, weight, world);
+    if (crossedSegment && weight < 1.9) {
+        return;
+    }
+    growMahoganyVine(to, rnd.getDouble(0.97, 0.98) * weight, angle, rnd, world);
+    switch (static_cast<int>(
+                99999 * (1 + rnd.getFineNoise(from.first, from.second))) %
+            11) {
+    case 0:
+        growMahoganyVine(
+            to,
+            0.65 * weight,
+            angle - std::numbers::pi / 2,
+            rnd,
+            world);
+        break;
+    case 1:
+        growMahoganyVine(
+            to,
+            0.65 * weight,
+            angle + std::numbers::pi / 2,
+            rnd,
+            world);
+        break;
+    case 2:
+    case 3:
+    case 4:
+        for (int x = from.first - 6; x < from.first + 6; ++x) {
+            for (int y = from.second - 6; y < from.second + 6; ++y) {
+                Tile &tile = world.getTile(x, y);
+                double threshold =
+                    std::hypot(x - from.first, y - from.second) / 3 - 1;
+                if (tile.blockID == TileID::empty &&
+                    rnd.getFineNoise(x, y) > threshold) {
+                    tile.blockID = TileID::mahoganyLeaf;
+                    tile.wallID = WallID::Safe::livingLeaf;
+                }
+            }
+        }
+        break;
+    }
+}
+
+void levitateIslands(Random &rnd, World &world)
+{
+    int centerX =
+        world.jungleCenter + rnd.getDouble(-0.05, 0.05) * world.getWidth();
+    double scanDist = rnd.getDouble(0.03, 0.035) * world.getWidth();
+    int minSurface = world.getUndergroundLevel();
+    int xMin = centerX - scanDist;
+    int xMax = centerX - scanDist;
+    while (xMax < centerX + scanDist) {
+        int width = rnd.getInt(20, 35);
+        xMax += width;
+        minSurface =
+            std::min(levitateIsland(xMax, width, rnd, world), minSurface);
+        xMax += width;
+    }
+    int yMin = minSurface - 0.22 * world.getUndergroundLevel();
+    int yMax = minSurface + 0.1 * world.getUndergroundLevel();
+    int numVines = (yMax - yMin) * (xMax - xMin) / rnd.getInt(6910, 8640);
+    while (numVines > 0) {
+        int x = rnd.getInt(xMin, xMax);
+        int y = rnd.getInt(yMin, yMax);
+        if (!world.regionPasses(x - 4, y - 4, 8, 8, [](Tile &tile) {
+                return tile.blockID != TileID::empty &&
+                       tile.blockID != TileID::livingMahogany &&
+                       tile.blockID != TileID::mahoganyLeaf;
+            })) {
+            continue;
+        }
+        growMahoganyVine(
+            {x, y},
+            rnd.getDouble(2.1, 2.5),
+            rnd.getDouble(-std::numbers::pi, std::numbers::pi),
+            rnd,
+            world);
+        --numVines;
+    }
+    for (int x = xMin - 100; x < xMax + 100; ++x) {
+        for (int y = yMin - 100; y < yMax + 100; ++y) {
+            Tile &tile = world.getTile(x, y);
+            if (tile.blockID != TileID::livingMahogany ||
+                static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 7 !=
+                    0) {
+                continue;
+            }
+            std::map<int, int> neighbors;
+            for (auto [i, j] : {std::pair{1, 0}, {-1, 0}, {0, 1}, {0, -1}}) {
+                ++neighbors[world.getTile(x + i, y + j).blockID];
+            }
+            if (neighbors[TileID::empty] == 1 &&
+                neighbors[TileID::livingMahogany] == 3) {
+                tile.blockID = TileID::jungleGrass;
+            }
+        }
+    }
+}
 
 void genJungle(Random &rnd, World &world)
 {
     std::cout << "Generating jungle\n";
     rnd.shuffleNoise();
+    levitateIslands(rnd, world);
     double center = world.jungleCenter;
     double scanDist = 0.11 * world.getWidth();
     std::map<int, int> surfaceJungleWalls{
@@ -83,7 +255,9 @@ void genJungle(Random &rnd, World &world)
             if (y < world.getUndergroundLevel()) {
                 if (tile.blockID == TileID::empty) {
                     tile.wallID = surfaceJungleWalls[tile.wallID];
-                } else {
+                } else if (
+                    tile.wallID != WallID::Unsafe::livingWood &&
+                    tile.wallID != WallID::Safe::livingLeaf) {
                     tile.wallID = WallID::Unsafe::mud;
                 }
             } else {

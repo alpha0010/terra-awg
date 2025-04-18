@@ -6,6 +6,7 @@
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/data/Rooms.h"
+#include <algorithm>
 #include <iostream>
 #include <set>
 

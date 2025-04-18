@@ -3,6 +3,7 @@
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
+#include "ids/Paint.h"
 #include <iostream>
 #include <map>
 
@@ -13,6 +14,7 @@ void genVines(Random &rnd, World &world)
         {TileID::grass, TileID::vines},
         {TileID::leaf, TileID::vines},
         {TileID::jungleGrass, TileID::jungleVines},
+        {TileID::mahoganyLeaf, TileID::vineRope},
         {TileID::corruptGrass, TileID::corruptVines},
         {TileID::corruptJungleGrass, TileID::corruptVines},
         {TileID::crimsonGrass, TileID::crimsonVines},
@@ -28,6 +30,9 @@ void genVines(Random &rnd, World &world)
                 if (tile.blockID == TileID::empty &&
                     tile.liquid == Liquid::none) {
                     tile.blockID = vine;
+                    if (vine == TileID::vineRope) {
+                        tile.blockPaint = Paint::lime;
+                    }
                     --vineLen;
                     continue;
                 } else {

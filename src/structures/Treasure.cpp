@@ -21,7 +21,9 @@ bool listContains(const T &list, const U &value)
 
 inline const std::set<int> placementAvoidTiles{
     TileID::leaf,
+    TileID::livingMahogany,
     TileID::livingWood,
+    TileID::mahoganyLeaf,
     TileID::thinIce,
 };
 
@@ -118,6 +120,30 @@ void placeLifeCrystals(
     }
 }
 
+void placeFallenLogs(
+    int maxBin,
+    LocationBins &locations,
+    Random &rnd,
+    World &world)
+{
+    int logCount = world.getWidth() / rnd.getInt(1066, 1600);
+    while (logCount > 0) {
+        int binId = rnd.getInt(0, maxBin);
+        if (locations[binId].empty()) {
+            continue;
+        }
+        auto [x, y] = rnd.select(locations[binId]);
+        if (y > 0.45 * world.getUndergroundLevel() &&
+            y < world.getUndergroundLevel() &&
+            world.getTile(x, y).blockID == TileID::grass &&
+            isPlacementCandidate(x, y, world) &&
+            isPlacementCandidate(x - 1, y, world)) {
+            world.placeFramedTile(x - 1, y - 2, TileID::fallenLog);
+            --logCount;
+        }
+    }
+}
+
 void placeAltars(int maxBin, LocationBins &locations, Random &rnd, World &world)
 {
     int altarCount = std::max(8, world.getWidth() / 200);
@@ -201,6 +227,30 @@ void placeOrbHearts(
             tendrilID == TileID::lesion ? Variant::corruption
                                         : Variant::crimson);
         --orbHeartCount;
+    }
+}
+
+void placeHellforges(
+    int maxBin,
+    LocationBins &locations,
+    Random &rnd,
+    World &world)
+{
+    int forgeCount = world.getWidth() / 200;
+    while (forgeCount > 0) {
+        int binId = rnd.getInt(0, maxBin);
+        if (locations[binId].empty()) {
+            continue;
+        }
+        auto [x, y] = rnd.select(locations[binId]);
+        if (y < world.getUnderworldLevel()) {
+            continue;
+        }
+        if (isPlacementCandidate(x, y, world) &&
+            isPlacementCandidate(x - 1, y, world)) {
+            world.placeFramedTile(x - 1, y - 2, TileID::hellforge);
+            --forgeCount;
+        }
     }
 }
 
@@ -460,6 +510,8 @@ Variant getChestType(int x, int y, World &world)
         {TileID::aetherium, Variant::meteorite},
         {TileID::mushroomGrass, Variant::mushroom},
         {TileID::jungleGrass, Variant::richMahogany},
+        {TileID::livingMahogany, Variant::richMahogany},
+        {TileID::mahoganyLeaf, Variant::richMahogany},
         {TileID::sand, Variant::sandstone},
         {TileID::sandstone, Variant::sandstone},
         {TileID::sandstoneBrick, Variant::sandstone},
@@ -743,8 +795,10 @@ void genTreasure(Random &rnd, World &world)
         binLocation(world.getWidth(), world.getHeight(), world.getHeight());
     placeJungleShrines(rnd, world);
     placeLifeCrystals(maxBin, flatLocations, rnd, world);
+    placeFallenLogs(maxBin, flatLocations, rnd, world);
     placeAltars(maxBin, flatLocations, rnd, world);
     placeOrbHearts(maxBin, orbHeartLocations, rnd, world);
+    placeHellforges(maxBin, flatLocations, rnd, world);
     placeManaCrystals(maxBin, flatLocations, rnd, world);
     placeChests(maxBin, flatLocations, rnd, world);
     placePots(maxBin, flatLocations, rnd, world);

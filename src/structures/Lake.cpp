@@ -72,6 +72,8 @@ void simulateRain(World &world, int minX, int maxX)
         TileID::crimsonJungleGrass,
         TileID::livingWood,
         TileID::leaf,
+        TileID::livingMahogany,
+        TileID::mahoganyLeaf,
         TileID::ashGrass,
         TileID::sandstoneBrick,
         TileID::ebonstoneBrick,

@@ -28,19 +28,19 @@ bool isLocationUsed(
 }
 
 inline const std::set<int> nonSolidTiles{
-    TileID::empty,         TileID::alchemyTable, TileID::bathtub,
-    TileID::bed,           TileID::bench,        TileID::bewitchingTable,
-    TileID::boneWelder,    TileID::book,         TileID::bookcase,
-    TileID::bottle,        TileID::bubble,       TileID::candelabra,
-    TileID::candle,        TileID::catacomb,     TileID::chair,
-    TileID::chandelier,    TileID::chest,        TileID::chestGroup2,
-    TileID::clock,         TileID::dresser,      TileID::lantern,
-    TileID::lihzahrdAltar, TileID::painting3x3,  TileID::painting6x4,
-    TileID::piano,         TileID::pot,          TileID::rollingCactus,
-    TileID::rope,          TileID::silverCoin,   TileID::sink,
-    TileID::smallPile,     TileID::statue,       TileID::table,
-    TileID::toilet,        TileID::waterCandle,  TileID::woodenBeam,
-    TileID::workBench,
+    TileID::empty,         TileID::alchemyTable,  TileID::bathtub,
+    TileID::bed,           TileID::bench,         TileID::bewitchingTable,
+    TileID::boneWelder,    TileID::book,          TileID::bookcase,
+    TileID::bottle,        TileID::bubble,        TileID::candelabra,
+    TileID::candle,        TileID::catacomb,      TileID::chair,
+    TileID::chandelier,    TileID::chest,         TileID::chestGroup2,
+    TileID::clock,         TileID::dresser,       TileID::hellforge,
+    TileID::lantern,       TileID::lihzahrdAltar, TileID::painting3x3,
+    TileID::painting6x4,   TileID::piano,         TileID::pot,
+    TileID::rollingCactus, TileID::rope,          TileID::silverCoin,
+    TileID::sink,          TileID::smallPile,     TileID::statue,
+    TileID::table,         TileID::toilet,        TileID::waterCandle,
+    TileID::woodenBeam,    TileID::workBench,
 };
 
 bool isSolidBlock(int tileId)
@@ -58,9 +58,16 @@ Point subPts(Point a, Point b)
     return {a.first - b.first, a.second - b.second};
 }
 
+bool isInBounds(Point pt, World &world)
+{
+    return pt.first > 5 && pt.first < world.getWidth() - 5 && pt.second > 5 &&
+           pt.second < world.getHeight() - 5;
+}
+
 Point scanWhileEmpty(Point from, Point delta, World &world)
 {
-    while (world.getTile(addPts(from, delta)).blockID == TileID::empty) {
+    while (world.getTile(addPts(from, delta)).blockID == TileID::empty &&
+           isInBounds(from, world)) {
         from = addPts(from, delta);
     }
     return from;
