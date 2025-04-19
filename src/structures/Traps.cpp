@@ -111,7 +111,7 @@ void placeSandTraps(Random &rnd, World &world)
         }
         world.getTile(x, trapFloor).blockID = TileID::pressurePlate;
         world.getTile(x, trapFloor).frameY = 126; // TODO
-        placeWire({x, trapFloor}, {x, y - 1}, world);
+        placeWire({x, trapFloor}, {x, y - 1}, Wire::red, world);
         Point prevActuator{-1, -1};
         for (int i = -5; i < 5; ++i) {
             int trapCeiling =
@@ -125,7 +125,11 @@ void placeSandTraps(Random &rnd, World &world)
                      world.getTile(x + i, trapCeiling - 1).blockID))) {
                 tile.actuator = true;
                 if (prevActuator.first != -1) {
-                    placeWire(prevActuator, {x + i, trapCeiling}, world);
+                    placeWire(
+                        prevActuator,
+                        {x + i, trapCeiling},
+                        Wire::red,
+                        world);
                 }
                 prevActuator = {x + i, trapCeiling};
             }
@@ -279,7 +283,7 @@ void placeLavaTraps(Random &rnd, World &world)
         Tile &pressureTile = world.getTile(plateX, plateY);
         pressureTile.blockID = TileID::pressurePlate;
         pressureTile.frameY = 126;
-        placeWire({x, y + gapJ}, {plateX, plateY}, world);
+        placeWire({x, y + gapJ}, {plateX, plateY}, Wire::red, world);
         --numLavaTraps;
     }
 }

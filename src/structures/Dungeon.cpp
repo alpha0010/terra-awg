@@ -483,7 +483,7 @@ private:
             std::shuffle(traps.begin(), traps.end(), rnd.getPRNG());
             traps.resize(rnd.getInt(1, std::min<int>(traps.size(), 3)));
             for (auto trap : traps) {
-                placeWire(trap, {x, y}, world);
+                placeWire(trap, {x, y}, Wire::red, world);
                 world.placeFramedTile(
                     trap.first,
                     trap.second,

@@ -39,8 +39,8 @@ inline const std::set<int> nonSolidTiles{
     TileID::painting6x4,   TileID::piano,         TileID::pot,
     TileID::rollingCactus, TileID::rope,          TileID::silverCoin,
     TileID::sink,          TileID::smallPile,     TileID::statue,
-    TileID::table,         TileID::toilet,        TileID::waterCandle,
-    TileID::woodenBeam,    TileID::workBench,
+    TileID::table,         TileID::TNTBarrel,     TileID::toilet,
+    TileID::waterCandle,   TileID::woodenBeam,    TileID::workBench,
 };
 
 bool isSolidBlock(int tileId)
@@ -73,21 +73,38 @@ Point scanWhileEmpty(Point from, Point delta, World &world)
     return from;
 }
 
-void placeWire(Point from, Point to, World &world)
+void placeWire(Point from, Point to, Wire wire, World &world)
 {
-    world.getTile(from.first, from.second).wireRed = true;
+    auto enableWireAt = [wire, &world](Point pt) {
+        Tile &tile = world.getTile(pt.first, pt.second);
+        switch (wire) {
+        case Wire::red:
+            tile.wireRed = true;
+            break;
+        case Wire::blue:
+            tile.wireBlue = true;
+            break;
+        case Wire::green:
+            tile.wireGreen = true;
+            break;
+        case Wire::yellow:
+            tile.wireYellow = true;
+            break;
+        }
+    };
+    enableWireAt(from);
     while (from != to) {
         if (from.first < to.first) {
             ++from.first;
         } else if (from.first > to.first) {
             --from.first;
         }
-        world.getTile(from.first, from.second).wireRed = true;
+        enableWireAt(from);
         if (from.second < to.second) {
             ++from.second;
         } else if (from.second > to.second) {
             --from.second;
         }
-        world.getTile(from.first, from.second).wireRed = true;
+        enableWireAt(from);
     }
 }

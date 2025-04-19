@@ -9,6 +9,8 @@ class World;
 typedef std::pair<int, int> Point;
 typedef std::map<int, std::vector<Point>> LocationBins;
 
+enum class Wire { red = 0, blue, green, yellow };
+
 int binLocation(int x, int y, int maxY);
 
 bool isLocationUsed(
@@ -25,6 +27,6 @@ Point subPts(Point a, Point b);
 
 Point scanWhileEmpty(Point from, Point delta, World &world);
 
-void placeWire(Point from, Point to, World &world);
+void placeWire(Point from, Point to, Wire wire, World &world);
 
 #endif // STRUCTUREUTIL_H

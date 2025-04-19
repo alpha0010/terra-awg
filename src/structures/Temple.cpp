@@ -6,6 +6,7 @@
 #include "structures/LootRules.h"
 #include "structures/Platforms.h"
 #include "structures/StructureUtil.h"
+#include <algorithm>
 #include <iostream>
 #include <set>
 
@@ -251,7 +252,8 @@ bool canPlaceTempleTreasureAt(int x, int y, World &world)
            });
 }
 
-void addTempleTreasures(Point center, int numRooms, Random &rnd, World &world)
+std::vector<Point>
+addTempleTreasures(Point center, int numRooms, Random &rnd, World &world)
 {
     std::vector<Point> locations;
     iterateTemple(center, world, [&](int x, int y) {
@@ -296,6 +298,112 @@ void addTempleTreasures(Point center, int numRooms, Random &rnd, World &world)
         }
         world.placeFramedTile(x, y - 3, TileID::statue, Variant::lihzahrd);
         --numStatues;
+    }
+    return locations;
+}
+
+void addWallTrap(
+    Point pos,
+    Variant trapLeft,
+    Variant trapRight,
+    Random &rnd,
+    World &world)
+{
+    if (!canPlaceTempleTreasureAt(pos.first, pos.second, world)) {
+        return;
+    }
+    auto [x, y] = pos;
+    --y;
+    std::vector<Point> traps;
+    for (int j = 0; j < 4; ++j) {
+        for (int dir : {-1, 1}) {
+            Point trap = scanWhileEmpty({x, y - j}, {dir, 0}, world);
+            double dist = std::hypot(x - trap.first, y - trap.second);
+            if (dist > 1.5 && dist < 20 &&
+                world.getTile(trap.first + dir, trap.second).blockID ==
+                    TileID::lihzahrdBrick) {
+                traps.push_back({trap.first + dir, trap.second});
+            }
+        }
+    }
+    if (traps.empty()) {
+        return;
+    }
+    std::shuffle(traps.begin(), traps.end(), rnd.getPRNG());
+    traps.resize(rnd.getInt(1, std::min<int>(traps.size(), 3)));
+    for (auto trap : traps) {
+        placeWire(trap, {x, y}, static_cast<Wire>((x + y) % 4), world);
+        world.placeFramedTile(
+            trap.first,
+            trap.second,
+            TileID::trap,
+            trap.first > x ? trapLeft : trapRight);
+    }
+    world.placeFramedTile(x, y, TileID::pressurePlate, Variant::lihzahrd);
+}
+
+void addCeilingTrap(Point pos, Variant trapType, World &world)
+{
+    if (!canPlaceTempleTreasureAt(pos.first, pos.second, world)) {
+        return;
+    }
+    auto [x, y] = pos;
+    --y;
+    int trapCeiling = scanWhileEmpty({x, y}, {0, -1}, world).second - 1;
+    if (world.getTile(x, trapCeiling).blockID != TileID::lihzahrdBrick) {
+        return;
+    }
+    for (int i = -3; i < 4; ++i) {
+        if (world.getTile(x + i, trapCeiling).blockID ==
+                TileID::lihzahrdBrick &&
+            world.getTile(x + i, trapCeiling + 1).blockID == TileID::empty) {
+            placeWire(
+                {x + i, trapCeiling},
+                {x, y},
+                static_cast<Wire>((x + y) % 4),
+                world);
+            world.placeFramedTile(x + i, trapCeiling, TileID::trap, trapType);
+        }
+    }
+    world.placeFramedTile(x, y, TileID::pressurePlate, Variant::lihzahrd);
+}
+
+void addTraps(std::vector<Point> locations, Random &rnd, World &world)
+{
+    for (auto [x, y] : locations) {
+        switch (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 75) {
+        case 0:
+            if (canPlaceTempleTreasureAt(x, y, world)) {
+                world.placeFramedTile(x, y - 2, TileID::TNTBarrel);
+            }
+            break;
+        case 1:
+        case 2:
+            addWallTrap(
+                {x, y},
+                Variant::flameLeft,
+                Variant::flameRight,
+                rnd,
+                world);
+            break;
+        case 3:
+        case 4:
+            addWallTrap(
+                {x, y},
+                Variant::superDartLeft,
+                Variant::superDartRight,
+                rnd,
+                world);
+            break;
+        case 5:
+        case 6:
+            addCeilingTrap({x, y}, Variant::spear, world);
+            break;
+        case 7:
+        case 8:
+            addCeilingTrap({x, y}, Variant::spikyBall, world);
+            break;
+        }
     }
 }
 
@@ -404,5 +512,11 @@ void genTemple(Random &rnd, World &world)
         centerRoomX + roomSize / 2 - 1,
         maxRoomY + roomSize - 2,
         TileID::lihzahrdAltar);
-    addTempleTreasures(center, rooms.size(), rnd, world);
+    std::vector<Point> flatLocations =
+        addTempleTreasures(center, rooms.size(), rnd, world);
+    std::erase_if(flatLocations, [&world](Point &pt) {
+        return world.getTile(pt.first, pt.second).blockID == TileID::platform;
+    });
+    std::shuffle(flatLocations.begin(), flatLocations.end(), rnd.getPRNG());
+    addTraps(flatLocations, rnd, world);
 }

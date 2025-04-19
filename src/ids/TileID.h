@@ -171,6 +171,7 @@ enum {
     corruptVines = 636,
     ashVines = 638,
     manaCrystal = 639,
+    TNTBarrel = 654,
     corruptJungleGrass = 661,
     crimsonJungleGrass = 662,
     lifeCrystalBoulder = 665,
