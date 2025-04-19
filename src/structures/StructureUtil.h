@@ -27,6 +27,8 @@ Point subPts(Point a, Point b);
 
 Point scanWhileEmpty(Point from, Point delta, World &world);
 
+Point scanWhileNotSolid(Point from, Point delta, World &world);
+
 void placeWire(Point from, Point to, Wire wire, World &world);
 
 #endif // STRUCTUREUTIL_H

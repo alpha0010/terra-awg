@@ -73,6 +73,15 @@ Point scanWhileEmpty(Point from, Point delta, World &world)
     return from;
 }
 
+Point scanWhileNotSolid(Point from, Point delta, World &world)
+{
+    while (!isSolidBlock(world.getTile(addPts(from, delta)).blockID) &&
+           isInBounds(from, world)) {
+        from = addPts(from, delta);
+    }
+    return from;
+}
+
 void placeWire(Point from, Point to, Wire wire, World &world)
 {
     auto enableWireAt = [wire, &world](Point pt) {

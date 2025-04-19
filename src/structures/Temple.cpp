@@ -317,7 +317,7 @@ void addWallTrap(
     std::vector<Point> traps;
     for (int j = 0; j < 4; ++j) {
         for (int dir : {-1, 1}) {
-            Point trap = scanWhileEmpty({x, y - j}, {dir, 0}, world);
+            Point trap = scanWhileNotSolid({x, y - j}, {dir, 0}, world);
             double dist = std::hypot(x - trap.first, y - trap.second);
             if (dist > 1.5 && dist < 20 &&
                 world.getTile(trap.first + dir, trap.second).blockID ==
@@ -405,6 +405,50 @@ void addTraps(std::vector<Point> locations, Random &rnd, World &world)
             break;
         }
     }
+}
+
+void addSpikesAt(Point pos, Random &rnd, World &world)
+{
+    if (static_cast<int>(
+            99999 * (1 + rnd.getFineNoise(pos.first, pos.second))) %
+            150 !=
+        0) {
+        return;
+    }
+    Point delta = rnd.select({std::pair{1, 0}, {-1, 0}, {0, 1}, {0, -1}});
+    Point wall = scanWhileNotSolid(pos, delta, world);
+    Point incr = delta.first == 0 ? std::pair{1, 0} : std::pair{0, 1};
+    for (int t = 0; t < 4; ++t) {
+        wall = subPts(wall, incr);
+    }
+    for (int t = 0; t < 9; ++t, wall = addPts(wall, incr)) {
+        if (world.getTile(wall).blockID != TileID::empty ||
+            world.getTile(addPts(wall, delta)).blockID !=
+                TileID::lihzahrdBrick) {
+            continue;
+        }
+        world.getTile(wall).blockID = TileID::woodenSpike;
+        if ((wall.first + wall.second) % 2 == 0) {
+            world.getTile(addPts(wall, delta)).blockID = TileID::woodenSpike;
+        } else {
+            Tile &tile = world.getTile(subPts(wall, delta));
+            if (tile.blockID == TileID::empty) {
+                tile.blockID = TileID::woodenSpike;
+            }
+        }
+    }
+}
+
+void addSpikes(Point center, Random &rnd, World &world)
+{
+    iterateTemple(center, world, [&](int x, int y) {
+        if (world.regionPasses(x - 1, y - 1, 3, 3, [](Tile &tile) {
+                return tile.blockID == TileID::empty;
+            })) {
+            addSpikesAt({x, y}, rnd, world);
+        }
+        return true;
+    });
 }
 
 void genTemple(Random &rnd, World &world)
@@ -515,8 +559,9 @@ void genTemple(Random &rnd, World &world)
     std::vector<Point> flatLocations =
         addTempleTreasures(center, rooms.size(), rnd, world);
     std::erase_if(flatLocations, [&world](Point &pt) {
-        return world.getTile(pt.first, pt.second).blockID == TileID::platform;
+        return world.getTile(pt).blockID == TileID::platform;
     });
     std::shuffle(flatLocations.begin(), flatLocations.end(), rnd.getPRNG());
     addTraps(flatLocations, rnd, world);
+    addSpikes(center, rnd, world);
 }

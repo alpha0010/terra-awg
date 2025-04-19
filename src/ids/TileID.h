@@ -106,6 +106,7 @@ enum {
     honey = 229,
     crispyHoney = 230,
     larva = 231,
+    woodenSpike = 232,
     crimsand = 234,
     lihzahrdAltar = 237,
     painting3x3 = 240,
