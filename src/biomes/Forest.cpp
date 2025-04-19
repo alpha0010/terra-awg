@@ -373,10 +373,7 @@ void growLivingTrees(Random &rnd, World &world)
             if (std::abs(x - world.getWidth() / 2) < 20) {
                 continue;
             }
-            int y = world.spawnY;
-            while (world.getTile(x, y - 1).blockID != TileID::empty && y > 0) {
-                --y;
-            }
+            int y = world.getSurfaceLevel(x);
             while (world.getTile(x, y).blockID == TileID::empty &&
                    y < world.getUndergroundLevel()) {
                 ++y;

@@ -114,6 +114,13 @@ void simulateRain(World &world, int minX, int maxX)
                       probeTile.liquid == Liquid::lava))) {
                     continue;
                 }
+                if (y < world.getUndergroundLevel() &&
+                    (surfaceDryBlocks.contains(
+                         world.getTile(minDropX - 1, dropY).blockID) ||
+                     surfaceDryBlocks.contains(
+                         world.getTile(maxDropX, dropY).blockID))) {
+                    continue;
+                }
                 for (int dropX = minDropX; dropX < maxDropX; ++dropX) {
                     Tile &tile = world.getTile(dropX, dropY);
                     tile.liquid = tile.wallID == WallID::Unsafe::hive
@@ -136,7 +143,9 @@ void simulateRain(World &world, int minX, int maxX)
 void evaporateSmallPools(World &world, int minX, int maxX)
 {
     for (int x = minX; x < maxX; ++x) {
-        for (int y = 0; y < world.getUnderworldLevel(); ++y) {
+        for (int y = world.getSurfaceLevel(x) - 50;
+             y < world.getUnderworldLevel();
+             ++y) {
             Tile &tile = world.getTile(x, y);
             if (tile.liquid != Liquid::water &&
                 (tile.liquid != Liquid::lava ||

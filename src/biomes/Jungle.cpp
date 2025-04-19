@@ -17,10 +17,8 @@ int levitateIsland(int center, int width, Random &rnd, World &world)
     int xMin = center - width;
     int xMax = center + width;
     int minSurface = world.getHeight();
-    for (int x = xMin; x < xMax; x += 7) {
-        minSurface = std::min(
-            scanWhileEmpty({x, yMin}, {0, 1}, world).second,
-            minSurface);
+    for (int x = xMin; x < xMax; ++x) {
+        minSurface = std::min(world.getSurfaceLevel(x), minSurface);
     }
     int floatHeight = rnd.getDouble(0.07, 0.2) * world.getUndergroundLevel();
     yMin = minSurface - floatHeight - 5;

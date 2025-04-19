@@ -21,7 +21,6 @@ bool listContains(const T &list, const U &value)
 
 inline const std::set<int> placementAvoidTiles{
     TileID::leaf,
-    TileID::livingMahogany,
     TileID::livingWood,
     TileID::mahoganyLeaf,
     TileID::thinIce,
@@ -704,8 +703,13 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
             isLocationUsed(x, y, 20, usedLocations[binId])) {
             continue;
         }
-        usedLocations[binId].emplace_back(x, y);
         Variant type = getChestType(x, y, world);
+        int surface = world.getSurfaceLevel(x);
+        if (y < surface + 3 && y > surface - 8 && type != Variant::reef &&
+            type != Variant::water && rnd.getDouble(0, 1) < 0.8) {
+            continue;
+        }
+        usedLocations[binId].emplace_back(x, y);
         placeChest(x, y, type, rnd, world);
         --chestCount;
     }

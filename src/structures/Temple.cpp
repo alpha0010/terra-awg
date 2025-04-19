@@ -350,7 +350,8 @@ void addCeilingTrap(Point pos, Variant trapType, World &world)
     auto [x, y] = pos;
     --y;
     int trapCeiling = scanWhileEmpty({x, y}, {0, -1}, world).second - 1;
-    if (world.getTile(x, trapCeiling).blockID != TileID::lihzahrdBrick) {
+    if (world.getTile(x, trapCeiling).blockID != TileID::lihzahrdBrick ||
+        (trapType == Variant::spear && y - trapCeiling > 18)) {
         return;
     }
     for (int i = -3; i < 4; ++i) {

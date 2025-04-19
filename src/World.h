@@ -18,12 +18,14 @@ private:
     std::vector<Tile> tiles;
     std::vector<Chest> chests;
     std::vector<bool> framedTiles;
+    std::vector<int> surface;
 
 public:
     World(int w, int h);
 
     int getWidth() const;
     int getHeight() const;
+    int &getSurfaceLevel(int x);
     int getUndergroundLevel() const;
     int getCavernLevel() const;
     int getUnderworldLevel() const;

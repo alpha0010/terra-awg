@@ -186,7 +186,7 @@ void genPyramid(Random &rnd, World &world)
             world.desertCenter - scanDist,
             world.desertCenter + scanDist);
     }
-    int y = 0.6 * world.getUndergroundLevel();
+    int y = world.getSurfaceLevel(x);
     std::set<int> ignoreBlocks{TileID::empty, TileID::lesion, TileID::flesh};
     while (ignoreBlocks.contains(world.getTile(x, y).blockID) &&
            y < 0.85 * world.getUndergroundLevel()) {

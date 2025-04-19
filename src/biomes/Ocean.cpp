@@ -9,13 +9,10 @@ void genOceans(Random &rnd, World &world)
 {
     std::cout << "Filling oceans\n";
     rnd.shuffleNoise();
-    int waterTable = 0;
-    while (world.getTile(300, waterTable).blockID == TileID::empty ||
-           world.getTile(world.getWidth() - 300, waterTable).blockID ==
-               TileID::empty) {
-        ++waterTable;
-    }
-    waterTable += rnd.getInt(4, 12);
+    int waterTable = std::max(
+                         world.getSurfaceLevel(300),
+                         world.getSurfaceLevel(world.getWidth() - 300)) +
+                     rnd.getInt(4, 12);
     for (int x = 0; x < 390; ++x) {
         double drop = 90 * (1 - 1 / (1 + std::exp(0.041 * (200 - x))));
         double sandDepth = (40 + 9 * rnd.getCoarseNoise(x, 0)) *

@@ -57,7 +57,7 @@ std::pair<int, int> framedTileToDims(int tileID)
 
 World::World(int w, int h)
     : width(w), height(h), tiles(width * height),
-      framedTiles(genFramedTileLookup())
+      framedTiles(genFramedTileLookup()), surface(width)
 {
 }
 
@@ -69,6 +69,11 @@ int World::getWidth() const
 int World::getHeight() const
 {
     return height;
+}
+
+int &World::getSurfaceLevel(int x)
+{
+    return surface[(x + surface.size()) % surface.size()];
 }
 
 int World::getUndergroundLevel() const

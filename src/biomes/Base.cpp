@@ -65,14 +65,14 @@ void genWorldBase(Random &rnd, World &world)
         [center, surfaceLevel, &rnd, &wallVarNoise, &world](int x) {
             // Skip background wall for the first tile in every column.
             bool placeWalls = false;
-            for (int y = surfaceLevel +
-                         std::min(
-                             {0.1 * std::abs(center - x) + 15,
-                              0.08 * std::min(x, world.getWidth() - x) + 5,
-                              50.0}) *
-                             rnd.getCoarseNoise(x, 0);
-                 y < world.getHeight();
-                 ++y) {
+            int minY = surfaceLevel +
+                       std::min(
+                           {0.1 * std::abs(center - x) + 15,
+                            0.08 * std::min(x, world.getWidth() - x) + 5,
+                            50.0}) *
+                           rnd.getCoarseNoise(x, 0);
+            world.getSurfaceLevel(x) = minY;
+            for (int y = minY; y < world.getHeight(); ++y) {
                 double threshold =
                     y < world.getUndergroundLevel()
                         ? 3.0 * y / world.getUndergroundLevel() - 3
