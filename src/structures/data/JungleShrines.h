@@ -1,5 +1,5 @@
-#ifndef SHRINES_H
-#define SHRINES_H
+#ifndef JUNGLESHRINES_H
+#define JUNGLESHRINES_H
 
 #include "TileBuffer.h"
 #include <ranges>
@@ -13,4 +13,4 @@ TileBuffer getShrine(int shrineId, const std::vector<bool> &framedTiles);
 
 } // namespace Data
 
-#endif // SHRINES_H
+#endif // JUNGLESHRINES_H

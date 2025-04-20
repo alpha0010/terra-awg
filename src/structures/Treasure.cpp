@@ -8,7 +8,7 @@
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/Plants.h"
-#include "structures/data/Shrines.h"
+#include "structures/data/JungleShrines.h"
 #include <algorithm>
 #include <iostream>
 #include <set>

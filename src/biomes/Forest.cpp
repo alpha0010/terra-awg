@@ -6,6 +6,7 @@
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/data/Rooms.h"
+#include "structures/data/SwordShrines.h"
 #include <algorithm>
 #include <iostream>
 #include <set>
@@ -385,6 +386,82 @@ void growLivingTrees(Random &rnd, World &world)
     }
 }
 
+void buryEnchantedSwords(Random &rnd, World &world)
+{
+    double numSwords = world.getWidth() / rnd.getInt(1800, 3800);
+    while (numSwords > 0) {
+        int x = rnd.getInt(400, 0.36 * world.getWidth());
+        if (rnd.getBool()) {
+            x = world.getWidth() - x;
+        }
+        int y = world.getSurfaceLevel(x) + rnd.getInt(15, 35);
+        if (!world.regionPasses(x - 16, y, 32, 20, [](Tile &tile) {
+                return tile.blockID != TileID::empty &&
+                       tile.blockID != TileID::snow &&
+                       tile.blockID != TileID::sand &&
+                       tile.blockID != TileID::jungleGrass;
+            })) {
+            numSwords -= 0.01;
+            continue;
+        }
+        for (int i = -15; i < 15; ++i) {
+            for (int j = 3; j < 17; ++j) {
+                if (std::hypot(i, 17 - j) + 2 * rnd.getFineNoise(x + i, y + j) <
+                    13.5) {
+                    Tile &tile = world.getTile(x + i, y + j);
+                    tile.blockID = TileID::empty;
+                    if (i == 0) {
+                        tile.wallID = WallID::empty;
+                    } else {
+                        tile.wallID = WallID::Unsafe::flower;
+                    }
+                }
+            }
+        }
+        for (int i = -15; i < 15; ++i) {
+            for (int j = 2; j < 18; ++j) {
+                Tile &tile = world.getTile(x + i, y + j);
+                if (tile.blockID == TileID::dirt &&
+                    world.isExposed(x + i, y + j)) {
+                    tile.blockID = TileID::grass;
+                }
+            }
+        }
+        world.queuedTreasures.emplace_back([x, y](Random &, World &world) {
+            TileBuffer shrine = Data::getSwordShrine(world.getFramedTiles());
+            if (!world.regionPasses(
+                    x - shrine.getWidth() / 2,
+                    y + 13,
+                    shrine.getWidth(),
+                    shrine.getHeight(),
+                    [](Tile &tile) { return tile.blockID == TileID::empty; })) {
+                return;
+            }
+            for (int i = 0; i < shrine.getWidth(); ++i) {
+                for (int j = 0; j < shrine.getHeight(); ++j) {
+                    Tile &shrineTile = shrine.getTile(i, j);
+                    if (shrineTile.blockID == TileID::empty) {
+                        continue;
+                    }
+                    Tile &tile = world.getTile(
+                        x - shrine.getWidth() / 2 + i,
+                        y + 13 + j);
+                    shrineTile.wallID = tile.wallID;
+                    tile = shrineTile;
+                    tile.guarded = true;
+                }
+                Tile &base = world.getTile(
+                    x - shrine.getWidth() / 2 + i,
+                    y + 13 + shrine.getHeight());
+                if (base.blockID == TileID::grass) {
+                    base.blockID = TileID::dirt;
+                }
+            }
+        });
+        --numSwords;
+    }
+}
+
 void genForest(Random &rnd, World &world)
 {
     std::cout << "Nurturing forests\n";
@@ -411,4 +488,5 @@ void genForest(Random &rnd, World &world)
     }
     // Add living tree clumps.
     growLivingTrees(rnd, world);
+    buryEnchantedSwords(rnd, world);
 }
