@@ -119,6 +119,28 @@ void growMahoganyVine(
     }
 }
 
+void connectSurfaceCaves(int xMin, int xMax, Random &rnd, World &world)
+{
+    rnd.restoreShuffleState();
+    for (int x = xMin; x < xMax; ++x) {
+        int surface = world.getSurfaceLevel(x);
+        for (int y = surface; y < world.getUndergroundLevel(); ++y) {
+            double t = std::min(
+                std::min({y - surface, x - xMin, xMax - x}) / 75.0,
+                1.0);
+            double threshold = std::lerp(
+                2.94 - 3.1 * y / world.getUndergroundLevel(),
+                -0.16,
+                t);
+            if (std::abs(rnd.getCoarseNoise(x, 2 * y) + 0.1) < 0.15 &&
+                rnd.getFineNoise(x, y) > threshold) {
+                world.getTile(x, y).blockID = TileID::empty;
+            }
+        }
+    }
+    rnd.shuffleNoise();
+}
+
 void levitateIslands(Random &rnd, World &world)
 {
     int centerX =
@@ -134,6 +156,7 @@ void levitateIslands(Random &rnd, World &world)
             std::min(levitateIsland(xMax, width, rnd, world), minSurface);
         xMax += width;
     }
+    connectSurfaceCaves(xMin, xMax, rnd, world);
     int yMin = minSurface - 0.22 * world.getUndergroundLevel();
     int yMax = minSurface + 0.1 * world.getUndergroundLevel();
     int numVines = (yMax - yMin) * (xMax - xMin) / rnd.getInt(6910, 8640);

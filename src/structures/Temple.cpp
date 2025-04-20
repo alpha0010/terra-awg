@@ -14,7 +14,7 @@ typedef std::pair<int, int> Point;
 
 template <typename Func> void iterateTemple(Point center, World &world, Func f)
 {
-    int scanX = 0.029 * world.getWidth();
+    int scanX = std::max<int>(0.029 * world.getWidth(), 128);
     int scanY = 0.45 * scanX;
     int startScanY = scanY;
     int stepCtrl = -1;
