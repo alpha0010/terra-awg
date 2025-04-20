@@ -677,6 +677,16 @@ private:
         bool anchorBot =
             data.getWidth() > 1 &&
             data.getTile(1, data.getHeight() - 1).blockID == TileID::cloud;
+        int anchorLeftAt = -1;
+        int anchorRightAt = -1;
+        for (int j = 1; j < data.getHeight() - 1; ++j) {
+            if (data.getTile(0, j).blockID == TileID::cloud) {
+                anchorLeftAt = j;
+            } else if (
+                data.getTile(data.getWidth() - 1, j).blockID == TileID::cloud) {
+                anchorRightAt = j;
+            }
+        }
         for (int tries = 0; tries < 10000; ++tries) {
             int x = rnd.getInt(
                 dungeonCenter - dungeonWidth,
@@ -688,17 +698,33 @@ private:
                 continue;
             }
             if (anchorTop && world.getTile(x + 1, y).blockID == TileID::empty) {
-                y = scanWhileEmpty({x + 1, y}, {0, -1}, world).second - 1;
+                y = scanWhileNotSolid({x + 1, y}, {0, -1}, world).second - 1;
             } else if (
                 anchorBot &&
                 world.getTile(x + 1, y + data.getHeight() - 1).blockID ==
                     TileID::empty) {
-                y = scanWhileEmpty(
+                y = scanWhileNotSolid(
                         {x + 1, y + data.getHeight() - 1},
                         {0, 1},
                         world)
                         .second -
                     data.getHeight() + 2;
+            }
+            if (anchorLeftAt != -1 &&
+                world.getTile(x, y + anchorLeftAt).blockID == TileID::empty) {
+                x = scanWhileNotSolid({x, y + anchorLeftAt}, {-1, 0}, world)
+                        .first -
+                    1;
+            } else if (
+                anchorRightAt != -1 &&
+                world.getTile(x + data.getWidth() - 1, y + anchorRightAt)
+                        .blockID == TileID::empty) {
+                x = scanWhileNotSolid(
+                        {x + data.getWidth() - 1, y + anchorRightAt},
+                        {1, 0},
+                        world)
+                        .first -
+                    data.getWidth() + 2;
             }
             if (canPlaceFurniture(x, y, data) &&
                 !isLocationUsed(x, y, 12, usedLocations)) {
