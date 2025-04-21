@@ -20,6 +20,7 @@ bool listContains(const T &list, const U &value)
 }
 
 inline const std::set<int> placementAvoidTiles{
+    TileID::grate,
     TileID::leaf,
     TileID::livingWood,
     TileID::mahoganyLeaf,

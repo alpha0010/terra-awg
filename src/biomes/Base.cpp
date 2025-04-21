@@ -113,20 +113,24 @@ void genWorldBase(Random &rnd, World &world)
     }
     for (int x = 0; x < world.getWidth(); ++x) {
         int underworldRoof =
-            world.getUnderworldLevel() + 0.23 * underworldHeight +
-            20 * rnd.getCoarseNoise(x, 0.33 * world.getHeight());
+            world.getUnderworldLevel() + 0.22 * underworldHeight +
+            19 * rnd.getCoarseNoise(x, 0.33 * world.getHeight());
         int underworldFloor =
-            world.getUnderworldLevel() + 0.5 * underworldHeight +
-            20 * rnd.getCoarseNoise(x, 0.66 * world.getHeight());
+            world.getUnderworldLevel() + 0.42 * underworldHeight +
+            35 * rnd.getCoarseNoise(x, 0.66 * world.getHeight());
         for (int y = world.getUnderworldLevel() + 20 * rnd.getCoarseNoise(x, 0);
              y < world.getHeight();
              ++y) {
             // Fill underworld with ash, with an empty band across the entire
             // middle.
             Tile &tile = world.getTile(x, y);
-            tile.blockID = y < underworldRoof || y > underworldFloor
-                               ? TileID::ash
-                               : TileID::empty;
+            if (y > underworldFloor) {
+                tile.blockID = std::abs(rnd.getFineNoise(x, y)) > 0.5
+                                   ? TileID::hellstone
+                                   : TileID::ash;
+            } else {
+                tile.blockID = y < underworldRoof ? TileID::ash : TileID::empty;
+            }
             tile.wallID = underworldWalls[tile.wallID];
         }
     }

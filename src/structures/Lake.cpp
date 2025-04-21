@@ -111,7 +111,8 @@ void simulateRain(World &world, int minX, int maxX)
                     probeTile.blockID == TileID::bubble ||
                     (y < world.getUndergroundLevel() &&
                      (surfaceDryBlocks.contains(probeTile.blockID) ||
-                      probeTile.liquid == Liquid::lava))) {
+                      probeTile.liquid == Liquid::lava)) ||
+                    dropY > world.getUnderworldLevel() + 50) {
                     continue;
                 }
                 if (y < world.getUndergroundLevel() &&
