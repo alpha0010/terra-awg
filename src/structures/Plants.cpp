@@ -339,3 +339,102 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
         }
     }
 }
+
+void growGrass(int x, int y, Random &rnd, World &world)
+{
+    Tile &baseTile = world.getTile(x, y);
+    Tile &probeTile = world.getTile(x, y - 1);
+    if (baseTile.slope != Slope::none || probeTile.blockID != TileID::empty ||
+        probeTile.liquid != Liquid::none) {
+        return;
+    }
+    int randInt = 99999 * (1 + rnd.getFineNoise(x, y));
+    if (randInt % 61 == 0) {
+        probeTile.blockID = TileID::herb;
+        switch (baseTile.blockID) {
+        case TileID::ash:
+        case TileID::ashGrass:
+            probeTile.frameX = 90;
+            return;
+        case TileID::corruptGrass:
+        case TileID::corruptJungleGrass:
+        case TileID::crimsonGrass:
+        case TileID::crimsonJungleGrass:
+        case TileID::ebonstone:
+        case TileID::crimstone:
+            probeTile.frameX = 54;
+            return;
+        case TileID::dirt:
+        case TileID::mud:
+            probeTile.frameX = 36;
+            return;
+        case TileID::grass:
+            return;
+        case TileID::jungleGrass:
+            probeTile.frameX = 18;
+            return;
+        case TileID::sand:
+            probeTile.frameX = 72;
+            return;
+        case TileID::snow:
+        case TileID::ice:
+            probeTile.frameX = 108;
+            return;
+        default:
+            probeTile.blockID = TileID::empty;
+        }
+    }
+    switch (baseTile.blockID) {
+    case TileID::ashGrass:
+        world.placeFramedTile(x, y - 1, TileID::ashPlant);
+        break;
+    case TileID::corruptGrass:
+        world.placeFramedTile(x, y - 1, TileID::corruptPlant);
+        break;
+    case TileID::crimsonGrass:
+        world.placeFramedTile(x, y - 1, TileID::crimsonPlant);
+        break;
+    case TileID::grass:
+        world.placeFramedTile(
+            x,
+            y - 1,
+            rnd.getCoarseNoise(x, y) > 0 ? TileID::tallGrassPlant
+                                         : TileID::grassPlant);
+        break;
+    case TileID::jungleGrass:
+        if (isRegionEmpty(x + 1, y - 2, 2, 2, world) &&
+            world.regionPasses(
+                x + 1,
+                y,
+                2,
+                1,
+                [](Tile &tile) {
+                    return tile.blockID == TileID::jungleGrass &&
+                           tile.slope == Slope::none;
+                }) &&
+            randInt % 3 != 0) {
+            world.placeFramedTile(x, y - 2, TileID::largeJunglePlant);
+            break;
+        }
+        world.placeFramedTile(
+            x,
+            y - 1,
+            rnd.getCoarseNoise(x, y) > 0 ? TileID::tallJunglePlant
+                                         : TileID::junglePlant);
+        break;
+    case TileID::mushroomGrass:
+        world.placeFramedTile(x, y - 1, TileID::mushroomPlant);
+        break;
+    }
+}
+
+void genGrasses(const LocationBins &locations, Random &rnd, World &world)
+{
+    std::cout << "Growing plants\n";
+    for (const auto &bin : locations) {
+        for (auto [x, y] : bin.second) {
+            growGrass(x, y, rnd, world);
+            growGrass(x + 1, y, rnd, world);
+        }
+    }
+}

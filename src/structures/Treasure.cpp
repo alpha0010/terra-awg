@@ -7,7 +7,6 @@
 #include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
-#include "structures/Plants.h"
 #include "structures/data/JungleShrines.h"
 #include <algorithm>
 #include <iostream>
@@ -770,7 +769,7 @@ void placePots(int maxBin, LocationBins &locations, Random &rnd, World &world)
     }
 }
 
-void genTreasure(Random &rnd, World &world)
+LocationBins genTreasure(Random &rnd, World &world)
 {
     std::cout << "Cataloging ground\n";
     std::vector<std::vector<Point>> rawLocations(world.getWidth());
@@ -814,5 +813,5 @@ void genTreasure(Random &rnd, World &world)
     placeManaCrystals(maxBin, flatLocations, rnd, world);
     placeChests(maxBin, flatLocations, rnd, world);
     placePots(maxBin, flatLocations, rnd, world);
-    genPlants(flatLocations, rnd, world);
+    return flatLocations;
 }

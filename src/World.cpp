@@ -55,6 +55,17 @@ std::pair<int, int> framedTileToDims(int tileID)
     }
 }
 
+uint32_t fnv1a32pt(uint32_t x, uint32_t y)
+{
+    const uint32_t prime = 16777619;
+    uint32_t hash = 2166136261;
+    hash ^= x;
+    hash *= prime;
+    hash ^= y;
+    hash *= prime;
+    return hash;
+}
+
 World::World(int w, int h)
     : width(w), height(h), tiles(width * height),
       framedTiles(genFramedTileLookup()), surface(width)
@@ -111,6 +122,7 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::alchemyTable, Variant::none}, {3, 3, 0, 0}},
     {{TileID::altar, Variant::corruption}, {3, 2, 0, 0}},
     {{TileID::altar, Variant::crimson}, {3, 2, 54, 0}},
+    {{TileID::ashPlant, Variant::none}, {1, 1, 0, 0}},
     {{TileID::banner, Variant::ankh}, {1, 3, 72, 0}},
     {{TileID::banner, Variant::omega}, {1, 3, 108, 0}},
     {{TileID::banner, Variant::snake}, {1, 3, 90, 0}},
@@ -145,10 +157,14 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::chestGroup2, Variant::lesion}, {2, 2, 108, 0}},
     {{TileID::chestGroup2, Variant::reef}, {2, 2, 504, 0}},
     {{TileID::chestGroup2, Variant::sandstone}, {2, 2, 360, 0}},
+    {{TileID::corruptPlant, Variant::none}, {1, 1, 0, 0}},
+    {{TileID::crimsonPlant, Variant::none}, {1, 1, 0, 0}},
     {{TileID::door, Variant::dungeon}, {1, 3, 0, 702}},
     {{TileID::door, Variant::lihzahrd}, {1, 3, 0, 594}},
     {{TileID::fallenLog, Variant::none}, {3, 2, 0, 0}},
+    {{TileID::grassPlant, Variant::none}, {1, 1, 0, 0}},
     {{TileID::hellforge, Variant::none}, {3, 2, 0, 0}},
+    {{TileID::junglePlant, Variant::none}, {1, 1, 0, 0}},
     {{TileID::lamp, Variant::crystal}, {1, 3, 0, 1674}},
     {{TileID::lamp, Variant::dynasty}, {1, 3, 0, 918}},
     {{TileID::lamp, Variant::flesh}, {1, 3, 0, 162}},
@@ -158,6 +174,7 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::lamp, Variant::sandstone}, {1, 3, 0, 2052}},
     {{TileID::larva, Variant::none}, {3, 3, 0, 0}},
     {{TileID::lihzahrdAltar, Variant::none}, {3, 2, 0, 0}},
+    {{TileID::mushroomPlant, Variant::none}, {1, 1, 0, 0}},
     {{TileID::orbHeart, Variant::crimson}, {2, 2, 36, 0}},
     {{TileID::pot, Variant::corruption}, {2, 2, 0, 576}},
     {{TileID::pot, Variant::crimson}, {2, 2, 0, 792}},
@@ -173,6 +190,8 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::pressurePlate, Variant::lihzahrd}, {1, 1, 0, 108}},
     {{TileID::smallPile, Variant::gold}, {2, 1, 648, 18}},
     {{TileID::statue, Variant::lihzahrd}, {2, 3, 1548, 0}},
+    {{TileID::tallGrassPlant, Variant::none}, {1, 1, 0, 0}},
+    {{TileID::tallJunglePlant, Variant::none}, {1, 1, 0, 0}},
     {{TileID::trap, Variant::dartLeft}, {1, 1, 0, 0}},
     {{TileID::trap, Variant::dartRight}, {1, 1, 18, 0}},
     {{TileID::trap, Variant::flameLeft}, {1, 1, 0, 36}},
@@ -203,29 +222,76 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
         frameWidth = data.width;
         frameHeight = data.height;
     }
+    uint32_t coordHash = fnv1a32pt(x, y);
     if (blockID == TileID::pot) {
         // Cycle pot variations based on world coordinates.
         switch (type) {
         case Variant::crimson:
         case Variant::marble:
         case Variant::pyramid:
-            offsetY += 36 * ((x + y) % 3);
+            offsetY += 36 * (coordHash % 3);
             break;
         case Variant::forest:
-            offsetX += 36 * (y % 3);
-            offsetY += 36 * (x % 4);
+            offsetX += 36 * (coordHash % 3);
+            offsetY += 36 * (coordHash % 4);
             break;
         case Variant::lihzahrd:
-            offsetX += 36 * (y % 2);
-            offsetY += 36 * (x % 3);
+            offsetX += 36 * (coordHash % 2);
+            offsetY += 36 * (coordHash % 3);
             break;
         default:
-            offsetX += 36 * (y % 3);
-            offsetY += 36 * (x % 3);
+            offsetX += 36 * (coordHash % 3);
+            offsetY += 36 * (coordHash % 3);
         }
     } else if (blockID == TileID::statue && type == Variant::lihzahrd) {
-        offsetX += 36 * ((x + y) % 3);
-        offsetY += 162 * ((x + y) % 2);
+        offsetX += 36 * (coordHash % 3);
+        offsetY += 162 * (coordHash % 2);
+    } else {
+        switch (blockID) {
+        case TileID::ashPlant:
+            offsetX += 18 * (coordHash % 11);
+            break;
+        case TileID::corruptPlant:
+        case TileID::crimsonPlant:
+            offsetX += 18 * (coordHash % 23);
+            break;
+        case TileID::grassPlant:
+        case TileID::tallGrassPlant: {
+            int mod = coordHash % (coordHash % 7 == 1 ? 45 : 6);
+            if (mod == 8 && blockID == TileID::tallGrassPlant) {
+                mod = coordHash % 6;
+            }
+            offsetX += 18 * mod;
+        } break;
+        case TileID::junglePlant: {
+            int mod = coordHash % (coordHash % 7 == 1 ? 23 : 6);
+            if ((mod == 8 && y < getCavernLevel()) ||
+                (mod == 9 && y < getUndergroundLevel())) {
+                mod = coordHash % 6;
+            }
+            offsetX += 18 * mod;
+        } break;
+        case TileID::largeJunglePlant: {
+            int mod = coordHash % 21;
+            if (mod > 8) {
+                offsetX = 36 * (mod - 9);
+                offsetY = 36;
+            } else {
+                frameWidth = 3;
+                offsetX += 54 * mod;
+            }
+        } break;
+        case TileID::mushroomPlant:
+            offsetX += 18 * (coordHash % 5);
+            break;
+        case TileID::tallJunglePlant: {
+            int mod = coordHash % (coordHash % 7 == 1 ? 17 : 6);
+            if (mod == 8) {
+                mod = coordHash % 6;
+            }
+            offsetX += 18 * mod;
+        } break;
+        }
     }
     for (int i = 0; i < frameWidth; ++i) {
         for (int j = 0; j < frameHeight; ++j) {
