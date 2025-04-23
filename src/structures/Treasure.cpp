@@ -29,11 +29,13 @@ inline const std::set<int> placementAvoidTiles{
 
 bool isPlacementCandidate(int x, int y, World &world)
 {
-    int floorLeft = world.getTile(x, y).blockID;
-    int floorRight = world.getTile(x + 1, y).blockID;
-    return isSolidBlock(floorLeft) && isSolidBlock(floorRight) &&
-           !placementAvoidTiles.contains(floorLeft) &&
-           !placementAvoidTiles.contains(floorRight) &&
+    Tile &floorLeft = world.getTile(x, y);
+    Tile &floorRight = world.getTile(x + 1, y);
+    return isSolidBlock(floorLeft.blockID) &&
+           isSolidBlock(floorRight.blockID) && floorLeft.slope == Slope::none &&
+           floorRight.slope == Slope::none &&
+           !placementAvoidTiles.contains(floorLeft.blockID) &&
+           !placementAvoidTiles.contains(floorRight.blockID) &&
            world.regionPasses(x, y - 3, 2, 3, [](Tile &tile) {
                return tile.blockID == TileID::empty &&
                       tile.liquid != Liquid::lava &&
@@ -709,6 +711,9 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
         int surface = world.getSurfaceLevel(x);
         if (y < surface + 3 && y > surface - 8 && type != Variant::reef &&
             type != Variant::water && rnd.getDouble(0, 1) < 0.8) {
+            continue;
+        } else if (
+            y < world.getUndergroundLevel() && type == Variant::goldLocked) {
             continue;
         }
         usedLocations[binId].emplace_back(x, y);

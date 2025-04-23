@@ -3,11 +3,13 @@
 #include "Random.h"
 #include "World.h"
 #include "ids/ItemID.h"
+#include "ids/Paint.h"
 #include "ids/Prefix.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/Platforms.h"
 #include "structures/StructureUtil.h"
+#include "structures/data/DungeonRooms.h"
 #include "structures/data/Furniture.h"
 #include <algorithm>
 #include <iostream>
@@ -776,47 +778,184 @@ private:
         int scanDist = 0.1 * world.getWidth();
         world.dungeonX = dungeonCenter;
         world.dungeonY = world.getSurfaceLevel(world.dungeonX);
+        int offset = world.dungeonX < world.getWidth() / 2 ? 23 : -23;
         for (int swapI = 0; swapI < scanDist; ++swapI) {
             int i = swapI / 2;
             if (swapI % 2 == 0) {
                 i = -i;
             }
+            int surfaceLevel = std::midpoint(
+                world.getSurfaceLevel(dungeonCenter + i - 8),
+                world.getSurfaceLevel(dungeonCenter + i + 8));
             if (world.regionPasses(
-                    dungeonCenter + i - 55,
-                    world.dungeonY,
-                    110,
-                    1,
+                    dungeonCenter + i + offset - 45,
+                    surfaceLevel - 30,
+                    90,
+                    30,
                     [](Tile &tile) {
-                        return tile.blockID != TileID::livingWood;
+                        return tile.blockID != TileID::livingWood &&
+                               tile.blockID != TileID::leaf;
                     })) {
                 world.dungeonX = dungeonCenter + i;
                 break;
             }
         }
         std::vector<int> surface;
-        for (int i = -26; i < 26; ++i) {
-            surface.push_back(world.getSurfaceLevel(world.dungeonX + i));
+        for (int i = -30; i < 30; ++i) {
+            surface.push_back(
+                world.getSurfaceLevel(world.dungeonX + i + offset));
         }
         std::sort(surface.begin(), surface.end());
-        world.dungeonY = surface[0.3 * surface.size()];
+        world.dungeonY = surface[0.15 * surface.size()];
+    }
+
+    void makeEntryHallway(Point entry, Point room)
+    {
+        if (2 * std::abs(entry.first - room.first) <
+            std::abs(entry.second - room.second)) {
+            makeHallway(entry, room);
+            return;
+        }
+        Point mid{
+            (2 * entry.first + room.first) / 3,
+            (entry.second + 2 * room.second) / 3};
+        Point offset{
+            roomSize / 2 + wallThickness,
+            roomSize / 2 + wallThickness};
+        drawRect(subPts(mid, offset), addPts(mid, offset), 0, 0, false);
+        makeHallway(entry, mid);
+        makeHallway(mid, room);
     }
 
     void makeEntry()
     {
-        for (int x = world.dungeonX - 35; x < world.dungeonX + 35; ++x) {
-            for (int y = world.dungeonY + 1;
-                 y < world.dungeonY + wallThickness + 1;
-                 ++y) {
-                Tile &tile = world.getTile(x, y);
-                if (tile.wallID != theme.brickWall) {
-                    tile.blockID = theme.brick;
+        bool isOnLeft = world.dungeonX < world.getWidth() / 2;
+        TileBuffer entry = Data::getDungeonRoom(
+            isOnLeft ? Data::Room::entranceRight : Data::Room::entranceLeft,
+            theme.furniture,
+            world.getFramedTiles());
+        int x = world.dungeonX;
+        int y = world.dungeonY;
+        int minX = world.getWidth();
+        int maxX = 0;
+        for (int i = -20; i < 20; ++i) {
+            if (world.getTile(x + i, y).blockID == theme.brick) {
+                minX = std::min(minX, x + i);
+                maxX = std::max(maxX, x + i);
+            }
+        }
+        x = std::midpoint(minX, maxX);
+        bool foundAnchor = false;
+        for (int i = 0; i < entry.getWidth() && !foundAnchor; ++i) {
+            for (int j = 0; j < entry.getHeight(); ++j) {
+                Tile &tile = entry.getTile(i, j);
+                if (tile.blockID == TileID::cloud &&
+                    tile.blockPaint == Paint::purple) {
+                    x -= i;
+                    y -= j;
+                    foundAnchor = true;
+                    break;
                 }
             }
         }
-        for (int x = world.dungeonX - 35; x < world.dungeonX + 35; ++x) {
-            for (int y = world.dungeonY - 20; y < world.dungeonY + 1; ++y) {
-                Tile &tile = world.getTile(x, y);
-                tile.blockID = TileID::empty;
+        for (int i = 0; i < entry.getWidth(); ++i) {
+            bool foundSolidTile = false;
+            for (int j = 0; j < entry.getHeight(); ++j) {
+                Tile &entryTile = entry.getTile(i, j);
+                Tile &tile = world.getTile(x + i, y + j);
+                if (entryTile.blockID == TileID::cloud) {
+                    if (entryTile.blockPaint == Paint::red) {
+                        world.dungeonX = x + i;
+                        world.dungeonY = y + j;
+                    }
+                    if (entryTile.blockPaint == Paint::none) {
+                        entryTile.blockID = tile.blockID;
+                    } else {
+                        entryTile.blockID = TileID::empty;
+                        entryTile.blockPaint = Paint::none;
+                    }
+                }
+                if (tile.wallID == theme.brickWall &&
+                    tile.blockID == TileID::empty &&
+                    entryTile.blockID == theme.brick) {
+                    continue;
+                }
+                int existingTileId = tile.blockID;
+                tile = entryTile;
+                double noise = rnd.getFineNoise(x + 2 * i, y + j);
+                double threshold = 1.9 * j / entry.getHeight() - 0.56;
+                if (noise > threshold + 0.15) {
+                    if (tile.blockID != TileID::empty &&
+                        !world.getFramedTiles()[tile.blockID]) {
+                        tile.blockID = TileID::empty;
+                    }
+                    tile.wallID = WallID::empty;
+                } else if (noise > threshold) {
+                    if (tile.blockID != TileID::empty &&
+                        !world.getFramedTiles()[tile.blockID]) {
+                        tile.blockID = TileID::leaf;
+                    }
+                    if (tile.wallID != WallID::empty) {
+                        tile.wallID = WallID::Safe::livingLeaf;
+                    }
+                }
+                if (!foundSolidTile && tile.blockID != TileID::empty) {
+                    foundSolidTile = true;
+                    if (tile.blockID == theme.brick) {
+                        tile.slope = rnd.select(
+                            {Slope::none,
+                             Slope::none,
+                             Slope::half,
+                             Slope::topRight,
+                             Slope::topLeft});
+                    }
+                }
+                if (tile.blockID == TileID::empty &&
+                    (existingTileId == TileID::livingWood ||
+                     existingTileId == TileID::leaf)) {
+                    tile.blockID = existingTileId;
+                }
+            }
+            for (int j = entry.getHeight(); j < 100; ++j) {
+                Tile &tile = world.getTile(x + i, y + j);
+                if (tile.wallID == theme.brickWall) {
+                    if (j < 50) {
+                        continue;
+                    } else {
+                        break;
+                    }
+                }
+                if (tile.blockID != TileID::empty) {
+                    if (tile.blockID == TileID::grass) {
+                        tile.blockID = TileID::dirt;
+                        Tile &nextTile = world.getTile(x + i, y + j + 1);
+                        if (nextTile.blockID == TileID::grass) {
+                            nextTile.blockID = TileID::dirt;
+                        }
+                    }
+                    break;
+                }
+                tile.blockID = theme.brick;
+                tile.wallID = theme.brickWall;
+            }
+        }
+        int delta = isOnLeft ? 1 : -1;
+        x += isOnLeft ? entry.getWidth() : -1;
+        y += entry.getHeight() - 1;
+        for (int i = 0; std::abs(i) < 50; i += delta) {
+            int minJ = 2 * std::abs(i);
+            if (world.getTile(x + i, y + minJ).blockID != TileID::empty) {
+                break;
+            }
+            for (int j = minJ; j < 100; ++j) {
+                Tile &tile = world.getTile(x + i, y + j);
+                if (tile.blockID != TileID::empty) {
+                    if (tile.blockID == TileID::grass) {
+                        tile.blockID = TileID::dirt;
+                    }
+                    break;
+                }
+                tile.blockID = theme.brick;
                 tile.wallID = theme.brickWall;
             }
         }
@@ -887,10 +1026,8 @@ public:
         for (auto [x, y] : zones) {
             if (connectedZones.empty()) {
                 findConnectedZones(x, y, connectedZones, allZones);
-                makeHallway(
-                    {world.dungeonX +
-                         (world.dungeonX > world.getWidth() / 2 ? 5 : -5),
-                     world.dungeonY},
+                makeEntryHallway(
+                    {world.dungeonX, world.dungeonY + hallSize - 3},
                     {x, y});
                 continue;
             } else if (connectedZones.contains({x, y})) {

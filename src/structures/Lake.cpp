@@ -77,7 +77,10 @@ void simulateRain(World &world, int minX, int maxX)
         TileID::ashGrass,
         TileID::sandstoneBrick,
         TileID::ebonstoneBrick,
-        TileID::crimstoneBrick};
+        TileID::crimstoneBrick,
+        TileID::blueBrick,
+        TileID::greenBrick,
+        TileID::pinkBrick};
     std::set<int> dryWalls{
         WallID::Safe::sandstoneBrick,
         WallID::Unsafe::sandstone,

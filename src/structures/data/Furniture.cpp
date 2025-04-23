@@ -308,6 +308,18 @@ inline const std::map<std::pair<int, Variant>, std::pair<int, int>> frameDetail{
     {{TileID::workBench, Variant::pinkDungeon}, {468, 0}},
 };
 
+bool convertFurniture(Tile &tile, Variant furnitureSet)
+{
+    auto itr = frameDetail.find({tile.blockID, furnitureSet});
+    if (itr == frameDetail.end()) {
+        return false;
+    }
+    auto [frameX, frameY] = itr->second;
+    tile.frameX += frameX;
+    tile.frameY += frameY;
+    return true;
+}
+
 TileBuffer
 getFurniture(int id, Variant furnitureSet, const std::vector<bool> &framedTiles)
 {
@@ -318,16 +330,11 @@ getFurniture(int id, Variant furnitureSet, const std::vector<bool> &framedTiles)
             if (tile.blockID == TileID::cloud) {
                 continue;
             }
-            auto itr = frameDetail.find({tile.blockID, furnitureSet});
-            if (itr == frameDetail.end()) {
+            if (!convertFurniture(tile, furnitureSet)) {
                 tile.blockID = TileID::empty;
                 tile.frameX = 0;
                 tile.frameY = 0;
-                continue;
             }
-            auto [frameX, frameY] = itr->second;
-            tile.frameX += frameX;
-            tile.frameY += frameY;
         }
     }
     return data;

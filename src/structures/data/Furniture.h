@@ -11,6 +11,8 @@ enum class Variant { blueDungeon, greenDungeon, pinkDungeon };
 
 inline auto furnitureLayouts = std::views::iota(0, 29);
 
+bool convertFurniture(Tile &tile, Variant furnitureSet);
+
 TileBuffer getFurniture(
     int id,
     Variant furnitureSet,
