@@ -5,6 +5,7 @@
 #include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
+#include "structures/StructureUtil.h"
 #include "structures/data/Rooms.h"
 #include "structures/data/SwordShrines.h"
 #include <algorithm>
@@ -177,7 +178,7 @@ void growRoot(
     }
 }
 
-std::pair<int, int> findDoor(TileBuffer &room)
+Point findDoor(TileBuffer &room)
 {
     for (int i = 0; i < room.getWidth(); ++i) {
         for (int j = 0; j < room.getHeight(); ++j) {
@@ -308,7 +309,7 @@ void growTapRoot(double x, double y, int roomId, Random &rnd, World &world)
                 tile.wallID = WallID::Unsafe::livingWood;
             }
         }
-        std::set<std::pair<int, int>> chests;
+        std::set<Point> chests;
         for (int i = 0; i < room.getWidth(); ++i) {
             for (int j = 0; j < room.getHeight(); ++j) {
                 Tile &roomTile = room.getTile(i, j);
@@ -389,21 +390,29 @@ void growLivingTrees(Random &rnd, World &world)
 void buryEnchantedSwords(Random &rnd, World &world)
 {
     double numSwords = world.getWidth() / rnd.getInt(1800, 3800);
+    std::vector<Point> usedLocations;
     while (numSwords > 0) {
         int x = rnd.getInt(400, 0.36 * world.getWidth());
         if (rnd.getBool()) {
             x = world.getWidth() - x;
         }
         int y = world.getSurfaceLevel(x) + rnd.getInt(15, 35);
-        if (!world.regionPasses(x - 16, y, 32, 20, [](Tile &tile) {
-                return tile.blockID != TileID::empty &&
-                       tile.blockID != TileID::snow &&
-                       tile.blockID != TileID::sand &&
-                       tile.blockID != TileID::jungleGrass;
-            })) {
-            numSwords -= 0.01;
+        if (!world.regionPasses(
+                x - 16,
+                y,
+                32,
+                20,
+                [](Tile &tile) {
+                    return tile.blockID != TileID::empty &&
+                           tile.blockID != TileID::snow &&
+                           tile.blockID != TileID::sand &&
+                           tile.blockID != TileID::jungleGrass;
+                }) ||
+            isLocationUsed(x, y, 100, usedLocations)) {
+            numSwords -= 0.002;
             continue;
         }
+        usedLocations.emplace_back(x, y);
         for (int i = -15; i < 15; ++i) {
             for (int j = 3; j < 17; ++j) {
                 if (std::hypot(i, 17 - j) + 2 * rnd.getFineNoise(x + i, y + j) <
@@ -434,7 +443,13 @@ void buryEnchantedSwords(Random &rnd, World &world)
                     y + 13,
                     shrine.getWidth(),
                     shrine.getHeight(),
-                    [](Tile &tile) { return tile.blockID == TileID::empty; })) {
+                    [](Tile &tile) { return tile.blockID == TileID::empty; }) ||
+                !world.regionPasses(
+                    x - shrine.getWidth() / 2,
+                    y + 13 + shrine.getHeight(),
+                    shrine.getWidth(),
+                    1,
+                    [](Tile &tile) { return tile.blockID != TileID::empty; })) {
                 return;
             }
             for (int i = 0; i < shrine.getWidth(); ++i) {

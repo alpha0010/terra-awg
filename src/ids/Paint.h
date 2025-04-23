@@ -8,6 +8,7 @@ enum {
     red = 1,
     lime = 4,
     purple = 10,
+    black = 25,
     brown = 28,
 };
 }

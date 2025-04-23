@@ -33,7 +33,8 @@ bool isPlacementCandidate(int x, int y, World &world)
     Tile &floorRight = world.getTile(x + 1, y);
     return isSolidBlock(floorLeft.blockID) &&
            isSolidBlock(floorRight.blockID) && floorLeft.slope == Slope::none &&
-           floorRight.slope == Slope::none &&
+           floorRight.slope == Slope::none && !floorLeft.actuated &&
+           !floorRight.actuated &&
            !placementAvoidTiles.contains(floorLeft.blockID) &&
            !placementAvoidTiles.contains(floorRight.blockID) &&
            world.regionPasses(x, y - 3, 2, 3, [](Tile &tile) {

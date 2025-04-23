@@ -29,6 +29,7 @@ enum {
     orbHeart = 31,
     candle = 33,
     chandelier = 34,
+    meteorite = 37,
     clay = 40,
     blueBrick = 41,
     lantern = 42,

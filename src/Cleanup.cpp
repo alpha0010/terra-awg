@@ -124,6 +124,7 @@ void smoothSurfaces(World &world)
         TileID::grass,
         TileID::corruptGrass,
         TileID::ebonstone,
+        TileID::meteorite,
         TileID::clay,
         TileID::sand,
         TileID::obsidian,
