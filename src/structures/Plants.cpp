@@ -340,6 +340,55 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
     }
 }
 
+bool placeSmallPile(int x, int y, World &world)
+{
+    Tile &nextBase = world.getTile(x + 1, y);
+    if (nextBase.blockID != world.getTile(x, y).blockID ||
+        nextBase.slope != Slope::none ||
+        world.getTile(x + 1, y - 1).blockID != TileID::empty) {
+        return false;
+    }
+    switch (nextBase.blockID) {
+    case TileID::ash:
+    case TileID::ashGrass:
+    case TileID::blueBrick:
+    case TileID::greenBrick:
+    case TileID::pinkBrick:
+    case TileID::hellstone:
+    case TileID::hellstoneBrick:
+    case TileID::obsidianBrick:
+        world.placeFramedTile(
+            x,
+            y - 1,
+            TileID::smallPile,
+            y < world.getUndergroundLevel() ? Variant::stone : Variant::bone);
+        return true;
+    case TileID::dirt:
+        world.placeFramedTile(x, y - 1, TileID::smallPile, Variant::dirt);
+        return true;
+    case TileID::granite:
+        world.placeFramedTile(x, y - 1, TileID::smallPile, Variant::granite);
+        return true;
+    case TileID::grass:
+        world.placeFramedTile(x, y - 1, TileID::smallPile, Variant::forest);
+        return true;
+    case TileID::ice:
+    case TileID::snow:
+        world.placeFramedTile(x, y - 1, TileID::smallPile, Variant::ice);
+        return true;
+    case TileID::marble:
+        world.placeFramedTile(x, y - 1, TileID::smallPile, Variant::marble);
+        return true;
+    case TileID::sandstone:
+        world.placeFramedTile(x, y - 1, TileID::smallPile, Variant::sandstone);
+        return true;
+    case TileID::stone:
+        world.placeFramedTile(x, y - 1, TileID::smallPile, Variant::stone);
+        return true;
+    }
+    return false;
+}
+
 void growGrass(int x, int y, Random &rnd, World &world)
 {
     Tile &baseTile = world.getTile(x, y);
@@ -383,6 +432,9 @@ void growGrass(int x, int y, Random &rnd, World &world)
         default:
             probeTile.blockID = TileID::empty;
         }
+    }
+    if (randInt % 41 == 0 && placeSmallPile(x, y, world)) {
+        return;
     }
     switch (baseTile.blockID) {
     case TileID::ashGrass:

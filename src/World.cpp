@@ -188,7 +188,16 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::pot, Variant::tundra}, {2, 2, 0, 144}},
     {{TileID::pot, Variant::underworld}, {2, 2, 0, 468}},
     {{TileID::pressurePlate, Variant::lihzahrd}, {1, 1, 0, 108}},
+    {{TileID::smallPile, Variant::bone}, {2, 1, 216, 0}},
+    {{TileID::smallPile, Variant::dirt}, {1, 1, 108, 0}},
+    {{TileID::smallPile, Variant::forest}, {2, 1, 1368, 18}},
     {{TileID::smallPile, Variant::gold}, {2, 1, 648, 18}},
+    {{TileID::smallPile, Variant::granite}, {2, 1, 0, 0}},
+    {{TileID::smallPile, Variant::ice}, {2, 1, 0, 0}},
+    {{TileID::smallPile, Variant::marble}, {2, 1, 0, 0}},
+    {{TileID::smallPile, Variant::sandstone}, {2, 1, 0, 0}},
+    {{TileID::smallPile, Variant::spider}, {2, 1, 0, 0}},
+    {{TileID::smallPile, Variant::stone}, {2, 1, 0, 0}},
     {{TileID::statue, Variant::lihzahrd}, {2, 3, 1548, 0}},
     {{TileID::tallGrassPlant, Variant::none}, {1, 1, 0, 0}},
     {{TileID::tallJunglePlant, Variant::none}, {1, 1, 0, 0}},
@@ -246,6 +255,90 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
     } else if (blockID == TileID::statue && type == Variant::lihzahrd) {
         offsetX += 36 * (coordHash % 3);
         offsetY += 162 * (coordHash % 2);
+    } else if (blockID == TileID::smallPile) {
+        if (type == Variant::forest && coordHash % 41 > 30) {
+            type = Variant::stone;
+        }
+        switch (type) {
+        case Variant::bone: {
+            int mod = coordHash % 26;
+            if (mod < 16) {
+                frameWidth = 1;
+                offsetX += 18 * mod;
+            } else {
+                offsetX += 36 * (mod - 16);
+                offsetY = 18;
+            }
+        } break;
+        case Variant::dirt:
+            offsetX += 18 * (coordHash % 6);
+            break;
+        case Variant::forest:
+            offsetX += 36 * (coordHash % 3);
+            break;
+        case Variant::granite: {
+            int mod = coordHash % 12;
+            if (mod < 6) {
+                frameWidth = 1;
+                offsetX = 1080 + 18 * mod;
+            } else {
+                offsetX = 1692 + 36 * (mod - 6);
+                offsetY = 18;
+            }
+        } break;
+        case Variant::ice: {
+            int mod = coordHash % 18;
+            if (mod < 12) {
+                frameWidth = 1;
+                offsetX = 648 + 18 * mod;
+            } else {
+                offsetX = 900 + 36 * (mod - 12);
+                offsetY = 18;
+            }
+        } break;
+        case Variant::marble: {
+            int mod = coordHash % 12;
+            if (mod < 6) {
+                frameWidth = 1;
+                offsetX = 1188 + 18 * mod;
+            } else {
+                offsetX = 1908 + 36 * (mod - 6);
+                offsetY = 18;
+            }
+        } break;
+        case Variant::sandstone: {
+            int mod = coordHash % 12;
+            if (mod < 6) {
+                frameWidth = 1;
+                offsetX = 972 + 18 * mod;
+            } else {
+                offsetX = 1476 + 36 * (mod - 6);
+                offsetY = 18;
+            }
+        } break;
+        case Variant::spider: {
+            int mod = coordHash % 10;
+            if (mod < 6) {
+                frameWidth = 1;
+                offsetX = 864 + 18 * mod;
+            } else {
+                offsetX = 1224 + 36 * (mod - 6);
+                offsetY = 18;
+            }
+        } break;
+        case Variant::stone: {
+            int mod = coordHash % 12;
+            if (mod < 6) {
+                frameWidth = 1;
+                offsetX = 18 * mod;
+            } else {
+                offsetX = 36 * (mod - 6);
+                offsetY = 18;
+            }
+        } break;
+        default:
+            break;
+        }
     } else {
         switch (blockID) {
         case TileID::ashPlant:
