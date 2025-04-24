@@ -515,6 +515,11 @@ Chest &World::placeChest(int x, int y, Variant type)
     return chests.emplace_back(x, y);
 }
 
+Chest &World::registerStorage(int x, int y)
+{
+    return chests.emplace_back(x, y);
+}
+
 bool World::isExposed(int x, int y) const
 {
     if (x < 1 || x >= width - 1 || y < 1 || y >= height - 1) {

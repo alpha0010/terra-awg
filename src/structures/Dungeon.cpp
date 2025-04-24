@@ -767,6 +767,13 @@ private:
                     tile.blockID = dataTile.blockID;
                     tile.frameX = dataTile.frameX;
                     tile.frameY = dataTile.frameY;
+                    if (((tile.blockID == TileID::dresser &&
+                          tile.frameX % 54 == 0) ||
+                         (tile.blockID == TileID::chest &&
+                          tile.frameX % 36 == 0)) &&
+                        tile.frameY == 0) {
+                        fillDresser(world.registerStorage(x + i, y + j), rnd);
+                    }
                 }
             }
             --numPlacements;

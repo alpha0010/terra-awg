@@ -1807,3 +1807,23 @@ void fillLihzahrdChest(Chest &chest, Random &rnd)
             {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(5, 10)}},
         });
 }
+
+void fillDresser(Chest &chest, Random &rnd)
+{
+    fillLoot(
+        chest,
+        rnd,
+        {
+            {1,
+             {rnd.pool(
+                  {ItemID::robe,
+                   ItemID::crimsonCloak,
+                   ItemID::redCape,
+                   ItemID::winterCape}),
+              Prefix::none,
+              1}},
+            {1, {ItemID::book, Prefix::none, rnd.getInt(3, 5)}},
+            {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(1, 2)}},
+            {0.5, {ItemID::cobweb, Prefix::none, rnd.getInt(10, 29)}},
+        });
+}

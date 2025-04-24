@@ -120,7 +120,7 @@ void placeGems(Random &rnd, World &world)
         }
         tile.blockID = TileID::gem;
         tile.frameX = 108;
-        tile.frameY = frameY + 54 * ((x + y) % 3);
+        tile.frameY = frameY + 18 * ((x + y) % 3);
         --numGems;
     }
 }

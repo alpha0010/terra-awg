@@ -38,5 +38,6 @@ void fillPyramidChest(Chest &chest, Random &rnd, World &world);
 void fillDungeonChest(Chest &chest, Random &rnd, World &world);
 void fillDungeonBiomeChest(Chest &chest, Random &rnd, Item &&primaryItem);
 void fillLihzahrdChest(Chest &chest, Random &rnd);
+void fillDresser(Chest &chest, Random &rnd);
 
 #endif // LOOTRULES_H
