@@ -172,6 +172,19 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::lamp, Variant::lesion}, {1, 3, 0, 1782}},
     {{TileID::lamp, Variant::lihzahrd}, {1, 3, 0, 432}},
     {{TileID::lamp, Variant::sandstone}, {1, 3, 0, 2052}},
+    {{TileID::largePile, Variant::bone}, {3, 2, 0, 0}},
+    {{TileID::largePile, Variant::ice}, {3, 2, 1404, 0}},
+    {{TileID::largePile, Variant::mushroom}, {3, 2, 1728, 0}},
+    {{TileID::largePile, Variant::stone}, {3, 2, 378, 0}},
+    {{TileID::largePileGroup2, Variant::ash}, {3, 2, 324, 0}},
+    {{TileID::largePileGroup2, Variant::forest}, {3, 2, 756, 0}},
+    {{TileID::largePileGroup2, Variant::granite}, {3, 2, 1890, 0}},
+    {{TileID::largePileGroup2, Variant::jungle}, {3, 2, 0, 0}},
+    {{TileID::largePileGroup2, Variant::lihzahrd}, {3, 2, 972, 0}},
+    {{TileID::largePileGroup2, Variant::livingWood}, {3, 2, 2538, 0}},
+    {{TileID::largePileGroup2, Variant::marble}, {3, 2, 2214, 0}},
+    {{TileID::largePileGroup2, Variant::sandstone}, {3, 2, 1566, 0}},
+    {{TileID::largePileGroup2, Variant::spider}, {3, 2, 486, 0}},
     {{TileID::larva, Variant::none}, {3, 3, 0, 0}},
     {{TileID::lihzahrdAltar, Variant::none}, {3, 2, 0, 0}},
     {{TileID::mushroomPlant, Variant::none}, {1, 1, 0, 0}},
@@ -194,6 +207,7 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::smallPile, Variant::gold}, {2, 1, 648, 18}},
     {{TileID::smallPile, Variant::granite}, {2, 1, 0, 0}},
     {{TileID::smallPile, Variant::ice}, {2, 1, 0, 0}},
+    {{TileID::smallPile, Variant::livingWood}, {2, 1, 2124, 18}},
     {{TileID::smallPile, Variant::marble}, {2, 1, 0, 0}},
     {{TileID::smallPile, Variant::sandstone}, {2, 1, 0, 0}},
     {{TileID::smallPile, Variant::spider}, {2, 1, 0, 0}},
@@ -274,6 +288,7 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
             offsetX += 18 * (coordHash % 6);
             break;
         case Variant::forest:
+        case Variant::livingWood:
             offsetX += 36 * (coordHash % 3);
             break;
         case Variant::granite: {
@@ -336,6 +351,31 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
                 offsetY = 18;
             }
         } break;
+        default:
+            break;
+        }
+    } else if (
+        blockID == TileID::largePile || blockID == TileID::largePileGroup2) {
+        switch (type) {
+        case Variant::ash:
+        case Variant::forest:
+        case Variant::lihzahrd:
+        case Variant::mushroom:
+            offsetX += 54 * (coordHash % 3);
+            break;
+        case Variant::bone:
+        case Variant::granite:
+        case Variant::ice:
+        case Variant::jungle:
+        case Variant::marble:
+        case Variant::sandstone:
+        case Variant::spider:
+        case Variant::stone:
+            offsetX += 54 * (coordHash % 6);
+            break;
+        case Variant::livingWood:
+            offsetX += 54 * (coordHash % 5);
+            break;
         default:
             break;
         }

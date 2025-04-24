@@ -340,6 +340,77 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
     }
 }
 
+void placeLivingTreeDecoAt(int x, Random &rnd, World &world)
+{
+    int y = world.getSurfaceLevel(x);
+    switch (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 5) {
+    case 0:
+        for (int j = -10; j < 10; ++j) {
+            if (world.regionPasses(
+                    x,
+                    y + j,
+                    2,
+                    1,
+                    [](Tile &tile) {
+                        return tile.blockID == TileID::empty &&
+                               tile.wallID == WallID::empty;
+                    }) &&
+                world.regionPasses(x, y + j + 1, 2, 1, [](Tile &tile) {
+                    return tile.slope == Slope::none &&
+                           (tile.blockID == TileID::grass ||
+                            tile.blockID == TileID::livingWood);
+                })) {
+                world.placeFramedTile(
+                    x,
+                    y + j,
+                    TileID::smallPile,
+                    Variant::livingWood);
+                return;
+            }
+        }
+        break;
+    case 1:
+        for (int j = -10; j < 10; ++j) {
+            if (world.regionPasses(
+                    x,
+                    y + j,
+                    3,
+                    2,
+                    [](Tile &tile) {
+                        return tile.blockID == TileID::empty &&
+                               tile.wallID == WallID::empty;
+                    }) &&
+                world.regionPasses(x, y + j + 2, 3, 1, [](Tile &tile) {
+                    return tile.slope == Slope::none &&
+                           (tile.blockID == TileID::grass ||
+                            tile.blockID == TileID::livingWood);
+                })) {
+                world.placeFramedTile(
+                    x,
+                    y + j,
+                    TileID::largePileGroup2,
+                    Variant::livingWood);
+                return;
+            }
+        }
+        break;
+    }
+}
+
+void growLivingTreeDeco(Random &rnd, World &world)
+{
+    int doPlacementUntil = -1;
+    for (int x = 300; x < world.getWidth() - 300; ++x) {
+        if (world.getTile(x, world.getSurfaceLevel(x)).blockID ==
+            TileID::livingWood) {
+            doPlacementUntil = x + 20;
+        }
+        if (x - 20 < doPlacementUntil) {
+            placeLivingTreeDecoAt(x - 20, rnd, world);
+        }
+    }
+}
+
 bool placeSmallPile(int x, int y, World &world)
 {
     Tile &nextBase = world.getTile(x + 1, y);
@@ -384,6 +455,100 @@ bool placeSmallPile(int x, int y, World &world)
         return true;
     case TileID::stone:
         world.placeFramedTile(x, y - 1, TileID::smallPile, Variant::stone);
+        return true;
+    }
+    return false;
+}
+
+bool placeLargePile(int x, int y, World &world)
+{
+    if (!isRegionEmpty(x, y - 2, 3, 2, world) ||
+        !world.regionPasses(x + 1, y, 2, 1, [](Tile &tile) {
+            return tile.slope == Slope::none && isSolidBlock(tile.blockID);
+        })) {
+        return false;
+    }
+    switch (world.getTile(x + 1, y).blockID) {
+    case TileID::ash:
+    case TileID::ashGrass:
+    case TileID::hellstone:
+    case TileID::hellstoneBrick:
+    case TileID::obsidianBrick:
+        if (y > world.getUnderworldLevel() && (x + y) % 5 == 0) {
+            world.placeFramedTile(x, y - 2, TileID::largePile, Variant::bone);
+        } else {
+            world.placeFramedTile(
+                x,
+                y - 2,
+                TileID::largePileGroup2,
+                Variant::ash);
+        }
+        return true;
+    case TileID::blueBrick:
+    case TileID::greenBrick:
+    case TileID::pinkBrick:
+        if (y > world.getUndergroundLevel() && (x + y) % 5 == 0) {
+            world.placeFramedTile(x, y - 2, TileID::largePile, Variant::bone);
+            return true;
+        }
+        return false;
+    case TileID::granite:
+        world.placeFramedTile(
+            x,
+            y - 2,
+            TileID::largePileGroup2,
+            Variant::granite);
+        return true;
+    case TileID::grass:
+        world.placeFramedTile(
+            x,
+            y - 2,
+            TileID::largePileGroup2,
+            Variant::forest);
+        return true;
+    case TileID::ice:
+    case TileID::snow:
+        world.placeFramedTile(x, y - 2, TileID::largePile, Variant::ice);
+        return true;
+    case TileID::jungleGrass:
+        world.placeFramedTile(
+            x,
+            y - 2,
+            TileID::largePileGroup2,
+            Variant::jungle);
+        return true;
+    case TileID::lihzahrdBrick:
+        if (world.getTile(x + 1, y - 1).wallID ==
+            WallID::Unsafe::lihzahrdBrick) {
+            world.placeFramedTile(
+                x,
+                y - 2,
+                TileID::largePileGroup2,
+                Variant::lihzahrd);
+            return true;
+        }
+        return false;
+    case TileID::marble:
+        world.placeFramedTile(
+            x,
+            y - 2,
+            TileID::largePileGroup2,
+            Variant::marble);
+        return true;
+    case TileID::mushroomGrass:
+        world.placeFramedTile(x, y - 2, TileID::largePile, Variant::mushroom);
+        return true;
+    case TileID::sandstone:
+    case TileID::ebonsandstone:
+    case TileID::crimsandstone:
+        world.placeFramedTile(
+            x,
+            y - 2,
+            TileID::largePileGroup2,
+            Variant::sandstone);
+        return true;
+    case TileID::stone:
+        world.placeFramedTile(x, y - 2, TileID::largePile, Variant::stone);
         return true;
     }
     return false;
@@ -436,6 +601,9 @@ void growGrass(int x, int y, Random &rnd, World &world)
     if (randInt % 41 == 0 && placeSmallPile(x, y, world)) {
         return;
     }
+    if (randInt % 37 == 0 && placeLargePile(x, y, world)) {
+        return;
+    }
     switch (baseTile.blockID) {
     case TileID::ashGrass:
         world.placeFramedTile(x, y - 1, TileID::ashPlant);
@@ -483,6 +651,7 @@ void growGrass(int x, int y, Random &rnd, World &world)
 void genGrasses(const LocationBins &locations, Random &rnd, World &world)
 {
     std::cout << "Growing plants\n";
+    growLivingTreeDeco(rnd, world);
     for (const auto &bin : locations) {
         for (auto [x, y] : bin.second) {
             growGrass(x, y, rnd, world);

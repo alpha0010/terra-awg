@@ -96,6 +96,8 @@ enum {
     sink = 172,
     gem = 178,
     smallPile = 185,
+    largePile = 186,
+    largePileGroup2 = 187,
     cloud = 189,
     livingWood = 191,
     leaf = 192,

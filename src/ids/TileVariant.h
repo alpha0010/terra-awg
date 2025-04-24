@@ -4,6 +4,7 @@
 enum class Variant {
     none,
     ankh,
+    ash,
     ashWood,
     bone,
     corruption,
