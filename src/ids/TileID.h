@@ -94,6 +94,7 @@ enum {
     tungstenOre = 168,
     platinumOre = 169,
     sink = 172,
+    gem = 178,
     smallPile = 185,
     cloud = 189,
     livingWood = 191,

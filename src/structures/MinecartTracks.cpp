@@ -59,6 +59,7 @@ inline const std::set<int> trackClearTiles{
     TileID::leadOre,
     TileID::tungstenOre,
     TileID::platinumOre,
+    TileID::gem,
     TileID::corruptIce,
     TileID::slime,
     TileID::crimsonGrass,

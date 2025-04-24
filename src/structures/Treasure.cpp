@@ -88,6 +88,43 @@ int testOrbHeartCandidate(int x, int y, World &world)
     return tendrilID;
 }
 
+void placeGems(Random &rnd, World &world)
+{
+    int numGems =
+        world.getWidth() * world.getHeight() / rnd.getInt(65800, 76800);
+    int scanDist = 0.08 * world.getWidth();
+    std::set<int> validAnchors{
+        TileID::sand,
+        TileID::hardenedSand,
+        TileID::sandstone,
+        TileID::ebonsand,
+        TileID::hardenedEbonsand,
+        TileID::ebonsandstone,
+        TileID::crimsand,
+        TileID::hardenedCrimsand,
+        TileID::crimsandstone};
+    while (numGems > 0) {
+        int x = rnd.getInt(
+            world.desertCenter - scanDist,
+            world.desertCenter + scanDist);
+        int y =
+            rnd.getInt(world.getUndergroundLevel(), world.getUnderworldLevel());
+        if (!validAnchors.contains(world.getTile(x, y).blockID)) {
+            continue;
+        }
+        auto [deltaX, deltaY, frameY] = rnd.select(
+            {std::tuple{-1, 0, 162}, {1, 0, 108}, {0, -1, 0}, {0, 1, 54}});
+        Tile &tile = world.getTile(x + deltaX, y + deltaY);
+        if (tile.blockID != TileID::empty) {
+            continue;
+        }
+        tile.blockID = TileID::gem;
+        tile.frameX = 108;
+        tile.frameY = frameY + 54 * ((x + y) % 3);
+        --numGems;
+    }
+}
+
 void placeLifeCrystals(
     int maxBin,
     LocationBins &locations,
@@ -802,6 +839,7 @@ LocationBins genTreasure(Random &rnd, World &world)
     for (const auto &applyQueuedTreasure : world.queuedTreasures) {
         applyQueuedTreasure(rnd, world);
     }
+    placeGems(rnd, world);
     int maxBin =
         binLocation(world.getWidth(), world.getHeight(), world.getHeight());
     placeJungleShrines(rnd, world);
