@@ -806,6 +806,21 @@ void placePots(int maxBin, LocationBins &locations, Random &rnd, World &world)
     }
 }
 
+void placeDirtiestBlocks(Random &rnd, World &world)
+{
+    int numBlocks = world.getWidth() * world.getHeight() / 1680000;
+    while (numBlocks > 0) {
+        int x = rnd.getInt(60, world.getWidth() - 60);
+        int y = rnd.getInt(60, world.getHeight() - 60);
+        Tile &tile = world.getTile(x, y);
+        if (tile.blockID != TileID::dirt || world.isExposed(x, y)) {
+            continue;
+        }
+        tile.blockID = TileID::dirtiestBlock;
+        --numBlocks;
+    }
+}
+
 LocationBins genTreasure(Random &rnd, World &world)
 {
     std::cout << "Cataloging ground\n";
@@ -851,5 +866,6 @@ LocationBins genTreasure(Random &rnd, World &world)
     placeManaCrystals(maxBin, flatLocations, rnd, world);
     placeChests(maxBin, flatLocations, rnd, world);
     placePots(maxBin, flatLocations, rnd, world);
+    placeDirtiestBlocks(rnd, world);
     return flatLocations;
 }
