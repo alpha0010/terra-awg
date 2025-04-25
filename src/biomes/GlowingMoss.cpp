@@ -2,6 +2,7 @@
 
 #include "Random.h"
 #include "World.h"
+#include "biomes/BiomeUtil.h"
 #include <iostream>
 #include <set>
 
@@ -13,7 +14,7 @@ bool isSolidArea(int x, int y, int size, World &world)
     });
 }
 
-std::pair<int, int> findSolidArea(int minY, int maxY, Random &rnd, World &world)
+Point findSolidArea(int minY, int maxY, Random &rnd, World &world)
 {
     int size = 8;
     while (true) {
@@ -60,6 +61,7 @@ void fillGlowingMossCave(Random &rnd, World &world)
         (world.getCavernLevel() + 4 * world.getUnderworldLevel()) / 5) {
         mossType = rnd.select({mossType, (int)TileID::lavaMossStone});
     }
+    std::vector<Point> mossLocations;
     for (int x = centerX - size; x < centerX + size; ++x) {
         for (int y = centerY - size; y < centerY + size; ++y) {
             double threshold =
@@ -69,10 +71,16 @@ void fillGlowingMossCave(Random &rnd, World &world)
                 if (tile.blockID == TileID::stone && world.isExposed(x, y)) {
                     // Coat edges in moss.
                     tile.blockID = mossType;
+                    mossLocations.emplace_back(x, y);
                 }
             }
         }
     }
+    world.queuedDeco.emplace_back([mossLocations](Random &, World &world) {
+        for (auto [x, y] : mossLocations) {
+            growMossOn(x, y, world);
+        }
+    });
 }
 
 void genGlowingMoss(Random &rnd, World &world)

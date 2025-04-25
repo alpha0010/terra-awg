@@ -651,6 +651,9 @@ void growGrass(int x, int y, Random &rnd, World &world)
 void genGrasses(const LocationBins &locations, Random &rnd, World &world)
 {
     std::cout << "Growing plants\n";
+    for (const auto &applyQueuedDeco : world.queuedDeco) {
+        applyQueuedDeco(rnd, world);
+    }
     growLivingTreeDeco(rnd, world);
     for (const auto &bin : locations) {
         for (auto [x, y] : bin.second) {

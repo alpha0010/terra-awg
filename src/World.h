@@ -91,6 +91,7 @@ public:
     int dungeonX;
     int dungeonY;
 
+    std::vector<std::function<void(Random &, World &)>> queuedDeco;
     std::vector<std::function<void(Random &, World &)>> queuedTraps;
     std::vector<std::function<void(Random &, World &)>> queuedTreasures;
 };

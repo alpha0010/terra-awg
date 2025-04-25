@@ -24,4 +24,6 @@ Point findStoneCave(
     World &world,
     int minSize = 6);
 
+void growMossOn(int x, int y, World &world);
+
 #endif // BIOMEUTIL_H

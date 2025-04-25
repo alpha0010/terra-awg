@@ -2,6 +2,7 @@
 
 #include "Random.h"
 #include "World.h"
+#include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
 #include <iostream>
 
@@ -54,6 +55,7 @@ void genAether(Random &rnd, World &world)
     applyAetherDistortion(centerX, centerY, size * 3.2, world);
     int maxBubblePos = centerY;
     int maxEditPos = centerY;
+    std::vector<Point> mossLocations;
     for (int x = centerX - size; x < centerX + size; ++x) {
         for (int y = centerY - size; y < centerY + size; ++y) {
             double centralPropo = std::hypot(x - centerX, y - centerY) / size;
@@ -75,6 +77,7 @@ void genAether(Random &rnd, World &world)
                 tile.blockID = tile.blockID == TileID::empty ? TileID::aetherium
                                : centralPropo < 0.6 ? TileID::heliumMossStone
                                                     : TileID::stone;
+                mossLocations.emplace_back(x, y);
             }
             if (noiseVal > 0.019) {
                 tile.wallID = WallID::empty;
@@ -82,6 +85,11 @@ void genAether(Random &rnd, World &world)
             }
         }
     }
+    world.queuedDeco.emplace_back([mossLocations](Random &, World &world) {
+        for (auto [x, y] : mossLocations) {
+            growMossOn(x, y, world);
+        }
+    });
     for (int x = centerX - size; x < centerX + size; ++x) {
         for (int y = centerY - size; y < centerY + size; ++y) {
             Tile &tile = world.getTile(x, y);

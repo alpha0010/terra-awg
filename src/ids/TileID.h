@@ -95,6 +95,7 @@ enum {
     platinumOre = 169,
     sink = 172,
     gem = 178,
+    mossPlant = 184,
     smallPile = 185,
     largePile = 186,
     largePileGroup2 = 187,
