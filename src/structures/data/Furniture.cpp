@@ -226,86 +226,107 @@ inline const std::map<std::pair<int, Variant>, std::pair<int, int>> frameDetail{
     {{TileID::bathtub, Variant::blueDungeon}, {0, 756}},
     {{TileID::bathtub, Variant::greenDungeon}, {0, 792}},
     {{TileID::bathtub, Variant::pinkDungeon}, {0, 828}},
+    {{TileID::bathtub, Variant::obsidian}, {0, 900}},
     // Base: Wooden Bed
     {{TileID::bed, Variant::blueDungeon}, {0, 180}},
     {{TileID::bed, Variant::greenDungeon}, {0, 216}},
     {{TileID::bed, Variant::pinkDungeon}, {0, 252}},
+    {{TileID::bed, Variant::obsidian}, {0, 288}},
     // Base: Wooden Bench
     {{TileID::bench, Variant::blueDungeon}, {324, 0}},
     {{TileID::bench, Variant::greenDungeon}, {378, 0}},
     {{TileID::bench, Variant::pinkDungeon}, {432, 0}},
+    {{TileID::bench, Variant::obsidian}, {540, 0}},
     // Base: Wooden Bookcase
     {{TileID::bookcase, Variant::blueDungeon}, {54, 0}},
     {{TileID::bookcase, Variant::greenDungeon}, {108, 0}},
     {{TileID::bookcase, Variant::pinkDungeon}, {162, 0}},
+    {{TileID::bookcase, Variant::obsidian}, {216, 0}},
     // Base: Candelabra
     {{TileID::candelabra, Variant::blueDungeon}, {0, 792}},
     {{TileID::candelabra, Variant::greenDungeon}, {0, 828}},
     {{TileID::candelabra, Variant::pinkDungeon}, {0, 864}},
+    {{TileID::candelabra, Variant::obsidian}, {0, 900}},
     // Base: Candle
     {{TileID::candle, Variant::blueDungeon}, {0, 22}},
     {{TileID::candle, Variant::greenDungeon}, {0, 44}},
     {{TileID::candle, Variant::pinkDungeon}, {0, 66}},
+    {{TileID::candle, Variant::obsidian}, {0, 550}},
     // Base: Wooden Chair
     {{TileID::chair, Variant::blueDungeon}, {0, 520}},
     {{TileID::chair, Variant::greenDungeon}, {0, 560}},
     {{TileID::chair, Variant::pinkDungeon}, {0, 600}},
+    {{TileID::chair, Variant::obsidian}, {0, 640}},
     // Base: Copper Chandelier
     {{TileID::chandelier, Variant::blueDungeon}, {0, 1458}},
     {{TileID::chandelier, Variant::greenDungeon}, {0, 1512}},
     {{TileID::chandelier, Variant::pinkDungeon}, {0, 1566}},
+    {{TileID::chandelier, Variant::obsidian}, {0, 1728}},
     // Base: Wooden Chest
     {{TileID::chest, Variant::blueDungeon}, {1404, 0}},
     {{TileID::chest, Variant::greenDungeon}, {1260, 0}},
     {{TileID::chest, Variant::pinkDungeon}, {1332, 0}},
+    {{TileID::chest, Variant::obsidian}, {1584, 0}},
     // Base: Grandfather Clock
     {{TileID::clock, Variant::blueDungeon}, {1080, 0}},
     {{TileID::clock, Variant::greenDungeon}, {1116, 0}},
     {{TileID::clock, Variant::pinkDungeon}, {1152, 0}},
+    {{TileID::clock, Variant::obsidian}, {612, 0}},
     // Base: Wooden Door
     {{TileID::door, Variant::blueDungeon}, {0, 864}},
     {{TileID::door, Variant::greenDungeon}, {0, 918}},
     {{TileID::door, Variant::pinkDungeon}, {0, 972}},
+    {{TileID::door, Variant::obsidian}, {0, 1026}},
     // Base: Wooden Dresser
     {{TileID::dresser, Variant::blueDungeon}, {270, 0}},
     {{TileID::dresser, Variant::greenDungeon}, {324, 0}},
     {{TileID::dresser, Variant::pinkDungeon}, {378, 0}},
+    {{TileID::dresser, Variant::obsidian}, {486, 0}},
     // Base: Tiki Torch
     {{TileID::lamp, Variant::blueDungeon}, {0, 1296}},
     {{TileID::lamp, Variant::greenDungeon}, {0, 1350}},
     {{TileID::lamp, Variant::pinkDungeon}, {0, 1404}},
+    {{TileID::lamp, Variant::obsidian}, {0, 1242}},
     // Base: Chain Lantern
     {{TileID::lantern, Variant::blueDungeon}, {0, 36}},
     {{TileID::lantern, Variant::greenDungeon}, {0, 216}},
     {{TileID::lantern, Variant::pinkDungeon}, {0, 180}},
+    {{TileID::lantern, Variant::obsidian}, {0, 1152}},
     // Base: Wooden Piano
     {{TileID::piano, Variant::blueDungeon}, {594, 0}},
     {{TileID::piano, Variant::greenDungeon}, {648, 0}},
     {{TileID::piano, Variant::pinkDungeon}, {702, 0}},
+    {{TileID::piano, Variant::obsidian}, {810, 0}},
     // Base: Wood Platform
     {{TileID::platform, Variant::blueDungeon}, {0, 108}},
     {{TileID::platform, Variant::greenDungeon}, {0, 144}},
     {{TileID::platform, Variant::pinkDungeon}, {0, 126}},
+    {{TileID::platform, Variant::obsidian}, {0, 234}},
     // Base: Wooden Sink
     {{TileID::sink, Variant::blueDungeon}, {0, 380}},
     {{TileID::sink, Variant::greenDungeon}, {0, 418}},
     {{TileID::sink, Variant::pinkDungeon}, {0, 456}},
+    {{TileID::sink, Variant::obsidian}, {0, 494}},
     // Base: Armor Statue
     {{TileID::statue, Variant::blueDungeon}, {1656, 0}},
     {{TileID::statue, Variant::greenDungeon}, {1692, 0}},
     {{TileID::statue, Variant::pinkDungeon}, {1728, 0}},
+    {{TileID::statue, Variant::obsidian}, {1764, 0}},
     // Base: Wooden Table
     {{TileID::table, Variant::blueDungeon}, {540, 0}},
     {{TileID::table, Variant::greenDungeon}, {594, 0}},
     {{TileID::table, Variant::pinkDungeon}, {648, 0}},
+    {{TileID::table, Variant::obsidian}, {702, 0}},
     // Base: Ebonwood Toilet
     {{TileID::toilet, Variant::blueDungeon}, {0, 440}},
     {{TileID::toilet, Variant::greenDungeon}, {0, 480}},
     {{TileID::toilet, Variant::pinkDungeon}, {0, 520}},
+    {{TileID::toilet, Variant::obsidian}, {0, 560}},
     // Base: Wooden Work Bench
     {{TileID::workBench, Variant::blueDungeon}, {396, 0}},
     {{TileID::workBench, Variant::greenDungeon}, {432, 0}},
     {{TileID::workBench, Variant::pinkDungeon}, {468, 0}},
+    {{TileID::workBench, Variant::obsidian}, {504, 0}},
 };
 
 bool convertFurniture(Tile &tile, Variant furnitureSet)

@@ -7,7 +7,7 @@
 namespace Data
 {
 
-enum class Variant { blueDungeon, greenDungeon, pinkDungeon };
+enum class Variant { blueDungeon, greenDungeon, pinkDungeon, obsidian };
 
 inline auto furnitureLayouts = std::views::iota(0, 29);
 

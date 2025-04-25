@@ -13,6 +13,7 @@ private:
     std::vector<Tile> tiles;
 
 public:
+    TileBuffer() = default;
     /**
      * Max dimensions supported by data format are 255x255 tiles.
      */

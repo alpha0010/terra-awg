@@ -3,7 +3,11 @@
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
+#include "structures/LootRules.h"
 #include "structures/Platforms.h"
+#include "structures/StructureUtil.h"
+#include "structures/data/Furniture.h"
+#include <algorithm>
 #include <iostream>
 #include <set>
 
@@ -12,10 +16,42 @@ int makeCongruent(int val, int mod)
     return mod * (val / mod);
 }
 
+bool canPlaceFurniture(int x, int y, TileBuffer &data, World &world)
+{
+    for (int i = 0; i < data.getWidth(); ++i) {
+        for (int j = 0; j < data.getHeight(); ++j) {
+            Tile &tile = world.getTile(x + i, y + j);
+            if (tile.wallID != WallID::Unsafe::obsidianBrick && i != 0 &&
+                j != 0 && i != data.getWidth() - 1 &&
+                j != data.getHeight() - 1) {
+                return false;
+            }
+            switch (data.getTile(i, j).blockID) {
+            case TileID::empty:
+                if (isSolidBlock(tile.blockID)) {
+                    return false;
+                }
+                break;
+            case TileID::cloud:
+                if (tile.blockID != TileID::obsidianBrick) {
+                    return false;
+                }
+                break;
+            default:
+                if (tile.blockID != TileID::empty) {
+                    return false;
+                }
+                break;
+            }
+        }
+    }
+    return true;
+}
+
 void genRuins(Random &rnd, World &world)
 {
     std::cout << "Abandoning cities\n";
-    int step = 6;
+    int step = 8;
     int underworldHeight = world.getHeight() - world.getUnderworldLevel();
     int cityBase = makeCongruent(
         world.getUnderworldLevel() + 0.49 * underworldHeight,
@@ -41,8 +77,11 @@ void genRuins(Random &rnd, World &world)
                    11 ==
                0;
     };
-    std::set<std::pair<int, int>> queuedPlatforms;
-    for (int x = 0; x < world.getWidth(); ++x) {
+    std::set<Point> queuedPlatforms;
+    std::vector<Point> locations;
+    int minX = makeCongruent(0.15 * world.getWidth(), step);
+    int maxX = makeCongruent(0.85 * world.getWidth(), step);
+    for (int x = minX; x < maxX; ++x) {
         if (x % step == 0 && (rnd.getCoarseNoise(x, 0) < 0.15 ||
                               !world.regionPasses(
                                   x,
@@ -86,6 +125,7 @@ void genRuins(Random &rnd, World &world)
                 tile.blockID == TileID::flesh) {
                 continue;
             }
+            locations.emplace_back(x, y);
             tile.liquid = Liquid::none;
             if (!isInBuilding(x - 1, y) ||
                 (isInBuilding(x, y - 1) && !isInBuilding(x - 1, y - 1)) ||
@@ -144,6 +184,50 @@ void genRuins(Random &rnd, World &world)
         if (queuedPlatforms.contains({x - 1, y}) ||
             queuedPlatforms.contains({x + 1, y})) {
             placePlatform(x, y, Platform::obsidian, world);
+        }
+    }
+    std::shuffle(locations.begin(), locations.end(), rnd.getPRNG());
+    TileBuffer data;
+    int tries = 0;
+    int numPlacements = locations.size() / 250;
+    for (auto [x, y] : locations) {
+        if (tries > 30) {
+            tries = 0;
+        }
+        if (tries == 0) {
+            data = getFurniture(
+                rnd.select(Data::furnitureLayouts),
+                Data::Variant::obsidian,
+                world.getFramedTiles());
+        }
+        ++tries;
+        if (!canPlaceFurniture(x, y, data, world)) {
+            continue;
+        }
+        for (int i = 0; i < data.getWidth(); ++i) {
+            for (int j = 0; j < data.getHeight(); ++j) {
+                Tile &dataTile = data.getTile(i, j);
+                if (dataTile.blockID == TileID::empty ||
+                    dataTile.blockID == TileID::cloud) {
+                    continue;
+                }
+                Tile &tile = world.getTile(x + i, y + j);
+                tile.blockID = dataTile.blockID;
+                tile.frameX = dataTile.frameX;
+                tile.frameY = dataTile.frameY;
+                if (((tile.blockID == TileID::dresser &&
+                      tile.frameX % 54 == 0) ||
+                     (tile.blockID == TileID::chest &&
+                      tile.frameX % 36 == 0)) &&
+                    tile.frameY == 0) {
+                    fillDresser(world.registerStorage(x + i, y + j), rnd);
+                }
+            }
+        }
+        tries = 0;
+        --numPlacements;
+        if (numPlacements < 0) {
+            break;
         }
     }
 }
