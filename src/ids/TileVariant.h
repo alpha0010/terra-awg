@@ -59,11 +59,24 @@ enum class Variant {
 };
 
 enum class Painting {
+    // 2x3
+    darkness,
+    darkSoulReaper,
+    trappedGhost,
+    // 3x2
+    demonsEye,
+    livingGore,
+    flowingMagma,
     // 3x3
     bloodMoonRising,
     boneWarp,
     gloryOfTheFire,
+    handEarth,
     hangingSkeleton,
+    impFace,
+    ominousPresence,
+    shiningMoon,
+    skelehead,
     skellingtonJSkellingsworth,
     theCursedMan,
     theGuardiansGaze,
@@ -86,6 +99,7 @@ enum class Painting {
     goblinsPlayingPoker,
     greatWave,
     impact,
+    lakeOfFire,
     poweredByBirds,
     somethingEvilIsWatchingYou,
     sparky,

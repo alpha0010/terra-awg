@@ -44,6 +44,10 @@ constexpr std::vector<bool> genFramedTileLookup()
 std::pair<int, int> framedTileToDims(int tileID)
 {
     switch (tileID) {
+    case TileID::painting2x3:
+        return {2, 3};
+    case TileID::painting3x2:
+        return {3, 2};
     case TileID::catacomb:
         return {4, 3};
     case TileID::painting3x3:
@@ -444,10 +448,21 @@ struct PaintingDetails {
 };
 
 inline const std::map<Painting, PaintingDetails> paintingData{
+    {Painting::darkness, {TileID::painting2x3, 36, 0}},
+    {Painting::darkSoulReaper, {TileID::painting2x3, 72, 0}},
+    {Painting::trappedGhost, {TileID::painting2x3, 144, 0}},
+    {Painting::demonsEye, {TileID::painting3x2, 0, 0}},
+    {Painting::livingGore, {TileID::painting3x2, 0, 576}},
+    {Painting::flowingMagma, {TileID::painting3x2, 0, 612}},
     {Painting::bloodMoonRising, {TileID::painting3x3, 648, 0}},
     {Painting::boneWarp, {TileID::painting3x3, 810, 0}},
     {Painting::gloryOfTheFire, {TileID::painting3x3, 756, 0}},
+    {Painting::handEarth, {TileID::painting3x3, 1458, 0}},
     {Painting::hangingSkeleton, {TileID::painting3x3, 918, 0}},
+    {Painting::impFace, {TileID::painting3x3, 1620, 0}},
+    {Painting::ominousPresence, {TileID::painting3x3, 1674, 0}},
+    {Painting::shiningMoon, {TileID::painting3x3, 1728, 0}},
+    {Painting::skelehead, {TileID::painting3x3, 1566, 0}},
     {Painting::skellingtonJSkellingsworth, {TileID::painting3x3, 972, 0}},
     {Painting::theCursedMan, {TileID::painting3x3, 1026, 0}},
     {Painting::theGuardiansGaze, {TileID::painting3x3, 1242, 0}},
@@ -468,6 +483,7 @@ inline const std::map<Painting, PaintingDetails> paintingData{
     {Painting::goblinsPlayingPoker, {TileID::painting6x4, 0, 288}},
     {Painting::greatWave, {TileID::painting6x4, 0, 792}},
     {Painting::impact, {TileID::painting6x4, 0, 432}},
+    {Painting::lakeOfFire, {TileID::painting6x4, 0, 1008}},
     {Painting::poweredByBirds, {TileID::painting6x4, 0, 504}},
     {Painting::somethingEvilIsWatchingYou, {TileID::painting6x4, 0, 72}},
     {Painting::sparky, {TileID::painting6x4, 108, 216}},

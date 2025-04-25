@@ -94,8 +94,11 @@ void genRuins(Random &rnd, World &world)
         } else if (isInBuilding(x, cityBase - 1)) {
             // Base.
             Tile &tile = world.getTile(x, cityBase);
-            tile.blockID = TileID::obsidianBrick;
-            tile.liquid = Liquid::none;
+            if (tile.blockID != TileID::lesion &&
+                tile.blockID != TileID::flesh) {
+                tile.blockID = TileID::obsidianBrick;
+                tile.liquid = Liquid::none;
+            }
             for (int j = 1; j < 20; ++j) {
                 double noise = rnd.getFineNoise(x, cityBase + j);
                 if (noise > j / 10.0 - 1) {
@@ -189,8 +192,11 @@ void genRuins(Random &rnd, World &world)
     std::shuffle(locations.begin(), locations.end(), rnd.getPRNG());
     TileBuffer data;
     int tries = 0;
+    // Furniture.
     int numPlacements = locations.size() / 250;
-    for (auto [x, y] : locations) {
+    auto locItr = locations.begin();
+    for (; locItr != locations.end(); ++locItr) {
+        auto [x, y] = *locItr;
         if (tries > 30) {
             tries = 0;
         }
@@ -229,5 +235,101 @@ void genRuins(Random &rnd, World &world)
         if (numPlacements < 0) {
             break;
         }
+    }
+    std::array underworldPaintings{
+        Painting::darkness,
+        Painting::darkSoulReaper,
+        Painting::trappedGhost,
+        Painting::demonsEye,
+        Painting::livingGore,
+        Painting::flowingMagma,
+        Painting::handEarth,
+        Painting::impFace,
+        Painting::ominousPresence,
+        Painting::shiningMoon,
+        Painting::skelehead,
+        Painting::lakeOfFire};
+    std::shuffle(
+        underworldPaintings.begin(),
+        underworldPaintings.end(),
+        rnd.getPRNG());
+    auto paintingItr = underworldPaintings.begin();
+    // Paintings.
+    numPlacements = locations.size() / 280;
+    std::vector<Point> usedLocations;
+    for (; locItr != locations.end(); ++locItr) {
+        auto [x, y] = *locItr;
+        auto [width, height] = world.getPaintingDims(*paintingItr);
+        if (!world.regionPasses(
+                x,
+                y,
+                width,
+                height,
+                [](Tile &tile) {
+                    return tile.blockID == TileID::empty &&
+                           tile.wallID == WallID::Unsafe::obsidianBrick;
+                }) ||
+            isLocationUsed(x, y, 10, usedLocations)) {
+            continue;
+        }
+        usedLocations.emplace_back(x, y);
+        world.placePainting(x, y, *paintingItr);
+        --numPlacements;
+        if (numPlacements < 0) {
+            break;
+        }
+        ++paintingItr;
+        if (paintingItr == underworldPaintings.end()) {
+            paintingItr = underworldPaintings.begin();
+        }
+    }
+    // Chests.
+    numPlacements = locations.size() / 640;
+    usedLocations.clear();
+    for (; locItr != locations.end() && numPlacements > 0; ++locItr) {
+        auto [x, y] = *locItr;
+        if (!world.regionPasses(
+                x,
+                y,
+                2,
+                2,
+                [](Tile &tile) { return tile.blockID == TileID::empty; }) ||
+            !world.regionPasses(
+                x,
+                y + 2,
+                2,
+                1,
+                [](Tile &tile) { return isSolidBlock(tile.blockID); }) ||
+            isLocationUsed(x, y, 25, usedLocations)) {
+            continue;
+        }
+        usedLocations.emplace_back(x, y);
+        Chest &chest = world.placeChest(x, y, Variant::shadow);
+        fillShadowChest(chest, rnd, world);
+        --numPlacements;
+    }
+    // Hellforges.
+    numPlacements = locations.size() / 600;
+    usedLocations.clear();
+    for (; locItr != locations.end() && numPlacements > 0; ++locItr) {
+        auto [x, y] = *locItr;
+        if (!world.regionPasses(
+                x,
+                y,
+                3,
+                2,
+                [](Tile &tile) { return tile.blockID == TileID::empty; }) ||
+            !world.regionPasses(
+                x,
+                y + 2,
+                3,
+                1,
+                [](Tile &tile) { return isSolidBlock(tile.blockID); }) ||
+            isLocationUsed(x, y, 25, usedLocations)) {
+            continue;
+        }
+        usedLocations.emplace_back(x, y);
+        world.placeFramedTile(x, y, TileID::hellforge);
+        --numPlacements;
     }
 }

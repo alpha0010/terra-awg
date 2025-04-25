@@ -269,30 +269,6 @@ void placeOrbHearts(
     }
 }
 
-void placeHellforges(
-    int maxBin,
-    LocationBins &locations,
-    Random &rnd,
-    World &world)
-{
-    int forgeCount = world.getWidth() / 200;
-    while (forgeCount > 0) {
-        int binId = rnd.getInt(0, maxBin);
-        if (locations[binId].empty()) {
-            continue;
-        }
-        auto [x, y] = rnd.select(locations[binId]);
-        if (y < world.getUnderworldLevel()) {
-            continue;
-        }
-        if (isPlacementCandidate(x, y, world) &&
-            isPlacementCandidate(x - 1, y, world)) {
-            world.placeFramedTile(x - 1, y - 2, TileID::hellforge);
-            --forgeCount;
-        }
-    }
-}
-
 void placeManaCrystals(
     int maxBin,
     LocationBins &locations,
@@ -752,6 +728,10 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
         } else if (
             y < world.getUndergroundLevel() && type == Variant::goldLocked) {
             continue;
+        } else if (
+            type == Variant::shadow &&
+            world.getTile(x, y).blockID == TileID::ash) {
+            continue;
         }
         usedLocations[binId].emplace_back(x, y);
         placeChest(x, y, type, rnd, world);
@@ -862,7 +842,6 @@ LocationBins genTreasure(Random &rnd, World &world)
     placeFallenLogs(maxBin, flatLocations, rnd, world);
     placeAltars(maxBin, flatLocations, rnd, world);
     placeOrbHearts(maxBin, orbHeartLocations, rnd, world);
-    placeHellforges(maxBin, flatLocations, rnd, world);
     placeManaCrystals(maxBin, flatLocations, rnd, world);
     placeChests(maxBin, flatLocations, rnd, world);
     placePots(maxBin, flatLocations, rnd, world);
