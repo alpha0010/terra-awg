@@ -8,6 +8,42 @@
 #include <iostream>
 #include <map>
 
+void computeSurfaceLevel(Random &rnd, World &world)
+{
+    double surfaceLevel = rnd.getDouble(
+        0.7 * world.getUndergroundLevel(),
+        0.8 * world.getUndergroundLevel());
+    int center = world.getWidth() / 2;
+    int delta = 0;
+    int deltaLen = 1;
+    int prevY = surfaceLevel;
+    // Keep surface terrain mostly level near spawn and oceans.
+    for (int x = 0; x < world.getWidth(); ++x) {
+        int curY =
+            surfaceLevel + std::min(
+                               {0.1 * std::abs(center - x) + 15,
+                                0.08 * std::min(x, world.getWidth() - x) + 5,
+                                50.0}) *
+                               rnd.getCoarseNoise(x, 0);
+        world.getSurfaceLevel(x) = curY;
+        if (delta == curY - prevY) {
+            ++deltaLen;
+        } else {
+            if (deltaLen > 4 && (delta == 1 || delta == -1)) {
+                // Break up boring slopes.
+                for (int i = 0; i < deltaLen; ++i) {
+                    world.getSurfaceLevel(x - i) +=
+                        9 * (0.5 - std::abs(i - 0.5 * deltaLen) / deltaLen) *
+                        rnd.getFineNoise(x - 2 * i, 0);
+                }
+            }
+            delta = curY - prevY;
+            deltaLen = 1;
+        }
+        prevY = curY;
+    }
+}
+
 void scatterResource(Random &rnd, World &world, int resource)
 {
     rnd.shuffleNoise();
@@ -45,10 +81,6 @@ void genOreVeins(Random &rnd, World &world, int oreRoof, int oreFloor, int ore)
 void genWorldBase(Random &rnd, World &world)
 {
     std::cout << "Generating base terrain\n";
-    double surfaceLevel = rnd.getDouble(
-        0.7 * world.getUndergroundLevel(),
-        0.8 * world.getUndergroundLevel());
-    int center = world.getWidth() / 2;
     std::vector<std::tuple<int, int, int>> wallVarNoise;
     for (int wallId : WallVariants::dirt) {
         wallVarNoise.emplace_back(
@@ -56,23 +88,16 @@ void genWorldBase(Random &rnd, World &world)
             rnd.getInt(0, world.getHeight()),
             wallId);
     }
-    world.spawnY = surfaceLevel + 15 * rnd.getCoarseNoise(center, 0) - 1;
+    computeSurfaceLevel(rnd, world);
+    world.spawnY = world.getSurfaceLevel(world.getWidth() / 2) - 1;
     // Fill the world with dirt and stone; mostly dirt near the surface,
-    // transitioning to mostly stone deeper down. Keep surface terrain mostly
-    // level near spawn and oceans.
+    // transitioning to mostly stone deeper down.
     parallelFor(
         std::views::iota(0, world.getWidth()),
-        [center, surfaceLevel, &rnd, &wallVarNoise, &world](int x) {
+        [&rnd, &wallVarNoise, &world](int x) {
             // Skip background wall for the first tile in every column.
             bool placeWalls = false;
-            int minY = surfaceLevel +
-                       std::min(
-                           {0.1 * std::abs(center - x) + 15,
-                            0.08 * std::min(x, world.getWidth() - x) + 5,
-                            50.0}) *
-                           rnd.getCoarseNoise(x, 0);
-            world.getSurfaceLevel(x) = minY;
-            for (int y = minY; y < world.getHeight(); ++y) {
+            for (int y = world.getSurfaceLevel(x); y < world.getHeight(); ++y) {
                 double threshold =
                     y < world.getUndergroundLevel()
                         ? 3.0 * y / world.getUndergroundLevel() - 3
