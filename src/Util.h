@@ -27,15 +27,14 @@ constexpr void parallelFor(R &&r, UnaryFunc f)
 {
     std::vector<std::thread> pool;
     size_t numThreads = std::max(std::thread::hardware_concurrency(), 4u);
-    for (size_t loopId = 0; loopId < numThreads; ++loopId) {
-        pool.emplace_back([&r, &f, loopId, numThreads]() {
+    size_t total = std::distance(r.begin(), r.end());
+    size_t chunkSize = std::max<size_t>(total / numThreads, 1);
+    for (size_t chunkStart = 0; chunkStart < total; chunkStart += chunkSize) {
+        pool.emplace_back([&r, &f, chunkStart, chunkSize]() {
             auto itr = r.begin();
-            for (size_t i = 0; i < loopId && itr != r.end(); ++i, ++itr)
-                ;
-            while (itr != r.end()) {
+            std::advance(itr, chunkStart);
+            for (size_t i = 0; i < chunkSize && itr != r.end(); ++i, ++itr) {
                 f(*itr);
-                for (size_t i = 0; i < numThreads && itr != r.end(); ++i, ++itr)
-                    ;
             }
         });
     }

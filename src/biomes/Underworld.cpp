@@ -1,6 +1,7 @@
 #include "Underworld.h"
 
 #include "Random.h"
+#include "Util.h"
 #include "World.h"
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
@@ -140,45 +141,55 @@ void genUnderworld(Random &rnd, World &world)
     int lavaLevel = world.getUnderworldLevel() + 0.46 * underworldHeight;
     double aspectRatio =
         static_cast<double>(world.getHeight()) / world.getWidth();
-    for (int x = 0; x < world.getWidth(); ++x) {
-        int stalactiteLen =
-            std::max(0.0, 16 * rnd.getFineNoise(4 * x, aspectRatio * x));
-        bool foundRoof = false;
-        for (int y = centerLevel;
-             y > world.getUnderworldLevel() && stalactiteLen < 10;
-             --y) {
-            Tile &tile = world.getTile(x, y);
-            if (tile.blockID == TileID::ash) {
-                foundRoof = true;
-            }
-            if (foundRoof) {
+    parallelFor(
+        std::views::iota(0, world.getWidth()),
+        [aspectRatio,
+         centerLevel,
+         lavaLevel,
+         upperDist,
+         lowerDist,
+         &rnd,
+         &world](int x) {
+            int stalactiteLen =
+                std::max(0.0, 16 * rnd.getFineNoise(4 * x, aspectRatio * x));
+            bool foundRoof = false;
+            for (int y = centerLevel;
+                 y > world.getUnderworldLevel() && stalactiteLen < 10;
+                 --y) {
+                Tile &tile = world.getTile(x, y);
                 if (tile.blockID == TileID::ash) {
-                    tile.blockID = TileID::empty;
-                    ++stalactiteLen;
-                } else {
-                    break;
+                    foundRoof = true;
+                }
+                if (foundRoof) {
+                    if (tile.blockID == TileID::ash) {
+                        tile.blockID = TileID::empty;
+                        ++stalactiteLen;
+                    } else {
+                        break;
+                    }
                 }
             }
-        }
-        for (int y = world.getUnderworldLevel(); y < world.getHeight(); ++y) {
-            double threshold =
-                0.25 - 0.25 * (y < centerLevel ? (centerLevel - y) / upperDist
-                                               : (y - centerLevel) / lowerDist);
-            Tile &tile = world.getTile(x, y);
-            if (std::abs(rnd.getCoarseNoise(2 * x, y + aspectRatio * x)) <
-                threshold) {
-                tile.blockID = TileID::empty;
-                tile.wallID = WallID::empty;
-            } else if (
-                std::abs(rnd.getFineNoise(2 * x, 2 * y + aspectRatio * x)) <
-                0.1) {
-                tile.wallID = WallID::empty;
+            for (int y = world.getUnderworldLevel(); y < world.getHeight();
+                 ++y) {
+                double threshold =
+                    0.25 - 0.25 * (y < centerLevel
+                                       ? (centerLevel - y) / upperDist
+                                       : (y - centerLevel) / lowerDist);
+                Tile &tile = world.getTile(x, y);
+                if (std::abs(rnd.getCoarseNoise(2 * x, y + aspectRatio * x)) <
+                    threshold) {
+                    tile.blockID = TileID::empty;
+                    tile.wallID = WallID::empty;
+                } else if (
+                    std::abs(rnd.getFineNoise(2 * x, 2 * y + aspectRatio * x)) <
+                    0.1) {
+                    tile.wallID = WallID::empty;
+                }
+                if (y > lavaLevel && tile.blockID == TileID::empty) {
+                    tile.liquid = Liquid::lava;
+                }
             }
-            if (y > lavaLevel && tile.blockID == TileID::empty) {
-                tile.liquid = Liquid::lava;
-            }
-        }
-    }
+        });
     addBridges(centerLevel, lavaLevel, rnd, world);
     int skipFrom = 0.15 * world.getWidth();
     int skipTo = 0.85 * world.getWidth();

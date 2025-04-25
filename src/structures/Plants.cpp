@@ -216,7 +216,7 @@ void growTree(
 
 void genPlants(const LocationBins &locations, Random &rnd, World &world)
 {
-    std::cout << "Growing plants\n";
+    std::cout << "Growing trees\n";
     for (const auto &bin : locations) {
         for (auto [x, y] : bin.second) {
             int curTileID = world.getTile(x, y).blockID;

@@ -111,29 +111,33 @@ void genWorldBase(Random &rnd, World &world)
     for (int wallId : WallVariants::dirt) {
         underworldWalls[wallId] = rnd.select(WallVariants::underworld);
     }
-    for (int x = 0; x < world.getWidth(); ++x) {
-        int underworldRoof =
-            world.getUnderworldLevel() + 0.22 * underworldHeight +
-            19 * rnd.getCoarseNoise(x, 0.33 * world.getHeight());
-        int underworldFloor =
-            world.getUnderworldLevel() + 0.42 * underworldHeight +
-            35 * rnd.getCoarseNoise(x, 0.66 * world.getHeight());
-        for (int y = world.getUnderworldLevel() + 20 * rnd.getCoarseNoise(x, 0);
-             y < world.getHeight();
-             ++y) {
-            // Fill underworld with ash, with an empty band across the entire
-            // middle.
-            Tile &tile = world.getTile(x, y);
-            if (y > underworldFloor) {
-                tile.blockID = std::abs(rnd.getFineNoise(x, y)) > 0.5
-                                   ? TileID::hellstone
-                                   : TileID::ash;
-            } else {
-                tile.blockID = y < underworldRoof ? TileID::ash : TileID::empty;
+    parallelFor(
+        std::views::iota(0, world.getWidth()),
+        [underworldHeight, &underworldWalls, &rnd, &world](int x) {
+            int underworldRoof =
+                world.getUnderworldLevel() + 0.22 * underworldHeight +
+                19 * rnd.getCoarseNoise(x, 0.33 * world.getHeight());
+            int underworldFloor =
+                world.getUnderworldLevel() + 0.42 * underworldHeight +
+                35 * rnd.getCoarseNoise(x, 0.66 * world.getHeight());
+            for (int y =
+                     world.getUnderworldLevel() + 20 * rnd.getCoarseNoise(x, 0);
+                 y < world.getHeight();
+                 ++y) {
+                // Fill underworld with ash, with an empty band across the
+                // entire middle.
+                Tile &tile = world.getTile(x, y);
+                if (y > underworldFloor) {
+                    tile.blockID = std::abs(rnd.getFineNoise(x, y)) > 0.5
+                                       ? TileID::hellstone
+                                       : TileID::ash;
+                } else {
+                    tile.blockID =
+                        y < underworldRoof ? TileID::ash : TileID::empty;
+                }
+                tile.wallID = underworldWalls[tile.wallID];
             }
-            tile.wallID = underworldWalls[tile.wallID];
-        }
-    }
+        });
 
     std::cout << "Generating ore veins\n";
     // Add ore deposits in overlapping bands; more valuable ore bands are

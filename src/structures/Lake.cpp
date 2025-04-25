@@ -55,8 +55,11 @@ followRainFrom(World &world, int x, int y, Func isPathable)
     }
 }
 
-void simulateRain(World &world, int minX, int maxX)
+void simulateRain(World &world, int x)
 {
+    if (x % 4 != 0) {
+        return;
+    }
     int lavaLevel =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     std::set<int> surfaceDryBlocks{
@@ -90,93 +93,84 @@ void simulateRain(World &world, int minX, int maxX)
         WallID::Unsafe::ebonsandstone,
         WallID::Unsafe::crimsandstone};
     dryWalls.insert(WallVariants::dungeon.begin(), WallVariants::dungeon.end());
-    for (int x = minX; x < maxX; x += 4) {
-        double pendingWater =
-            std::abs(x - world.jungleCenter) < 0.08 * world.getWidth() ? 15
-                                                                       : -4;
-        for (int y = world.spawnY - 45; y < world.getUnderworldLevel();
-             y += 3) {
-            if (!isLiquidPathable(world, x, y) ||
-                (y < lavaLevel &&
-                 dryWalls.contains(world.getTile(x, y).wallID))) {
-                pendingWater = 2.1;
+    double pendingWater =
+        std::abs(x - world.jungleCenter) < 0.08 * world.getWidth() ? 15 : -4;
+    for (int y = world.spawnY - 45; y < world.getUnderworldLevel(); y += 3) {
+        if (!isLiquidPathable(world, x, y) ||
+            (y < lavaLevel && dryWalls.contains(world.getTile(x, y).wallID))) {
+            pendingWater = 2.1;
+            continue;
+        }
+        pendingWater +=
+            world.getTile(x, y).wallID == WallID::Unsafe::hive ? 2.4 : 1.6;
+        auto [minDropX, maxDropX, dropY] =
+            followRainFrom(world, x, y, isLiquidPathable);
+        if (maxDropX - minDropX < pendingWater) {
+            pendingWater -= maxDropX - minDropX;
+            Tile &probeTile =
+                world.getTile((minDropX + maxDropX) / 2, dropY + 1);
+            if (probeTile.liquid == Liquid::shimmer ||
+                probeTile.blockID == TileID::bubble ||
+                (y < world.getUndergroundLevel() &&
+                 (surfaceDryBlocks.contains(probeTile.blockID) ||
+                  probeTile.liquid == Liquid::lava)) ||
+                dropY > world.getUnderworldLevel() + 50) {
                 continue;
             }
-            pendingWater +=
-                world.getTile(x, y).wallID == WallID::Unsafe::hive ? 2.4 : 1.6;
-            auto [minDropX, maxDropX, dropY] =
-                followRainFrom(world, x, y, isLiquidPathable);
-            if (maxDropX - minDropX < pendingWater) {
-                pendingWater -= maxDropX - minDropX;
-                Tile &probeTile =
-                    world.getTile((minDropX + maxDropX) / 2, dropY + 1);
-                if (probeTile.liquid == Liquid::shimmer ||
-                    probeTile.blockID == TileID::bubble ||
-                    (y < world.getUndergroundLevel() &&
-                     (surfaceDryBlocks.contains(probeTile.blockID) ||
-                      probeTile.liquid == Liquid::lava)) ||
-                    dropY > world.getUnderworldLevel() + 50) {
-                    continue;
-                }
-                if (y < world.getUndergroundLevel() &&
-                    (surfaceDryBlocks.contains(
-                         world.getTile(minDropX - 1, dropY).blockID) ||
-                     surfaceDryBlocks.contains(
-                         world.getTile(maxDropX, dropY).blockID))) {
-                    continue;
-                }
-                for (int dropX = minDropX; dropX < maxDropX; ++dropX) {
-                    Tile &tile = world.getTile(dropX, dropY);
-                    tile.liquid = tile.wallID == WallID::Unsafe::hive
-                                      ? Liquid::honey
-                                  : dropY > lavaLevel ? Liquid::lava
-                                                      : Liquid::water;
-                    if (probeTile.blockID == TileID::hive &&
-                        tile.liquid != Liquid::honey) {
-                        tile.blockID = tile.liquid == Liquid::lava
-                                           ? TileID::crispyHoney
-                                           : TileID::honey;
-                        tile.liquid = Liquid::none;
-                    }
+            if (y < world.getUndergroundLevel() &&
+                (surfaceDryBlocks.contains(
+                     world.getTile(minDropX - 1, dropY).blockID) ||
+                 surfaceDryBlocks.contains(
+                     world.getTile(maxDropX, dropY).blockID))) {
+                continue;
+            }
+            for (int dropX = minDropX; dropX < maxDropX; ++dropX) {
+                Tile &tile = world.getTile(dropX, dropY);
+                tile.liquid = tile.wallID == WallID::Unsafe::hive
+                                  ? Liquid::honey
+                              : dropY > lavaLevel ? Liquid::lava
+                                                  : Liquid::water;
+                if (probeTile.blockID == TileID::hive &&
+                    tile.liquid != Liquid::honey) {
+                    tile.blockID = tile.liquid == Liquid::lava
+                                       ? TileID::crispyHoney
+                                       : TileID::honey;
+                    tile.liquid = Liquid::none;
                 }
             }
         }
     }
 }
 
-void evaporateSmallPools(World &world, int minX, int maxX)
+void evaporateSmallPools(World &world, int x)
 {
-    for (int x = minX; x < maxX; ++x) {
-        for (int y = world.getSurfaceLevel(x) - 50;
-             y < world.getUnderworldLevel();
-             ++y) {
-            Tile &tile = world.getTile(x, y);
-            if (tile.liquid != Liquid::water &&
-                (tile.liquid != Liquid::lava ||
-                 y < world.getUndergroundLevel())) {
-                continue;
+    for (int y = world.getSurfaceLevel(x) - 50; y < world.getUnderworldLevel();
+         ++y) {
+        Tile &tile = world.getTile(x, y);
+        if (tile.liquid != Liquid::water &&
+            (tile.liquid != Liquid::lava || y < world.getUndergroundLevel())) {
+            continue;
+        }
+        int poolDepth = std::get<2>(
+            followRainFrom(world, x, y, [](World &world, int x, int y) {
+                Tile &tile = world.getTile(x, y);
+                return tile.liquid == Liquid::water ||
+                       tile.liquid == Liquid::lava;
+            }));
+        if (poolDepth - y < 4 &&
+            world.getTile(x, y - 1).blockID == TileID::empty) {
+            while (y <= poolDepth) {
+                world.getTile(x, y).liquid = Liquid::none;
+                ++y;
             }
-            int poolDepth = std::get<2>(
-                followRainFrom(world, x, y, [](World &world, int x, int y) {
-                    Tile &tile = world.getTile(x, y);
-                    return tile.liquid == Liquid::water ||
-                           tile.liquid == Liquid::lava;
-                }));
-            if (poolDepth - y < 4 &&
-                world.getTile(x, y - 1).blockID == TileID::empty) {
-                while (y <= poolDepth) {
-                    world.getTile(x, y).liquid = Liquid::none;
-                    ++y;
-                }
-            } else {
-                if ((tile.wallID == WallID::Unsafe::snow ||
-                     tile.wallID == WallID::Unsafe::ice) &&
-                    tile.liquid == Liquid::water) {
-                    tile.liquid = Liquid::none;
-                    tile.blockID = TileID::thinIce;
-                }
-                y = poolDepth;
+        } else {
+            if ((tile.wallID == WallID::Unsafe::snow ||
+                 tile.wallID == WallID::Unsafe::ice) &&
+                tile.liquid == Liquid::water) {
+                tile.liquid = Liquid::none;
+                tile.blockID = TileID::thinIce;
             }
+            y = poolDepth;
         }
     }
 }
@@ -184,22 +178,10 @@ void evaporateSmallPools(World &world, int minX, int maxX)
 void genLake(World &world)
 {
     std::cout << "Raining\n";
-    int numSegments = world.getWidth() / 500;
-    int segmentSize = 1 + world.getWidth() / numSegments;
-    parallelFor(
-        std::views::iota(0, numSegments),
-        [segmentSize, &world](int segment) {
-            simulateRain(
-                world,
-                segmentSize * segment,
-                std::min(segmentSize * (1 + segment), world.getWidth()));
-        });
-    parallelFor(
-        std::views::iota(0, numSegments),
-        [segmentSize, &world](int segment) {
-            evaporateSmallPools(
-                world,
-                segmentSize * segment,
-                std::min(segmentSize * (1 + segment), world.getWidth()));
-        });
+    parallelFor(std::views::iota(0, world.getWidth()), [&world](int x) {
+        simulateRain(world, x);
+    });
+    parallelFor(std::views::iota(0, world.getWidth()), [&world](int x) {
+        evaporateSmallPools(world, x);
+    });
 }
