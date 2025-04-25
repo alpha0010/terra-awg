@@ -30,6 +30,7 @@
 #include "structures/MinecartTracks.h"
 #include "structures/Plants.h"
 #include "structures/Pyramid.h"
+#include "structures/Ruins.h"
 #include "structures/Temple.h"
 #include "structures/Traps.h"
 #include "structures/Treasure.h"
@@ -83,6 +84,7 @@ void doWorldGen(Random &rnd, World &world)
     genTemple(rnd, world);
     genPyramid(rnd, world);
     genBuriedBoat(rnd, world);
+    genRuins(rnd, world);
     genLake(world);
     auto flatLocations = genTreasure(rnd, world);
     genPlants(flatLocations, rnd, world);

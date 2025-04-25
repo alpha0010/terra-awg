@@ -31,6 +31,7 @@ enum {
     blueBrick = 7,
     greenBrick = 8,
     pinkBrick = 9,
+    obsidianBrick = 14,
     mud = 15,
     snow = 40,
     amethystStone = 48,

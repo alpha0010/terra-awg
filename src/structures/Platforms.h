@@ -10,6 +10,7 @@ enum {
     brassShelf = 180,
     woodShelf = 198,
     dungeonShelf = 216,
+    obsidian = 234,
     lihzahrd = 594,
     stone = 774,
 };

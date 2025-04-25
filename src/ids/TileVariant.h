@@ -37,6 +37,7 @@ enum class Variant {
     marble,
     meteorite,
     mushroom,
+    obsidian,
     omega,
     palmWood,
     pyramid,
