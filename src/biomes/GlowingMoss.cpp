@@ -3,6 +3,7 @@
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
+#include "ids/WallID.h"
 #include <iostream>
 #include <set>
 
@@ -61,6 +62,12 @@ void fillGlowingMossCave(Random &rnd, World &world)
         (world.getCavernLevel() + 4 * world.getUnderworldLevel()) / 5) {
         mossType = rnd.select({mossType, (int)TileID::lavaMossStone});
     }
+    std::map<int, int> wallRepl;
+    for (int wallId : WallVariants::dirt) {
+        wallRepl[wallId] = mossType == TileID::lavaMossStone
+                               ? rnd.select(WallVariants::underworld)
+                               : rnd.select(WallVariants::stone);
+    }
     std::vector<Point> mossLocations;
     for (int x = centerX - size; x < centerX + size; ++x) {
         for (int y = centerY - size; y < centerY + size; ++y) {
@@ -68,6 +75,10 @@ void fillGlowingMossCave(Random &rnd, World &world)
                 4 * std::hypot(x - centerX, y - centerY) / size - 3;
             if (rnd.getFineNoise(x, y) > threshold) {
                 Tile &tile = world.getTile(x, y);
+                auto itr = wallRepl.find(tile.wallID);
+                if (itr != wallRepl.end()) {
+                    tile.wallID = itr->second;
+                }
                 if (tile.blockID == TileID::stone && world.isExposed(x, y)) {
                     // Coat edges in moss.
                     tile.blockID = mossType;

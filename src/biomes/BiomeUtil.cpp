@@ -77,6 +77,11 @@ Point findStoneCave(int yMin, int yMax, Random &rnd, World &world, int minSize)
 }
 
 inline const std::map<int, int> mossFrameX{
+    {TileID::greenMossStone, 0},
+    {TileID::brownMossStone, 22},
+    {TileID::redMossStone, 44},
+    {TileID::blueMossStone, 66},
+    {TileID::purpleMossStone, 88},
     {TileID::lavaMossStone, 110},
     {TileID::kryptonMossStone, 132},
     {TileID::xenonMossStone, 154},
@@ -97,7 +102,7 @@ void growMossOn(int x, int y, World &world)
         if (tile.blockID == TileID::empty) {
             tile.blockID = TileID::mossPlant;
             tile.frameX = itr->second;
-            tile.frameY = frameY + 18 * ((x + i + y + j) % 3);
+            tile.frameY = frameY + 18 * (fnv1a32pt(x + i, y + j) % 3);
         }
     }
 }

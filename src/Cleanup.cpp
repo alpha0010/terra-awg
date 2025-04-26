@@ -3,8 +3,10 @@
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
+#include "biomes/BiomeUtil.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
+#include <algorithm>
 #include <iostream>
 #include <map>
 #include <set>
@@ -208,25 +210,78 @@ void smoothSurfaces(World &world)
         });
 }
 
+struct MossRegion {
+    int blockID;
+    int wallID;
+    int rndX;
+    int rndY;
+};
+
+bool convertToMoss(
+    int x,
+    int y,
+    Tile &tile,
+    const std::vector<MossRegion> &mosses,
+    Random &rnd,
+    World &world)
+{
+    for (const auto &region : mosses) {
+        if (rnd.getCoarseNoise(x + region.rndX, y + region.rndY) > 0.6) {
+            tile.wallID = region.wallID;
+            if (tile.blockID == TileID::stone) {
+                tile.blockID = region.blockID;
+                growMossOn(x, y, world);
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
 void finalizeWalls(Random &rnd, World &world)
 {
     std::cout << "Hardening walls\n";
+    std::vector<MossRegion> mosses;
+    for (auto [blockID, wallID] :
+         {std::pair{TileID::greenMossStone, WallID::Unsafe::greenMossy},
+          {TileID::brownMossStone, WallID::Unsafe::brownMossy},
+          {TileID::redMossStone, WallID::Unsafe::redMossy},
+          {TileID::blueMossStone, WallID::Unsafe::blueMossy},
+          {TileID::purpleMossStone, WallID::Unsafe::purpleMossy}}) {
+        mosses.emplace_back(
+            blockID,
+            wallID,
+            rnd.getInt(0, world.getWidth()),
+            rnd.getInt(0, world.getHeight()));
+    }
+    std::shuffle(mosses.begin(), mosses.end(), rnd.getPRNG());
     std::map<int, int> stoneWalls;
     for (int wallId : WallVariants::dirt) {
         stoneWalls[wallId] = rnd.select(WallVariants::stone);
     }
-    double bound =
+    double mossBound =
+        (2 * world.getUndergroundLevel() + world.getCavernLevel()) / 3;
+    double stoneBound =
         (4 * world.getCavernLevel() + world.getUnderworldLevel()) / 5;
     parallelFor(
         std::views::iota(0, world.getWidth()),
-        [bound, &stoneWalls, &rnd, &world](int x) {
-            for (int y = world.getCavernLevel(); y < world.getHeight(); ++y) {
-                double threshold = 15 * (bound - y) / world.getHeight();
+        [mossBound, stoneBound, &mosses, &stoneWalls, &rnd, &world](int x) {
+            for (int y = world.getUndergroundLevel(); y < world.getHeight();
+                 ++y) {
+                double threshold = 15 * (mossBound - y) / world.getHeight();
                 if (rnd.getCoarseNoise(x, y) < threshold) {
                     continue;
                 }
                 Tile &tile = world.getTile(x, y);
                 auto itr = stoneWalls.find(tile.wallID);
+                if (itr != stoneWalls.end() && world.isExposed(x, y) &&
+                    convertToMoss(x, y, tile, mosses, rnd, world)) {
+                    continue;
+                }
+                threshold = 15 * (stoneBound - y) / world.getHeight();
+                if (rnd.getCoarseNoise(x, y) < threshold) {
+                    continue;
+                }
                 if (tile.blockID != TileID::dirt && itr != stoneWalls.end()) {
                     tile.wallID = itr->second;
                 }

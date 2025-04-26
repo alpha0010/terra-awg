@@ -9,6 +9,8 @@
 
 class Random;
 
+uint32_t fnv1a32pt(uint32_t x, uint32_t y);
+
 class World
 {
 private:
