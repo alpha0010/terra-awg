@@ -24,6 +24,8 @@ inline const std::set<int> placementAvoidTiles{
     TileID::livingWood,
     TileID::mahoganyLeaf,
     TileID::thinIce,
+    TileID::spike,
+    TileID::woodenSpike,
 };
 
 bool isPlacementCandidate(int x, int y, World &world)

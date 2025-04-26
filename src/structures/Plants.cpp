@@ -474,7 +474,7 @@ bool placeLargePile(int x, int y, World &world)
     case TileID::hellstone:
     case TileID::hellstoneBrick:
     case TileID::obsidianBrick:
-        if (y > world.getUnderworldLevel() && (x + y) % 5 == 0) {
+        if (y > world.getUnderworldLevel() && fnv1a32pt(x, y) % 5 == 0) {
             world.placeFramedTile(x, y - 2, TileID::largePile, Variant::bone);
         } else {
             world.placeFramedTile(
@@ -487,7 +487,7 @@ bool placeLargePile(int x, int y, World &world)
     case TileID::blueBrick:
     case TileID::greenBrick:
     case TileID::pinkBrick:
-        if (y > world.getUndergroundLevel() && (x + y) % 5 == 0) {
+        if (y > world.getUndergroundLevel() && fnv1a32pt(x, y) % 5 == 0) {
             world.placeFramedTile(x, y - 2, TileID::largePile, Variant::bone);
             return true;
         }

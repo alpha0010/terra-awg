@@ -6,6 +6,7 @@
 #include "biomes/BiomeUtil.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
+#include "structures/StructureUtil.h"
 #include <algorithm>
 #include <iostream>
 #include <map>
@@ -182,7 +183,7 @@ void smoothSurfaces(World &world)
         [&stablizeBlocks, &slopedTiles, &world](int x) {
             for (int y = 0; y < world.getHeight(); ++y) {
                 Tile &tile = world.getTile(x, y);
-                if (tile.blockID == TileID::empty || tile.guarded ||
+                if (tile.guarded || !isSolidBlock(tile.blockID) ||
                     !world.isExposed(x, y)) {
                     continue;
                 }

@@ -396,7 +396,7 @@ void buryEnchantedSwords(Random &rnd, World &world)
         if (rnd.getBool()) {
             x = world.getWidth() - x;
         }
-        int y = world.getSurfaceLevel(x) + rnd.getInt(15, 35);
+        int y = world.getSurfaceLevel(x) + rnd.getInt(25, 45);
         if (!world.regionPasses(
                 x - 16,
                 y,

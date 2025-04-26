@@ -4,6 +4,7 @@
 #include "Chest.h"
 #include "Tile.h"
 #include "ids/TileVariant.h"
+#include <cstdint>
 #include <functional>
 #include <vector>
 

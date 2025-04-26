@@ -15,6 +15,7 @@ void genVines(Random &rnd, World &world)
         {TileID::leaf, TileID::vines},
         {TileID::jungleGrass, TileID::jungleVines},
         {TileID::mahoganyLeaf, TileID::vineRope},
+        {TileID::lihzahrdBrick, TileID::vineRope},
         {TileID::corruptGrass, TileID::corruptVines},
         {TileID::corruptJungleGrass, TileID::corruptVines},
         {TileID::crimsonGrass, TileID::crimsonVines},
@@ -82,7 +83,9 @@ void genVines(Random &rnd, World &world)
                 continue;
             }
             auto vineItr = vineTypes.find(tile.blockID);
-            if (vineItr == vineTypes.end() || randInt % 3 == 0) {
+            if (vineItr == vineTypes.end() ||
+                (tile.blockID == TileID::lihzahrdBrick ? randInt % 29 != 0
+                                                       : randInt % 3 == 0)) {
                 auto dropperItr = dropperTypes.find(tile.blockID);
                 if (dropperItr != dropperTypes.end()) {
                     dropper = dropperItr->second;

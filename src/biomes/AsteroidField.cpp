@@ -8,14 +8,12 @@
 std::pair<int, int>
 selectAsteroidFieldLocation(int width, int height, Random &rnd, World &world)
 {
+    int y = 40;
     while (true) {
         int x = rnd.getInt(40, 0.3 * world.getWidth() - width);
         if (rnd.getBool()) {
             x = world.getWidth() - x - width;
         }
-        int y = rnd.getInt(
-            40,
-            std::max<int>(0.35 * world.getUndergroundLevel() - height, 50));
         if (world.regionPasses(
                 x + 0.1 * width,
                 y,
@@ -31,7 +29,7 @@ void genAsteroidField(Random &rnd, World &world)
 {
     std::cout << "Suspending asteroids\n";
     int width = rnd.getDouble(0.06, 0.07) * world.getWidth();
-    int height = rnd.getDouble(0.13, 0.16) * world.getUndergroundLevel();
+    int height = rnd.getDouble(0.18, 0.21) * world.getUndergroundLevel();
     auto [fieldX, fieldY] =
         selectAsteroidFieldLocation(width, height, rnd, world);
     int numAsteroids = width * height / 220;
@@ -42,12 +40,12 @@ void genAsteroidField(Random &rnd, World &world)
         double centerDist = std::hypot(
             (fieldX + 0.5 * width - x) / width,
             (fieldY + 0.5 * height - y) / height);
-        if ((centerDist > 0.48 && (x + y) % 9 != 0) ||
+        if ((centerDist > 0.48 && fnv1a32pt(x, y) % 11 != 0) ||
             !world.regionPasses(
                 x - radius,
                 y - radius,
-                2 * radius,
-                2 * radius,
+                2 * radius + 0.5,
+                2 * radius + 0.5,
                 [](Tile &tile) { return tile.blockID == TileID::empty; })) {
             continue;
         }

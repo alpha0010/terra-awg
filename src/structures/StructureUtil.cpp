@@ -28,19 +28,20 @@ bool isLocationUsed(
 }
 
 inline const std::set<int> nonSolidTiles{
-    TileID::empty,         TileID::alchemyTable,  TileID::bathtub,
-    TileID::bed,           TileID::bench,         TileID::bewitchingTable,
-    TileID::boneWelder,    TileID::book,          TileID::bookcase,
-    TileID::bottle,        TileID::bubble,        TileID::candelabra,
-    TileID::candle,        TileID::catacomb,      TileID::chair,
-    TileID::chandelier,    TileID::chest,         TileID::chestGroup2,
-    TileID::clock,         TileID::dresser,       TileID::hellforge,
-    TileID::lantern,       TileID::lihzahrdAltar, TileID::painting3x3,
-    TileID::painting6x4,   TileID::piano,         TileID::pot,
-    TileID::rollingCactus, TileID::rope,          TileID::silverCoin,
-    TileID::sink,          TileID::smallPile,     TileID::statue,
-    TileID::table,         TileID::TNTBarrel,     TileID::toilet,
-    TileID::waterCandle,   TileID::woodenBeam,    TileID::workBench,
+    TileID::empty,       TileID::alchemyTable,  TileID::bathtub,
+    TileID::bed,         TileID::bench,         TileID::bewitchingTable,
+    TileID::boneWelder,  TileID::book,          TileID::bookcase,
+    TileID::bottle,      TileID::bubble,        TileID::candelabra,
+    TileID::candle,      TileID::catacomb,      TileID::chair,
+    TileID::chandelier,  TileID::chest,         TileID::chestGroup2,
+    TileID::clock,       TileID::dresser,       TileID::hellforge,
+    TileID::lantern,     TileID::lihzahrdAltar, TileID::painting2x3,
+    TileID::painting3x2, TileID::painting3x3,   TileID::painting6x4,
+    TileID::piano,       TileID::pot,           TileID::rollingCactus,
+    TileID::rope,        TileID::silverCoin,    TileID::sink,
+    TileID::smallPile,   TileID::statue,        TileID::table,
+    TileID::TNTBarrel,   TileID::toilet,        TileID::waterCandle,
+    TileID::woodenBeam,  TileID::workBench,
 };
 
 bool isSolidBlock(int tileId)

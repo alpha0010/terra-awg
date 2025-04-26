@@ -906,6 +906,11 @@ private:
                         tile.wallID = WallID::Safe::livingLeaf;
                     }
                 }
+                if (tile.wallID != WallID::empty &&
+                    std::abs(rnd.getFineNoise(x + 2 * i, y + 2 * j)) <
+                        0.1 - 0.1 * j / entry.getHeight()) {
+                    tile.wallID = WallID::Unsafe::craggyStone;
+                }
                 if (!foundSolidTile && tile.blockID != TileID::empty) {
                     foundSolidTile = true;
                     if (tile.blockID == theme.brick) {
