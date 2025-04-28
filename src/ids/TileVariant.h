@@ -12,6 +12,7 @@ enum class Variant {
     crystal,
     dartLeft,
     dartRight,
+    deadMans,
     desert,
     dirt,
     dungeon,

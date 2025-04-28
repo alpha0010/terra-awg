@@ -3,6 +3,7 @@
 #include "Random.h"
 #include "World.h"
 #include "structures/StructureUtil.h"
+#include <algorithm>
 #include <iostream>
 #include <set>
 
@@ -296,5 +297,193 @@ void genTraps(Random &rnd, World &world)
     placeLavaTraps(rnd, world);
     for (const auto &applyQueuedTrap : world.queuedTraps) {
         applyQueuedTrap(rnd, world);
+    }
+}
+
+bool addChestBoulderTraps(int x, int y, Random &rnd, World &world)
+{
+    std::vector<Point> traps;
+    for (int i = rnd.getInt(-10, -7); i < 10; i += 4) {
+        Point pos = scanWhileNotSolid({x + i, y}, {0, -1}, world);
+        int dist = y - pos.second;
+        if (dist < 5 || dist > 30) {
+            continue;
+        }
+        pos = addPts(pos, {0, -5});
+        if (world.regionPasses(
+                pos.first - 2,
+                pos.second - 2,
+                6,
+                6,
+                [](Tile &tile) {
+                    return tile.blockID != TileID::empty && isTrappable(tile);
+                }) &&
+            world.regionPasses(
+                pos.first,
+                pos.second,
+                2,
+                pos.second - y - 3,
+                isTrappable)) {
+            traps.push_back(pos);
+        }
+    }
+    if (traps.empty()) {
+        return false;
+    }
+    for (auto trap : traps) {
+        placeWire({trap.first, trap.second + 2}, {x, y}, Wire::red, world);
+        for (int i = 0; i < 2; ++i) {
+            for (int wireY = trap.second + 2; wireY < y; ++wireY) {
+                Tile &tile = world.getTile(trap.first + i, wireY);
+                if (tile.blockID != TileID::empty) {
+                    tile.actuator = true;
+                    placeWire(
+                        {trap.first, trap.second + 2},
+                        {trap.first + i, wireY},
+                        Wire::red,
+                        world);
+                }
+            }
+        }
+        world.placeFramedTile(trap.first, trap.second, TileID::boulder);
+    }
+    return true;
+}
+
+bool addChestDartTraps(int x, int y, Random &rnd, World &world)
+{
+    std::vector<Point> traps;
+    for (auto delta : {Point{-1, 0}, {1, 0}}) {
+        for (int j = -4; j < 2; ++j) {
+            Point pos = scanWhileNotSolid({x, y + j}, delta, world);
+            int dist = std::abs(pos.first - x);
+            if (dist < 5 || dist > 30) {
+                continue;
+            }
+            if (!isTrappable(world.getTile(pos)) ||
+                !isSolidBlock(world.getTile(addPts(pos, {0, 1})).blockID)) {
+                pos = addPts(pos, delta);
+                if (!isTrappable(world.getTile(pos)) ||
+                    !isSolidBlock(world.getTile(addPts(pos, {0, 1})).blockID)) {
+                    continue;
+                }
+            }
+            traps.push_back(pos);
+        }
+    }
+    if (traps.empty()) {
+        return false;
+    }
+    std::shuffle(traps.begin(), traps.end(), rnd.getPRNG());
+    traps.resize(rnd.getInt(1, std::min<int>(traps.size(), 4)));
+    for (auto trap : traps) {
+        placeWire(trap, {x, y}, Wire::red, world);
+        world.placeFramedTile(
+            trap.first,
+            trap.second,
+            TileID::trap,
+            trap.first > x ? Variant::dartLeft : Variant::dartRight);
+    }
+    return true;
+}
+
+bool addChestExplosiveTraps(int x, int y, Random &rnd, World &world)
+{
+    double numExplosives = 3;
+    bool didTrap = false;
+    while (numExplosives > 0) {
+        int i = rnd.getInt(-9, 9);
+        int j = rnd.getInt(-7, 6);
+        if (!world.regionPasses(x + i - 1, y + j - 1, 3, 3, [](Tile &tile) {
+                return tile.blockID != TileID::empty && isTrappable(tile);
+            })) {
+            numExplosives -= 0.1;
+            continue;
+        }
+        world.getTile(x + i, y + j).blockID = TileID::explosives;
+        placeWire({x + i, y + j}, {x, y}, Wire::red, world);
+        didTrap = true;
+        --numExplosives;
+    }
+    return didTrap;
+}
+
+bool addChestLavaTrap(int x, int y, Random &rnd, World &world)
+{
+    if (y < std::midpoint(world.getCavernLevel(), world.getUnderworldLevel())) {
+        return false;
+    }
+    Point pos = scanWhileNotSolid({x, y}, {0, -1}, world);
+    int dist = y - pos.second;
+    if (dist < 5 || dist > 30) {
+        return false;
+    }
+    pos = addPts(pos, {0, -5});
+    std::set<int> oreTiles{
+        TileID::ironOre,
+        TileID::copperOre,
+        TileID::goldOre,
+        TileID::silverOre,
+        TileID::tinOre,
+        TileID::leadOre,
+        TileID::tungstenOre,
+        TileID::platinumOre};
+    if (!world.regionPasses(
+            pos.first - 10,
+            pos.second - 10,
+            20,
+            20,
+            [&oreTiles](Tile &tile) {
+                return !tile.guarded &&
+                       (trappableTiles.contains(tile.blockID) ||
+                        oreTiles.contains(tile.blockID));
+            }) ||
+        !world.regionPasses(
+            pos.first - 9,
+            pos.second - 18,
+            18,
+            14,
+            [&oreTiles](Tile &tile) {
+                return !tile.guarded && tile.blockID != TileID::empty &&
+                       (trappableTiles.contains(tile.blockID) ||
+                        oreTiles.contains(tile.blockID));
+            })) {
+        return false;
+    }
+    for (int i = -7; i < 7; ++i) {
+        for (int j = -7; j < 7; ++j) {
+            double threshold = 4 * std::hypot(i, j) / 7 - 3;
+            if (rnd.getFineNoise(pos.first + i, pos.second + j - 11) >
+                threshold) {
+                Tile &tile = world.getTile(pos.first + i, pos.second + j - 11);
+                tile.blockID = TileID::empty;
+                tile.liquid = Liquid::lava;
+                tile.guarded = true;
+            }
+        }
+    }
+    world.getTile(pos).blockID = TileID::explosives;
+    placeWire(pos, {x, y}, Wire::red, world);
+    return true;
+}
+
+void addChestTraps(int x, int y, Random &rnd, World &world)
+{
+    if (addChestLavaTrap(x, y, rnd, world)) {
+        return;
+    }
+    std::array trapAdders{
+        addChestBoulderTraps,
+        addChestDartTraps,
+        addChestExplosiveTraps};
+    std::shuffle(trapAdders.begin(), trapAdders.end(), rnd.getPRNG());
+    int numTypes = 0;
+    for (const auto &trapAdder : trapAdders) {
+        if (trapAdder(x, y, rnd, world)) {
+            ++numTypes;
+            if (numTypes == 2) {
+                break;
+            }
+        }
     }
 }

@@ -255,7 +255,7 @@ void genRuins(Random &rnd, World &world)
         rnd.getPRNG());
     auto paintingItr = underworldPaintings.begin();
     // Paintings.
-    numPlacements = locations.size() / 280;
+    numPlacements = locations.size() / 320;
     std::vector<Point> usedLocations;
     for (; locItr != locations.end(); ++locItr) {
         auto [x, y] = *locItr;
@@ -269,7 +269,7 @@ void genRuins(Random &rnd, World &world)
                     return tile.blockID == TileID::empty &&
                            tile.wallID == WallID::Unsafe::obsidianBrick;
                 }) ||
-            isLocationUsed(x, y, 10, usedLocations)) {
+            isLocationUsed(x, y, 40, usedLocations)) {
             continue;
         }
         usedLocations.emplace_back(x, y);

@@ -82,6 +82,7 @@ enum {
     woodenBeam = 124,
     trap = 137,
     boulder = 138,
+    explosives = 141,
     snow = 147,
     sandstoneBrick = 151,
     ebonstoneBrick = 152,

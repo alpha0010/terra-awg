@@ -7,6 +7,7 @@
 #include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
+#include "structures/Traps.h"
 #include "structures/data/JungleShrines.h"
 #include <algorithm>
 #include <iostream>
@@ -30,14 +31,12 @@ inline const std::set<int> placementAvoidTiles{
 
 bool isPlacementCandidate(int x, int y, World &world)
 {
-    Tile &floorLeft = world.getTile(x, y);
-    Tile &floorRight = world.getTile(x + 1, y);
-    return isSolidBlock(floorLeft.blockID) &&
-           isSolidBlock(floorRight.blockID) && floorLeft.slope == Slope::none &&
-           floorRight.slope == Slope::none && !floorLeft.actuated &&
-           !floorRight.actuated &&
-           !placementAvoidTiles.contains(floorLeft.blockID) &&
-           !placementAvoidTiles.contains(floorRight.blockID) &&
+    auto isFloorTile = [](const Tile &tile) {
+        return isSolidBlock(tile.blockID) && tile.slope == Slope::none &&
+               !tile.actuated && !placementAvoidTiles.contains(tile.blockID);
+    };
+    return isFloorTile(world.getTile(x, y)) &&
+           isFloorTile(world.getTile(x + 1, y)) &&
            world.regionPasses(x, y - 3, 2, 3, [](Tile &tile) {
                return tile.blockID == TileID::empty &&
                       tile.liquid != Liquid::lava &&
@@ -694,12 +693,18 @@ void placeChest(int x, int y, Variant type, Random &rnd, World &world)
     default:
         break;
     }
+    bool isTrapped = type == Variant::deadMans;
     if (y < world.getUndergroundLevel()) {
         fillSurfaceChest(chest, torchID, rnd, world);
     } else if (y < world.getCavernLevel()) {
-        fillUndergroundChest(chest, torchID, rnd, world);
+        fillUndergroundChest(chest, torchID, isTrapped, rnd, world);
     } else {
-        fillCavernChest(chest, torchID, rnd, world);
+        fillCavernChest(chest, torchID, isTrapped, rnd, world);
+    }
+    if (isTrapped) {
+        world.queuedTraps.emplace_back([x, y](Random &rnd, World &world) {
+            addChestTraps(x, y - 2, rnd, world);
+        });
     }
 }
 
@@ -734,6 +739,10 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
             type == Variant::shadow &&
             world.getTile(x, y).blockID == TileID::ash) {
             continue;
+        } else if (
+            type == Variant::gold &&
+            static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 19 < 4) {
+            type = Variant::deadMans;
         }
         usedLocations[binId].emplace_back(x, y);
         placeChest(x, y, type, rnd, world);

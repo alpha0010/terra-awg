@@ -230,6 +230,7 @@ enum {
     potionOfReturn = 4870,
     tungstenBullet = 4915,
     fledglingWings = 4978,
+    deadMansSweater = 5007,
     treasureMagnet = 5010,
     mace = 5011,
     ashWood = 5215,

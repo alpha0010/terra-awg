@@ -430,7 +430,12 @@ void fillSurfaceWaterChest(Chest &chest, Random &rnd, World &world)
           {ItemID::coral, Prefix::none, rnd.getInt(3, 5)}}});
 }
 
-void fillUndergroundChest(Chest &chest, int torchID, Random &rnd, World &world)
+void fillUndergroundChest(
+    Chest &chest,
+    int torchID,
+    bool isTrapped,
+    Random &rnd,
+    World &world)
 {
     fillLoot(
         chest,
@@ -447,6 +452,8 @@ void fillUndergroundChest(Chest &chest, int torchID, Random &rnd, World &world)
                  {ItemID::mace, rnd.select(PrefixSet::universal), 1},
                  {ItemID::shoeSpikes, rnd.select(PrefixSet::accessory), 1},
              })},
+            {isTrapped ? 1.0 / 3 : 0,
+             {ItemID::deadMansSweater, Prefix::none, 1}},
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
             {0.05, {ItemID::flareGun, Prefix::none, 1}},
             {1.0 / 3, {ItemID::bomb, Prefix::none, rnd.getInt(10, 19)}},
@@ -901,7 +908,12 @@ void fillUndergroundWaterChest(Chest &chest, Random &rnd, World &world)
         });
 }
 
-void fillCavernChest(Chest &chest, int torchID, Random &rnd, World &world)
+void fillCavernChest(
+    Chest &chest,
+    int torchID,
+    bool isTrapped,
+    Random &rnd,
+    World &world)
 {
     int lavaLevel =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
@@ -920,6 +932,8 @@ void fillCavernChest(Chest &chest, int torchID, Random &rnd, World &world)
                  {ItemID::shoeSpikes, rnd.select(PrefixSet::accessory), 1},
                  {ItemID::flareGun, Prefix::none, 1},
              })},
+            {isTrapped ? 1.0 / 3 : 0,
+             {ItemID::deadMansSweater, Prefix::none, 1}},
             {chest.y < lavaLevel ? 0.05 : 0.15,
              {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
               Prefix::none,
