@@ -94,6 +94,7 @@ std::vector<Point> planTrack(Random &rnd, World &world)
         rnd.getInt(0, world.getWidth()),
         rnd.getInt(world.getUndergroundLevel(), world.getUnderworldLevel())};
     Point delta{rnd.select({-1, 1}), 0};
+    size_t minLen = 100 + world.getWidth() / 80;
     int maxLen = rnd.getInt(world.getWidth() / 26, world.getWidth() / 4.2);
     int minY = 0.8 * world.getUndergroundLevel();
     int maxY = 0.2 * world.getHeight() + 0.8 * world.getUnderworldLevel();
@@ -113,15 +114,23 @@ std::vector<Point> planTrack(Random &rnd, World &world)
                     return !tile.guarded &&
                            (!tile.actuator || tile.blockID != TileID::sand) &&
                            trackClearTiles.contains(tile.blockID);
+                }) ||
+            !world.regionPasses(
+                pos.first,
+                pos.second + 1,
+                1,
+                20,
+                [](Tile &tile) {
+                    return tile.blockID != TileID::minecartTrack;
                 })) {
             break;
         }
         track.push_back(pos);
     }
-    if (track.size() < 150) {
+    if (track.size() < minLen) {
         return {};
     }
-    track.resize(track.size() - rnd.getInt(5, 15));
+    track.resize(track.size() - rnd.getInt(4, 10));
     if (delta.first == -1) {
         std::reverse(track.begin(), track.end());
     }
@@ -202,7 +211,8 @@ void genTracks(Random &rnd, World &world)
         for (size_t idx = 0; idx < track.size(); ++idx) {
             auto [x, y] = track[idx];
             int height = 7 + 2.9 * rnd.getFineNoise(2 * x, noiseRow);
-            if (idx == 0 || idx == track.size() - 1) {
+            bool isEndpoint = idx == 0 || idx + 1 == track.size();
+            if (isEndpoint) {
                 height *= 0.3;
             } else if (idx == 1 || idx == track.size() - 2) {
                 height *= 0.8;
@@ -213,8 +223,13 @@ void genTracks(Random &rnd, World &world)
                 tile.actuator = false;
             }
             Tile &tile = world.getTile(x, y);
+            if (isEndpoint) {
+                tile.blockID = TileID::empty;
+                applyMudGrass(x, y, world);
+                continue;
+            }
             tile.blockID = TileID::minecartTrack;
-            Mode mode = idx + 1 == track.size()     ? Mode::none
+            Mode mode = idx + 2 == track.size()     ? Mode::none
                         : y > track[idx + 1].second ? Mode::asc
                         : y < track[idx + 1].second ? Mode::desc
                                                     : Mode::flat;
