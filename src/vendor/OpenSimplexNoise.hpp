@@ -12,14 +12,6 @@
 #include <memory> // unique_ptr
 #include <ctime> // time for random seed
 
-#if defined(__clang__) // Couldn't find one for clang
-#define FORCE_INLINE inline
-#elif defined(__GNUC__) || defined(__GNUG__)
-#define FORCE_INLINE __attribute__((always_inline))
-#elif defined(_MSC_VER)
-#define FORCE_INLINE __forceinline
-#endif
-
 class OpenSimplexNoise
 {
   friend class StaticConstructor;
@@ -324,12 +316,6 @@ protected:
   };
   // Initialise our static tables
   inline static StaticConstructor staticConstructor;
-  
-  FORCE_INLINE static int FastFloor(double x)
-  {
-    int xi = static_cast<int>(x);
-    return x < xi ? xi - 1 : xi;
-  }
 
 public:
   OpenSimplexNoise()
@@ -368,8 +354,8 @@ public:
     double xs = x + stretchOffset;
     double ys = y + stretchOffset;
 
-    int xsb = FastFloor(xs);
-    int ysb = FastFloor(ys);
+    int xsb = std::floor(xs);
+    int ysb = std::floor(ys);
 
     double squishOffset = (xsb + ysb) * SQUISH_2D;
     double dx0 = x - (xsb + squishOffset);
@@ -419,9 +405,9 @@ public:
     double ys = y + stretchOffset;
     double zs = z + stretchOffset;
 
-    int xsb = FastFloor(xs);
-    int ysb = FastFloor(ys);
-    int zsb = FastFloor(zs);
+    int xsb = std::floor(xs);
+    int ysb = std::floor(ys);
+    int zsb = std::floor(zs);
 
     double squishOffset = (xsb + ysb + zsb) * SQUISH_3D;
     double dx0 = x - (xsb + squishOffset);
@@ -481,10 +467,10 @@ public:
     double zs = z + stretchOffset;
     double ws = w + stretchOffset;
 
-    int xsb = FastFloor(xs);
-    int ysb = FastFloor(ys);
-    int zsb = FastFloor(zs);
-    int wsb = FastFloor(ws);
+    int xsb = std::floor(xs);
+    int ysb = std::floor(ys);
+    int zsb = std::floor(zs);
+    int wsb = std::floor(ws);
 
     double squishOffset = (xsb + ysb + zsb + wsb) * SQUISH_4D;
     double dx0 = x - (xsb + squishOffset);
