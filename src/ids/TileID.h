@@ -205,6 +205,7 @@ enum {
     TNTBarrel = 654,
     corruptJungleGrass = 661,
     crimsonJungleGrass = 662,
+    bouncyBoulder = 664,
     lifeCrystalBoulder = 665,
     dirtiestBlock = 668,
     aetherium = 659

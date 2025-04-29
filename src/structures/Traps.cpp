@@ -141,8 +141,17 @@ void placeSandTraps(Random &rnd, World &world)
 
 bool isValidBoulderPlacement(int x, int y, World &world)
 {
-    return world.regionPasses(x, y, 6, 6, [](Tile &tile) {
-        return !tile.guarded && tile.blockID == TileID::stone;
+    std::set<int> validTiles{
+        TileID::crimstone,
+        TileID::ebonstone,
+        TileID::granite,
+        TileID::sandstone,
+        TileID::slime,
+        TileID::stone};
+    return world.regionPasses(x, y, 6, 6, [&validTiles](Tile &tile) {
+        return !tile.guarded && validTiles.contains(tile.blockID);
+    }) && world.regionPasses(x + 2, y + 6, 2, 1, [](Tile &tile) {
+        return tile.blockID != TileID::empty;
     });
 }
 
@@ -166,6 +175,7 @@ void placeBoulderTraps(Random &rnd, World &world)
 {
     int numBoulders =
         world.getWidth() * world.getHeight() / rnd.getInt(57600, 64000);
+    std::vector<Point> usedLocations;
     while (numBoulders > 0) {
         auto [x, y] = selectBoulderLocation(rnd, world);
         int trapFloor = y + 4;
@@ -177,12 +187,25 @@ void placeBoulderTraps(Random &rnd, World &world)
         int trapX = rnd.select({x, x + 1});
         trapFloor = scanWhileEmpty({trapX, trapFloor}, {0, 1}, world).second;
         if (trapFloor > world.getUnderworldLevel() || trapFloor - y > 25 ||
-            !world.regionPasses(x, y, 2, trapFloor - y + 2, [](Tile &tile) {
-                return isTrappable(tile) && tile.liquid == Liquid::none;
-            })) {
+            !world.regionPasses(
+                x,
+                y,
+                2,
+                trapFloor - y + 2,
+                [](Tile &tile) {
+                    return isTrappable(tile) && tile.liquid == Liquid::none;
+                }) ||
+            isLocationUsed(x, y, 20, usedLocations)) {
             continue;
         }
-        world.placeFramedTile(x, y, TileID::boulder);
+        usedLocations.emplace_back(x, y);
+        int probeTileId = world.getTile(x, y).blockID;
+        world.placeFramedTile(
+            x,
+            y,
+            probeTileId == TileID::sandstone ? TileID::rollingCactus
+            : probeTileId == TileID::slime   ? TileID::bouncyBoulder
+                                             : TileID::boulder);
         for (int i = -2; i < 4; ++i) {
             for (int j = -2; j < 4; ++j) {
                 world.getTile(x + i, y + j).guarded = true;
@@ -389,11 +412,11 @@ bool addChestDartTraps(int x, int y, Random &rnd, World &world)
 
 bool addChestExplosiveTraps(int x, int y, Random &rnd, World &world)
 {
-    double numExplosives = 3;
+    double numExplosives = rnd.getDouble(0, 3);
     bool didTrap = false;
     while (numExplosives > 0) {
         int i = rnd.getInt(-9, 9);
-        int j = rnd.getInt(-7, 6);
+        int j = rnd.getInt(-7, 4);
         if (!world.regionPasses(x + i - 1, y + j - 1, 3, 3, [](Tile &tile) {
                 return tile.blockID != TileID::empty && isTrappable(tile);
             })) {
