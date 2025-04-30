@@ -554,6 +554,24 @@ bool World::isExposed(int x, int y) const
     return false;
 }
 
+bool World::isIsolated(int x, int y) const
+{
+    if (x < 1 || x >= width - 1 || y < 1 || y >= height - 1) {
+        return false;
+    }
+    for (int i = -1; i < 2; ++i) {
+        for (int j = -1; j < 2; ++j) {
+            if (i == 0 && j == 0) {
+                continue;
+            }
+            if (tiles[(y + j) + (x + i) * height].blockID != TileID::empty) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 void World::planBiomes(Random &rnd)
 {
     std::cout << "Planning biomes\n";

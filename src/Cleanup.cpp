@@ -12,21 +12,6 @@
 #include <map>
 #include <set>
 
-bool isIsolated(World &world, int x, int y)
-{
-    for (int i = -1; i < 2; ++i) {
-        for (int j = -1; j < 2; ++j) {
-            if (i == 0 && j == 0) {
-                continue;
-            }
-            if (world.getTile(x + i, y + j).blockID != TileID::empty) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
 std::pair<int, int> getAttachedOpenWall(World &world, int x, int y)
 {
     Tile &origin = world.getTile(x, y);
@@ -193,7 +178,7 @@ void smoothSurfaces(World &world)
                     std::tie(tile.wallID, tile.wallPaint) =
                         getAttachedOpenWall(world, x, y);
                 }
-                if (isIsolated(world, x, y)) {
+                if (world.isIsolated(x, y)) {
                     tile.blockID = TileID::empty;
                     continue;
                 }

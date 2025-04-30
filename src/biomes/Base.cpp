@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <iostream>
 #include <map>
+#include <mutex>
 
 void computeSurfaceLevel(Random &rnd, World &world)
 {
@@ -196,10 +197,14 @@ void genWorldBase(Random &rnd, World &world)
     rnd.shuffleNoise();
     // Save so later generators can match cave structures.
     rnd.saveShuffleState();
+    std::mutex ptMtx;
+    std::vector<std::pair<int, int>> isolatedPoints;
     parallelFor(
         std::views::iota(0, world.getWidth()),
-        [underworldHeight, &rnd, &world](int x) {
+        [underworldHeight, &ptMtx, &isolatedPoints, &rnd, &world](int x) {
             bool nearEdge = x < 350 || x > world.getWidth() - 350;
+            int scanState = 0;
+            std::vector<std::pair<int, int>> candidates;
             for (int y = 0; y < world.getHeight(); ++y) {
                 if (nearEdge && y < 0.9 * world.getUndergroundLevel()) {
                     continue;
@@ -212,12 +217,47 @@ void genWorldBase(Random &rnd, World &world)
                                   underworldHeight -
                               0.16
                         : -0.16;
+                bool isEmpty = false;
                 if (std::abs(rnd.getCoarseNoise(x, 2 * y) + 0.1) < 0.15 &&
                     rnd.getFineNoise(x, y) > threshold) {
                     // Strings of nearly connected caves, with horizontal bias.
                     Tile &tile = world.getTile(x, y);
                     tile.blockID = TileID::empty;
+                    isEmpty = true;
+                }
+                switch (scanState) {
+                case 0:
+                    if (isEmpty) {
+                        scanState = 1;
+                    }
+                    break;
+                case 1:
+                    if (!isEmpty) {
+                        scanState = 2;
+                    }
+                    break;
+                case 2:
+                    if (isEmpty) {
+                        scanState = 1;
+                        candidates.emplace_back(x, y - 1);
+                    } else {
+                        scanState = 0;
+                    }
+                    break;
                 }
             }
+            if (!candidates.empty()) {
+                std::lock_guard lock{ptMtx};
+                isolatedPoints.insert(
+                    isolatedPoints.end(),
+                    candidates.begin(),
+                    candidates.end());
+            }
         });
+    for (auto [x, y] : isolatedPoints) {
+        if (world.isIsolated(x, y)) {
+            world.getTile(x, y).blockID = TileID::empty;
+            continue;
+        }
+    }
 }

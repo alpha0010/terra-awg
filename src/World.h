@@ -75,6 +75,10 @@ public:
      */
     bool isExposed(int x, int y) const;
     /**
+     * Check if the given location is surrounded exclusively by empty tiles.
+     */
+    bool isIsolated(int x, int y) const;
+    /**
      * Select desert, jungle, and snow locations.
      */
     void planBiomes(Random &rnd);
