@@ -3,6 +3,7 @@
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
+#include "structures/Traps.h"
 #include "structures/data/Trees.h"
 #include <iostream>
 #include <set>
@@ -217,6 +218,7 @@ void growTree(
 void genPlants(const LocationBins &locations, Random &rnd, World &world)
 {
     std::cout << "Growing trees\n";
+    std::vector<Point> oreLocations;
     for (const auto &bin : locations) {
         for (auto [x, y] : bin.second) {
             int curTileID = world.getTile(x, y).blockID;
@@ -335,9 +337,23 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
                         world);
                 }
                 break;
+            case TileID::copperOre:
+            case TileID::tinOre:
+            case TileID::ironOre:
+            case TileID::leadOre:
+            case TileID::silverOre:
+            case TileID::tungstenOre:
+            case TileID::goldOre:
+            case TileID::platinumOre:
+                oreLocations.emplace_back(x, y);
+                break;
             }
         }
     }
+    world.queuedTraps.emplace_back(
+        [locs = std::move(oreLocations)](Random &rnd, World &world) mutable {
+            addOreTraps(std::move(locs), rnd, world);
+        });
 }
 
 void placeLivingTreeDecoAt(int x, Random &rnd, World &world)

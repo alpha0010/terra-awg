@@ -165,6 +165,7 @@ enum {
     ebonsandstone = 400,
     crimsandstone = 401,
     desertFossil = 404,
+    detonator = 411,
     sensor = 423,
     snowCloud = 460,
     sandDrip = 461,

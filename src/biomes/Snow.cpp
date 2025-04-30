@@ -66,6 +66,15 @@ void genSnow(Random &rnd, World &world)
                 if (itr != snowWalls.end()) {
                     tile.wallID = itr->second;
                 }
+                threshold = std::max(
+                    threshold,
+                    15.0 * (world.getCavernLevel() - y) / world.getHeight());
+                if (std::abs(rnd.getCoarseNoise(2 * x, y) + 0.1) < 0.12 &&
+                    rnd.getFineNoise(x, y) > std::max(-0.1, 1 + threshold)) {
+                    tile.blockID = tile.blockID == TileID::snow
+                                       ? TileID::thinIce
+                                       : TileID::empty;
+                }
             }
         });
 }
