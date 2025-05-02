@@ -7,9 +7,12 @@
 #include "structures/Platforms.h"
 #include "structures/StructureUtil.h"
 #include "structures/data/Furniture.h"
+#include "structures/data/RoomWindows.h"
 #include <algorithm>
 #include <iostream>
 #include <set>
+
+inline std::array const roofCurve{1, 2, 3, 5, 8, 13, 21, 26, 29, 31, 32, 33};
 
 int makeCongruent(int val, int mod)
 {
@@ -33,7 +36,9 @@ bool canPlaceFurniture(int x, int y, TileBuffer &data, World &world)
                 }
                 break;
             case TileID::cloud:
-                if (tile.blockID != TileID::obsidianBrick) {
+                if ((tile.blockID != TileID::obsidianBrick &&
+                     tile.blockID != TileID::hellstoneBrick) ||
+                    tile.actuated) {
                     return false;
                 }
                 break;
@@ -48,57 +53,126 @@ bool canPlaceFurniture(int x, int y, TileBuffer &data, World &world)
     return true;
 }
 
-void genRuins(Random &rnd, World &world)
+class Ruins
 {
-    std::cout << "Abandoning cities\n";
-    int step = 8;
-    int underworldHeight = world.getHeight() - world.getUnderworldLevel();
-    int cityBase = makeCongruent(
-        world.getUnderworldLevel() + 0.49 * underworldHeight,
-        step);
-    auto isInBuilding = [cityBase, step, underworldHeight, &rnd](int x, int y) {
-        double threshold =
-            1.6 * (cityBase - makeCongruent(y, step)) / underworldHeight - 0.2;
-        return rnd.getFineNoise(
-                   makeCongruent(x, step),
-                   makeCongruent(y, step)) > threshold;
-    };
-    auto isRoomWall = [step, &rnd](int x, int y) {
-        return static_cast<int>(
-                   99999 * (1 + rnd.getFineNoise(x, makeCongruent(y, step)))) %
-                   23 ==
-               0;
-    };
-    auto isPlatform = [step, &rnd](int x, int y) {
-        return static_cast<int>(
-                   99999 * (1 + rnd.getFineNoise(
-                                    makeCongruent(x, step / 2) + step / 4,
-                                    y))) %
-                   11 ==
-               0;
-    };
+private:
+    Random &rnd;
+    World &world;
     std::set<Point> queuedPlatforms;
+    std::vector<Point> queuedDoors;
     std::vector<Point> locations;
-    int minX = makeCongruent(0.15 * world.getWidth(), step);
-    int maxX = makeCongruent(0.85 * world.getWidth(), step);
-    for (int x = minX; x < maxX; ++x) {
-        if (x % step == 0 && (rnd.getCoarseNoise(x, 0) < 0.15 ||
-                              !world.regionPasses(
-                                  x,
-                                  world.getUnderworldLevel(),
-                                  step,
-                                  cityBase - world.getUnderworldLevel(),
-                                  [](Tile &tile) { return !tile.guarded; }))) {
-            x += step - 1;
-            continue;
-        } else if (isInBuilding(x, cityBase - 1)) {
-            // Base.
-            Tile &tile = world.getTile(x, cityBase);
-            if (tile.blockID != TileID::lesion &&
-                tile.blockID != TileID::flesh) {
+    std::vector<Point> structLocs;
+
+    void buildRoof(int &minX, int &maxX, int &roofLevel)
+    {
+        int center = std::midpoint(minX, maxX);
+        for (size_t j = 0; j < roofCurve.size(); ++j) {
+            for (int i = -roofCurve[j]; i < roofCurve[j]; ++i) {
+                Tile &tile = world.getTile(center + i, roofLevel + j);
+                if (tile.blockID == TileID::lesion ||
+                    tile.blockID == TileID::flesh) {
+                    continue;
+                }
                 tile.blockID = TileID::obsidianBrick;
-                tile.liquid = Liquid::none;
+                if (i == -roofCurve[j]) {
+                    tile.slope = j == 0 || j > 2 ? Slope::half : Slope::topLeft;
+                } else if (i == roofCurve[j] - 1) {
+                    tile.slope =
+                        j == 0 || j > 2 ? Slope::half : Slope::topRight;
+                }
+                if (world.getTile(center + i, roofLevel + j - 1).blockID ==
+                    TileID::empty) {
+                    tile.wallID = WallID::empty;
+                } else {
+                    tile.wallID = WallID::Unsafe::obsidianBrick;
+                }
+                structLocs.emplace_back(center + i, roofLevel + j);
             }
+            if (center - roofCurve[j] <= minX) {
+                roofLevel += j + 1;
+                minX = std::max(minX, center - roofCurve[j] + 1);
+                maxX = std::min(maxX, center + roofCurve[j] - 1);
+                return;
+            }
+        }
+    }
+
+    void partitionRooms(int minX, int maxX, int minY, int maxY)
+    {
+        if (maxY - minY > 11) {
+            int center = std::midpoint(minY, maxY) + rnd.getInt(-1, 1);
+            partitionRooms(minX, maxX, minY, center);
+            partitionRooms(minX, maxX, center, maxY);
+            return;
+        }
+        auto isRoomWall = [maxY, this](int x) {
+            return static_cast<int>(99999 * (1 + rnd.getFineNoise(x, maxY))) %
+                       23 ==
+                   0;
+        };
+        for (int x = minX; x < maxX; ++x) {
+            for (int y = minY; y < maxY; ++y) {
+                Tile &tile = world.getTile(x, y);
+                if (tile.blockID == TileID::lesion ||
+                    tile.blockID == TileID::flesh) {
+                    continue;
+                }
+                tile.blockID =
+                    y == minY || x == minX || x == maxX - 1 ||
+                            (x > minX + 1 && x < maxX - 2 && isRoomWall(x) &&
+                             !isRoomWall(x - 1) && !isRoomWall(x - 2))
+                        ? TileID::obsidianBrick
+                        : TileID::empty;
+                tile.wallID = WallID::Unsafe::obsidianBrick;
+                tile.liquid = Liquid::none;
+                locations.emplace_back(x, y);
+                if (y == maxY - 3 && tile.blockID == TileID::obsidianBrick &&
+                    static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
+                            3 ==
+                        0) {
+                    queuedDoors.emplace_back(x, y);
+                }
+            }
+        }
+        int range = maxX - minX;
+        for (auto partition : rnd.partitionRange(
+                 std::max(rnd.getInt(range / 18, range / 10), 2),
+                 range)) {
+            for (int i = -2; i < 2; ++i) {
+                queuedPlatforms.emplace(minX + partition + i, minY);
+            }
+        }
+    }
+
+    void buildRuin(int minX, int maxX, int cityBase)
+    {
+        if (minX == -1) {
+            return;
+        }
+        if (maxX - minX > 66) {
+            int center = std::midpoint(minX, maxX);
+            buildRuin(minX, center - rnd.getInt(2, 5), cityBase);
+            buildRuin(center + rnd.getInt(2, 5), maxX, cityBase);
+            return;
+        }
+        cityBase += rnd.getInt(-2, 8);
+        int roofLevel = std::max<int>(
+            cityBase - 5 - rnd.getDouble(0.7, 1.3) * (maxX - minX),
+            world.getUnderworldLevel() + 50);
+        if (cityBase - roofLevel < 12) {
+            return;
+        }
+        buildRoof(minX, maxX, roofLevel);
+        partitionRooms(minX, maxX, roofLevel, cityBase);
+        for (int x = minX; x < maxX; ++x) {
+            Tile &tile = world.getTile(x, cityBase);
+            if (tile.blockID == TileID::lesion ||
+                tile.blockID == TileID::flesh) {
+                continue;
+            }
+            // Base.
+            tile.blockID = TileID::obsidianBrick;
+            structLocs.emplace_back(x, cityBase);
             for (int j = 1; j < 20; ++j) {
                 double noise = rnd.getFineNoise(x, cityBase + j);
                 if (noise > j / 10.0 - 1) {
@@ -116,85 +190,162 @@ void genRuins(Random &rnd, World &world)
                     break;
                 }
             }
-        } else {
+        }
+    }
+
+public:
+    Ruins(Random &r, World &w) : rnd(r), world(w) {}
+
+    std::vector<Point> gen()
+    {
+        int step = 8;
+        int underworldHeight = world.getHeight() - world.getUnderworldLevel();
+        int cityBase = world.getUnderworldLevel() + 0.47 * underworldHeight;
+        int minX = makeCongruent(0.15 * world.getWidth(), step);
+        int maxX = makeCongruent(0.85 * world.getWidth(), step);
+        int ruinStartX = -1;
+        for (int x = minX; x < maxX; ++x) {
+            if (x % step == 0 &&
+                (rnd.getCoarseNoise(x, 0) < 0.15 ||
+                 !world.regionPasses(
+                     x,
+                     world.getUnderworldLevel(),
+                     step,
+                     cityBase - world.getUnderworldLevel(),
+                     [](Tile &tile) { return !tile.guarded; }))) {
+                buildRuin(ruinStartX, x, cityBase);
+                ruinStartX = -1;
+                x += step - 1;
+            } else if (rnd.getFineNoise(makeCongruent(x, step), 0) < -0.2) {
+                buildRuin(ruinStartX, x, cityBase);
+                ruinStartX = -1;
+            } else if (ruinStartX == -1) {
+                ruinStartX = x;
+            }
+        }
+        return locations;
+    }
+
+    void applyDamage()
+    {
+        locations.insert(locations.end(), structLocs.begin(), structLocs.end());
+        std::vector<Point> noiseShuffles;
+        for (int iter = 0; iter < 4; ++iter) {
+            noiseShuffles.emplace_back(
+                rnd.getInt(0, world.getWidth()),
+                rnd.getInt(0, world.getHeight()));
+        }
+        auto getCompsiteNoise = [noiseShuffles, this](int x, int y) {
+            double noise = 0;
+            for (auto [shuffleX, shuffleY] : noiseShuffles) {
+                noise = std::max(
+                    std::abs(rnd.getFineNoise(x + shuffleX, y + shuffleY)),
+                    noise);
+            }
+            return noise;
+        };
+        for (auto [x, y] : locations) {
+            double noise = getCompsiteNoise(x, y);
+            if (noise > 0.65) {
+                world.getTile(x, y) = {};
+            } else if (noise > 0.55) {
+                Tile &tile = world.getTile(x, y);
+                if (tile.blockID == TileID::obsidianBrick) {
+                    tile.blockID = TileID::hellstoneBrick;
+                }
+                if (tile.wallID == WallID::Unsafe::obsidianBrick) {
+                    tile.wallID = WallID::Unsafe::hellstoneBrick;
+                }
+            }
+        }
+        for (auto [x, y] : queuedDoors) {
+            if (isSolidBlock(world.getTile(x, y - 1).blockID) &&
+                isSolidBlock(world.getTile(x, y + 3).blockID)) {
+                world.placeFramedTile(x, y, TileID::door, Variant::obsidian);
+            }
+        }
+        std::erase_if(queuedPlatforms, [this](const auto &pt) {
+            return world.getTile(pt.first, pt.second - 1).blockID !=
+                       TileID::empty ||
+                   world.getTile(pt.first, pt.second).blockID ==
+                       TileID::empty ||
+                   world.getTile(pt.first, pt.second + 1).blockID !=
+                       TileID::empty;
+        });
+        for (auto [x, y] : queuedPlatforms) {
+            if (queuedPlatforms.contains({x - 1, y}) ||
+                queuedPlatforms.contains({x + 1, y})) {
+                placePlatform(x, y, Platform::obsidian, world);
+            }
+        }
+    }
+};
+
+void genRuins(Random &rnd, World &world)
+{
+    std::cout << "Abandoning cities\n";
+    Ruins structure(rnd, world);
+    std::vector<Point> locations = structure.gen();
+    std::shuffle(locations.begin(), locations.end(), rnd.getPRNG());
+    // Windows.
+    int numPlacements = locations.size() / 500;
+    auto locItr = locations.begin();
+    Data::Window windowStyle = Data::Window::tall;
+    TileBuffer data = Data::getWindow(
+        windowStyle,
+        TileID::obsidianBrick,
+        WallID::Safe::redStainedGlass,
+        world.getFramedTiles());
+    std::vector<Point> usedLocations;
+    for (; locItr != locations.end(); ++locItr) {
+        auto [x, y] = *locItr;
+        y = scanWhileEmpty({x, y}, {0, -1}, world).second;
+        if (windowStyle == Data::Window::square) {
+            ++y;
+        }
+        if (!world.regionPasses(
+                x - 1,
+                windowStyle == Data::Window::tall ? y : y - 1,
+                data.getWidth() + 2,
+                data.getHeight() + (windowStyle == Data::Window::tall ? 1 : 2),
+                [](Tile &tile) { return tile.blockID == TileID::empty; }) ||
+            isLocationUsed(x, y, 10, usedLocations)) {
             continue;
         }
-        for (int y = cityBase - 1; y > world.getUnderworldLevel(); --y) {
-            if (!isInBuilding(x, y)) {
-                break;
-            }
-            Tile &tile = world.getTile(x, y);
-            if (tile.blockID == TileID::lesion ||
-                tile.blockID == TileID::flesh) {
-                continue;
-            }
-            locations.emplace_back(x, y);
-            tile.liquid = Liquid::none;
-            if (!isInBuilding(x - 1, y) ||
-                (isInBuilding(x, y - 1) && !isInBuilding(x - 1, y - 1)) ||
-                !isInBuilding(x + 1, y) ||
-                (isInBuilding(x, y - 1) && !isInBuilding(x + 1, y - 1))) {
-                // Outer wall.
-                if (step - y % step == 3 &&
-                    static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
-                            7 ==
-                        0) {
-                    world
-                        .placeFramedTile(x, y, TileID::door, Variant::obsidian);
-                } else {
-                    tile.blockID = TileID::obsidianBrick;
+        usedLocations.emplace_back(x, y);
+        for (int i = 0; i < data.getWidth(); ++i) {
+            for (int j = 0; j < data.getHeight(); ++j) {
+                Tile &dataTile = data.getTile(i, j);
+                Tile &tile = world.getTile(x + i, y + j);
+                if (dataTile.blockID != TileID::empty) {
+                    tile.blockID = dataTile.blockID;
+                    tile.slope = dataTile.slope;
+                    tile.actuated = dataTile.actuated;
+                    tile.guarded = true;
                 }
-            } else if (
-                isRoomWall(x, y) && !isRoomWall(x + 1, y) &&
-                !isRoomWall(x + 2, y)) {
-                // Room wall.
-                if (step - y % step == 3 &&
-                    static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
-                            2 ==
-                        0) {
-                    world
-                        .placeFramedTile(x, y, TileID::door, Variant::obsidian);
-                } else {
-                    tile.blockID = TileID::obsidianBrick;
+                if (dataTile.wallID != WallID::empty) {
+                    tile.wallID = dataTile.wallID;
                 }
-                tile.wallID = WallID::Unsafe::obsidianBrick;
-            } else if (!isInBuilding(x, y - 1)) {
-                // Roof.
-                tile.blockID = TileID::obsidianBrick;
-                if (isPlatform(x, y)) {
-                    queuedPlatforms.emplace(x, y);
-                }
-            } else if (y % step == 0) {
-                // Room floor.
-                tile.blockID = TileID::obsidianBrick;
-                tile.wallID = WallID::Unsafe::obsidianBrick;
-                if (isPlatform(x, y)) {
-                    queuedPlatforms.emplace(x, y);
-                }
-            } else {
-                // Room.
-                tile.blockID = TileID::empty;
-                tile.wallID = WallID::Unsafe::obsidianBrick;
             }
         }
-    }
-    std::erase_if(queuedPlatforms, [&world](const auto &pt) {
-        return world.getTile(pt.first, pt.second - 1).blockID !=
-                   TileID::empty ||
-               world.getTile(pt.first, pt.second + 1).blockID != TileID::empty;
-    });
-    for (auto [x, y] : queuedPlatforms) {
-        if (queuedPlatforms.contains({x - 1, y}) ||
-            queuedPlatforms.contains({x + 1, y})) {
-            placePlatform(x, y, Platform::obsidian, world);
+        --numPlacements;
+        if (numPlacements < 0) {
+            break;
         }
+        windowStyle = rnd.select({Data::Window::square, Data::Window::tall});
+        data = Data::getWindow(
+            windowStyle,
+            TileID::obsidianBrick,
+            rnd.select(
+                {WallID::Safe::redStainedGlass,
+                 WallID::Safe::multicoloredStainedGlass,
+                 WallID::Safe::leadFence}),
+            world.getFramedTiles());
     }
-    std::shuffle(locations.begin(), locations.end(), rnd.getPRNG());
-    TileBuffer data;
-    int tries = 0;
+    structure.applyDamage();
     // Furniture.
-    int numPlacements = locations.size() / 250;
-    auto locItr = locations.begin();
+    int tries = 0;
+    numPlacements = locations.size() / 450;
     for (; locItr != locations.end(); ++locItr) {
         auto [x, y] = *locItr;
         if (tries > 30) {
@@ -255,11 +406,12 @@ void genRuins(Random &rnd, World &world)
         rnd.getPRNG());
     auto paintingItr = underworldPaintings.begin();
     // Paintings.
-    numPlacements = locations.size() / 320;
-    std::vector<Point> usedLocations;
+    numPlacements = locations.size() / 650;
+    usedLocations.clear();
     for (; locItr != locations.end(); ++locItr) {
         auto [x, y] = *locItr;
         auto [width, height] = world.getPaintingDims(*paintingItr);
+        y = scanWhileNotSolid({x, y}, {0, -1}, world).second + 1;
         if (!world.regionPasses(
                 x,
                 y,
@@ -267,9 +419,10 @@ void genRuins(Random &rnd, World &world)
                 height,
                 [](Tile &tile) {
                     return tile.blockID == TileID::empty &&
-                           tile.wallID == WallID::Unsafe::obsidianBrick;
+                           (tile.wallID == WallID::Unsafe::obsidianBrick ||
+                            tile.wallID == WallID::Unsafe::hellstoneBrick);
                 }) ||
-            isLocationUsed(x, y, 40, usedLocations)) {
+            isLocationUsed(x, y, 30, usedLocations)) {
             continue;
         }
         usedLocations.emplace_back(x, y);
@@ -288,6 +441,7 @@ void genRuins(Random &rnd, World &world)
     usedLocations.clear();
     for (; locItr != locations.end() && numPlacements > 0; ++locItr) {
         auto [x, y] = *locItr;
+        y = scanWhileNotSolid({x, y}, {0, 1}, world).second - 1;
         if (!world.regionPasses(
                 x,
                 y,
@@ -299,7 +453,9 @@ void genRuins(Random &rnd, World &world)
                 y + 2,
                 2,
                 1,
-                [](Tile &tile) { return isSolidBlock(tile.blockID); }) ||
+                [](Tile &tile) {
+                    return isSolidBlock(tile.blockID) && !tile.actuated;
+                }) ||
             isLocationUsed(x, y, 25, usedLocations)) {
             continue;
         }
@@ -311,8 +467,11 @@ void genRuins(Random &rnd, World &world)
     // Hellforges.
     numPlacements = locations.size() / 600;
     usedLocations.clear();
-    for (; locItr != locations.end() && numPlacements > 0; ++locItr) {
-        auto [x, y] = *locItr;
+    for (auto rItr = locations.rbegin();
+         rItr != locations.rend() && numPlacements > 0;
+         ++rItr) {
+        auto [x, y] = *rItr;
+        y = scanWhileNotSolid({x, y}, {0, 1}, world).second - 1;
         if (!world.regionPasses(
                 x,
                 y,
@@ -324,12 +483,41 @@ void genRuins(Random &rnd, World &world)
                 y + 2,
                 3,
                 1,
-                [](Tile &tile) { return isSolidBlock(tile.blockID); }) ||
+                [](Tile &tile) {
+                    return isSolidBlock(tile.blockID) && !tile.actuated;
+                }) ||
             isLocationUsed(x, y, 25, usedLocations)) {
             continue;
         }
         usedLocations.emplace_back(x, y);
         world.placeFramedTile(x, y, TileID::hellforge);
+        --numPlacements;
+    }
+    // Pots.
+    numPlacements = locations.size() / 600;
+    usedLocations.clear();
+    for (; locItr != locations.end() && numPlacements > 0; ++locItr) {
+        auto [x, y] = *locItr;
+        y = scanWhileNotSolid({x, y}, {0, 1}, world).second - 1;
+        if (!world.regionPasses(
+                x,
+                y,
+                2,
+                2,
+                [](Tile &tile) { return tile.blockID == TileID::empty; }) ||
+            !world.regionPasses(
+                x,
+                y + 2,
+                2,
+                1,
+                [](Tile &tile) {
+                    return isSolidBlock(tile.blockID) && !tile.actuated;
+                }) ||
+            isLocationUsed(x, y, 5, usedLocations)) {
+            continue;
+        }
+        usedLocations.emplace_back(x, y);
+        world.placeFramedTile(x, y, TileID::pot, Variant::underworld);
         --numPlacements;
     }
 }
