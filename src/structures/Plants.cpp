@@ -570,6 +570,23 @@ bool placeLargePile(int x, int y, World &world)
     return false;
 }
 
+bool placeGeyser(int x, int y, World &world)
+{
+    int lavaLevel =
+        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
+    if (y > lavaLevel && isRegionEmpty(x, y - 3, 2, 3, world) &&
+        world.regionPasses(x, y, 2, 1, [](Tile &tile) {
+            return tile.slope == Slope::none &&
+                   (tile.blockID == TileID::ash ||
+                    tile.blockID == TileID::jungleGrass ||
+                    tile.blockID == TileID::stone);
+        })) {
+        world.placeFramedTile(x, y - 1, TileID::geyser);
+        return true;
+    }
+    return false;
+}
+
 void growGrass(int x, int y, Random &rnd, World &world)
 {
     Tile &baseTile = world.getTile(x, y);
@@ -618,6 +635,9 @@ void growGrass(int x, int y, Random &rnd, World &world)
         return;
     }
     if (randInt % 37 == 0 && placeLargePile(x, y, world)) {
+        return;
+    }
+    if (randInt % 131 == 0 && placeGeyser(x, y, world)) {
         return;
     }
     switch (baseTile.blockID) {

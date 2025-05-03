@@ -169,6 +169,7 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::door, Variant::obsidian}, {1, 3, 0, 1026}},
     {{TileID::fallenLog, Variant::none}, {3, 2, 0, 0}},
     {{TileID::grassPlant, Variant::none}, {1, 1, 0, 0}},
+    {{TileID::geyser, Variant::none}, {2, 1, 0, 0}},
     {{TileID::hellforge, Variant::none}, {3, 2, 0, 0}},
     {{TileID::junglePlant, Variant::none}, {1, 1, 0, 0}},
     {{TileID::lamp, Variant::crystal}, {1, 3, 0, 1674}},

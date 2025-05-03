@@ -167,6 +167,7 @@ enum {
     desertFossil = 404,
     detonator = 411,
     sensor = 423,
+    geyser = 443,
     snowCloud = 460,
     sandDrip = 461,
     chestGroup2 = 467,
