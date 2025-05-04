@@ -325,7 +325,6 @@ inline const std::map<std::pair<int, Variant>, std::pair<int, int>> frameDetail{
     {{TileID::statue, Variant::blueDungeon}, {1656, 0}},
     {{TileID::statue, Variant::greenDungeon}, {1692, 0}},
     {{TileID::statue, Variant::pinkDungeon}, {1728, 0}},
-    {{TileID::statue, Variant::mushroom}, {1224, 0}},
     {{TileID::statue, Variant::obsidian}, {1764, 0}},
     // Base: Wooden Table
     {{TileID::table, Variant::blueDungeon}, {540, 0}},

@@ -4,6 +4,7 @@
 #include "World.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
+#include "structures/Statues.h"
 #include "structures/StructureUtil.h"
 #include "structures/data/Furniture.h"
 #include "structures/data/Mushrooms.h"
@@ -122,6 +123,11 @@ void placeMushroomFurniture(
     World &world)
 {
     std::shuffle(locations.begin(), locations.end(), rnd.getPRNG());
+    std::vector<int> furniture{
+        Data::furnitureLayouts.begin(),
+        Data::furnitureLayouts.end()};
+    std::shuffle(furniture.begin(), furniture.end(), rnd.getPRNG());
+    auto furnitureItr = furniture.begin();
     double numPlacements = locations.size() / 50.0;
     int tries = 0;
     TileBuffer data;
@@ -133,9 +139,13 @@ void placeMushroomFurniture(
             }
             if (tries == 0) {
                 data = getFurniture(
-                    rnd.select(Data::furnitureLayouts),
+                    *furnitureItr,
                     Data::Variant::mushroom,
                     world.getFramedTiles());
+                ++furnitureItr;
+                if (furnitureItr == furniture.end()) {
+                    furnitureItr = furniture.begin();
+                }
             }
             ++tries;
             if (!canPlaceCabinFurniture(x, y, data, world)) {
@@ -228,6 +238,32 @@ void genMushroomCabin(Random &rnd, World &world)
             fillUndergroundMushroomChest(chest, rnd, world);
         } else {
             fillCavernMushroomChest(chest, rnd, world);
+        }
+        int statueX = x + rnd.getDouble(0.1, 0.9) * cabinWidth;
+        if (world.regionPasses(statueX, y - 3, 2, 3, [](Tile &tile) {
+                return tile.blockID == TileID::empty;
+            })) {
+            placeStatue(
+                statueX,
+                y - 3,
+                rnd.pool(StatueVariants::utility),
+                world);
+        }
+        statueX = x + rnd.getDouble(0.1, 0.9) * cabinWidth;
+        if (world.regionPasses(statueX, y - 3, 2, 3, [](Tile &tile) {
+                return tile.blockID == TileID::empty;
+            })) {
+            placeStatue(
+                statueX,
+                y - 3,
+                rnd.select(StatueVariants::enemy),
+                world);
+        }
+        statueX = x + rnd.getDouble(0.1, 0.9) * cabinWidth;
+        if (world.regionPasses(statueX, y - 3, 2, 3, [](Tile &tile) {
+                return tile.blockID == TileID::empty;
+            })) {
+            placeStatue(statueX, y - 3, Statue::mushroom, world);
         }
         placeMushroomFurniture(std::move(locations), rnd, world);
     }

@@ -182,7 +182,7 @@ void smoothSurfaces(World &world)
                     tile.blockID = TileID::empty;
                     continue;
                 }
-                if (world.getTile(x, y + 1).blockID == TileID::empty) {
+                if (!isSolidBlock(world.getTile(x, y + 1).blockID)) {
                     // Stop falling sand.
                     auto itr = stablizeBlocks.find(tile.blockID);
                     if (itr != stablizeBlocks.end()) {
