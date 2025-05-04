@@ -14,6 +14,7 @@ void fillMushroomField(
 {
     rnd.shuffleNoise();
     int centerY = fieldFloor - 0.35 * fieldSize;
+    world.mushroomCenter.emplace_back(centerX, centerY);
     int secondaryBlock = rnd.select({TileID::silt, TileID::slime});
     for (int x = centerX - 1.4 * fieldSize; x < centerX + 1.4 * fieldSize;
          ++x) {

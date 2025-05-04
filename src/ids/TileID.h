@@ -106,6 +106,7 @@ enum {
     largePile = 186,
     largePileGroup2 = 187,
     cloud = 189,
+    glowingMushroom = 190,
     livingWood = 191,
     leaf = 192,
     slime = 193,

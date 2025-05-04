@@ -144,14 +144,14 @@ void genCrimson(Random &rnd, World &world)
                             } else if (
                                 tile.blockID == TileID::livingWood ||
                                 tile.blockID == TileID::livingMahogany) {
-                                tile.blockPaint = Paint::red;
+                                tile.blockPaint = Paint::gray;
                             }
                             auto wallItr = crimsonWalls.find(tile.wallID);
                             if (wallItr != crimsonWalls.end()) {
                                 tile.wallID = wallItr->second;
                             } else if (
                                 tile.wallID == WallID::Unsafe::livingWood) {
-                                tile.wallPaint = Paint::red;
+                                tile.wallPaint = Paint::gray;
                             }
                         }
                     }

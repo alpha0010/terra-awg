@@ -97,6 +97,7 @@ public:
     int surfaceEvilCenter;
     int dungeonX;
     int dungeonY;
+    std::vector<std::pair<int, int>> mushroomCenter;
 
     std::vector<std::function<void(Random &, World &)>> queuedDeco;
     std::vector<std::function<void(Random &, World &)>> queuedTraps;

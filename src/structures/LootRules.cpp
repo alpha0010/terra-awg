@@ -36,6 +36,17 @@ void fillLoot(
                     Prefix::none,
                     1};
                 ++itemIndex;
+            } else if (item.id == ItemID::mushroomHat) {
+                chest.items[itemIndex] = {
+                    ItemID::mushroomVest,
+                    Prefix::none,
+                    1};
+                ++itemIndex;
+                chest.items[itemIndex] = {
+                    ItemID::mushroomPants,
+                    Prefix::none,
+                    1};
+                ++itemIndex;
             }
         }
     }
@@ -54,6 +65,18 @@ Item getSurfacePrimaryLoot(Random &rnd)
         {ItemID::wandOfSparking, rnd.select(PrefixSet::magic), 1},
         {ItemID::radar, rnd.select(PrefixSet::accessory), 1},
         {ItemID::stepStool, rnd.select(PrefixSet::accessory), 1},
+    });
+}
+
+Item getUndergroundPrimaryLoot(Random &rnd)
+{
+    return rnd.pool<Item>({
+        {ItemID::bandOfRegeneration, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::magicMirror, Prefix::none, 1},
+        {ItemID::cloudInABottle, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::hermesBoots, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::mace, rnd.select(PrefixSet::universal), 1},
+        {ItemID::shoeSpikes, rnd.select(PrefixSet::accessory), 1},
     });
 }
 
@@ -441,17 +464,7 @@ void fillUndergroundChest(
         chest,
         rnd,
         {
-            {1,
-             rnd.pool<Item>({
-                 {ItemID::bandOfRegeneration,
-                  rnd.select(PrefixSet::accessory),
-                  1},
-                 {ItemID::magicMirror, Prefix::none, 1},
-                 {ItemID::cloudInABottle, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::hermesBoots, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::mace, rnd.select(PrefixSet::universal), 1},
-                 {ItemID::shoeSpikes, rnd.select(PrefixSet::accessory), 1},
-             })},
+            {1, getUndergroundPrimaryLoot(rnd)},
             {isTrapped ? 1.0 / 3 : 0,
              {ItemID::deadMansSweater, Prefix::none, 1}},
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
@@ -674,24 +687,9 @@ void fillUndergroundMushroomChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
+            {1, getUndergroundPrimaryLoot(rnd)},
             {1,
-             rnd.pool<Item>({
-                 {ItemID::bandOfRegeneration,
-                  rnd.select(PrefixSet::accessory),
-                  1},
-                 {ItemID::magicMirror, Prefix::none, 1},
-                 {ItemID::cloudInABottle, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::hermesBoots, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::mace, rnd.select(PrefixSet::universal), 1},
-                 {ItemID::shoeSpikes, rnd.select(PrefixSet::accessory), 1},
-             })},
-            {1,
-             {rnd.pool(
-                  {ItemID::shroomMinecart,
-                   rnd.pool(
-                       {ItemID::mushroomHat,
-                        ItemID::mushroomVest,
-                        ItemID::mushroomPants})}),
+             {rnd.pool({ItemID::shroomMinecart, ItemID::mushroomHat}),
               Prefix::none,
               1}},
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
@@ -797,17 +795,7 @@ void fillUndergroundRichMahoganyChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1,
-             rnd.pool<Item>({
-                 {ItemID::bandOfRegeneration,
-                  rnd.select(PrefixSet::accessory),
-                  1},
-                 {ItemID::magicMirror, Prefix::none, 1},
-                 {ItemID::cloudInABottle, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::hermesBoots, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::mace, rnd.select(PrefixSet::universal), 1},
-                 {ItemID::shoeSpikes, rnd.select(PrefixSet::accessory), 1},
-             })},
+            {1, getUndergroundPrimaryLoot(rnd)},
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
             {0.05, {ItemID::flareGun, Prefix::none, 1}},
             {1.0 / 3, {ItemID::bomb, Prefix::none, rnd.getInt(10, 19)}},
@@ -1215,12 +1203,7 @@ void fillCavernMushroomChest(Chest &chest, Random &rnd, World &world)
                  {ItemID::flareGun, Prefix::none, 1},
              })},
             {1,
-             {rnd.pool(
-                  {ItemID::shroomMinecart,
-                   rnd.pool(
-                       {ItemID::mushroomHat,
-                        ItemID::mushroomVest,
-                        ItemID::mushroomPants})}),
+             {rnd.pool({ItemID::shroomMinecart, ItemID::mushroomHat}),
               Prefix::none,
               1}},
             {chest.y < lavaLevel ? 0.05 : 0.15,

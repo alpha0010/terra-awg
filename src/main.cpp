@@ -28,6 +28,7 @@
 #include "structures/Dungeon.h"
 #include "structures/Lake.h"
 #include "structures/MinecartTracks.h"
+#include "structures/MushroomCabin.h"
 #include "structures/Plants.h"
 #include "structures/Pyramid.h"
 #include "structures/Ruins.h"
@@ -86,6 +87,7 @@ void doWorldGen(Random &rnd, World &world)
     genBuriedBoat(rnd, world);
     genRuins(rnd, world);
     genLake(world);
+    genMushroomCabin(rnd, world);
     auto flatLocations = genTreasure(rnd, world);
     genPlants(flatLocations, rnd, world);
     genTraps(rnd, world);
