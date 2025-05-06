@@ -27,6 +27,7 @@ enum {
     corruptPlant = 24,
     ebonstone = 25,
     altar = 26,
+    sunflower = 27,
     pot = 28,
     orbHeart = 31,
     candle = 33,

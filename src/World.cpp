@@ -221,6 +221,7 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::smallPile, Variant::spider}, {2, 1, 0, 0}},
     {{TileID::smallPile, Variant::stone}, {2, 1, 0, 0}},
     {{TileID::statue, Variant::lihzahrd}, {2, 3, 1548, 0}},
+    {{TileID::sunflower, Variant::none}, {2, 4, 0, 0}},
     {{TileID::tallGrassPlant, Variant::none}, {1, 1, 0, 0}},
     {{TileID::tallJunglePlant, Variant::none}, {1, 1, 0, 0}},
     {{TileID::trap, Variant::dartLeft}, {1, 1, 0, 0}},
@@ -277,6 +278,8 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
     } else if (blockID == TileID::statue && type == Variant::lihzahrd) {
         offsetX += 36 * (coordHash % 3);
         offsetY += 162 * (coordHash % 2);
+    } else if (blockID == TileID::sunflower) {
+        offsetX += 36 * (coordHash % 3);
     } else if (blockID == TileID::smallPile) {
         if (type == Variant::forest && coordHash % 41 > 30) {
             type = Variant::stone;

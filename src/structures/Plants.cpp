@@ -570,6 +570,20 @@ bool placeLargePile(int x, int y, World &world)
     return false;
 }
 
+bool placeSunflower(int x, int y, World &world)
+{
+    Tile &nextBase = world.getTile(x + 1, y);
+    if (nextBase.blockID != TileID::grass || nextBase.slope != Slope::none ||
+        !world.regionPasses(x, y - 4, 2, 4, [](Tile &tile) {
+            return tile.blockID == TileID::empty &&
+                   tile.wallID == WallID::empty;
+        })) {
+        return false;
+    }
+    world.placeFramedTile(x, y - 4, TileID::sunflower);
+    return true;
+}
+
 bool placeGeyser(int x, int y, World &world)
 {
     int lavaLevel =
@@ -638,6 +652,10 @@ void growGrass(int x, int y, Random &rnd, World &world)
         return;
     }
     if (randInt % 131 == 0 && placeGeyser(x, y, world)) {
+        return;
+    }
+    if (baseTile.blockID == TileID::grass && randInt % 3 == 0 &&
+        rnd.getCoarseNoise(x, y) < -0.3 && placeSunflower(x, y, world)) {
         return;
     }
     switch (baseTile.blockID) {
