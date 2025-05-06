@@ -603,7 +603,13 @@ Variant getChestType(int x, int y, World &world)
     return y < world.getUndergroundLevel() ? Variant::none : Variant::gold;
 }
 
-void placeChest(int x, int y, Variant type, Random &rnd, World &world)
+void placeChest(
+    int x,
+    int y,
+    Variant type,
+    Variant origType,
+    Random &rnd,
+    World &world)
 {
     Chest &chest = world.placeChest(x, y - 2, type);
     int torchID = ItemID::torch;
@@ -694,6 +700,9 @@ void placeChest(int x, int y, Variant type, Random &rnd, World &world)
         break;
     }
     bool isTrapped = type == Variant::deadMans;
+    if (isTrapped && origType == Variant::richMahogany) {
+        torchID = ItemID::jungleTorch;
+    }
     if (y < world.getUndergroundLevel()) {
         fillSurfaceChest(chest, torchID, rnd, world);
     } else if (y < world.getCavernLevel()) {
@@ -729,6 +738,7 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
             continue;
         }
         Variant type = getChestType(x, y, world);
+        Variant origType = Variant::none;
         if (y < surface + 3 && y > surface - 8 && type != Variant::reef &&
             type != Variant::water && rnd.getDouble(0, 1) < 0.8) {
             continue;
@@ -740,12 +750,16 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
             world.getTile(x, y).blockID == TileID::ash) {
             continue;
         } else if (
-            type == Variant::gold &&
+            (type == Variant::gold || (type == Variant::richMahogany &&
+                                       y > std::midpoint(
+                                               world.getUndergroundLevel(),
+                                               world.getCavernLevel()))) &&
             static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 19 < 4) {
+            origType = type;
             type = Variant::deadMans;
         }
         usedLocations[binId].emplace_back(x, y);
-        placeChest(x, y, type, rnd, world);
+        placeChest(x, y, type, origType, rnd, world);
         --chestCount;
     }
 }
