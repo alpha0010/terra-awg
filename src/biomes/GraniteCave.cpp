@@ -66,9 +66,11 @@ void fillGraniteCave(int centerX, int centerY, Random &rnd, World &world)
             default:
                 break;
             }
-            if (tile.wallID != WallID::empty &&
+            if ((tile.wallID != WallID::empty || shouldClear) &&
                 y < world.getUnderworldLevel() &&
-                !bgOverrideExcl.contains(tile.blockID)) {
+                !bgOverrideExcl.contains(tile.blockID) &&
+                (tile.wallID != WallID::Unsafe::marble ||
+                 rnd.getFineNoise(x + noiseShuffleX, y + noiseShuffleY) > 0)) {
                 tile.wallID = WallID::Unsafe::granite;
             }
         }
