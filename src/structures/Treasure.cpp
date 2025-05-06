@@ -723,12 +723,12 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
             continue;
         }
         auto [x, y] = rnd.select(locations[binId]);
+        int surface = world.getSurfaceLevel(x);
         if (!isPlacementCandidate(x, y, world) ||
-            isLocationUsed(x, y, 20, usedLocations[binId])) {
+            isLocationUsed(x, y, y > surface ? 20 : 50, usedLocations[binId])) {
             continue;
         }
         Variant type = getChestType(x, y, world);
-        int surface = world.getSurfaceLevel(x);
         if (y < surface + 3 && y > surface - 8 && type != Variant::reef &&
             type != Variant::water && rnd.getDouble(0, 1) < 0.8) {
             continue;
