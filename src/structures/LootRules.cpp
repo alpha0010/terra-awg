@@ -1805,6 +1805,27 @@ void fillLihzahrdChest(Chest &chest, Random &rnd)
         });
 }
 
+void fillBarrel(Chest &chest, Random &rnd)
+{
+    fillLoot(
+        chest,
+        rnd,
+        {
+            {0.3, {ItemID::atlanticCod, Prefix::none, rnd.getInt(3, 5)}},
+            {0.3, {ItemID::bass, Prefix::none, rnd.getInt(3, 5)}},
+            {0.3, {ItemID::flounder, Prefix::none, rnd.getInt(3, 5)}},
+            {0.3, {ItemID::neonTetra, Prefix::none, rnd.getInt(3, 5)}},
+            {0.3, {ItemID::redSnapper, Prefix::none, rnd.getInt(3, 5)}},
+            {0.3, {ItemID::rockLobster, Prefix::none, rnd.getInt(3, 5)}},
+            {0.3, {ItemID::salmon, Prefix::none, rnd.getInt(3, 5)}},
+            {0.3, {ItemID::shrimp, Prefix::none, rnd.getInt(3, 5)}},
+            {0.3, {ItemID::trout, Prefix::none, rnd.getInt(3, 5)}},
+            {0.3, {ItemID::tuna, Prefix::none, rnd.getInt(3, 5)}},
+            {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(1, 2)}},
+            {0.5, {ItemID::cobweb, Prefix::none, rnd.getInt(10, 29)}},
+        });
+}
+
 void fillDresser(Chest &chest, Random &rnd)
 {
     fillLoot(

@@ -238,7 +238,7 @@ inline const std::map<std::pair<int, Variant>, std::pair<int, int>> frameDetail{
     {{TileID::bench, Variant::blueDungeon}, {324, 0}},
     {{TileID::bench, Variant::greenDungeon}, {378, 0}},
     {{TileID::bench, Variant::pinkDungeon}, {432, 0}},
-    {{TileID::bench, Variant::mushroom}, {252, 0}},
+    {{TileID::bench, Variant::mushroom}, {918, 0}},
     {{TileID::bench, Variant::obsidian}, {540, 0}},
     // Base: Wooden Bookcase
     {{TileID::bookcase, Variant::blueDungeon}, {54, 0}},

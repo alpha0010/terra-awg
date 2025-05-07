@@ -80,10 +80,16 @@ bool placeIgloo(Point pt, TileBuffer &igloo, Random &rnd, World &world)
                     tile.guarded = true;
                     if (tile.blockID == TileID::chest &&
                         tile.frameX % 36 == 0 && tile.frameY == 0) {
-                        fillSurfaceFrozenChest(
-                            world.registerStorage(x + i, y + j),
-                            rnd,
-                            world);
+                        if (tile.frameX == 180) {
+                            fillBarrel(
+                                world.registerStorage(x + i, y + j),
+                                rnd);
+                        } else {
+                            fillSurfaceFrozenChest(
+                                world.registerStorage(x + i, y + j),
+                                rnd,
+                                world);
+                        }
                     }
                 }
             }
