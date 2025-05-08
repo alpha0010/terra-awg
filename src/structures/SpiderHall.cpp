@@ -92,9 +92,13 @@ void placeCobwebs(
     }
 }
 
-void genSpiderHall(Random &rnd, World &world)
+Point selectSpiderHallLocation(
+    int minX,
+    int maxX,
+    TileBuffer &hall,
+    Random &rnd,
+    World &world)
 {
-    std::cout << "Spinning webs\n";
     std::set<int> clearableTiles{
         TileID::empty,
         TileID::dirt,
@@ -111,14 +115,12 @@ void genSpiderHall(Random &rnd, World &world)
         TileID::goldOre,
         TileID::platinumOre,
     };
-    TileBuffer hall =
-        Data::getBuilding(Data::Building::spiderHall, world.getFramedTiles());
     int minY = (world.getUndergroundLevel() + 2 * world.getCavernLevel()) / 3;
     int maxY = (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3 -
                hall.getHeight() / 2;
     int maxFoundationEmpty = 0.4 * hall.getWidth();
     for (int tries = 0; tries < 8000; ++tries) {
-        int x = rnd.getInt(200, world.getWidth() - hall.getWidth() - 200);
+        int x = rnd.getInt(minX, maxX);
         int y = rnd.getInt(minY, maxY);
         int numEmpty = 0;
         int numFilled = 0;
@@ -165,61 +167,78 @@ void genSpiderHall(Random &rnd, World &world)
                     }
                     return numEmpty < maxFoundationEmpty;
                 })) {
-            for (int i = 0; i < hall.getWidth(); ++i) {
-                for (int j = 0; j < hall.getHeight(); ++j) {
-                    Tile &hallTile = hall.getTile(i, j);
-                    if (hallTile.blockID == TileID::empty &&
-                        hallTile.wallID == WallID::empty) {
-                        continue;
+            return {x, y};
+        }
+    }
+    return {-1, -1};
+}
+
+void genSpiderHall(Random &rnd, World &world)
+{
+    std::cout << "Spinning webs\n";
+    TileBuffer hall =
+        Data::getBuilding(Data::Building::spiderHall, world.getFramedTiles());
+    std::vector<Point> bounds;
+    if (world.getWidth() < 8000) {
+        bounds.emplace_back(200, world.getWidth() - hall.getWidth() - 200);
+    } else {
+        bounds.emplace_back(200, 0.35 * world.getWidth() - hall.getWidth());
+        bounds.emplace_back(
+            0.65 * world.getWidth(),
+            world.getWidth() - hall.getWidth() - 200);
+    }
+    for (auto [minX, maxX] : bounds) {
+        auto [x, y] = selectSpiderHallLocation(minX, maxX, hall, rnd, world);
+        if (x == -1) {
+            continue;
+        }
+        for (int i = 0; i < hall.getWidth(); ++i) {
+            for (int j = 0; j < hall.getHeight(); ++j) {
+                Tile &hallTile = hall.getTile(i, j);
+                if (hallTile.blockID == TileID::empty &&
+                    hallTile.wallID == WallID::empty) {
+                    continue;
+                }
+                Tile &tile = world.getTile(x + i, y + j);
+                bool isColumn = hallTile.wallID == WallID::Safe::grayBrick;
+                if (static_cast<int>(
+                        99999 * (1 + rnd.getFineNoise(x + i, y + j))) %
+                        5 ==
+                    0) {
+                    if (hallTile.blockID == TileID::grayBrick ||
+                        hallTile.blockID == TileID::stoneSlab) {
+                        hallTile.blockID = TileID::stone;
                     }
-                    Tile &tile = world.getTile(x + i, y + j);
-                    if (static_cast<int>(
-                            99999 * (1 + rnd.getFineNoise(x + i, y + j))) %
-                            5 ==
-                        0) {
-                        if (hallTile.blockID == TileID::grayBrick ||
-                            hallTile.blockID == TileID::stoneSlab) {
-                            hallTile.blockID = TileID::stone;
-                        }
-                        if (hallTile.wallID == WallID::Safe::grayBrick ||
-                            hallTile.wallID == WallID::Safe::stoneSlab) {
-                            hallTile.wallID = WallID::Unsafe::craggyStone;
-                        }
-                    }
-                    if (hallTile.wallID == WallID::empty) {
-                        hallTile.wallID = tile.wallID;
-                    }
-                    if (hallTile.wallID != WallID::Safe::grayBrick &&
-                        std::abs(rnd.getFineNoise(x + 3 * i, y + 3 * j)) <
-                            0.45) {
-                        hallTile.wallID = WallID::Unsafe::spider;
-                    }
-                    tile = hallTile;
-                    tile.guarded = true;
-                    if (tile.blockID == TileID::chest &&
-                        tile.frameX % 36 == 0 && tile.frameY == 0) {
-                        fillWebCoveredChest(
-                            world.registerStorage(x + i, y + j),
-                            rnd,
-                            world);
+                    if (hallTile.wallID == WallID::Safe::grayBrick ||
+                        hallTile.wallID == WallID::Safe::stoneSlab) {
+                        hallTile.wallID = WallID::Unsafe::craggyStone;
                     }
                 }
+                if (hallTile.wallID == WallID::empty) {
+                    hallTile.wallID = tile.wallID;
+                }
+                if (!isColumn &&
+                    std::abs(rnd.getFineNoise(x + 3 * i, y + 3 * j)) < 0.45) {
+                    hallTile.wallID = WallID::Unsafe::spider;
+                }
+                tile = hallTile;
+                tile.guarded = true;
+                if (tile.blockID == TileID::chest && tile.frameX % 36 == 0 &&
+                    tile.frameY == 0) {
+                    fillWebCoveredChest(
+                        world.registerStorage(x + i, y + j),
+                        rnd,
+                        world);
+                }
             }
-            placeSpiderDeco(
-                x,
-                y,
-                hall.getWidth(),
-                hall.getHeight(),
-                rnd,
-                world);
-            placeCobwebs(
-                x + hall.getWidth() / 2,
-                y + hall.getHeight() / 2,
-                hall.getWidth(),
-                hall.getHeight(),
-                rnd,
-                world);
-            break;
         }
+        placeSpiderDeco(x, y, hall.getWidth(), hall.getHeight(), rnd, world);
+        placeCobwebs(
+            x + hall.getWidth() / 2,
+            y + hall.getHeight() / 2,
+            hall.getWidth(),
+            hall.getHeight(),
+            rnd,
+            world);
     }
 }
