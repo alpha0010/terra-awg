@@ -45,6 +45,21 @@ void growCactus(int x, int y, Random &rnd, World &world)
 {
     if (rnd.getDouble(0, 1) > 0.07 ||
         !isRegionEmpty(x - 1, y - 8, 3, 8, world)) {
+        if (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 13 == 0) {
+            world.queuedDeco.emplace_back([x, y](Random &, World &world) {
+                if (isRegionEmpty(x, y - 2, 3, 2, world) &&
+                    world.regionPasses(x, y, 3, 1, [](Tile &tile) {
+                        return tile.blockID == TileID::sand &&
+                               tile.slope == Slope::none;
+                    })) {
+                    world.placeFramedTile(
+                        x,
+                        y - 2,
+                        TileID::largePileGroup2,
+                        Variant::dryBone);
+                }
+            });
+        }
         return;
     }
     int cactusSize = rnd.getInt(3, 7);
@@ -410,6 +425,31 @@ void placeLivingTreeDecoAt(int x, Random &rnd, World &world)
             }
         }
         break;
+    case 2:
+    case 3:
+        for (int j = -120; j < -10; ++j) {
+            if (world.regionPasses(
+                    x,
+                    y + j + 2,
+                    3,
+                    1,
+                    [](Tile &tile) {
+                        return tile.blockID == TileID::leaf &&
+                               tile.slope == Slope::none;
+                    }) &&
+                world.regionPasses(x, y + j, 3, 2, [](Tile &tile) {
+                    return tile.blockID == TileID::empty &&
+                           tile.wallID == WallID::empty;
+                })) {
+                world.placeFramedTile(
+                    x,
+                    y + j,
+                    TileID::largePileGroup2,
+                    Variant::livingLeaf);
+                return;
+            }
+        }
+        break;
     }
 }
 
@@ -434,6 +474,12 @@ bool placeSmallPile(int x, int y, World &world)
         nextBase.slope != Slope::none ||
         world.getTile(x + 1, y - 1).blockID != TileID::empty) {
         return false;
+    }
+    if (!world.regionPasses(x - 1, y - 1, 4, 3, [](Tile &tile) {
+            return tile.wallID != WallID::Unsafe::spider;
+        })) {
+        world.placeFramedTile(x, y - 1, TileID::smallPile, Variant::spider);
+        return true;
     }
     switch (nextBase.blockID) {
     case TileID::ash:
@@ -483,6 +529,16 @@ bool placeLargePile(int x, int y, World &world)
             return tile.slope == Slope::none && isSolidBlock(tile.blockID);
         })) {
         return false;
+    }
+    if (!world.regionPasses(x - 1, y - 1, 5, 4, [](Tile &tile) {
+            return tile.wallID != WallID::Unsafe::spider;
+        })) {
+        world.placeFramedTile(
+            x,
+            y - 2,
+            TileID::largePileGroup2,
+            Variant::spider);
+        return true;
     }
     switch (world.getTile(x + 1, y).blockID) {
     case TileID::ash:
@@ -645,10 +701,14 @@ void growGrass(int x, int y, Random &rnd, World &world)
             probeTile.blockID = TileID::empty;
         }
     }
-    if (randInt % 41 == 0 && placeSmallPile(x, y, world)) {
+    bool increasedPileRate = probeTile.wallID == WallID::Unsafe::granite ||
+                             probeTile.wallID == WallID::Unsafe::marble;
+    if (randInt % 41 < (increasedPileRate ? 5 : 1) &&
+        placeSmallPile(x, y, world)) {
         return;
     }
-    if (randInt % 37 == 0 && placeLargePile(x, y, world)) {
+    if (randInt % 37 < (increasedPileRate ? 6 : 1) &&
+        placeLargePile(x, y, world)) {
         return;
     }
     if (randInt % 131 == 0 && placeGeyser(x, y, world)) {

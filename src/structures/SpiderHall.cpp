@@ -200,7 +200,9 @@ void genSpiderHall(Random &rnd, World &world)
                     continue;
                 }
                 Tile &tile = world.getTile(x + i, y + j);
-                bool isColumn = hallTile.wallID == WallID::Safe::grayBrick;
+                bool shouldConvertWall =
+                    hallTile.wallID != WallID::Safe::grayBrick &&
+                    hallTile.wallID != WallID::empty;
                 if (static_cast<int>(
                         99999 * (1 + rnd.getFineNoise(x + i, y + j))) %
                         5 ==
@@ -214,12 +216,11 @@ void genSpiderHall(Random &rnd, World &world)
                         hallTile.wallID = WallID::Unsafe::craggyStone;
                     }
                 }
-                if (hallTile.wallID == WallID::empty) {
-                    hallTile.wallID = tile.wallID;
-                }
-                if (!isColumn &&
+                if (shouldConvertWall &&
                     std::abs(rnd.getFineNoise(x + 3 * i, y + 3 * j)) < 0.45) {
                     hallTile.wallID = WallID::Unsafe::spider;
+                } else if (hallTile.wallID == WallID::empty) {
+                    hallTile.wallID = tile.wallID;
                 }
                 tile = hallTile;
                 tile.guarded = true;

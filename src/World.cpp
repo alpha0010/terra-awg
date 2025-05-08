@@ -185,11 +185,13 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::largePile, Variant::mushroom}, {3, 2, 1728, 0}},
     {{TileID::largePile, Variant::stone}, {3, 2, 378, 0}},
     {{TileID::largePileGroup2, Variant::ash}, {3, 2, 324, 0}},
+    {{TileID::largePileGroup2, Variant::dryBone}, {3, 2, 2808, 0}},
     {{TileID::largePileGroup2, Variant::forest}, {3, 2, 756, 0}},
     {{TileID::largePileGroup2, Variant::granite}, {3, 2, 1890, 0}},
     {{TileID::largePileGroup2, Variant::jungle}, {3, 2, 0, 0}},
     {{TileID::largePileGroup2, Variant::lihzahrd}, {3, 2, 972, 0}},
     {{TileID::largePileGroup2, Variant::livingWood}, {3, 2, 2538, 0}},
+    {{TileID::largePileGroup2, Variant::livingLeaf}, {3, 2, 2700, 0}},
     {{TileID::largePileGroup2, Variant::marble}, {3, 2, 2214, 0}},
     {{TileID::largePileGroup2, Variant::sandstone}, {3, 2, 1566, 0}},
     {{TileID::largePileGroup2, Variant::spider}, {3, 2, 486, 0}},
@@ -369,8 +371,10 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
         blockID == TileID::largePile || blockID == TileID::largePileGroup2) {
         switch (type) {
         case Variant::ash:
+        case Variant::dryBone:
         case Variant::forest:
         case Variant::lihzahrd:
+        case Variant::livingWood:
         case Variant::mushroom:
             offsetX += 54 * (coordHash % 3);
             break;
@@ -384,8 +388,8 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
         case Variant::stone:
             offsetX += 54 * (coordHash % 6);
             break;
-        case Variant::livingWood:
-            offsetX += 54 * (coordHash % 5);
+        case Variant::livingLeaf:
+            offsetX += 54 * (coordHash % 2);
             break;
         default:
             break;

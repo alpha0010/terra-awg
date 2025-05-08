@@ -164,6 +164,10 @@ void evaporateSmallPools(World &world, int x)
                 world.getTile(x, y).liquid = Liquid::none;
                 ++y;
             }
+        } else if (
+            poolDepth == y && world.getTile(x - 1, y).liquid == Liquid::none &&
+            world.getTile(x + 1, y).liquid == Liquid::none) {
+            world.getTile(x, y).liquid = Liquid::none;
         } else {
             if ((tile.wallID == WallID::Unsafe::snow ||
                  tile.wallID == WallID::Unsafe::ice) &&
