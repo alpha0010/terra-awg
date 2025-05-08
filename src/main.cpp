@@ -32,6 +32,7 @@
 #include "structures/Plants.h"
 #include "structures/Pyramid.h"
 #include "structures/Ruins.h"
+#include "structures/SpiderHall.h"
 #include "structures/SurfaceIgloo.h"
 #include "structures/Temple.h"
 #include "structures/Traps.h"
@@ -86,6 +87,7 @@ void doWorldGen(Random &rnd, World &world)
     genTemple(rnd, world);
     genPyramid(rnd, world);
     genBuriedBoat(rnd, world);
+    genSpiderHall(rnd, world);
     genRuins(rnd, world);
     genLake(world);
     genIgloo(rnd, world);

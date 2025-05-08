@@ -91,7 +91,8 @@ void simulateRain(World &world, int x)
         WallID::Unsafe::hardenedEbonsand,
         WallID::Unsafe::hardenedCrimsand,
         WallID::Unsafe::ebonsandstone,
-        WallID::Unsafe::crimsandstone};
+        WallID::Unsafe::crimsandstone,
+        WallID::Unsafe::spider};
     dryWalls.insert(WallVariants::dungeon.begin(), WallVariants::dungeon.end());
     double pendingWater =
         std::abs(x - world.jungleCenter) < 0.08 * world.getWidth() ? 15 : -4;

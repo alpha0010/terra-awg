@@ -1,0 +1,225 @@
+#include "structures/SpiderHall.h"
+
+#include "Random.h"
+#include "World.h"
+#include "ids/WallID.h"
+#include "structures/LootRules.h"
+#include "structures/StructureUtil.h"
+#include "structures/data/Buildings.h"
+#include <iostream>
+#include <set>
+
+bool canPlaceSpiderDecoAt(int x, int y, int width, int height, World &world)
+{
+    return world.regionPasses(x, y, width, height, [](Tile &tile) {
+        return tile.blockID == TileID::empty;
+    }) && world.regionPasses(x, y + height, width, 1, [](Tile &tile) {
+        return tile.slope == Slope::none && !tile.actuated &&
+               isSolidBlock(tile.blockID);
+    }) && world.getTile(x, y).wallID == WallID::Unsafe::spider;
+}
+
+void placeSpiderDeco(
+    int x,
+    int y,
+    int width,
+    int height,
+    Random &rnd,
+    World &world)
+{
+    for (int i = 0; i < width; ++i) {
+        for (int j = 0; j < height; ++j) {
+            switch (
+                static_cast<int>(99999 * (1 + rnd.getFineNoise(x + i, y + j))) %
+                11) {
+            case 0:
+                if (canPlaceSpiderDecoAt(x + i, y + j, 2, 2, world)) {
+                    world.placeFramedTile(
+                        x + i,
+                        y + j,
+                        TileID::pot,
+                        Variant::spider);
+                }
+                break;
+            case 1:
+                if (canPlaceSpiderDecoAt(x + i, y + j, 2, 1, world)) {
+                    world.placeFramedTile(
+                        x + i,
+                        y + j,
+                        TileID::smallPile,
+                        Variant::spider);
+                }
+                break;
+            case 2:
+                if (canPlaceSpiderDecoAt(x + i, y + j, 3, 2, world)) {
+                    world.placeFramedTile(
+                        x + i,
+                        y + j,
+                        TileID::largePileGroup2,
+                        Variant::spider);
+                }
+                break;
+            }
+        }
+    }
+}
+
+void placeCobwebs(
+    int centerX,
+    int centerY,
+    int width,
+    int height,
+    Random &rnd,
+    World &world)
+{
+    for (int i = -width; i < width; ++i) {
+        for (int j = -height; j < height; ++j) {
+            double threshold = std::max(
+                0.1,
+                2 * std::hypot(
+                        static_cast<double>(i) / width,
+                        static_cast<double>(j) / height) -
+                    1);
+            if (rnd.getFineNoise(centerX + 4 * i, centerY + 4 * j) <
+                threshold) {
+                continue;
+            }
+            Tile &tile = world.getTile(centerX + i, centerY + j);
+            if (tile.blockID == TileID::empty) {
+                tile.blockID = TileID::cobweb;
+            }
+        }
+    }
+}
+
+void genSpiderHall(Random &rnd, World &world)
+{
+    std::cout << "Spinning webs\n";
+    std::set<int> clearableTiles{
+        TileID::empty,
+        TileID::dirt,
+        TileID::stone,
+        TileID::clay,
+        TileID::sand,
+        TileID::mud,
+        TileID::copperOre,
+        TileID::tinOre,
+        TileID::ironOre,
+        TileID::leadOre,
+        TileID::silverOre,
+        TileID::tungstenOre,
+        TileID::goldOre,
+        TileID::platinumOre,
+    };
+    TileBuffer hall =
+        Data::getBuilding(Data::Building::spiderHall, world.getFramedTiles());
+    int minY = (world.getUndergroundLevel() + 2 * world.getCavernLevel()) / 3;
+    int maxY = (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3 -
+               hall.getHeight() / 2;
+    int maxFoundationEmpty = 0.4 * hall.getWidth();
+    for (int tries = 0; tries < 8000; ++tries) {
+        int x = rnd.getInt(200, world.getWidth() - hall.getWidth() - 200);
+        int y = rnd.getInt(minY, maxY);
+        int numEmpty = 0;
+        int numFilled = 0;
+        int maxEntryFilled = tries / 250;
+        if (world.regionPasses(
+                x - 3,
+                y + hall.getHeight() - 9,
+                4,
+                4,
+                [maxEntryFilled, &numFilled](Tile &tile) {
+                    if (tile.blockID != TileID::empty) {
+                        ++numFilled;
+                    }
+                    return numFilled < maxEntryFilled;
+                }) &&
+            world.regionPasses(
+                x + hall.getWidth() - 1,
+                y + hall.getHeight() - 9,
+                4,
+                4,
+                [maxEntryFilled, &numFilled](Tile &tile) {
+                    if (tile.blockID != TileID::empty) {
+                        ++numFilled;
+                    }
+                    return numFilled < maxEntryFilled;
+                }) &&
+            world.regionPasses(
+                x - 20,
+                y - 20,
+                hall.getWidth() + 40,
+                hall.getHeight() + 40,
+                [&clearableTiles](Tile &tile) {
+                    return !tile.guarded && tile.liquid != Liquid::shimmer &&
+                           clearableTiles.contains(tile.blockID);
+                }) &&
+            world.regionPasses(
+                x,
+                y + hall.getHeight() - 2,
+                hall.getWidth(),
+                4,
+                [maxFoundationEmpty, &numEmpty](Tile &tile) {
+                    if (tile.blockID == TileID::empty) {
+                        ++numEmpty;
+                    }
+                    return numEmpty < maxFoundationEmpty;
+                })) {
+            for (int i = 0; i < hall.getWidth(); ++i) {
+                for (int j = 0; j < hall.getHeight(); ++j) {
+                    Tile &hallTile = hall.getTile(i, j);
+                    if (hallTile.blockID == TileID::empty &&
+                        hallTile.wallID == WallID::empty) {
+                        continue;
+                    }
+                    Tile &tile = world.getTile(x + i, y + j);
+                    if (static_cast<int>(
+                            99999 * (1 + rnd.getFineNoise(x + i, y + j))) %
+                            5 ==
+                        0) {
+                        if (hallTile.blockID == TileID::grayBrick ||
+                            hallTile.blockID == TileID::stoneSlab) {
+                            hallTile.blockID = TileID::stone;
+                        }
+                        if (hallTile.wallID == WallID::Safe::grayBrick ||
+                            hallTile.wallID == WallID::Safe::stoneSlab) {
+                            hallTile.wallID = WallID::Unsafe::craggyStone;
+                        }
+                    }
+                    if (hallTile.wallID == WallID::empty) {
+                        hallTile.wallID = tile.wallID;
+                    }
+                    if (hallTile.wallID != WallID::Safe::grayBrick &&
+                        std::abs(rnd.getFineNoise(x + 3 * i, y + 3 * j)) <
+                            0.45) {
+                        hallTile.wallID = WallID::Unsafe::spider;
+                    }
+                    tile = hallTile;
+                    tile.guarded = true;
+                    if (tile.blockID == TileID::chest &&
+                        tile.frameX % 36 == 0 && tile.frameY == 0) {
+                        fillWebCoveredChest(
+                            world.registerStorage(x + i, y + j),
+                            rnd,
+                            world);
+                    }
+                }
+            }
+            placeSpiderDeco(
+                x,
+                y,
+                hall.getWidth(),
+                hall.getHeight(),
+                rnd,
+                world);
+            placeCobwebs(
+                x + hall.getWidth() / 2,
+                y + hall.getHeight() / 2,
+                hall.getWidth(),
+                hall.getHeight(),
+                rnd,
+                world);
+            break;
+        }
+    }
+}

@@ -1653,6 +1653,61 @@ void fillPyramidChest(Chest &chest, Random &rnd, World &world)
         });
 }
 
+void fillWebCoveredChest(Chest &chest, Random &rnd, World &world)
+{
+    fillLoot(
+        chest,
+        rnd,
+        {
+            {1, {ItemID::webSlinger, Prefix::none, 1}},
+            {1, {ItemID::cobweb, Prefix::none, rnd.getInt(10, 29)}},
+            {0.05, {ItemID::extractinator, Prefix::none, 1}},
+            {0.2, {ItemID::suspiciousLookingEye, Prefix::none, 1}},
+            {1.0 / 3, {ItemID::dynamite, Prefix::none, 1}},
+            {0.25, {ItemID::jestersArrow, Prefix::none, rnd.getInt(25, 50)}},
+            {0.5,
+             {rnd.select(
+                  {world.silverVariant == TileID::silverOre
+                       ? ItemID::silverBar
+                       : ItemID::tungstenBar,
+                   world.goldVariant == TileID::goldOre ? ItemID::goldBar
+                                                        : ItemID::platinumBar}),
+              Prefix::none,
+              rnd.getInt(3, 10)}},
+            {0.5,
+             {rnd.select({ItemID::flamingArrow, ItemID::throwingKnife}),
+              Prefix::none,
+              rnd.getInt(25, 50)}},
+            {0.5, {ItemID::healingPotion, Prefix::none, rnd.getInt(3, 5)}},
+            {2.0 / 3,
+             {rnd.select(
+                  {ItemID::spelunkerPotion,
+                   ItemID::featherfallPotion,
+                   ItemID::nightOwlPotion,
+                   ItemID::waterWalkingPotion,
+                   ItemID::archeryPotion,
+                   ItemID::gravitationPotion}),
+              Prefix::none,
+              rnd.getInt(1, 2)}},
+            {1.0 / 3,
+             {rnd.select(
+                  {ItemID::thornsPotion,
+                   ItemID::waterWalkingPotion,
+                   ItemID::invisibilityPotion,
+                   ItemID::hunterPotion,
+                   ItemID::dangersensePotion,
+                   ItemID::teleportationPotion}),
+              Prefix::none,
+              rnd.getInt(1, 2)}},
+            {0.5, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
+            {0.5,
+             {rnd.select<int>({ItemID::torch, ItemID::glowstick}),
+              Prefix::none,
+              rnd.getInt(15, 29)}},
+            {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}},
+        });
+}
+
 void fillDungeonChest(Chest &chest, Random &rnd, World &world)
 {
     fillLoot(

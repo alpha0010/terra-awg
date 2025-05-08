@@ -10,6 +10,7 @@ enum { empty = 0 };
 namespace Safe
 {
 enum {
+    grayBrick = 5,
     goldBrick = 10,
     demoniteBrick = 33,
     sandstoneBrick = 34,
@@ -19,6 +20,7 @@ enum {
     redStainedGlass = 92,
     multicoloredStainedGlass = 93,
     leadFence = 107,
+    stoneSlab = 147,
     palmWood = 151,
     crimtaneBrick = 174,
     crimstoneBrick = 234,

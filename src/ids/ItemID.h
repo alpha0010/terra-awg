@@ -114,6 +114,7 @@ enum {
     flare = 931,
     leafWand = 933,
     flyingCarpet = 934,
+    webSlinger = 939,
     umbrella = 946,
     iceSkates = 950,
     climbingClaws = 953,
