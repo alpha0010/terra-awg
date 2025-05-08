@@ -42,6 +42,7 @@ inline const std::set<int> nonSolidTiles{
     TileID::bookcase,
     TileID::bottle,
     TileID::bubble,
+    TileID::campfire,
     TileID::candelabra,
     TileID::candle,
     TileID::catacomb,

@@ -125,6 +125,7 @@ enum {
     crimsonVines = 205,
     iceBrick = 206,
     rope = 213,
+    campfire = 215,
     slush = 224,
     hive = 225,
     lihzahrdBrick = 226,

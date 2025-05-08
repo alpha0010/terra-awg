@@ -74,7 +74,7 @@ bool placeIgloo(Point pt, TileBuffer &igloo, Random &rnd, World &world)
                     }
                     Tile &tile = world.getTile(x + i, y + j);
                     if (iglooTile.wallID == WallID::empty &&
-                        iglooTile.blockID != TileID::empty &&
+                        isSolidBlock(iglooTile.blockID) &&
                         tile.wallID != WallID::empty) {
                         wallMerges.emplace_back(x + i, y + j, tile.wallID);
                     }
