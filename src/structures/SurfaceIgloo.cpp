@@ -65,6 +65,7 @@ bool placeIgloo(Point pt, TileBuffer &igloo, Random &rnd, World &world)
         }
         if (canPlaceIglooAt(x, y + offset, igloo, world)) {
             y += offset;
+            std::vector<std::tuple<int, int, int>> wallMerges;
             for (int i = 0; i < igloo.getWidth(); ++i) {
                 for (int j = 0; j < igloo.getHeight(); ++j) {
                     Tile &iglooTile = igloo.getTile(i, j);
@@ -73,8 +74,9 @@ bool placeIgloo(Point pt, TileBuffer &igloo, Random &rnd, World &world)
                     }
                     Tile &tile = world.getTile(x + i, y + j);
                     if (iglooTile.wallID == WallID::empty &&
-                        iglooTile.blockID != TileID::empty) {
-                        iglooTile.wallID = tile.wallID;
+                        iglooTile.blockID != TileID::empty &&
+                        tile.wallID != WallID::empty) {
+                        wallMerges.emplace_back(x + i, y + j, tile.wallID);
                     }
                     tile = iglooTile;
                     tile.guarded = true;
@@ -91,6 +93,11 @@ bool placeIgloo(Point pt, TileBuffer &igloo, Random &rnd, World &world)
                                 world);
                         }
                     }
+                }
+            }
+            for (auto [wX, wY, wallID] : wallMerges) {
+                if (!world.isExposed(wX, wY)) {
+                    world.getTile(wX, wY).wallID = wallID;
                 }
             }
             return true;
