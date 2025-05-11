@@ -2,6 +2,7 @@
 
 #include "Random.h"
 #include "World.h"
+#include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/StructureUtil.h"
@@ -18,6 +19,53 @@ bool canPlaceReefChest(int x, int y, World &world)
     });
 }
 
+void addGlowRocks(std::vector<Point> &locations, Random &rnd, World &world)
+{
+    std::shuffle(locations.begin(), locations.end(), rnd.getPRNG());
+    locations.resize(locations.size() / 150);
+    for (auto [x, y] : locations) {
+        double radius = rnd.getDouble(2, 3.2);
+        if (!world.regionPasses(
+                x - radius - 3,
+                y - radius - 3,
+                6 + 2 * radius,
+                6 + 2 * radius,
+                [](Tile &tile) { return tile.blockID == TileID::empty; })) {
+            continue;
+        }
+        for (int i = -radius; i < radius; ++i) {
+            for (int j = -radius; j < radius; ++j) {
+                if (std::hypot(i, j) / radius <
+                    0.6 + 0.6 * rnd.getFineNoise(x + i, y + j)) {
+                    Tile &tile = world.getTile(x + i, y + j);
+                    tile.blockID = TileID::stone;
+                }
+            }
+        }
+        int mossType = rnd.select(
+            {TileID::kryptonMossStone,
+             TileID::xenonMossStone,
+             TileID::argonMossStone,
+             TileID::neonMossStone});
+        std::vector<Point> mossLocations;
+        for (int i = -radius; i < radius; ++i) {
+            for (int j = -radius; j < radius; ++j) {
+                Tile &tile = world.getTile(x + i, y + j);
+                if (tile.blockID == TileID::stone &&
+                    world.isExposed(x + i, y + j)) {
+                    tile.blockID = mossType;
+                    mossLocations.emplace_back(x + i, y + j);
+                }
+            }
+        }
+        world.queuedDeco.emplace_back([mossLocations](Random &, World &world) {
+            for (auto [x, y] : mossLocations) {
+                growMossOn(x, y, world);
+            }
+        });
+    }
+}
+
 void addOceanCave(int waterTable, Random &rnd, World &world)
 {
     int centerOpt1 = 105;
@@ -29,6 +77,7 @@ void addOceanCave(int waterTable, Random &rnd, World &world)
             ? centerOpt1
             : rnd.select({centerOpt1, centerOpt2});
     int maxY = (5 * world.getCavernLevel() + world.getUnderworldLevel()) / 6;
+    std::vector<Point> locations;
     for (int x = centerX - 100; x < centerX + 100; ++x) {
         for (int y = waterTable + 20; y < maxY; ++y) {
             double threshold =
@@ -53,10 +102,14 @@ void addOceanCave(int waterTable, Random &rnd, World &world)
                 tile.blockID = TileID::empty;
                 tile.wallID = WallID::empty;
                 tile.liquid = Liquid::water;
+                if (y > world.getUndergroundLevel()) {
+                    locations.emplace_back(x, y);
+                }
             }
         }
     }
-    std::vector<Point> locations;
+    addGlowRocks(locations, rnd, world);
+    locations.clear();
     for (int x = centerX - 50; x < centerX + 50; ++x) {
         for (int y = world.getUndergroundLevel(); y < maxY; ++y) {
             if (canPlaceReefChest(x, y, world)) {

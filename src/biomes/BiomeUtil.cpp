@@ -99,7 +99,7 @@ void growMossOn(int x, int y, World &world)
     for (auto [i, j, frameY] :
          {std::tuple{0, -1, 0}, {0, 1, 54}, {1, 0, 108}, {-1, 0, 162}}) {
         Tile &tile = world.getTile(x + i, y + j);
-        if (tile.blockID == TileID::empty && tile.liquid == Liquid::none) {
+        if (tile.blockID == TileID::empty && tile.liquid != Liquid::lava) {
             tile.blockID = TileID::mossPlant;
             tile.frameX = itr->second;
             tile.frameY = frameY + 18 * (fnv1a32pt(x + i, y + j) % 3);
