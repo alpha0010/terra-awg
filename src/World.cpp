@@ -460,23 +460,36 @@ struct PaintingDetails {
 inline const std::map<Painting, PaintingDetails> paintingData{
     {Painting::darkness, {TileID::painting2x3, 36, 0}},
     {Painting::darkSoulReaper, {TileID::painting2x3, 72, 0}},
+    {Painting::gloriousNight, {TileID::painting2x3, 216, 0}},
+    {Painting::happyLittleTree, {TileID::painting2x3, 684, 0}},
+    {Painting::land, {TileID::painting2x3, 108, 0}},
+    {Painting::strangeGrowth, {TileID::painting2x3, 540, 0}},
     {Painting::trappedGhost, {TileID::painting2x3, 144, 0}},
+    {Painting::auroraBorealis, {TileID::painting3x2, 0, 1296}},
     {Painting::demonsEye, {TileID::painting3x2, 0, 0}},
     {Painting::livingGore, {TileID::painting3x2, 0, 576}},
     {Painting::flowingMagma, {TileID::painting3x2, 0, 612}},
+    {Painting::heartlands, {TileID::painting3x2, 0, 1224}},
+    {Painting::vikingVoyage, {TileID::painting3x2, 0, 1152}},
+    {Painting::wildflowers, {TileID::painting3x2, 0, 1116}},
     {Painting::bloodMoonRising, {TileID::painting3x3, 648, 0}},
     {Painting::boneWarp, {TileID::painting3x3, 810, 0}},
+    {Painting::discover, {TileID::painting3x3, 1404, 0}},
     {Painting::gloryOfTheFire, {TileID::painting3x3, 756, 0}},
     {Painting::handEarth, {TileID::painting3x3, 1458, 0}},
     {Painting::hangingSkeleton, {TileID::painting3x3, 918, 0}},
     {Painting::impFace, {TileID::painting3x3, 1620, 0}},
+    {Painting::morningHunt, {TileID::painting3x3, 378, 108}},
+    {Painting::oldMiner, {TileID::painting3x3, 1512, 0}},
     {Painting::ominousPresence, {TileID::painting3x3, 1674, 0}},
     {Painting::shiningMoon, {TileID::painting3x3, 1728, 0}},
     {Painting::skelehead, {TileID::painting3x3, 1566, 0}},
     {Painting::skellingtonJSkellingsworth, {TileID::painting3x3, 972, 0}},
+    {Painting::sunflowers, {TileID::painting3x3, 1080, 0}},
     {Painting::theCursedMan, {TileID::painting3x3, 1026, 0}},
     {Painting::theGuardiansGaze, {TileID::painting3x3, 1242, 0}},
     {Painting::theHangedMan, {TileID::painting3x3, 702, 0}},
+    {Painting::theMerchant, {TileID::painting3x3, 1782, 0}},
     {Painting::wallSkeleton, {TileID::painting3x3, 864, 0}},
     {Painting::catacomb1, {TileID::catacomb, 0, 0}},
     {Painting::catacomb2, {TileID::catacomb, 0, 54}},
@@ -517,6 +530,9 @@ void World::placePainting(int x, int y, Painting painting)
     }
     auto [blockID, offsetX, offsetY] = itr->second;
     auto [frameWidth, frameHeight] = framedTileToDims(blockID);
+    if (painting == Painting::strangeGrowth) {
+        offsetX += 36 * (fnv1a32pt(x, y) % 4);
+    }
     for (int i = 0; i < frameWidth; ++i) {
         for (int j = 0; j < frameHeight; ++j) {
             Tile &tile = getTile(x + i, y + j);

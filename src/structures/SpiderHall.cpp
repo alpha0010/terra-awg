@@ -6,6 +6,7 @@
 #include "structures/LootRules.h"
 #include "structures/StructureUtil.h"
 #include "structures/data/Buildings.h"
+#include <algorithm>
 #include <iostream>
 #include <set>
 
@@ -27,8 +28,18 @@ void placeSpiderDeco(
     Random &rnd,
     World &world)
 {
+    std::vector<Point> locations;
     for (int i = 0; i < width; ++i) {
+        bool prevIsSolid = false;
         for (int j = 0; j < height; ++j) {
+            Tile &tile = world.getTile(x + i, y + j);
+            bool curIsSolid = tile.guarded && tile.slope == Slope::none &&
+                              (tile.blockID == TileID::stoneSlab ||
+                               tile.blockID == TileID::stone);
+            if (prevIsSolid && !curIsSolid) {
+                locations.emplace_back(x + i, y + j);
+            }
+            prevIsSolid = curIsSolid;
             switch (
                 static_cast<int>(99999 * (1 + rnd.getFineNoise(x + i, y + j))) %
                 11) {
@@ -61,6 +72,47 @@ void placeSpiderDeco(
                 break;
             }
         }
+    }
+    std::array paintings{
+        Painting::gloriousNight,
+        Painting::happyLittleTree,
+        Painting::land,
+        Painting::strangeGrowth,
+        Painting::auroraBorealis,
+        Painting::heartlands,
+        Painting::vikingVoyage,
+        Painting::wildflowers,
+        Painting::discover,
+        Painting::morningHunt,
+        Painting::oldMiner,
+        Painting::sunflowers,
+        Painting::theMerchant};
+    std::shuffle(paintings.begin(), paintings.end(), rnd.getPRNG());
+    std::shuffle(locations.begin(), locations.end(), rnd.getPRNG());
+    auto paintingItr = paintings.begin();
+    int numPaintings = rnd.getInt(4, 5);
+    std::vector<Point> usedLocations;
+    for (auto [pX, pY] : locations) {
+        auto [pWidth, pHeight] = world.getPaintingDims(*paintingItr);
+        if (!world.regionPasses(
+                pX - 2,
+                pY,
+                pWidth + 2,
+                pHeight + 2,
+                [](Tile &tile) {
+                    return tile.blockID == TileID::empty &&
+                           tile.wallID != WallID::Safe::grayBrick;
+                }) ||
+            isLocationUsed(pX, pY, 10, usedLocations)) {
+            continue;
+        }
+        usedLocations.emplace_back(pX, pY);
+        world.placePainting(pX - 1, pY + 1, *paintingItr);
+        --numPaintings;
+        if (numPaintings <= 0) {
+            break;
+        }
+        ++paintingItr;
     }
 }
 
@@ -176,8 +228,9 @@ Point selectSpiderHallLocation(
 void genSpiderHall(Random &rnd, World &world)
 {
     std::cout << "Spinning webs\n";
-    TileBuffer hall =
-        Data::getBuilding(Data::Building::spiderHall, world.getFramedTiles());
+    TileBuffer hall = Data::getBuilding(
+        rnd.select({Data::Building::spiderHall1, Data::Building::spiderHall2}),
+        world.getFramedTiles());
     std::vector<Point> bounds;
     if (world.getWidth() < 8000) {
         bounds.emplace_back(200, world.getWidth() - hall.getWidth() - 200);
@@ -241,5 +294,9 @@ void genSpiderHall(Random &rnd, World &world)
             hall.getHeight(),
             rnd,
             world);
+        hall = Data::getBuilding(
+            rnd.select(
+                {Data::Building::spiderHall1, Data::Building::spiderHall2}),
+            world.getFramedTiles());
     }
 }
