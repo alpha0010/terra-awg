@@ -47,6 +47,9 @@ void fillLoot(
                     Prefix::none,
                     1};
                 ++itemIndex;
+            } else if (item.id == ItemID::tuxedoShirt) {
+                chest.items[itemIndex] = {ItemID::tuxedoPants, Prefix::none, 1};
+                ++itemIndex;
             }
         }
     }
@@ -408,6 +411,7 @@ void fillSurfaceWaterChest(Chest &chest, Random &rnd, World &world)
               {ItemID::waterWalkingBoots, rnd.select(PrefixSet::accessory), 1},
               {ItemID::beachBall, Prefix::none, 1},
           })},
+         {nearEdge ? 0.05 : 0, {ItemID::whitePearl, Prefix::none, 1}},
          {0.5, {ItemID::sandcastleBucket, Prefix::none, 1}},
          {0.5, {ItemID::sharkBait, Prefix::none, 1}},
          {1.0 / 6, {ItemID::glowstick, Prefix::none, rnd.getInt(40, 75)}},
@@ -854,6 +858,10 @@ void fillUndergroundWaterChest(Chest &chest, Random &rnd, World &world)
                   1},
                  {ItemID::beachBall, Prefix::none, 1},
              })},
+            {nearEdge ? 0.5 : 0,
+             {rnd.select({ItemID::whitePearl, ItemID::blackPearl}),
+              Prefix::none,
+              1}},
             {0.5, {ItemID::sandcastleBucket, Prefix::none, 1}},
             {0.5, {ItemID::sharkBait, Prefix::none, 1}},
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
@@ -1417,6 +1425,10 @@ void fillCavernWaterChest(Chest &chest, Random &rnd, World &world)
                   1},
                  {ItemID::beachBall, Prefix::none, 1},
              })},
+            {nearEdge ? 0.5 : 0,
+             {rnd.select({ItemID::whitePearl, ItemID::blackPearl}),
+              Prefix::none,
+              1}},
             {0.5, {ItemID::sandcastleBucket, Prefix::none, 1}},
             {0.5, {ItemID::sharkBait, Prefix::none, 1}},
             {0.05,
@@ -1889,7 +1901,9 @@ void fillDresser(Chest &chest, Random &rnd)
         {
             {1,
              {rnd.pool(
-                  {ItemID::robe,
+                  {ItemID::tuxedoShirt,
+                   ItemID::summerHat,
+                   ItemID::robe,
                    ItemID::crimsonCloak,
                    ItemID::redCape,
                    ItemID::winterCape}),

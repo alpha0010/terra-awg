@@ -17,11 +17,16 @@ bool isLocationUsed(
     int x,
     int y,
     int radius,
-    const std::vector<Point> &usedLocations)
+    const std::vector<Point> &usedLocations,
+    int maxCount)
 {
+    int count = 0;
     for (auto [usedX, usedY] : usedLocations) {
         if (std::hypot(x - usedX, y - usedY) < radius) {
-            return true;
+            ++count;
+            if (count >= maxCount) {
+                return true;
+            }
         }
     }
     return false;

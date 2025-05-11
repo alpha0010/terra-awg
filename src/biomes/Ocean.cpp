@@ -3,7 +3,90 @@
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
+#include "structures/LootRules.h"
+#include "structures/StructureUtil.h"
+#include <algorithm>
 #include <iostream>
+
+bool canPlaceReefChest(int x, int y, World &world)
+{
+    return world.regionPasses(x, y - 1, 2, 3, [](Tile &tile) {
+        return tile.blockID == TileID::empty && tile.liquid == Liquid::water;
+    }) && world.regionPasses(x, y + 2, 2, 1, [](Tile &tile) {
+        return tile.blockID == TileID::sand ||
+               tile.blockID == TileID::coralstone;
+    });
+}
+
+void addOceanCave(int waterTable, Random &rnd, World &world)
+{
+    int centerOpt1 = 105;
+    int centerOpt2 = world.getWidth() - 105;
+    int centerX =
+        centerOpt1 > world.jungleCenter - 0.11 * world.getWidth() - 220
+            ? centerOpt2
+        : centerOpt2 < world.jungleCenter + 0.11 * world.getWidth() + 220
+            ? centerOpt1
+            : rnd.select({centerOpt1, centerOpt2});
+    int maxY = (5 * world.getCavernLevel() + world.getUnderworldLevel()) / 6;
+    for (int x = centerX - 100; x < centerX + 100; ++x) {
+        for (int y = waterTable + 20; y < maxY; ++y) {
+            double threshold =
+                std::max(std::abs(x - centerX), y + 100 - maxY) / 25.0 - 3;
+            if (rnd.getFineNoise(x, y) < threshold - 0.5 ||
+                std::abs(rnd.getCoarseNoise(2 * x, 2 * y)) > 0.51) {
+                continue;
+            }
+            Tile &tile = world.getTile(x, y);
+            if (tile.blockID == TileID::stone) {
+                tile.blockID = fnv1a32pt(x, y) % 7 == 0 ? TileID::sand
+                                                        : TileID::coralstone;
+            } else if (
+                tile.blockID == TileID::dirt || tile.blockID == TileID::mud ||
+                (tile.blockID == TileID::empty &&
+                 tile.liquid == Liquid::none)) {
+                tile.blockID = fnv1a32pt(x, y) % 5 == 0 ? TileID::hardenedSand
+                                                        : TileID::sand;
+            }
+            if (std::abs(rnd.getBlurNoise(2 * x, 2 * y)) < 0.18 &&
+                rnd.getFineNoise(x, y) > std::max(threshold, -0.12)) {
+                tile.blockID = TileID::empty;
+                tile.wallID = WallID::empty;
+                tile.liquid = Liquid::water;
+            }
+        }
+    }
+    std::vector<Point> locations;
+    for (int x = centerX - 50; x < centerX + 50; ++x) {
+        for (int y = world.getUndergroundLevel(); y < maxY; ++y) {
+            if (canPlaceReefChest(x, y, world)) {
+                locations.emplace_back(x, y);
+            }
+        }
+    }
+    std::shuffle(locations.begin(), locations.end(), rnd.getPRNG());
+    world.queuedTreasures.emplace_back(
+        [locs = std::move(locations)](Random &rnd, World &world) {
+            int numChests = std::max<int>(locs.size() / 100, 2);
+            std::vector<Point> usedLocations;
+            for (auto [x, y] : locs) {
+                if (canPlaceReefChest(x, y, world) &&
+                    !isLocationUsed(x, y, 50, usedLocations)) {
+                    usedLocations.emplace_back(x, y);
+                    Chest &chest = world.placeChest(x, y, Variant::reef);
+                    if (y < world.getCavernLevel()) {
+                        fillUndergroundWaterChest(chest, rnd, world);
+                    } else {
+                        fillCavernWaterChest(chest, rnd, world);
+                    }
+                    --numChests;
+                    if (numChests <= 0) {
+                        break;
+                    }
+                }
+            }
+        });
+}
 
 void genOceans(Random &rnd, World &world)
 {
@@ -56,4 +139,5 @@ void genOceans(Random &rnd, World &world)
         fillColumn(x);
         fillColumn(world.getWidth() - x - 1);
     }
+    addOceanCave(waterTable, rnd, world);
 }

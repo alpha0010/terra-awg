@@ -13,6 +13,15 @@
 #include <iostream>
 #include <set>
 
+enum class Gem {
+    topaz = 18,
+    sapphire = 36,
+    emerald = 54,
+    ruby = 72,
+    diamond = 90,
+    amber = 108
+};
+
 template <typename T, typename U>
 bool listContains(const T &list, const U &value)
 {
@@ -89,6 +98,20 @@ int testOrbHeartCandidate(int x, int y, World &world)
     return tendrilID;
 }
 
+bool attachGemTo(Gem gem, int x, int y, Random &rnd, World &world)
+{
+    auto [deltaX, deltaY, frameY] = rnd.select(
+        {std::tuple{-1, 0, 162}, {1, 0, 108}, {0, -1, 0}, {0, 1, 54}});
+    Tile &tile = world.getTile(x + deltaX, y + deltaY);
+    if (tile.blockID != TileID::empty) {
+        return false;
+    }
+    tile.blockID = TileID::gem;
+    tile.frameX = static_cast<int>(gem);
+    tile.frameY = frameY + 18 * (fnv1a32pt(x, y) % 3);
+    return true;
+}
+
 void placeGems(Random &rnd, World &world)
 {
     int numGems =
@@ -103,7 +126,8 @@ void placeGems(Random &rnd, World &world)
         TileID::ebonsandstone,
         TileID::crimsand,
         TileID::hardenedCrimsand,
-        TileID::crimsandstone};
+        TileID::crimsandstone,
+        TileID::coralstone};
     while (numGems > 0) {
         int x = rnd.getInt(
             world.desertCenter - scanDist,
@@ -113,16 +137,38 @@ void placeGems(Random &rnd, World &world)
         if (!validAnchors.contains(world.getTile(x, y).blockID)) {
             continue;
         }
-        auto [deltaX, deltaY, frameY] = rnd.select(
-            {std::tuple{-1, 0, 162}, {1, 0, 108}, {0, -1, 0}, {0, 1, 54}});
-        Tile &tile = world.getTile(x + deltaX, y + deltaY);
-        if (tile.blockID != TileID::empty) {
-            continue;
+        if (attachGemTo(Gem::amber, x, y, rnd, world)) {
+            --numGems;
         }
-        tile.blockID = TileID::gem;
-        tile.frameX = 108;
-        tile.frameY = frameY + 18 * ((x + y) % 3);
-        --numGems;
+    }
+    std::vector<Point> locations;
+    int maxY = (5 * world.getCavernLevel() + world.getUnderworldLevel()) / 6;
+    for (int x = 50; x < world.getWidth() - 50; ++x) {
+        if (x == 200) {
+            x = world.getWidth() - 200;
+        }
+        for (int y = world.getUndergroundLevel(); y < maxY; ++y) {
+            if (validAnchors.contains(world.getTile(x, y).blockID) &&
+                !world.regionPasses(x - 1, y - 1, 3, 3, [](Tile &tile) {
+                    return tile.blockID != TileID::empty ||
+                           tile.liquid == Liquid::none;
+                })) {
+                locations.emplace_back(x, y);
+            }
+        }
+    }
+    std::shuffle(locations.begin(), locations.end(), rnd.getPRNG());
+    locations.resize(locations.size() / 6);
+    for (auto [x, y] : locations) {
+        attachGemTo(
+            y < world.getCavernLevel()
+                ? rnd.select({Gem::topaz, Gem::sapphire, Gem::emerald})
+                : rnd.select(
+                      {Gem::sapphire, Gem::emerald, Gem::ruby, Gem::diamond}),
+            x,
+            y,
+            rnd,
+            world);
     }
 }
 
@@ -134,6 +180,7 @@ void placeLifeCrystals(
 {
     int lifeCrystalCount = world.getWidth() * world.getHeight() / 50000;
     int maxDungeonPlacements = 3;
+    std::vector<Point> usedLocations;
     while (lifeCrystalCount > 0) {
         int binId = rnd.getInt(0, maxBin);
         if (locations[binId].empty()) {
@@ -150,9 +197,12 @@ void placeLifeCrystals(
                 } else {
                     continue;
                 }
-            } else if (probeWall == WallID::Unsafe::lihzahrdBrick) {
+            } else if (
+                probeWall == WallID::Unsafe::lihzahrdBrick ||
+                isLocationUsed(x, y, 50, usedLocations, 2)) {
                 continue;
             } else {
+                usedLocations.emplace_back(x, y);
                 world.placeFramedTile(x, y - 2, TileID::lifeCrystal);
             }
             --lifeCrystalCount;
@@ -487,8 +537,16 @@ Variant getChestType(int x, int y, World &world)
     } else if (probeTile.wallID == WallID::Unsafe::hive) {
         return Variant::honey;
     } else if (probeTile.liquid == Liquid::water) {
-        return y < world.getUndergroundLevel() &&
-                       (x < 350 || x > world.getWidth() - 350)
+        return (x < 350 || x > world.getWidth() - 350) &&
+                       (y < world.getUndergroundLevel() ||
+                        !world.regionPasses(
+                            x - 2,
+                            y,
+                            6,
+                            6,
+                            [](Tile &tile) {
+                                return tile.blockID != TileID::coralstone;
+                            }))
                    ? Variant::reef
                    : Variant::water;
     } else if (listContains(WallVariants::dungeon, probeTile.wallID)) {
@@ -859,7 +917,6 @@ LocationBins genTreasure(Random &rnd, World &world)
     for (const auto &applyQueuedTreasure : world.queuedTreasures) {
         applyQueuedTreasure(rnd, world);
     }
-    placeGems(rnd, world);
     int maxBin =
         binLocation(world.getWidth(), world.getHeight(), world.getHeight());
     placeJungleShrines(rnd, world);
@@ -870,6 +927,7 @@ LocationBins genTreasure(Random &rnd, World &world)
     placeManaCrystals(maxBin, flatLocations, rnd, world);
     placeChests(maxBin, flatLocations, rnd, world);
     placePots(maxBin, flatLocations, rnd, world);
+    placeGems(rnd, world);
     placeDirtiestBlocks(rnd, world);
     return flatLocations;
 }

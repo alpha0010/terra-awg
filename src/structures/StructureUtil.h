@@ -17,7 +17,8 @@ bool isLocationUsed(
     int x,
     int y,
     int radius,
-    const std::vector<Point> &usedLocations);
+    const std::vector<Point> &usedLocations,
+    int maxCount = 1);
 
 bool isSolidBlock(int tileId);
 
