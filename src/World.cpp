@@ -507,6 +507,8 @@ inline const std::map<Painting, PaintingDetails> paintingData{
     {Painting::greatWave, {TileID::painting6x4, 0, 792}},
     {Painting::impact, {TileID::painting6x4, 0, 432}},
     {Painting::lakeOfFire, {TileID::painting6x4, 0, 1008}},
+    {Painting::lifeAboveTheSand, {TileID::painting6x4, 108, 720}},
+    {Painting::oasis, {TileID::painting6x4, 108, 792}},
     {Painting::poweredByBirds, {TileID::painting6x4, 0, 504}},
     {Painting::somethingEvilIsWatchingYou, {TileID::painting6x4, 0, 72}},
     {Painting::sparky, {TileID::painting6x4, 108, 216}},

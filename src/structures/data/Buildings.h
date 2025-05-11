@@ -6,7 +6,7 @@
 namespace Data
 {
 
-enum class Building { spiderHall1 = 0, spiderHall2 };
+enum class Building { desertTomb1 = 0, desertTomb2, spiderHall1, spiderHall2 };
 
 TileBuffer
 getBuilding(Building buildingId, const std::vector<bool> &framedTiles);

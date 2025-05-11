@@ -812,7 +812,7 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
                                        y > std::midpoint(
                                                world.getUndergroundLevel(),
                                                world.getCavernLevel()))) &&
-            static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 19 < 4) {
+            static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 19 < 5) {
             origType = type;
             type = Variant::deadMans;
         }

@@ -116,6 +116,8 @@ enum class Painting {
     greatWave,
     impact,
     lakeOfFire,
+    lifeAboveTheSand,
+    oasis,
     poweredByBirds,
     somethingEvilIsWatchingYou,
     sparky,

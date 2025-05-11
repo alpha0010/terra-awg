@@ -25,6 +25,7 @@
 #include "biomes/Underworld.h"
 #include "map/ImgWriter.h"
 #include "structures/BuriedBoat.h"
+#include "structures/DesertTomb.h"
 #include "structures/Dungeon.h"
 #include "structures/Lake.h"
 #include "structures/MinecartTracks.h"
@@ -86,6 +87,7 @@ void doWorldGen(Random &rnd, World &world)
     genDungeon(rnd, world);
     genTemple(rnd, world);
     genPyramid(rnd, world);
+    genDesertTomb(rnd, world);
     genBuriedBoat(rnd, world);
     genSpiderHall(rnd, world);
     genRuins(rnd, world);

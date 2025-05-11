@@ -142,6 +142,7 @@ enum {
     painting2x3 = 245,
     painting3x2 = 246,
     stoneSlab = 273,
+    sandstoneSlab = 274,
     boneWelder = 300,
     minecartTrack = 314,
     coralstone = 315,
