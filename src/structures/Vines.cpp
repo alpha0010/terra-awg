@@ -4,8 +4,139 @@
 #include "Util.h"
 #include "World.h"
 #include "ids/Paint.h"
+#include "ids/WallID.h"
 #include <iostream>
 #include <map>
+#include <set>
+
+enum class ScanState { n, s, se, see, seee, e, ee, eee, eees };
+
+inline const std::set<int> attatchTiles{
+    TileID::ice,
+    TileID::stone,
+    TileID::stoneSlab,
+    TileID::ebonstone,
+    TileID::crimstone,
+    TileID::sandstone,
+    TileID::granite,
+    TileID::marble,
+    TileID::corruptIce,
+    TileID::crimsonIce};
+
+ScanState scanTransition(Tile &tile, ScanState state)
+{
+    if (tile.blockID == TileID::empty) {
+        switch (state) {
+        case ScanState::n:
+            return ScanState::e;
+        case ScanState::s:
+        case ScanState::eees:
+            return ScanState::se;
+        case ScanState::se:
+            return ScanState::see;
+        case ScanState::see:
+            return ScanState::seee;
+        case ScanState::seee:
+        case ScanState::ee:
+        case ScanState::eee:
+            return ScanState::eee;
+        case ScanState::e:
+            return ScanState::ee;
+        }
+    } else if (
+        tile.slope == Slope::none && !tile.actuated &&
+        attatchTiles.contains(tile.blockID)) {
+        switch (state) {
+        case ScanState::n:
+        case ScanState::s:
+        case ScanState::se:
+        case ScanState::see:
+        case ScanState::e:
+        case ScanState::ee:
+        case ScanState::eees:
+            return ScanState::s;
+        case ScanState::seee:
+        case ScanState::eee:
+            return ScanState::eees;
+        }
+    }
+    return ScanState::n;
+}
+
+inline const std::map<int, int> stalactiteTypes{
+    {TileID::ice, 0},
+    {TileID::stone, 54},
+    {TileID::ebonstone, 270},
+    {TileID::crimstone, 324},
+    {TileID::sandstone, 378},
+    {TileID::granite, 432},
+    {TileID::marble, 486},
+    {TileID::corruptIce, 594},
+    {TileID::crimsonIce, 648}};
+
+void placeStalactite(int x, int y, World &world)
+{
+    int variation = fnv1a32pt(x, y) % 6;
+    int frameX = 18 * variation;
+    int frameY = 0;
+    int height = 2;
+    if (variation > 2) {
+        frameX -= 54;
+        frameY = 72;
+        height = 1;
+    }
+    Tile &probeTile = world.getTile(x, y);
+    if (probeTile.wallID == WallID::Unsafe::spider &&
+        (probeTile.blockID == TileID::stone ||
+         probeTile.blockID == TileID::stoneSlab)) {
+        frameX += 108;
+        frameY = 0;
+        height = 2;
+    } else {
+        auto itr = stalactiteTypes.find(probeTile.blockID);
+        if (itr == stalactiteTypes.end()) {
+            return;
+        }
+        frameX += itr->second;
+    }
+    for (int j = 0; j < height; ++j) {
+        Tile &tile = world.getTile(x, y + j + 1);
+        tile.blockID = TileID::stalactite;
+        tile.frameX = frameX;
+        tile.frameY = 18 * j + frameY;
+    }
+}
+
+inline const std::map<int, int> stalagmiteTypes{
+    {TileID::stone, 54},
+    {TileID::ebonstone, 270},
+    {TileID::crimstone, 324},
+    {TileID::sandstone, 378},
+    {TileID::granite, 432},
+    {TileID::marble, 486}};
+
+void placeStalagmite(int x, int y, World &world)
+{
+    auto itr = stalagmiteTypes.find(world.getTile(x, y).blockID);
+    if (itr == stalagmiteTypes.end()) {
+        return;
+    }
+    int variation = fnv1a32pt(x, y) % 6;
+    int frameX = 18 * variation + itr->second;
+    int frameY = 36;
+    int height = 2;
+    if (variation > 2) {
+        frameX -= 54;
+        frameY = 90;
+        height = 1;
+    }
+    for (int j = 0; j < height; ++j) {
+        Tile &tile = world.getTile(x, y + j - height);
+        tile.blockID = TileID::stalactite;
+        tile.frameX = frameX;
+        tile.frameY = 18 * j + frameY;
+    }
+}
 
 void genVines(Random &rnd, World &world)
 {
@@ -53,8 +184,10 @@ void genVines(Random &rnd, World &world)
         int vine = TileID::empty;
         int dropper = TileID::empty;
         int vineLen = 0;
+        ScanState state = ScanState::n;
         for (int y = 0; y < world.getHeight(); ++y) {
             Tile &tile = world.getTile(x, y);
+            state = scanTransition(tile, state);
             int randInt = 99999 * (1 + rnd.getFineNoise(x, y));
             if (vineLen > 0) {
                 if (tile.blockID == TileID::empty &&
@@ -63,6 +196,7 @@ void genVines(Random &rnd, World &world)
                     if (vine == TileID::vineRope) {
                         tile.blockPaint = Paint::lime;
                     }
+                    state = ScanState::n;
                     --vineLen;
                     continue;
                 } else {
@@ -76,7 +210,14 @@ void genVines(Random &rnd, World &world)
                                    ? TileID::lavaDrip
                                    : dropper;
                 dropper = TileID::empty;
+                state = ScanState::n;
                 continue;
+            }
+            if (state == ScanState::seee && randInt % 7 == 0) {
+                placeStalactite(x, y - 3, world);
+                state = ScanState::e;
+            } else if (state == ScanState::eees && randInt % 11 == 0) {
+                placeStalagmite(x, y, world);
             }
             dropper = TileID::empty;
             if (tile.slope != Slope::none || tile.actuated) {

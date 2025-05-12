@@ -93,6 +93,7 @@ enum {
     ice = 161,
     thinIce = 162,
     corruptIce = 163,
+    stalactite = 165,
     tinOre = 166,
     leadOre = 167,
     tungstenOre = 168,

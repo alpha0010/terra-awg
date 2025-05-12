@@ -384,12 +384,14 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
         case Variant::jungle:
         case Variant::marble:
         case Variant::sandstone:
-        case Variant::spider:
         case Variant::stone:
             offsetX += 54 * (coordHash % 6);
             break;
         case Variant::livingLeaf:
             offsetX += 54 * (coordHash % 2);
+            break;
+        case Variant::spider:
+            offsetX += 54 * (coordHash % 5);
             break;
         default:
             break;
