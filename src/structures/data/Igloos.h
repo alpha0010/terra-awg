@@ -7,7 +7,7 @@
 namespace Data
 {
 
-inline auto igloos = std::views::iota(0, 8);
+inline auto igloos = std::views::iota(0, 10);
 
 TileBuffer getIgloo(int iglooId, const std::vector<bool> &framedTiles);
 
