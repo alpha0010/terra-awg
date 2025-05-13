@@ -504,9 +504,8 @@ int main()
 {
     auto mainStart = std::chrono::high_resolution_clock::now();
 
-    Config conf = readConfig();
-
     Random rnd;
+    Config conf = readConfig(rnd);
     World world{conf.width, conf.height};
 
     world.isCrimson = rnd.getBool();

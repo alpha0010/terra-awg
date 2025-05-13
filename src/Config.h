@@ -3,6 +3,8 @@
 
 #include <string>
 
+class Random;
+
 enum class GameMode { journey = 3, classic = 0, expert = 1, master = 2 };
 
 struct Config {
@@ -13,6 +15,6 @@ struct Config {
     bool mapPreview;
 };
 
-Config readConfig();
+Config readConfig(Random &rnd);
 
 #endif // CONFIG_H
