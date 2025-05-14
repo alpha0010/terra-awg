@@ -12,7 +12,12 @@ enum class Variant {
     greenDungeon,
     pinkDungeon,
     mushroom,
-    obsidian
+    obsidian,
+    ashWood,
+    boreal,
+    forest,
+    livingWood,
+    palm
 };
 
 inline auto furnitureLayouts = std::views::iota(0, 29);

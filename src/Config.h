@@ -12,6 +12,7 @@ struct Config {
     int width;
     int height;
     GameMode mode;
+    bool starterHome;
     bool mapPreview;
 };
 

@@ -27,6 +27,9 @@ height = 1800
 # Difficulty: journey/classic/expert/master
 mode = classic
 
+# Add a starter home at the spawn point.
+home = false
+
 [extra]
 # Output a map preview image.
 map = true
@@ -380,7 +383,7 @@ std::string genRandomName(Random &rnd)
 
 Config readConfig(Random &rnd)
 {
-    Config conf{"Terra AWG World", 6400, 1800, GameMode::classic, true};
+    Config conf{"Terra AWG World", 6400, 1800, GameMode::classic, false, true};
     if (!std::filesystem::exists(confName)) {
         std::ofstream out(confName, std::ios::out);
         out.write(defaultConfigStr, std::strlen(defaultConfigStr));
@@ -397,6 +400,7 @@ Config readConfig(Random &rnd)
     conf.width = reader.GetInteger("world", "width", conf.width);
     conf.height = reader.GetInteger("world", "height", conf.height);
     conf.mode = parseGameMode(reader.Get("world", "mode", "classic"));
+    conf.starterHome = reader.GetBoolean("world", "home", conf.starterHome);
     conf.mapPreview = reader.GetBoolean("extra", "map", conf.mapPreview);
     return conf;
 }

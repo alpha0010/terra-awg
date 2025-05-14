@@ -252,29 +252,54 @@ inline const std::map<std::pair<int, Variant>, std::pair<int, int>> frameDetail{
     {{TileID::candelabra, Variant::pinkDungeon}, {0, 864}},
     {{TileID::candelabra, Variant::mushroom}, {36, 684}},
     {{TileID::candelabra, Variant::obsidian}, {0, 900}},
+    {{TileID::candelabra, Variant::ashWood}, {0, 1512}},
+    {{TileID::candelabra, Variant::boreal}, {0, 720}},
+    {{TileID::candelabra, Variant::forest}, {0, 0}},
+    {{TileID::candelabra, Variant::livingWood}, {0, 468}},
+    {{TileID::candelabra, Variant::palm}, {0, 648}},
     // Base: Candle
     {{TileID::candle, Variant::blueDungeon}, {0, 22}},
     {{TileID::candle, Variant::greenDungeon}, {0, 44}},
     {{TileID::candle, Variant::pinkDungeon}, {0, 66}},
     {{TileID::candle, Variant::mushroom}, {18, 418}},
     {{TileID::candle, Variant::obsidian}, {0, 550}},
+    {{TileID::candle, Variant::ashWood}, {0, 902}},
+    {{TileID::candle, Variant::boreal}, {0, 440}},
+    {{TileID::candle, Variant::forest}, {0, 0}},
+    {{TileID::candle, Variant::livingWood}, {0, 308}},
+    {{TileID::candle, Variant::palm}, {0, 396}},
     // Base: Wooden Chair
     {{TileID::chair, Variant::blueDungeon}, {0, 520}},
     {{TileID::chair, Variant::greenDungeon}, {0, 560}},
     {{TileID::chair, Variant::pinkDungeon}, {0, 600}},
     {{TileID::chair, Variant::mushroom}, {0, 360}},
     {{TileID::chair, Variant::obsidian}, {0, 640}},
+    {{TileID::chair, Variant::ashWood}, {0, 1880}},
+    {{TileID::chair, Variant::boreal}, {0, 1200}},
+    {{TileID::chair, Variant::forest}, {0, 0}},
+    {{TileID::chair, Variant::livingWood}, {0, 200}},
+    {{TileID::chair, Variant::palm}, {0, 1160}},
     // Base: Copper Chandelier
     {{TileID::chandelier, Variant::blueDungeon}, {0, 1458}},
     {{TileID::chandelier, Variant::greenDungeon}, {0, 1512}},
     {{TileID::chandelier, Variant::pinkDungeon}, {0, 1566}},
     {{TileID::chandelier, Variant::mushroom}, {54, 1296}},
     {{TileID::chandelier, Variant::obsidian}, {0, 1728}},
+    {{TileID::chandelier, Variant::ashWood}, {108, 594}},
+    {{TileID::chandelier, Variant::boreal}, {0, 1350}},
+    {{TileID::chandelier, Variant::forest}, {0, 0}},
+    {{TileID::chandelier, Variant::livingWood}, {0, 972}},
+    {{TileID::chandelier, Variant::palm}, {0, 1242}},
     // Base: Wooden Chest
     {{TileID::chest, Variant::blueDungeon}, {1404, 0}},
     {{TileID::chest, Variant::greenDungeon}, {1260, 0}},
     {{TileID::chest, Variant::pinkDungeon}, {1332, 0}},
     {{TileID::chest, Variant::obsidian}, {1584, 0}},
+    {{TileID::chest, Variant::ashWood}, {576, 0}},
+    {{TileID::chest, Variant::boreal}, {1188, 0}},
+    {{TileID::chest, Variant::forest}, {0, 0}},
+    {{TileID::chest, Variant::livingWood}, {432, 0}},
+    {{TileID::chest, Variant::palm}, {1116, 0}},
     // Base: Grandfather Clock
     {{TileID::clock, Variant::blueDungeon}, {1080, 0}},
     {{TileID::clock, Variant::greenDungeon}, {1116, 0}},
@@ -285,6 +310,11 @@ inline const std::map<std::pair<int, Variant>, std::pair<int, int>> frameDetail{
     {{TileID::door, Variant::greenDungeon}, {0, 918}},
     {{TileID::door, Variant::pinkDungeon}, {0, 972}},
     {{TileID::door, Variant::obsidian}, {0, 1026}},
+    {{TileID::door, Variant::ashWood}, {54, 648}},
+    {{TileID::door, Variant::boreal}, {0, 1620}},
+    {{TileID::door, Variant::forest}, {0, 0}},
+    {{TileID::door, Variant::livingWood}, {0, 378}},
+    {{TileID::door, Variant::palm}, {0, 1566}},
     // Base: Wooden Dresser
     {{TileID::dresser, Variant::blueDungeon}, {270, 0}},
     {{TileID::dresser, Variant::greenDungeon}, {324, 0}},
@@ -297,12 +327,22 @@ inline const std::map<std::pair<int, Variant>, std::pair<int, int>> frameDetail{
     {{TileID::lamp, Variant::pinkDungeon}, {0, 1404}},
     {{TileID::lamp, Variant::mushroom}, {18, 1026}},
     {{TileID::lamp, Variant::obsidian}, {0, 1242}},
+    {{TileID::lamp, Variant::ashWood}, {0, 2268}},
+    {{TileID::lamp, Variant::boreal}, {0, 1080}},
+    {{TileID::lamp, Variant::forest}, {0, 216}},
+    {{TileID::lamp, Variant::livingWood}, {0, 702}},
+    {{TileID::lamp, Variant::palm}, {0, 972}},
     // Base: Chain Lantern
     {{TileID::lantern, Variant::blueDungeon}, {0, 36}},
     {{TileID::lantern, Variant::greenDungeon}, {0, 216}},
     {{TileID::lantern, Variant::pinkDungeon}, {0, 180}},
     {{TileID::lantern, Variant::mushroom}, {18, 1008}},
     {{TileID::lantern, Variant::obsidian}, {0, 1152}},
+    {{TileID::lantern, Variant::ashWood}, {0, 1728}},
+    {{TileID::lantern, Variant::boreal}, {0, 1044}},
+    {{TileID::lantern, Variant::forest}, {0, 108}},
+    {{TileID::lantern, Variant::livingWood}, {0, 792}},
+    {{TileID::lantern, Variant::palm}, {0, 972}},
     // Base: Wooden Piano
     {{TileID::piano, Variant::blueDungeon}, {594, 0}},
     {{TileID::piano, Variant::greenDungeon}, {648, 0}},
@@ -315,6 +355,11 @@ inline const std::map<std::pair<int, Variant>, std::pair<int, int>> frameDetail{
     {{TileID::platform, Variant::pinkDungeon}, {0, 126}},
     {{TileID::platform, Variant::mushroom}, {0, 324}},
     {{TileID::platform, Variant::obsidian}, {0, 234}},
+    {{TileID::platform, Variant::ashWood}, {0, 846}},
+    {{TileID::platform, Variant::boreal}, {0, 342}},
+    {{TileID::platform, Variant::forest}, {0, 0}},
+    {{TileID::platform, Variant::livingWood}, {0, 414}},
+    {{TileID::platform, Variant::palm}, {0, 306}},
     // Base: Wooden Sink
     {{TileID::sink, Variant::blueDungeon}, {0, 380}},
     {{TileID::sink, Variant::greenDungeon}, {0, 418}},
@@ -332,6 +377,11 @@ inline const std::map<std::pair<int, Variant>, std::pair<int, int>> frameDetail{
     {{TileID::table, Variant::pinkDungeon}, {648, 0}},
     {{TileID::table, Variant::mushroom}, {1458, 0}},
     {{TileID::table, Variant::obsidian}, {702, 0}},
+    {{TileID::table, Variant::ashWood}, {594, 0}},
+    {{TileID::table, Variant::boreal}, {1512, 0}},
+    {{TileID::table, Variant::forest}, {0, 0}},
+    {{TileID::table, Variant::livingWood}, {324, 0}},
+    {{TileID::table, Variant::palm}, {1404, 0}},
     // Base: Ebonwood Toilet
     {{TileID::toilet, Variant::blueDungeon}, {0, 440}},
     {{TileID::toilet, Variant::greenDungeon}, {0, 480}},
@@ -355,6 +405,12 @@ bool convertFurniture(Tile &tile, Variant furnitureSet)
     auto [frameX, frameY] = itr->second;
     tile.frameX += frameX;
     tile.frameY += frameY;
+    if (tile.blockID == TileID::chest && furnitureSet == Variant::ashWood) {
+        tile.blockID = TileID::chestGroup2;
+    } else if (
+        tile.blockID == TileID::table && furnitureSet == Variant::ashWood) {
+        tile.blockID = TileID::tableGroup2;
+    }
     return true;
 }
 

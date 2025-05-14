@@ -34,6 +34,7 @@
 #include "structures/Pyramid.h"
 #include "structures/Ruins.h"
 #include "structures/SpiderHall.h"
+#include "structures/StarterHome.h"
 #include "structures/SurfaceIgloo.h"
 #include "structures/Temple.h"
 #include "structures/Traps.h"
@@ -57,7 +58,7 @@ uint64_t getBinaryTime()
     return ms * 10000 + 621355968000000000ull;
 }
 
-void doWorldGen(Random &rnd, World &world)
+void doWorldGen(Config &conf, Random &rnd, World &world)
 {
     world.planBiomes(rnd);
     rnd.initNoise(world.getWidth(), world.getHeight(), 0.07);
@@ -92,6 +93,9 @@ void doWorldGen(Random &rnd, World &world)
     genSpiderHall(rnd, world);
     genRuins(rnd, world);
     genLake(world);
+    if (conf.starterHome) {
+        genStarterHome(rnd, world);
+    }
     genIgloo(rnd, world);
     genMushroomCabin(rnd, world);
     auto flatLocations = genTreasure(rnd, world);
@@ -514,7 +518,7 @@ int main()
     world.silverVariant = rnd.select({TileID::silverOre, TileID::tungstenOre});
     world.goldVariant = rnd.select({TileID::goldOre, TileID::platinumOre});
 
-    doWorldGen(rnd, world);
+    doWorldGen(conf, rnd, world);
     saveWorldFile(conf, rnd, world);
 
     auto mainEnd = std::chrono::high_resolution_clock::now();
