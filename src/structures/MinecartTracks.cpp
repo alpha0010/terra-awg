@@ -95,8 +95,8 @@ std::vector<Point> planTrack(Random &rnd, World &world)
         rnd.getInt(0, world.getWidth()),
         rnd.getInt(world.getUndergroundLevel(), world.getUnderworldLevel())};
     Point delta{rnd.select({-1, 1}), 0};
-    size_t minLen = 100 + world.getWidth() / 80;
     int maxLen = rnd.getInt(world.getWidth() / 26, world.getWidth() / 4.2);
+    size_t minLen = std::min(120 + world.getWidth() / 70, maxLen - 10);
     int minY = 0.8 * world.getUndergroundLevel();
     int maxY = 0.2 * world.getHeight() + 0.8 * world.getUnderworldLevel();
     std::vector<Point> track;

@@ -83,6 +83,18 @@ Item getUndergroundPrimaryLoot(Random &rnd)
     });
 }
 
+Item getWaterPrimaryLoot(Random &rnd)
+{
+    return rnd.pool<Item>({
+        {ItemID::breathingReed, rnd.select(PrefixSet::melee), 1},
+        {ItemID::flipper, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::trident, rnd.select(PrefixSet::universal), 1},
+        {ItemID::innerTube, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::waterWalkingBoots, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::beachBall, Prefix::none, 1},
+    });
+}
+
 void fillSurfaceChest(Chest &chest, int torchID, Random &rnd, World &world)
 {
     fillLoot(
@@ -402,15 +414,7 @@ void fillSurfaceWaterChest(Chest &chest, Random &rnd, World &world)
     fillLoot(
         chest,
         rnd,
-        {{1,
-          rnd.pool<Item>({
-              {ItemID::breathingReed, rnd.select(PrefixSet::melee), 1},
-              {ItemID::flipper, rnd.select(PrefixSet::accessory), 1},
-              {ItemID::trident, rnd.select(PrefixSet::universal), 1},
-              {ItemID::innerTube, rnd.select(PrefixSet::accessory), 1},
-              {ItemID::waterWalkingBoots, rnd.select(PrefixSet::accessory), 1},
-              {ItemID::beachBall, Prefix::none, 1},
-          })},
+        {{1, getWaterPrimaryLoot(rnd)},
          {nearEdge ? 0.05 : 0, {ItemID::whitePearl, Prefix::none, 1}},
          {0.5, {ItemID::sandcastleBucket, Prefix::none, 1}},
          {0.5, {ItemID::sharkBait, Prefix::none, 1}},
@@ -847,17 +851,7 @@ void fillUndergroundWaterChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1,
-             rnd.pool<Item>({
-                 {ItemID::breathingReed, rnd.select(PrefixSet::melee), 1},
-                 {ItemID::flipper, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::trident, rnd.select(PrefixSet::universal), 1},
-                 {ItemID::innerTube, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::waterWalkingBoots,
-                  rnd.select(PrefixSet::accessory),
-                  1},
-                 {ItemID::beachBall, Prefix::none, 1},
-             })},
+            {1, getWaterPrimaryLoot(rnd)},
             {nearEdge ? 0.6 : 0,
              {rnd.select({ItemID::whitePearl, ItemID::blackPearl}),
               Prefix::none,
@@ -1414,17 +1408,7 @@ void fillCavernWaterChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1,
-             rnd.pool<Item>({
-                 {ItemID::breathingReed, rnd.select(PrefixSet::melee), 1},
-                 {ItemID::flipper, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::trident, rnd.select(PrefixSet::universal), 1},
-                 {ItemID::innerTube, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::waterWalkingBoots,
-                  rnd.select(PrefixSet::accessory),
-                  1},
-                 {ItemID::beachBall, Prefix::none, 1},
-             })},
+            {1, getWaterPrimaryLoot(rnd)},
             {nearEdge ? 0.7 : 0,
              {rnd.select({ItemID::whitePearl, ItemID::blackPearl}),
               Prefix::none,

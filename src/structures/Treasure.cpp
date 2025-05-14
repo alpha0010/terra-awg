@@ -778,7 +778,7 @@ void placeChest(
 void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
 {
     int chestCount =
-        world.getWidth() * world.getHeight() / 50000 - world.getChests().size();
+        world.getWidth() * world.getHeight() / 41800 - world.getChests().size();
     std::vector<Point> usedLocations;
     for (auto &chest : world.getChests()) {
         usedLocations.emplace_back(chest.x, chest.y);
@@ -791,13 +791,19 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
         auto [x, y] = rnd.select(locations[binId]);
         int surface = world.getSurfaceLevel(x);
         if (!isPlacementCandidate(x, y, world) ||
-            isLocationUsed(x, y, y > surface ? 20 : 50, usedLocations)) {
+            isLocationUsed(
+                x,
+                y,
+                y > surface                              ? 20
+                : y < 0.45 * world.getUndergroundLevel() ? 125
+                                                         : 50,
+                usedLocations)) {
             continue;
         }
         Variant type = getChestType(x, y, world);
         Variant origType = Variant::none;
         if (y < surface + 3 && y > surface - 8 && type != Variant::reef &&
-            type != Variant::water && rnd.getDouble(0, 1) < 0.8) {
+            type != Variant::water && rnd.getDouble(0, 1) < 0.85) {
             continue;
         } else if (
             y < world.getUndergroundLevel() && type == Variant::goldLocked) {
@@ -811,7 +817,7 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
                                        y > std::midpoint(
                                                world.getUndergroundLevel(),
                                                world.getCavernLevel()))) &&
-            static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 19 < 5) {
+            static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 37 < 9) {
             origType = type;
             type = Variant::deadMans;
         }
