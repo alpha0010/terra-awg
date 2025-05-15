@@ -27,7 +27,7 @@ inline const std::map<int, int> tileToRepTile{
     {TileID::brownMossStone, TileID::stone},
     {TileID::clay, TileID::clay},
     {TileID::cloud, TileID::cloud},
-    {TileID::cobweb, TileID::cloud},
+    {TileID::cobweb, TileID::spiderNest},
     {TileID::copperOre, TileID::copperOre},
     {TileID::coralstone, TileID::coralstone},
     {TileID::corruptGrass, TileID::ebonstoneBrick},
@@ -47,9 +47,9 @@ inline const std::map<int, int> tileToRepTile{
     {TileID::crimsonVines, TileID::crimstoneBrick},
     {TileID::crimstone, TileID::crimstoneBrick},
     {TileID::crimstoneBrick, TileID::crimstoneBrick},
-    {TileID::crimtane, TileID::crimtane},
-    {TileID::crispyHoney, TileID::crispyHoney},
-    {TileID::demonite, TileID::demonite},
+    {TileID::crimtane, TileID::crimstoneBrick},
+    {TileID::crispyHoney, TileID::honey},
+    {TileID::demonite, TileID::ebonstoneBrick},
     {TileID::desertFossil, TileID::desertFossil},
     {TileID::diamondStone, TileID::diamondStone},
     {TileID::diamondTree, TileID::stone},
@@ -62,12 +62,12 @@ inline const std::map<int, int> tileToRepTile{
     {TileID::emeraldStone, TileID::emeraldStone},
     {TileID::emeraldTree, TileID::stone},
     {TileID::fallenLog, TileID::wood},
-    {TileID::flesh, TileID::flesh},
+    {TileID::flesh, TileID::crimstoneBrick},
     {TileID::flowerVines, TileID::leaf},
     {TileID::glowingMushroom, TileID::slime},
     {TileID::goldOre, TileID::goldOre},
     {TileID::granite, TileID::granite},
-    {TileID::grass, TileID::leaf},
+    {TileID::grass, TileID::dirt},
     {TileID::grassPlant, TileID::leaf},
     {TileID::grayBrick, TileID::grayBrick},
     {TileID::greenBrick, TileID::greenBrick},
@@ -83,7 +83,7 @@ inline const std::map<int, int> tileToRepTile{
     {TileID::ice, TileID::ice},
     {TileID::iceBrick, TileID::iceBrick},
     {TileID::ironOre, TileID::ironOre},
-    {TileID::jungleGrass, TileID::mahoganyLeaf},
+    {TileID::jungleGrass, TileID::mud},
     {TileID::junglePlant, TileID::mahoganyLeaf},
     {TileID::jungleVines, TileID::mahoganyLeaf},
     {TileID::kryptonMossStone, TileID::stone},
@@ -91,13 +91,13 @@ inline const std::map<int, int> tileToRepTile{
     {TileID::lavaMossStone, TileID::stone},
     {TileID::leadOre, TileID::leadOre},
     {TileID::leaf, TileID::leaf},
-    {TileID::lesion, TileID::lesion},
+    {TileID::lesion, TileID::ebonstoneBrick},
     {TileID::lihzahrdBrick, TileID::lihzahrdBrick},
     {TileID::livingMahogany, TileID::livingMahogany},
-    {TileID::livingWood, TileID::leaf},
+    {TileID::livingWood, TileID::wood},
     {TileID::mahoganyLeaf, TileID::mahoganyLeaf},
     {TileID::marble, TileID::marble},
-    {TileID::meteorite, TileID::stone},
+    {TileID::meteorite, TileID::meteorite},
     {TileID::mud, TileID::mud},
     {TileID::mudstoneBrick, TileID::mudstoneBrick},
     {TileID::mushroomGrass, TileID::slime},
@@ -312,20 +312,23 @@ int getSectorColor(int i, int j, int scale, World &world)
             colorFreqs[getRepColorTile(x, y, world)] += 1;
         }
     }
-    int threshold = 0.08 * scale * scale;
-    for (int prioTile :
-         {TileID::offlineAmethystGemspark,
-          TileID::cloud,
-          TileID::livingMahogany,
-          TileID::borealWood,
-          TileID::sandstoneBrick,
-          TileID::honey,
-          TileID::slime,
-          TileID::blueBrick,
-          TileID::greenBrick,
-          TileID::pinkBrick,
-          TileID::lihzahrdBrick}) {
-        if (colorFreqs[prioTile] > threshold) {
+    int total = (maxX - minX) * (maxY - minY);
+    for (auto [prioTile, threshold] :
+         {std::pair{TileID::offlineAmethystGemspark, 0.08},
+          {TileID::meteorite, 0.017},
+          {TileID::cloud, 0.08},
+          {TileID::spiderNest, 0.04},
+          {TileID::livingMahogany, 0.08},
+          {TileID::borealWood, 0.07},
+          {TileID::sandstoneBrick, 0.08},
+          {TileID::honey, 0.08},
+          {TileID::slime, 0.08},
+          {TileID::blueBrick, 0.08},
+          {TileID::greenBrick, 0.08},
+          {TileID::pinkBrick, 0.08},
+          {TileID::lihzahrdBrick, 0.08},
+          {TileID::leaf, 0.2}}) {
+        if (colorFreqs[prioTile] > threshold * total) {
             return prioTile;
         }
     }

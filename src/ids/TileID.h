@@ -199,6 +199,7 @@ enum {
     fallenLog = 488,
     shellPile = 495,
     toilet = 497,
+    spiderNest = 498,
     bastStatue = 506,
     mushroomVines = 528,
     kryptonMossStone = 534,
