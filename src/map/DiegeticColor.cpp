@@ -1,0 +1,337 @@
+#include "map/DiegeticColor.h"
+
+#include "World.h"
+#include "ids/WallID.h"
+#include <algorithm>
+#include <map>
+
+inline const std::map<int, int> tileToRepTile{
+    {TileID::aetherium, TileID::amethystGemspark},
+    {TileID::amberTree, TileID::stone},
+    {TileID::amethystStone, TileID::amethystStone},
+    {TileID::amethystTree, TileID::stone},
+    {TileID::argonMossStone, TileID::stone},
+    {TileID::ash, TileID::ash},
+    {TileID::ashGrass, TileID::ash},
+    {TileID::ashPlant, TileID::ash},
+    {TileID::ashTree, TileID::wood},
+    {TileID::ashVines, TileID::ash},
+    {TileID::ashWood, TileID::wood},
+    {TileID::asphalt, TileID::asphalt},
+    {TileID::blueBrick, TileID::blueBrick},
+    {TileID::blueMossStone, TileID::stone},
+    {TileID::borealBeam, TileID::wood},
+    {TileID::borealWood, TileID::borealWood},
+    {TileID::boulder, TileID::stone},
+    {TileID::bouncyBoulder, TileID::stone},
+    {TileID::brownMossStone, TileID::stone},
+    {TileID::clay, TileID::clay},
+    {TileID::cloud, TileID::cloud},
+    {TileID::cobweb, TileID::cloud},
+    {TileID::copperOre, TileID::copperOre},
+    {TileID::coralstone, TileID::coralstone},
+    {TileID::corruptGrass, TileID::ebonstoneBrick},
+    {TileID::corruptIce, TileID::ebonstoneBrick},
+    {TileID::corruptJungleGrass, TileID::ebonstoneBrick},
+    {TileID::corruptPlant, TileID::ebonstoneBrick},
+    {TileID::corruptVines, TileID::ebonstoneBrick},
+    {TileID::crackedBlueBrick, TileID::blueBrick},
+    {TileID::crackedGreenBrick, TileID::greenBrick},
+    {TileID::crackedPinkBrick, TileID::pinkBrick},
+    {TileID::crimsand, TileID::crimstoneBrick},
+    {TileID::crimsandstone, TileID::crimstoneBrick},
+    {TileID::crimsonGrass, TileID::crimstoneBrick},
+    {TileID::crimsonIce, TileID::crimstoneBrick},
+    {TileID::crimsonJungleGrass, TileID::crimstoneBrick},
+    {TileID::crimsonPlant, TileID::crimstoneBrick},
+    {TileID::crimsonVines, TileID::crimstoneBrick},
+    {TileID::crimstone, TileID::crimstoneBrick},
+    {TileID::crimstoneBrick, TileID::crimstoneBrick},
+    {TileID::crimtane, TileID::crimtane},
+    {TileID::crispyHoney, TileID::crispyHoney},
+    {TileID::demonite, TileID::demonite},
+    {TileID::desertFossil, TileID::desertFossil},
+    {TileID::diamondStone, TileID::diamondStone},
+    {TileID::diamondTree, TileID::stone},
+    {TileID::dirt, TileID::dirt},
+    {TileID::dirtiestBlock, TileID::dirt},
+    {TileID::ebonsand, TileID::ebonstoneBrick},
+    {TileID::ebonsandstone, TileID::ebonstoneBrick},
+    {TileID::ebonstone, TileID::ebonstoneBrick},
+    {TileID::ebonstoneBrick, TileID::ebonstoneBrick},
+    {TileID::emeraldStone, TileID::emeraldStone},
+    {TileID::emeraldTree, TileID::stone},
+    {TileID::fallenLog, TileID::wood},
+    {TileID::flesh, TileID::flesh},
+    {TileID::flowerVines, TileID::leaf},
+    {TileID::glowingMushroom, TileID::slime},
+    {TileID::goldOre, TileID::goldOre},
+    {TileID::granite, TileID::granite},
+    {TileID::grass, TileID::leaf},
+    {TileID::grassPlant, TileID::leaf},
+    {TileID::grayBrick, TileID::grayBrick},
+    {TileID::greenBrick, TileID::greenBrick},
+    {TileID::greenMossStone, TileID::stone},
+    {TileID::hardenedCrimsand, TileID::crimstoneBrick},
+    {TileID::hardenedEbonsand, TileID::ebonstoneBrick},
+    {TileID::hardenedSand, TileID::hardenedSand},
+    {TileID::heliumMossStone, TileID::amethystGemspark},
+    {TileID::hellstone, TileID::hellstone},
+    {TileID::hellstoneBrick, TileID::hellstoneBrick},
+    {TileID::hive, TileID::honey},
+    {TileID::honey, TileID::honey},
+    {TileID::ice, TileID::ice},
+    {TileID::iceBrick, TileID::iceBrick},
+    {TileID::ironOre, TileID::ironOre},
+    {TileID::jungleGrass, TileID::mahoganyLeaf},
+    {TileID::junglePlant, TileID::mahoganyLeaf},
+    {TileID::jungleVines, TileID::mahoganyLeaf},
+    {TileID::kryptonMossStone, TileID::stone},
+    {TileID::largeJunglePlant, TileID::mahoganyLeaf},
+    {TileID::lavaMossStone, TileID::stone},
+    {TileID::leadOre, TileID::leadOre},
+    {TileID::leaf, TileID::leaf},
+    {TileID::lesion, TileID::lesion},
+    {TileID::lihzahrdBrick, TileID::lihzahrdBrick},
+    {TileID::livingMahogany, TileID::livingMahogany},
+    {TileID::livingWood, TileID::leaf},
+    {TileID::mahoganyLeaf, TileID::mahoganyLeaf},
+    {TileID::marble, TileID::marble},
+    {TileID::meteorite, TileID::stone},
+    {TileID::mud, TileID::mud},
+    {TileID::mudstoneBrick, TileID::mudstoneBrick},
+    {TileID::mushroomGrass, TileID::slime},
+    {TileID::mushroomPlant, TileID::slime},
+    {TileID::mushroomVines, TileID::slime},
+    {TileID::neonMossStone, TileID::stone},
+    {TileID::obsidian, TileID::obsidian},
+    {TileID::obsidianBrick, TileID::obsidianBrick},
+    {TileID::palmTree, TileID::wood},
+    {TileID::palmWood, TileID::wood},
+    {TileID::pinkBrick, TileID::pinkBrick},
+    {TileID::platinumOre, TileID::platinumOre},
+    {TileID::purpleMossStone, TileID::stone},
+    {TileID::rainCloud, TileID::cloud},
+    {TileID::redBrick, TileID::redBrick},
+    {TileID::redMossStone, TileID::stone},
+    {TileID::richMahogany, TileID::wood},
+    {TileID::richMahoganyBeam, TileID::wood},
+    {TileID::rope, TileID::borealWood},
+    {TileID::rubyStone, TileID::rubyStone},
+    {TileID::rubyTree, TileID::stone},
+    {TileID::sakuraTree, TileID::wood},
+    {TileID::sand, TileID::hardenedSand},
+    {TileID::sandstone, TileID::sandstone},
+    {TileID::sandstoneBrick, TileID::sandstoneBrick},
+    {TileID::sandstoneColumn, TileID::sandstoneBrick},
+    {TileID::sandstoneSlab, TileID::sandstoneBrick},
+    {TileID::sapphireStone, TileID::sapphireStone},
+    {TileID::sapphireTree, TileID::stone},
+    {TileID::shellPile, TileID::hardenedSand},
+    {TileID::silt, TileID::mud},
+    {TileID::silverOre, TileID::silverOre},
+    {TileID::slime, TileID::slime},
+    {TileID::slush, TileID::snow},
+    {TileID::smoothGranite, TileID::granite},
+    {TileID::smoothMarble, TileID::marble},
+    {TileID::snow, TileID::snow},
+    {TileID::snowBrick, TileID::snowBrick},
+    {TileID::snowCloud, TileID::cloud},
+    {TileID::stone, TileID::stone},
+    {TileID::stoneSlab, TileID::stone},
+    {TileID::sunplate, TileID::sunplate},
+    {TileID::tallGrassPlant, TileID::leaf},
+    {TileID::tallJunglePlant, TileID::mahoganyLeaf},
+    {TileID::thinIce, TileID::ice},
+    {TileID::tinBrick, TileID::tinBrick},
+    {TileID::tinOre, TileID::tinOre},
+    {TileID::topazStone, TileID::topazStone},
+    {TileID::topazTree, TileID::stone},
+    {TileID::tree, TileID::wood},
+    {TileID::tungstenOre, TileID::tungstenOre},
+    {TileID::vineRope, TileID::mahoganyLeaf},
+    {TileID::vines, TileID::leaf},
+    {TileID::wood, TileID::wood},
+    {TileID::woodenBeam, TileID::wood},
+    {TileID::xenonMossStone, TileID::stone},
+    {TileID::yellowWillowTree, TileID::wood},
+};
+
+inline const std::map<int, int> wallToRepTile{
+    {WallID::Safe::ashWood, TileID::wood},
+    {WallID::Safe::borealWood, TileID::wood},
+    {WallID::Safe::cloud, TileID::cloud},
+    {WallID::Safe::crimstoneBrick, TileID::crimstoneBrick},
+    {WallID::Safe::crimtaneBrick, TileID::crimstoneBrick},
+    {WallID::Safe::demoniteBrick, TileID::ebonstoneBrick},
+    {WallID::Safe::ebonstoneBrick, TileID::ebonstoneBrick},
+    {WallID::Safe::ember, TileID::ash},
+    {WallID::Safe::goldBrick, TileID::goldOre},
+    {WallID::Safe::grayBrick, TileID::grayBrick},
+    {WallID::Safe::hardenedSand, TileID::hardenedSand},
+    {WallID::Safe::ice, TileID::ice},
+    {WallID::Safe::iceBrick, TileID::iceBrick},
+    {WallID::Safe::livingLeaf, TileID::leaf},
+    {WallID::Safe::livingWood, TileID::wood},
+    {WallID::Safe::mudstoneBrick, TileID::mudstoneBrick},
+    {WallID::Safe::obsidianBrick, TileID::obsidianBrick},
+    {WallID::Safe::palmWood, TileID::wood},
+    {WallID::Safe::palmWoodFence, TileID::wood},
+    {WallID::Safe::planked, TileID::wood},
+    {WallID::Safe::redBrick, TileID::redBrick},
+    {WallID::Safe::richMahogany, TileID::borealWood},
+    {WallID::Safe::sail, TileID::borealWood},
+    {WallID::Safe::sandstone, TileID::sandstone},
+    {WallID::Safe::sandstoneBrick, TileID::sandstoneBrick},
+    {WallID::Safe::smoothSandstone, TileID::sandstone},
+    {WallID::Safe::snow, TileID::snow},
+    {WallID::Safe::snowBrick, TileID::snowBrick},
+    {WallID::Safe::stone, TileID::stone},
+    {WallID::Safe::stoneSlab, TileID::stone},
+    {WallID::Safe::tinBrick, TileID::tinBrick},
+    {WallID::Safe::wood, TileID::wood},
+    {WallID::Safe::wornStone, TileID::stone},
+    {WallID::Unsafe::amethystStone, TileID::amethystStone},
+    {WallID::Unsafe::blueBrick, TileID::blueBrick},
+    {WallID::Unsafe::blueMossy, TileID::stone},
+    {WallID::Unsafe::blueSlab, TileID::blueBrick},
+    {WallID::Unsafe::blueTiled, TileID::blueBrick},
+    {WallID::Unsafe::brownMossy, TileID::stone},
+    {WallID::Unsafe::caveDirt, TileID::dirt},
+    {WallID::Unsafe::cinder, TileID::offlineRubyGemspark},
+    {WallID::Unsafe::corruptGrass, TileID::ebonstoneBrick},
+    {WallID::Unsafe::corruptGrowth, TileID::ebonstoneBrick},
+    {WallID::Unsafe::corruptMass, TileID::ebonstoneBrick},
+    {WallID::Unsafe::corruptPustule, TileID::ebonstoneBrick},
+    {WallID::Unsafe::corruptTendril, TileID::ebonstoneBrick},
+    {WallID::Unsafe::crackedDirt, TileID::dirt},
+    {WallID::Unsafe::craggyStone, TileID::stone},
+    {WallID::Unsafe::crimsandstone, TileID::crimstoneBrick},
+    {WallID::Unsafe::crimsonBlister, TileID::crimstoneBrick},
+    {WallID::Unsafe::crimsonCrust, TileID::crimstoneBrick},
+    {WallID::Unsafe::crimsonGrass, TileID::crimstoneBrick},
+    {WallID::Unsafe::crimsonScab, TileID::crimstoneBrick},
+    {WallID::Unsafe::crimsonTeeth, TileID::crimstoneBrick},
+    {WallID::Unsafe::crimstone, TileID::crimstoneBrick},
+    {WallID::Unsafe::crumblingDirt, TileID::dirt},
+    {WallID::Unsafe::diamondStone, TileID::diamondStone},
+    {WallID::Unsafe::dirt, TileID::dirt},
+    {WallID::Unsafe::ebonsandstone, TileID::ebonstoneBrick},
+    {WallID::Unsafe::ebonstone, TileID::ebonstoneBrick},
+    {WallID::Unsafe::ember, TileID::offlineRubyGemspark},
+    {WallID::Unsafe::emeraldStone, TileID::emeraldStone},
+    {WallID::Unsafe::flower, TileID::leaf},
+    {WallID::Unsafe::fracturedStone, TileID::stone},
+    {WallID::Unsafe::granite, TileID::granite},
+    {WallID::Unsafe::grass, TileID::leaf},
+    {WallID::Unsafe::greenBrick, TileID::greenBrick},
+    {WallID::Unsafe::greenMossy, TileID::stone},
+    {WallID::Unsafe::greenSlab, TileID::greenBrick},
+    {WallID::Unsafe::greenTiled, TileID::greenBrick},
+    {WallID::Unsafe::hardenedCrimsand, TileID::crimstoneBrick},
+    {WallID::Unsafe::hardenedEbonsand, TileID::ebonstoneBrick},
+    {WallID::Unsafe::hardenedSand, TileID::hardenedSand},
+    {WallID::Unsafe::hellstoneBrick, TileID::hellstoneBrick},
+    {WallID::Unsafe::hive, TileID::honey},
+    {WallID::Unsafe::ice, TileID::ice},
+    {WallID::Unsafe::ivyStone, TileID::mud},
+    {WallID::Unsafe::jungle, TileID::mud},
+    {WallID::Unsafe::jungleVine, TileID::mud},
+    {WallID::Unsafe::layeredDirt, TileID::dirt},
+    {WallID::Unsafe::leafyJungle, TileID::mud},
+    {WallID::Unsafe::lichenStone, TileID::mud},
+    {WallID::Unsafe::lihzahrdBrick, TileID::lihzahrdBrick},
+    {WallID::Unsafe::livingWood, TileID::wood},
+    {WallID::Unsafe::magma, TileID::offlineRubyGemspark},
+    {WallID::Unsafe::marble, TileID::marble},
+    {WallID::Unsafe::mottledStone, TileID::stone},
+    {WallID::Unsafe::mud, TileID::mud},
+    {WallID::Unsafe::mushroom, TileID::slime},
+    {WallID::Unsafe::obsidianBrick, TileID::obsidianBrick},
+    {WallID::Unsafe::oldStone, TileID::stone},
+    {WallID::Unsafe::pinkBrick, TileID::pinkBrick},
+    {WallID::Unsafe::pinkSlab, TileID::pinkBrick},
+    {WallID::Unsafe::pinkTiled, TileID::pinkBrick},
+    {WallID::Unsafe::purpleMossy, TileID::stone},
+    {WallID::Unsafe::redMossy, TileID::stone},
+    {WallID::Unsafe::rockyDirt, TileID::dirt},
+    {WallID::Unsafe::roughDirt, TileID::dirt},
+    {WallID::Unsafe::rubyStone, TileID::rubyStone},
+    {WallID::Unsafe::sandstone, TileID::sandstone},
+    {WallID::Unsafe::sapphireStone, TileID::sapphireStone},
+    {WallID::Unsafe::smoulderingStone, TileID::offlineRubyGemspark},
+    {WallID::Unsafe::snow, TileID::snow},
+    {WallID::Unsafe::stalactiteStone, TileID::stone},
+    {WallID::Unsafe::topazStone, TileID::topazStone},
+    {WallID::Unsafe::wavyDirt, TileID::dirt},
+    {WallID::Unsafe::wornStone, TileID::stone},
+};
+
+int getRepColorTile(int x, int y, World &world)
+{
+    Tile &tile = world.getTile(x, y);
+    if (!tile.echoCoatBlock) {
+        auto itr = tileToRepTile.find(tile.blockID);
+        if (itr != tileToRepTile.end()) {
+            return itr->second;
+        }
+    }
+    switch (tile.liquid) {
+    case Liquid::none:
+        break;
+    case Liquid::water:
+        return TileID::offlineSapphireGemspark;
+    case Liquid::lava:
+        return TileID::rubyGemspark;
+    case Liquid::honey:
+        return TileID::honey;
+    case Liquid::shimmer:
+        return TileID::amethystGemspark;
+    }
+    if (!tile.echoCoatWall) {
+        auto itr = wallToRepTile.find(tile.wallID);
+        if (itr != wallToRepTile.end()) {
+            return itr->second;
+        }
+    }
+    return y < world.getUndergroundLevel()  ? TileID::sapphireGemspark
+           : y < world.getCavernLevel()     ? TileID::dirt
+           : y < world.getUnderworldLevel() ? TileID::stone
+                                            : TileID::offlineRubyGemspark;
+}
+
+int getSectorColor(int i, int j, int scale, World &world)
+{
+    int minX = i * scale;
+    int maxX = std::min(minX + scale, world.getWidth());
+    int minY = j * scale;
+    int maxY = std::min(minY + scale, world.getHeight());
+    std::map<int, int> colorFreqs;
+    for (int x = minX; x < maxX; ++x) {
+        for (int y = minY; y < maxY; ++y) {
+            colorFreqs[getRepColorTile(x, y, world)] += 1;
+        }
+    }
+    int threshold = 0.08 * scale * scale;
+    for (int prioTile :
+         {TileID::amethystGemspark,
+          TileID::cloud,
+          TileID::livingMahogany,
+          TileID::borealWood,
+          TileID::sandstoneBrick,
+          TileID::honey,
+          TileID::slime,
+          TileID::blueBrick,
+          TileID::greenBrick,
+          TileID::pinkBrick,
+          TileID::lihzahrdBrick}) {
+        if (colorFreqs[prioTile] > threshold) {
+            return prioTile;
+        }
+    }
+    return std::max_element(
+               colorFreqs.begin(),
+               colorFreqs.end(),
+               [](auto a, auto b) { return a.second < b.second; })
+        ->first;
+}

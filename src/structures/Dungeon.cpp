@@ -1,11 +1,13 @@
 #include "structures/Dungeon.h"
 
 #include "Random.h"
+#include "Util.h"
 #include "World.h"
 #include "ids/ItemID.h"
 #include "ids/Paint.h"
 #include "ids/Prefix.h"
 #include "ids/WallID.h"
+#include "map/DiegeticColor.h"
 #include "structures/LootRules.h"
 #include "structures/Platforms.h"
 #include "structures/StructureUtil.h"
@@ -163,6 +165,61 @@ private:
                 (to.second - from.second) / (2.0 * hallSize + deltaX),
                 filled);
         }
+    }
+
+    void makeMapRoom(std::vector<Point> &zones)
+    {
+        int minX = world.getWidth();
+        int maxX = 0;
+        int maxY = 0;
+        for (auto [x, y] : zones) {
+            minX = std::min(minX, x);
+            maxX = std::max(maxX, x);
+            maxY = std::max(maxY, y);
+        }
+        int padded = roomSize + 2 * wallThickness;
+        minX += padded / 2;
+        maxX -= padded / 2;
+        maxY += padded / 2;
+        int x =
+            minX + roomSize * static_cast<int>(0.2 * (maxX - minX) / roomSize);
+        int y = maxY + roomSize;
+        drawRect({x, y}, {x + padded, y + padded}, 0, 0, false);
+        zones.emplace_back(x + padded / 2, y + padded / 2);
+        int scale = 80;
+        int mapWidth = world.getWidth() / scale;
+        int mapHeight = world.getHeight() / scale;
+        x += 2 * roomSize;
+        drawRect(
+            {x, y},
+            {x + mapWidth + 2 * wallThickness,
+             y + mapHeight + 2 * wallThickness},
+            0,
+            0,
+            false);
+        makeHallway(
+            {x - 2 * roomSize + padded / 2, y + padded / 2},
+            {x + padded / 2, y + padded / 2});
+        x += wallThickness;
+        y += wallThickness;
+        for (int i = 0; i < mapWidth; ++i) {
+            for (int j = 0; j < mapHeight; ++j) {
+                world.getTile(x + i, y + j).blockID = theme.brick;
+            }
+        }
+        world.queuedDeco.emplace_back(
+            [x, y, mapWidth, mapHeight, scale](Random &, World &world) {
+                parallelFor(
+                    std::views::iota(0, mapWidth),
+                    [x, y, mapHeight, scale, &world](int i) {
+                        for (int j = 0; j < mapHeight; ++j) {
+                            Tile &tile = world.getTile(x + i, y + j);
+                            tile.blockID = getSectorColor(i, j, scale, world);
+                            tile.actuated = true;
+                            tile.illuminantBlock = true;
+                        }
+                    });
+            });
     }
 
     bool isValidPlacementLocation(
@@ -1033,6 +1090,7 @@ public:
                 }
             }
         }
+        makeMapRoom(zones);
         std::set<Point> connectedZones;
         std::set<Point> allZones{zones.begin(), zones.end()};
         for (auto [x, y] : zones) {
