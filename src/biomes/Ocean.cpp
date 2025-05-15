@@ -98,7 +98,8 @@ void addOceanCave(int waterTable, Random &rnd, World &world)
                                                         : TileID::sand;
             }
             if (std::abs(rnd.getBlurNoise(2 * x, 2 * y)) < 0.18 &&
-                rnd.getFineNoise(x, y) > std::max(threshold, -0.12)) {
+                (rnd.getFineNoise(x, y) > std::max(threshold, -0.14) ||
+                 rnd.getFineNoise(x, y) < -0.5)) {
                 tile.blockID = TileID::empty;
                 tile.wallID = WallID::empty;
                 tile.liquid = Liquid::water;
