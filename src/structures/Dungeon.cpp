@@ -1007,6 +1007,15 @@ private:
                 tile.wallID = theme.brickWall;
             }
         }
+        for (int i = 1; i < entry.getWidth() - 1; ++i) {
+            for (int j = 0; j < entry.getHeight(); ++j) {
+                Tile &tile = world.getTile(x + i, y + j);
+                if (tile.blockID == TileID::dirt &&
+                    world.isExposed(x + i, y + j)) {
+                    tile.blockID = TileID::grass;
+                }
+            }
+        }
         int delta = isOnLeft ? 1 : -1;
         x += isOnLeft ? entry.getWidth() : -1;
         y += entry.getHeight() - 1;

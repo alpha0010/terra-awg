@@ -422,6 +422,7 @@ void genRuins(Random &rnd, World &world)
                            (tile.wallID == WallID::Unsafe::obsidianBrick ||
                             tile.wallID == WallID::Unsafe::hellstoneBrick);
                 }) ||
+            world.getTile(x, y - 2).actuated ||
             isLocationUsed(x, y, 30, usedLocations)) {
             continue;
         }

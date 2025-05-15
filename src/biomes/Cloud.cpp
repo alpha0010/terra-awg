@@ -157,6 +157,10 @@ void addCloudStructure(
                             world.registerStorage(x + i, y + j),
                             rnd,
                             world);
+                    } else if (
+                        tile.blockID == TileID::dresser &&
+                        tile.frameX % 54 == 0 && tile.frameY == 0) {
+                        fillDresser(world.registerStorage(x + i, y + j), rnd);
                     }
                 }
             }
