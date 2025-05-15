@@ -6,7 +6,7 @@
 #include <map>
 
 inline const std::map<int, int> tileToRepTile{
-    {TileID::aetherium, TileID::amethystGemspark},
+    {TileID::aetherium, TileID::offlineAmethystGemspark},
     {TileID::amberTree, TileID::stone},
     {TileID::amethystStone, TileID::amethystStone},
     {TileID::amethystTree, TileID::stone},
@@ -75,7 +75,7 @@ inline const std::map<int, int> tileToRepTile{
     {TileID::hardenedCrimsand, TileID::crimstoneBrick},
     {TileID::hardenedEbonsand, TileID::ebonstoneBrick},
     {TileID::hardenedSand, TileID::hardenedSand},
-    {TileID::heliumMossStone, TileID::amethystGemspark},
+    {TileID::heliumMossStone, TileID::offlineAmethystGemspark},
     {TileID::hellstone, TileID::hellstone},
     {TileID::hellstoneBrick, TileID::hellstoneBrick},
     {TileID::hive, TileID::honey},
@@ -280,13 +280,13 @@ int getRepColorTile(int x, int y, World &world)
     case Liquid::none:
         break;
     case Liquid::water:
-        return TileID::offlineSapphireGemspark;
+        return TileID::waterfall;
     case Liquid::lava:
-        return TileID::rubyGemspark;
+        return TileID::offlineRubyGemspark;
     case Liquid::honey:
         return TileID::honey;
     case Liquid::shimmer:
-        return TileID::amethystGemspark;
+        return TileID::offlineAmethystGemspark;
     }
     if (!tile.echoCoatWall) {
         auto itr = wallToRepTile.find(tile.wallID);
@@ -294,7 +294,7 @@ int getRepColorTile(int x, int y, World &world)
             return itr->second;
         }
     }
-    return y < world.getUndergroundLevel()  ? TileID::sapphireGemspark
+    return y < world.getUndergroundLevel()  ? TileID::offlineSapphireGemspark
            : y < world.getCavernLevel()     ? TileID::dirt
            : y < world.getUnderworldLevel() ? TileID::stone
                                             : TileID::offlineRubyGemspark;
@@ -314,7 +314,7 @@ int getSectorColor(int i, int j, int scale, World &world)
     }
     int threshold = 0.08 * scale * scale;
     for (int prioTile :
-         {TileID::amethystGemspark,
+         {TileID::offlineAmethystGemspark,
           TileID::cloud,
           TileID::livingMahogany,
           TileID::borealWood,

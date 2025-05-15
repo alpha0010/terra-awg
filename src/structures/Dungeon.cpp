@@ -216,7 +216,6 @@ private:
                             Tile &tile = world.getTile(x + i, y + j);
                             tile.blockID = getSectorColor(i, j, scale, world);
                             tile.actuated = true;
-                            tile.illuminantBlock = true;
                         }
                     });
             });
