@@ -314,7 +314,7 @@ int getSectorColor(int i, int j, int scale, World &world)
     }
     int total = (maxX - minX) * (maxY - minY);
     for (auto [prioTile, threshold] :
-         {std::pair{TileID::offlineAmethystGemspark, 0.08},
+         {std::pair{TileID::offlineAmethystGemspark, 0.07},
           {TileID::meteorite, 0.017},
           {TileID::cloud, 0.08},
           {TileID::spiderNest, 0.04},
