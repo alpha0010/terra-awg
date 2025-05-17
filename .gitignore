@@ -1,4 +1,4 @@
 build/
-*.png
+/*.png
 *.wld
 terra-awg.ini
