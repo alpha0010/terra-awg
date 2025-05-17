@@ -69,6 +69,7 @@ enum {
     hellforge = 77,
     bed = 79,
     cactusPlant = 80,
+    coral = 81,
     herb = 83,
     piano = 87,
     dresser = 88,

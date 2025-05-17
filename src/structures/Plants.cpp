@@ -661,11 +661,21 @@ void growGrass(int x, int y, Random &rnd, World &world)
 {
     Tile &baseTile = world.getTile(x, y);
     Tile &probeTile = world.getTile(x, y - 1);
-    if (baseTile.slope != Slope::none || probeTile.blockID != TileID::empty ||
-        probeTile.liquid != Liquid::none) {
+    if (baseTile.slope != Slope::none || probeTile.blockID != TileID::empty) {
         return;
     }
     int randInt = 99999 * (1 + rnd.getFineNoise(x, y));
+    if (probeTile.liquid == Liquid::water &&
+        (baseTile.blockID == TileID::sand ||
+         baseTile.blockID == TileID::coralstone) &&
+        (x < 200 || x > world.getWidth() - 200) && randInt % 7 == 0) {
+        probeTile.blockID = TileID::coral;
+        probeTile.frameX = 26 * (fnv1a32pt(x, y) % 6);
+        return;
+    }
+    if (probeTile.liquid != Liquid::none) {
+        return;
+    }
     if (randInt % 61 == 0) {
         probeTile.blockID = TileID::herb;
         switch (baseTile.blockID) {

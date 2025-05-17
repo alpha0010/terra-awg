@@ -893,6 +893,8 @@ void fillUndergroundWaterChest(Chest &chest, Random &rnd, World &world)
               rnd.getInt(1, 2)}},
             {nearEdge ? 0.5 : 0,
              {ItemID::coralTorch, Prefix::none, rnd.getInt(10, 20)}},
+            {nearEdge ? 0.5 : 0,
+             {ItemID::coral, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
             {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(50, 89)}},
         });
@@ -1518,10 +1520,7 @@ void fillSkywareChest(Chest &chest, Random &rnd, World &world)
                 ItemID::swiftnessPotion}),
            Prefix::none,
            rnd.getInt(1, 2)}},
-         {0.5,
-          {rnd.select({ItemID::torch, ItemID::bottle}),
-           Prefix::none,
-           rnd.getInt(10, 20)}},
+         {0.5, {ItemID::fairyGlowstick, Prefix::none, rnd.getInt(10, 20)}},
          {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}}});
 }
 
