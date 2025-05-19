@@ -67,6 +67,15 @@ bool placeIgloo(Point pt, TileBuffer &igloo, Random &rnd, World &world)
             y += offset;
             std::vector<std::tuple<int, int, int>> wallMerges;
             for (int i = 0; i < igloo.getWidth(); ++i) {
+                int maxClearY = std::lerp(
+                                    world.getSurfaceLevel(x),
+                                    world.getSurfaceLevel(x + igloo.getWidth()),
+                                    static_cast<double>(i) / igloo.getWidth()) -
+                                1;
+                for (int cY = world.getSurfaceLevel(x + i) - 1; cY < maxClearY;
+                     ++cY) {
+                    world.getTile(x + i, cY) = {};
+                }
                 for (int j = 0; j < igloo.getHeight(); ++j) {
                     Tile &iglooTile = igloo.getTile(i, j);
                     if (iglooTile.blockID == TileID::cloud) {
