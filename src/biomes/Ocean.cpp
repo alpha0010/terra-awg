@@ -77,6 +77,8 @@ void addOceanCave(int waterTable, Random &rnd, World &world)
             ? centerOpt1
             : rnd.select({centerOpt1, centerOpt2});
     int maxY = (5 * world.getCavernLevel() + world.getUnderworldLevel()) / 6;
+    int shuffleX = rnd.getInt(0, world.getWidth());
+    int shuffleY = rnd.getInt(0, world.getHeight());
     std::vector<Point> locations;
     for (int x = centerX - 100; x < centerX + 100; ++x) {
         for (int y = waterTable + 20; y < maxY; ++y) {
@@ -99,7 +101,9 @@ void addOceanCave(int waterTable, Random &rnd, World &world)
             }
             if (std::abs(rnd.getBlurNoise(2 * x, 2 * y)) < 0.18 &&
                 (rnd.getFineNoise(x, y) > std::max(threshold, -0.14) ||
-                 rnd.getFineNoise(x, y) < -0.5)) {
+                 rnd.getFineNoise(x, y) < -0.5 ||
+                 rnd.getFineNoise(x + shuffleX, y + shuffleY) <
+                     std::min(-threshold - 0.5, -0.4))) {
                 tile.blockID = TileID::empty;
                 tile.wallID = WallID::empty;
                 tile.liquid = Liquid::water;
