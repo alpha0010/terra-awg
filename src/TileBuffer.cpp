@@ -73,3 +73,10 @@ Tile &TileBuffer::getTile(int x, int y)
 {
     return tiles[y + x * height];
 }
+
+void TileBuffer::resize(int w, int h)
+{
+    width = w;
+    height = h;
+    tiles.resize(w * h);
+}

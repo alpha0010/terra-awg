@@ -21,6 +21,11 @@ public:
 
     Tile &getTile(int x, int y);
 
+    /**
+     * Existing tiles are invalidated if height changes.
+     */
+    void resize(int w, int h);
+
     int getWidth() const
     {
         return width;

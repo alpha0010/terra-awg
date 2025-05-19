@@ -8,6 +8,7 @@
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/Traps.h"
+#include "structures/UndergroundCabin.h"
 #include "structures/data/JungleShrines.h"
 #include <algorithm>
 #include <iostream>
@@ -822,6 +823,9 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
             type = Variant::deadMans;
         }
         usedLocations.emplace_back(x, y);
+        if (type == Variant::gold) {
+            maybePlaceCabinForChest(x, y, rnd, world);
+        }
         placeChest(x, y, type, origType, rnd, world);
         --chestCount;
     }
