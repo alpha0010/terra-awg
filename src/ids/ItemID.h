@@ -237,6 +237,7 @@ enum {
     sliceOfHellCake = 4551,
     desertTigerStaff = 4607,
     ornateShadowKey = 4737,
+    shroomerang = 4764,
     fairyGlowstick = 4776,
     mushroomHat = 4779,
     mushroomVest = 4780,

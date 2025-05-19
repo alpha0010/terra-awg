@@ -83,6 +83,17 @@ Item getUndergroundPrimaryLoot(Random &rnd)
     });
 }
 
+Item getMushroomPrimaryLoot(Random &rnd)
+{
+    return rnd.pool<Item>({
+        {ItemID::bandOfRegeneration, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::magicMirror, Prefix::none, 1},
+        {ItemID::cloudInABottle, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::hermesBoots, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::shroomerang, rnd.select(PrefixSet::universal), 1},
+    });
+}
+
 Item getWaterPrimaryLoot(Random &rnd)
 {
     return rnd.pool<Item>({
@@ -695,7 +706,7 @@ void fillUndergroundMushroomChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1, getUndergroundPrimaryLoot(rnd)},
+            {1, getMushroomPrimaryLoot(rnd)},
             {1,
              {rnd.pool({ItemID::shroomMinecart, ItemID::mushroomHat}),
               Prefix::none,
@@ -1195,17 +1206,7 @@ void fillCavernMushroomChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1,
-             rnd.pool<Item>({
-                 {ItemID::bandOfRegeneration,
-                  rnd.select(PrefixSet::accessory),
-                  1},
-                 {ItemID::magicMirror, Prefix::none, 1},
-                 {ItemID::cloudInABottle, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::hermesBoots, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::shoeSpikes, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::flareGun, Prefix::none, 1},
-             })},
+            {1, getMushroomPrimaryLoot(rnd)},
             {1,
              {rnd.pool({ItemID::shroomMinecart, ItemID::mushroomHat}),
               Prefix::none,

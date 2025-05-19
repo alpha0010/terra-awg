@@ -1,4 +1,4 @@
-#include "structures/Pyramid.h"
+#include "structures/MushroomCabin.h"
 
 #include "Random.h"
 #include "World.h"
