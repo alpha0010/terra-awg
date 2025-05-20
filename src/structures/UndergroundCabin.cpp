@@ -2,8 +2,10 @@
 
 #include "Random.h"
 #include "World.h"
+#include "ids/WallID.h"
 #include "structures/StructureUtil.h"
 #include "structures/data/DynCabin.h"
+#include <algorithm>
 #include <set>
 
 inline const std::set<int> cabinClearTiles{
@@ -39,6 +41,45 @@ void applySupportBeam(int x, int y, World &world)
     }
 }
 
+void addCabinPainting(std::vector<Point> &locations, Random &rnd, World &world)
+{
+    Painting painting = rnd.pool(
+        {Painting::americanExplosive,
+         Painting::secrets,
+         Painting::strangeDeadFellows,
+         Painting::sufficientlyAdvanced,
+         Painting::bifrost,
+         Painting::bioluminescence,
+         Painting::findingGold,
+         Painting::forestTroll,
+         Painting::aHorribleNightForAlchemy,
+         Painting::catSword,
+         Painting::crownoDevoursHisLunch,
+         Painting::fairyGuides,
+         Painting::fatherOfSomeone,
+         Painting::guidePicasso,
+         Painting::nurseLisa,
+         Painting::outcast,
+         Painting::rareEnchantment,
+         Painting::terrarianGothic});
+    auto [pWidth, pHeight] = world.getPaintingDims(painting);
+    for (auto [x, y] : locations) {
+        if (!world.regionPasses(
+                x - 1,
+                y,
+                pWidth + 2,
+                pHeight + 1,
+                [](Tile &tile) {
+                    return tile.blockID == TileID::empty &&
+                           tile.wallID != WallID::empty;
+                })) {
+            continue;
+        }
+        world.placePainting(x, y, painting);
+        break;
+    }
+}
+
 void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
 {
     if (rnd.getDouble(0, 1) > 0.4) {
@@ -62,19 +103,27 @@ void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
             })) {
         return;
     }
+    std::vector<Point> locations;
     for (int i = 0; i < cabin.getWidth(); ++i) {
         int doorAt = -1;
         for (int j = 0; j < cabin.getHeight(); ++j) {
+            Tile &tile = world.getTile(x + i, y + j);
             if (std::abs(rnd.getFineNoise(x + 3 * i, y + 3 * j)) > 0.34) {
+                if (tile.blockID == TileID::empty &&
+                    fnv1a32pt(x + i, y + j) % 4 != 0) {
+                    tile = {};
+                } else {
+                    tile.liquid = Liquid::none;
+                }
                 continue;
             }
-            Tile &tile = world.getTile(x + i, y + j);
             Tile &cabinTile = cabin.getTile(i, j);
             if (cabinTile.blockID == TileID::door) {
                 doorAt = j - (cabinTile.frameY % 54) / 18;
             } else {
                 tile = cabinTile;
                 tile.guarded = true;
+                locations.emplace_back(x + i, y + j);
             }
         }
         if (doorAt != -1) {
@@ -96,4 +145,6 @@ void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
             world.getTile(chestX + i, chestY + j).blockID = TileID::chest;
         }
     }
+    std::shuffle(locations.begin(), locations.end(), rnd.getPRNG());
+    addCabinPainting(locations, rnd, world);
 }
