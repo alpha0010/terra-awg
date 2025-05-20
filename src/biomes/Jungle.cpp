@@ -238,8 +238,11 @@ void genJungle(Random &rnd, World &world)
                                     world.getHeight() - world.getCavernLevel(),
                                     2) +
                             0.75;
-                if (y > world.getCavernLevel() &&
-                    rnd.getCoarseNoise(2 * x, 2 * y) > threshold) {
+                if ((y > world.getCavernLevel() &&
+                     rnd.getCoarseNoise(2 * x, 2 * y) > threshold) ||
+                    (y > world.getUndergroundLevel() &&
+                     y < world.getUnderworldLevel() &&
+                     rnd.getFineNoise(2 * x, 2 * y) > 0.78)) {
                     tile.blockID = TileID::empty;
                     if (lastTileID == TileID::mud) {
                         Tile &prevTile = world.getTile(x, y - 1);
