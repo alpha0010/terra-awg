@@ -129,6 +129,7 @@ void growSandPlant(int x, int y, Random &rnd, World &world)
     for (int i = -10; i < 10; ++i) {
         for (int j = -8; j < 8; ++j) {
             switch (world.getTile(x + i, y + j).blockID) {
+            case TileID::grass:
             case TileID::cactusPlant:
                 return;
             case TileID::sand:
@@ -211,6 +212,11 @@ void growTree(
     int height = rnd.getInt(7, 15);
     if (!isRegionEmpty(x, y - 4 - height, 3, height + 4, world)) {
         return;
+    }
+    if (y < world.getUndergroundLevel()) {
+        for (int i = 0; i < 3; ++i) {
+            world.getTile(x + i, y).wallID = WallID::empty;
+        }
     }
     for (int j = 0; j < height; ++j) {
         TileBuffer tree =
