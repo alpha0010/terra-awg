@@ -540,6 +540,7 @@ bool addChestLavaTrap(int x, int y, Random &rnd, World &world)
         TileID::leadOre,
         TileID::tungstenOre,
         TileID::platinumOre};
+    int numEmpty = 0;
     if (!world.regionPasses(
             pos.first - 10,
             pos.second - 10,
@@ -555,8 +556,11 @@ bool addChestLavaTrap(int x, int y, Random &rnd, World &world)
             pos.second - 18,
             18,
             14,
-            [&oreTiles](Tile &tile) {
-                return !tile.guarded && tile.blockID != TileID::empty &&
+            [&numEmpty, &oreTiles](Tile &tile) {
+                if (tile.blockID == TileID::empty) {
+                    ++numEmpty;
+                }
+                return !tile.guarded && numEmpty < 12 &&
                        (trappableTiles.contains(tile.blockID) ||
                         oreTiles.contains(tile.blockID));
             })) {
