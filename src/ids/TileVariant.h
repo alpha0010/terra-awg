@@ -6,6 +6,7 @@ enum class Variant {
     ankh,
     ash,
     ashWood,
+    barrel,
     bone,
     corruption,
     crimson,

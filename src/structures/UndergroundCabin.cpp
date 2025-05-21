@@ -3,6 +3,7 @@
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
+#include "structures/LootRules.h"
 #include "structures/Statues.h"
 #include "structures/StructureUtil.h"
 #include "structures/data/DynCabin.h"
@@ -140,6 +141,47 @@ void addCabinDebris(std::vector<Point> &locations, World &world)
     }
 }
 
+void addCabinBarrel(std::vector<Point> &locations, Random &rnd, World &world)
+{
+    for (auto [x, y] : locations) {
+        if (!world.regionPasses(
+                x,
+                y,
+                2,
+                2,
+                [](Tile &tile) { return tile.blockID == TileID::empty; }) ||
+            !world.regionPasses(x, y + 2, 2, 1, [](Tile &tile) {
+                return tile.guarded && isSolidBlock(tile.blockID);
+            })) {
+            continue;
+        }
+        fillBarrel(world.placeChest(x, y, Variant::barrel), rnd);
+        break;
+    }
+}
+
+void addCabinStation(std::vector<Point> &locations, Random &rnd, World &world)
+{
+    for (auto [x, y] : locations) {
+        if (!world.regionPasses(
+                x,
+                y,
+                3,
+                2,
+                [](Tile &tile) { return tile.blockID == TileID::empty; }) ||
+            !world.regionPasses(x, y + 2, 3, 1, [](Tile &tile) {
+                return tile.guarded && isSolidBlock(tile.blockID);
+            })) {
+            continue;
+        }
+        world.placeFramedTile(
+            x,
+            y,
+            rnd.select({TileID::loom, TileID::sharpeningStation}));
+        break;
+    }
+}
+
 void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
 {
     if (rnd.getDouble(0, 1) > 0.4) {
@@ -213,4 +255,18 @@ void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
     addCabinStatue(locations, rnd.select(StatueVariants::deco), world);
     addCabinStatue(locations, rnd.select(StatueVariants::enemy), world);
     addCabinDebris(locations, world);
+    switch (rnd.getInt(0, 5)) {
+    case 0:
+        addCabinStation(locations, rnd, world);
+        [[fallthrough]];
+    case 1:
+        addCabinBarrel(locations, rnd, world);
+        break;
+    case 2:
+        addCabinBarrel(locations, rnd, world);
+        [[fallthrough]];
+    case 3:
+        addCabinStation(locations, rnd, world);
+        break;
+    }
 }
