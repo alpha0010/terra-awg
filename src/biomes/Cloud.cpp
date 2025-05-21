@@ -10,11 +10,23 @@
 #include <algorithm>
 #include <iostream>
 
+Point getEmbeddedPos(int x, int y, int deltaX, World &world)
+{
+    x += deltaX;
+    for (int dist = 0; dist < 3; ++dist, x += deltaX) {
+        if (!world.isExposed(x, y)) {
+            return {x, y};
+        }
+    }
+    return {-1, -1};
+}
+
 void makeFishingCloud(
     int startX,
     int startY,
     int width,
     int height,
+    Random &rnd,
     World &world)
 {
     int minX = startX + 0.2 * width;
@@ -39,6 +51,43 @@ void makeFishingCloud(
                 --depth;
             }
             ++y;
+        }
+    }
+    std::vector<std::tuple<int, int, int>> waterSources;
+    for (int y = startY; y < startY + height; ++y) {
+        int state = 0;
+        for (int x = startX; x < startX + width; ++x) {
+            Tile &tile = world.getTile(x, y);
+            int nextState = tile.blockID != TileID::empty ? -1
+                            : tile.liquid != Liquid::none ? 0
+                                                          : 1;
+            if (state != 0 && nextState != 0 && state != nextState) {
+                auto [sourceX, sourceY] = getEmbeddedPos(x, y, state, world);
+                if (sourceX != -1) {
+                    waterSources.emplace_back(sourceX, sourceY, nextState);
+                }
+            }
+            state = nextState;
+        }
+    }
+    std::shuffle(waterSources.begin(), waterSources.end(), rnd.getPRNG());
+    std::vector<Point> usedLocations;
+    for (auto [x, y, deltaX] : waterSources) {
+        if (isLocationUsed(x, y, 14, usedLocations)) {
+            continue;
+        }
+        usedLocations.emplace_back(x, y);
+        Tile &sourceTile = world.getTile(x, y);
+        sourceTile.blockID = TileID::empty;
+        sourceTile.liquid = Liquid::water;
+        for (int i = deltaX;; i += deltaX) {
+            Tile &tile = world.getTile(x + i, y);
+            if (tile.blockID == TileID::empty) {
+                break;
+            }
+            tile.wallID = WallID::empty;
+            tile.slope = Slope::half;
+            tile.guarded = true;
         }
     }
 }
@@ -205,7 +254,7 @@ void genCloud(Random &rnd, World &world)
         }
         switch (numClouds % 3) {
         case 1:
-            makeFishingCloud(x, y, width, height, world);
+            makeFishingCloud(x, y, width, height, rnd, world);
             break;
         case 2:
             makeResourceCloud(x, y, width, height, rnd, world);
