@@ -137,6 +137,7 @@ void applyGravity(int x, int y, int width, int height, World &world)
         TileID::crimsand};
     for (int i = 0; i < width; ++i) {
         int lastGap = -1;
+        std::set<int> fallenTiles;
         for (int j = height; j > -1; --j) {
             Tile &tile = world.getTile(x + i, y + j);
             if (tile.blockID == TileID::empty) {
@@ -147,10 +148,21 @@ void applyGravity(int x, int y, int width, int height, World &world)
                 if (lastGap != -1) {
                     world.getTile(x + i, y + lastGap).blockID = tile.blockID;
                     tile.blockID = TileID::empty;
+                    fallenTiles.insert(j);
                     --lastGap;
                 }
             } else {
                 lastGap = -1;
+            }
+        }
+        int cloneWall = world.getTile(x + i, y).wallID;
+        for (int j = 0; j < height; ++j) {
+            Tile &tile = world.getTile(x + i, y + j);
+            if (tile.blockID != TileID::empty) {
+                break;
+            }
+            if (fallenTiles.contains(j)) {
+                tile.wallID = cloneWall;
             }
         }
     }
