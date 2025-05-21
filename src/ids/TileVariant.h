@@ -23,6 +23,7 @@ enum class Variant {
     flesh,
     forest,
     frozen,
+    furniture,
     gold,
     goldLocked,
     granite,

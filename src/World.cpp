@@ -181,6 +181,7 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::lamp, Variant::lihzahrd}, {1, 3, 0, 432}},
     {{TileID::lamp, Variant::sandstone}, {1, 3, 0, 2052}},
     {{TileID::largePile, Variant::bone}, {3, 2, 0, 0}},
+    {{TileID::largePile, Variant::furniture}, {3, 2, 1188, 0}},
     {{TileID::largePile, Variant::ice}, {3, 2, 1404, 0}},
     {{TileID::largePile, Variant::mushroom}, {3, 2, 1728, 0}},
     {{TileID::largePile, Variant::stone}, {3, 2, 378, 0}},
@@ -214,6 +215,7 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::smallPile, Variant::bone}, {2, 1, 216, 0}},
     {{TileID::smallPile, Variant::dirt}, {1, 1, 108, 0}},
     {{TileID::smallPile, Variant::forest}, {2, 1, 1368, 18}},
+    {{TileID::smallPile, Variant::furniture}, {2, 1, 1116, 18}},
     {{TileID::smallPile, Variant::gold}, {2, 1, 648, 18}},
     {{TileID::smallPile, Variant::granite}, {2, 1, 0, 0}},
     {{TileID::smallPile, Variant::ice}, {2, 1, 0, 0}},
@@ -301,6 +303,7 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
             offsetX += 18 * (coordHash % 6);
             break;
         case Variant::forest:
+        case Variant::furniture:
         case Variant::livingWood:
             offsetX += 36 * (coordHash % 3);
             break;
@@ -386,6 +389,9 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
         case Variant::sandstone:
         case Variant::stone:
             offsetX += 54 * (coordHash % 6);
+            break;
+        case Variant::furniture:
+            offsetX += 54 * (coordHash % 4);
             break;
         case Variant::livingLeaf:
             offsetX += 54 * (coordHash % 2);

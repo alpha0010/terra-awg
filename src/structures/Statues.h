@@ -40,12 +40,39 @@ enum {
     heart = 1332'000,
     star = 72'000,
     mushroom = 1224'000,
+    anvil = 1152'000,
+    axe = 1044'000,
+    boomerang = 900'000,
+    boot = 936'000,
+    bow = 864'000,
+    cross = 792'000,
+    gargoyle = 504'000,
+    gloom = 540'000,
+    hammer = 684'000,
+    pickaxe = 1188'000,
+    pillar = 1296'000,
+    pot = 1368'000,
+    potion = 720'000,
+    reaper = 396'000,
+    shield = 216'000,
+    spear = 756'000,
+    sunflower = 1404'000,
+    sword = 108'000,
+    tree = 1116'000,
+    woman = 432'000,
 };
 
 }
 
 namespace StatueVariants
 {
+
+inline std::array const deco = {
+    Statue::anvil,     Statue::axe,     Statue::boomerang, Statue::boot,
+    Statue::bow,       Statue::cross,   Statue::gargoyle,  Statue::gloom,
+    Statue::hammer,    Statue::pickaxe, Statue::pillar,    Statue::pot,
+    Statue::potion,    Statue::reaper,  Statue::shield,    Statue::spear,
+    Statue::sunflower, Statue::sword,   Statue::tree,      Statue::woman};
 
 inline std::array const enemy = {
     Statue::armedZombie,  Statue::bat,          Statue::bloodZombie,

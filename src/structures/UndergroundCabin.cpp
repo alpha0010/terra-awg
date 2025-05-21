@@ -3,6 +3,7 @@
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
+#include "structures/Statues.h"
 #include "structures/StructureUtil.h"
 #include "structures/data/DynCabin.h"
 #include <algorithm>
@@ -80,6 +81,59 @@ void addCabinPainting(std::vector<Point> &locations, Random &rnd, World &world)
     }
 }
 
+void addCabinStatue(std::vector<Point> &locations, int statue, World &world)
+{
+    for (auto [x, y] : locations) {
+        if (!world.regionPasses(
+                x - 1,
+                y,
+                4,
+                3,
+                [](Tile &tile) { return tile.blockID == TileID::empty; }) ||
+            !world.regionPasses(x, y + 3, 2, 1, [](Tile &tile) {
+                return isSolidBlock(tile.blockID);
+            })) {
+            continue;
+        }
+        placeStatue(x, y, statue, world);
+        break;
+    }
+}
+
+void addCabinDebris(std::vector<Point> &locations, World &world)
+{
+    for (auto [x, y] : locations) {
+        if (!world.regionPasses(
+                x,
+                y,
+                3,
+                2,
+                [](Tile &tile) { return tile.blockID == TileID::empty; }) ||
+            !world.regionPasses(x, y + 2, 3, 1, [](Tile &tile) {
+                return isSolidBlock(tile.blockID);
+            })) {
+            continue;
+        }
+        world.placeFramedTile(x, y, TileID::largePile, Variant::furniture);
+        break;
+    }
+    for (auto [x, y] : locations) {
+        if (!world.regionPasses(
+                x,
+                y,
+                2,
+                1,
+                [](Tile &tile) { return tile.blockID == TileID::empty; }) ||
+            !world.regionPasses(x, y + 1, 2, 1, [](Tile &tile) {
+                return isSolidBlock(tile.blockID);
+            })) {
+            continue;
+        }
+        world.placeFramedTile(x, y, TileID::smallPile, Variant::furniture);
+        break;
+    }
+}
+
 void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
 {
     if (rnd.getDouble(0, 1) > 0.4) {
@@ -147,4 +201,7 @@ void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
     }
     std::shuffle(locations.begin(), locations.end(), rnd.getPRNG());
     addCabinPainting(locations, rnd, world);
+    addCabinStatue(locations, rnd.select(StatueVariants::deco), world);
+    addCabinStatue(locations, rnd.select(StatueVariants::enemy), world);
+    addCabinDebris(locations, world);
 }
