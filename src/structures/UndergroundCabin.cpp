@@ -91,7 +91,7 @@ void addCabinStatue(std::vector<Point> &locations, int statue, World &world)
                 3,
                 [](Tile &tile) { return tile.blockID == TileID::empty; }) ||
             !world.regionPasses(x, y + 3, 2, 1, [](Tile &tile) {
-                return isSolidBlock(tile.blockID);
+                return tile.guarded && isSolidBlock(tile.blockID);
             })) {
             continue;
         }
@@ -132,6 +132,12 @@ void addCabinDebris(std::vector<Point> &locations, World &world)
         world.placeFramedTile(x, y, TileID::smallPile, Variant::furniture);
         break;
     }
+    for (auto [x, y] : locations) {
+        Tile &tile = world.getTile(x, y);
+        if (tile.blockID == TileID::empty && fnv1a32pt(x, y) % 19 == 0) {
+            tile.blockID = TileID::cobweb;
+        }
+    }
 }
 
 void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
@@ -162,16 +168,19 @@ void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
         int doorAt = -1;
         for (int j = 0; j < cabin.getHeight(); ++j) {
             Tile &tile = world.getTile(x + i, y + j);
+            Tile &cabinTile = cabin.getTile(i, j);
             if (std::abs(rnd.getFineNoise(x + 3 * i, y + 3 * j)) > 0.34) {
                 if (tile.blockID == TileID::empty &&
-                    fnv1a32pt(x + i, y + j) % 4 != 0) {
+                    fnv1a32pt(x + i, y + j) % 5 != 0) {
                     tile = {};
                 } else {
                     tile.liquid = Liquid::none;
+                    if (isSolidBlock(cabinTile.blockID)) {
+                        tile.guarded = true;
+                    }
                 }
                 continue;
             }
-            Tile &cabinTile = cabin.getTile(i, j);
             if (cabinTile.blockID == TileID::door) {
                 doorAt = j - (cabinTile.frameY % 54) / 18;
             } else {
