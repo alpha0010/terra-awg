@@ -27,6 +27,15 @@ inline const std::set<int> cabinClearTiles{
     TileID::platinumOre,
 };
 
+bool canPlaceOnCabinGround(int x, int y, int width, int height, World &world)
+{
+    return world.regionPasses(x, y, width, height, [](Tile &tile) {
+        return tile.blockID == TileID::empty;
+    }) && world.regionPasses(x, y + height, width, 1, [](Tile &tile) {
+        return tile.guarded && isSolidBlock(tile.blockID);
+    });
+}
+
 void applySupportBeam(int x, int y, World &world)
 {
     if (world.getTile(x, y).blockID != TileID::empty) {
@@ -144,41 +153,23 @@ void addCabinDebris(std::vector<Point> &locations, World &world)
 void addCabinBarrel(std::vector<Point> &locations, Random &rnd, World &world)
 {
     for (auto [x, y] : locations) {
-        if (!world.regionPasses(
-                x,
-                y,
-                2,
-                2,
-                [](Tile &tile) { return tile.blockID == TileID::empty; }) ||
-            !world.regionPasses(x, y + 2, 2, 1, [](Tile &tile) {
-                return tile.guarded && isSolidBlock(tile.blockID);
-            })) {
-            continue;
+        if (canPlaceOnCabinGround(x, y, 2, 2, world)) {
+            fillBarrel(world.placeChest(x, y, Variant::barrel), rnd);
+            break;
         }
-        fillBarrel(world.placeChest(x, y, Variant::barrel), rnd);
-        break;
     }
 }
 
 void addCabinStation(std::vector<Point> &locations, Random &rnd, World &world)
 {
     for (auto [x, y] : locations) {
-        if (!world.regionPasses(
+        if (canPlaceOnCabinGround(x, y, 3, 2, world)) {
+            world.placeFramedTile(
                 x,
                 y,
-                3,
-                2,
-                [](Tile &tile) { return tile.blockID == TileID::empty; }) ||
-            !world.regionPasses(x, y + 2, 3, 1, [](Tile &tile) {
-                return tile.guarded && isSolidBlock(tile.blockID);
-            })) {
-            continue;
+                rnd.select({TileID::loom, TileID::sharpeningStation}));
+            break;
         }
-        world.placeFramedTile(
-            x,
-            y,
-            rnd.select({TileID::loom, TileID::sharpeningStation}));
-        break;
     }
 }
 
@@ -254,7 +245,6 @@ void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
     addCabinPainting(locations, rnd, world);
     addCabinStatue(locations, rnd.select(StatueVariants::deco), world);
     addCabinStatue(locations, rnd.select(StatueVariants::enemy), world);
-    addCabinDebris(locations, world);
     switch (rnd.getInt(0, 5)) {
     case 0:
         addCabinStation(locations, rnd, world);
@@ -269,4 +259,5 @@ void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
         addCabinStation(locations, rnd, world);
         break;
     }
+    addCabinDebris(locations, world);
 }
