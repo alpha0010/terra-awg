@@ -180,7 +180,7 @@ void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
     }
     TileBuffer cabin = Data::getCabin(
         rnd.select(Data::cabins),
-        rnd.getInt(16, 24),
+        rnd.getInt(16, 26),
         world.getFramedTiles());
     int chestX = x;
     int chestY = y - 2;
@@ -200,8 +200,11 @@ void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
     for (int i = 0; i < cabin.getWidth(); ++i) {
         int doorAt = -1;
         for (int j = 0; j < cabin.getHeight(); ++j) {
-            Tile &tile = world.getTile(x + i, y + j);
             Tile &cabinTile = cabin.getTile(i, j);
+            if (cabinTile.blockID == TileID::cloud) {
+                continue;
+            }
+            Tile &tile = world.getTile(x + i, y + j);
             if (std::abs(rnd.getFineNoise(x + 3 * i, y + 3 * j)) > 0.34) {
                 if (tile.blockID == TileID::empty &&
                     fnv1a32pt(x + i, y + j) % 5 != 0) {

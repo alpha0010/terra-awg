@@ -7,7 +7,7 @@
 namespace Data
 {
 
-inline auto cabins = std::views::iota(0, 1);
+inline auto cabins = std::views::iota(0, 5);
 
 TileBuffer
 getCabin(int cabinId, int targetWidth, const std::vector<bool> &framedTiles);
