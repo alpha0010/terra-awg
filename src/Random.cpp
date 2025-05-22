@@ -3,6 +3,7 @@
 #include "Util.h"
 #include "vendor/OpenSimplexNoise.hpp"
 #include <iostream>
+#include <numbers>
 
 Random::Random()
     : noiseWidth(0), noiseHeight(0), noiseDeltaX(0), noiseDeltaY(0),

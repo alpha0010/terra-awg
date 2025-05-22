@@ -10,6 +10,7 @@
 #include "structures/data/SwordShrines.h"
 #include <algorithm>
 #include <iostream>
+#include <numbers>
 #include <set>
 
 typedef std::pair<double, double> Pointf;

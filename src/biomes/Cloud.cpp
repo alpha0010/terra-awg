@@ -9,6 +9,7 @@
 #include "structures/data/SkyBoxes.h"
 #include <algorithm>
 #include <iostream>
+#include <numbers>
 
 Point getEmbeddedPos(int x, int y, int deltaX, World &world)
 {
@@ -153,7 +154,7 @@ void addCloudStructure(
     for (int j = 0; j < room.getHeight(); ++j) {
         int jLeft = surfaceLeft - y - j;
         int jRight = surfaceRight - y - j;
-        if (jLeft >= 0 && jRight >= 0 && jLeft < room.getHeight();
+        if (jLeft >= 0 && jRight >= 0 && jLeft < room.getHeight() &&
             jRight < room.getHeight() &&
             room.getTile(0, jLeft).blockPaint == Paint::red &&
             room.getTile(room.getWidth() - 1, jRight).blockPaint ==
