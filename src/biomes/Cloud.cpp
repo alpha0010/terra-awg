@@ -73,6 +73,7 @@ void makeFishingCloud(
     }
     std::shuffle(waterSources.begin(), waterSources.end(), rnd.getPRNG());
     std::vector<Point> usedLocations;
+    std::vector<Point> waterStream;
     for (auto [x, y, deltaX] : waterSources) {
         if (isLocationUsed(x, y, 14, usedLocations)) {
             continue;
@@ -81,16 +82,21 @@ void makeFishingCloud(
         Tile &sourceTile = world.getTile(x, y);
         sourceTile.blockID = TileID::empty;
         sourceTile.liquid = Liquid::water;
-        for (int i = deltaX;; i += deltaX) {
-            Tile &tile = world.getTile(x + i, y);
-            if (tile.blockID == TileID::empty) {
-                break;
-            }
-            tile.wallID = WallID::empty;
-            tile.slope = Slope::half;
-            tile.guarded = true;
+        for (int i = deltaX; world.getTile(x + i, y).blockID != TileID::empty;
+             i += deltaX) {
+            waterStream.emplace_back(x + i, y);
         }
     }
+    world.queuedDeco.emplace_back([waterStream](Random &, World &world) {
+        for (auto [x, y] : waterStream) {
+            Tile &tile = world.getTile(x, y);
+            if (tile.blockID == TileID::cloud ||
+                tile.blockID == TileID::rainCloud ||
+                tile.blockID == TileID::snowCloud) {
+                tile.slope = Slope::half;
+            }
+        }
+    });
 }
 
 void makeResourceCloud(
