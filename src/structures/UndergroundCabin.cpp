@@ -75,19 +75,18 @@ void addCabinPainting(std::vector<Point> &locations, Random &rnd, World &world)
          Painting::terrarianGothic});
     auto [pWidth, pHeight] = world.getPaintingDims(painting);
     for (auto [x, y] : locations) {
-        if (!world.regionPasses(
+        if (world.regionPasses(
                 x - 1,
                 y,
                 pWidth + 2,
                 pHeight + 1,
-                [](Tile &tile) {
-                    return tile.blockID == TileID::empty &&
-                           tile.wallID != WallID::empty;
-                })) {
-            continue;
+                [](Tile &tile) { return tile.blockID == TileID::empty; }) &&
+            world.regionPasses(x, y, pWidth, pHeight, [](Tile &tile) {
+                return tile.wallID != WallID::empty;
+            })) {
+            world.placePainting(x, y, painting);
+            break;
         }
-        world.placePainting(x, y, painting);
-        break;
     }
 }
 
