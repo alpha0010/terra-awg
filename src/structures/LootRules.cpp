@@ -5,7 +5,7 @@
 #include "ids/ItemID.h"
 #include "ids/Prefix.h"
 
-void fillLoot(
+int doFillLoot(
     Chest &chest,
     Random &rnd,
     std::initializer_list<std::pair<double, Item>> loot)
@@ -52,6 +52,24 @@ void fillLoot(
                 ++itemIndex;
             }
         }
+    }
+    return itemIndex;
+}
+
+void fillLoot(
+    Chest &chest,
+    Random &rnd,
+    std::initializer_list<std::pair<double, Item>> loot)
+{
+    double expectedValue = 0;
+    for (const auto &row : loot) {
+        expectedValue += row.first;
+    }
+    if (expectedValue > 5) {
+        expectedValue = 5 + 0.6 * (expectedValue - 5);
+    }
+    int minLoot = std::floor(0.9 * expectedValue - 0.5);
+    while (doFillLoot(chest, rnd, loot) < minLoot) {
     }
 }
 
