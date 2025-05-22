@@ -71,6 +71,7 @@ enum {
     cactusPlant = 80,
     coral = 81,
     herb = 83,
+    tombstone = 85,
     loom = 86,
     piano = 87,
     dresser = 88,

@@ -285,8 +285,6 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
     } else if (blockID == TileID::statue && type == Variant::lihzahrd) {
         offsetX += 36 * (coordHash % 3);
         offsetY += 162 * (coordHash % 2);
-    } else if (blockID == TileID::sunflower) {
-        offsetX += 36 * (coordHash % 3);
     } else if (blockID == TileID::smallPile) {
         if (type == Variant::forest && coordHash % 41 > 30) {
             type = Variant::stone;
@@ -450,6 +448,12 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
             }
             offsetX += 18 * mod;
         } break;
+        case TileID::sunflower:
+            offsetX += 36 * (coordHash % 3);
+            break;
+        case TileID::tombstone:
+            offsetX += 36 * (coordHash % 11);
+            break;
         }
     }
     for (int i = 0; i < frameWidth; ++i) {

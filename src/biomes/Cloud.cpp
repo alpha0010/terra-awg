@@ -141,6 +141,44 @@ void makeResourceCloud(
     }
 }
 
+void makeGraveCloud(
+    int startX,
+    int startY,
+    int width,
+    int height,
+    Random &rnd,
+    World &world)
+{
+    int radius = width / 2;
+    int centerX = startX + radius;
+    int centerY = startY + height / 2;
+    radius = 2 + 0.9 * radius;
+    double delta =
+        2 * std::numbers::pi / std::ceil(0.1 * std::numbers::pi * radius);
+    double offset = rnd.getDouble(0, delta);
+    std::vector<Point> locations;
+    for (double t = 0.0001; t < 2 * std::numbers::pi; t += delta) {
+        locations.emplace_back(
+            centerX + radius * std::cos(t + offset),
+            centerY + radius * std::sin(t + offset));
+    }
+    world.queuedDeco.emplace_back([locations](Random &, World &world) {
+        for (auto [x, y] : locations) {
+            if (world.regionPasses(x - 2, y - 2, 6, 6, [](Tile &tile) {
+                    return tile.blockID == TileID::empty &&
+                           tile.wallID == WallID::empty;
+                })) {
+                world.placeFramedTile(x, y, TileID::tombstone);
+                for (int i = 0; i < 2; ++i) {
+                    for (int j = 0; j < 2; ++j) {
+                        world.getTile(x + i, y + j).echoCoatBlock = true;
+                    }
+                }
+            }
+        }
+    });
+}
+
 void addCloudStructure(
     int startX,
     int startY,
@@ -269,6 +307,9 @@ void genCloud(Random &rnd, World &world)
             ++roomItr;
             break;
         default:
+            if (numClouds == 3) {
+                makeGraveCloud(x, y, width, height, rnd, world);
+            }
             addCloudStructure(x, y, width, *roomItr, TileID::cloud, world);
             ++roomItr;
             break;
