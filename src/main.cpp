@@ -30,6 +30,7 @@
 #include "structures/Lake.h"
 #include "structures/MinecartTracks.h"
 #include "structures/MushroomCabin.h"
+#include "structures/OceanWreck.h"
 #include "structures/Plants.h"
 #include "structures/Pyramid.h"
 #include "structures/Ruins.h"
@@ -98,6 +99,7 @@ void doWorldGen(Config &conf, Random &rnd, World &world)
     }
     genIgloo(rnd, world);
     genMushroomCabin(rnd, world);
+    genOceanWreck(rnd, world);
     auto flatLocations = genTreasure(rnd, world);
     genPlants(flatLocations, rnd, world);
     genTraps(rnd, world);

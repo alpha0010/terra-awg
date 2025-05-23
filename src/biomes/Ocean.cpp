@@ -80,6 +80,7 @@ void addOceanCave(int waterTable, Random &rnd, World &world)
     int shuffleX = rnd.getInt(0, world.getWidth());
     int shuffleY = rnd.getInt(0, world.getHeight());
     std::vector<Point> locations;
+    world.oceanCaveCenter = centerX;
     for (int x = centerX - 100; x < centerX + 100; ++x) {
         for (int y = waterTable + 20; y < maxY; ++y) {
             double threshold =
