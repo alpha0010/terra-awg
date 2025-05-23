@@ -484,29 +484,7 @@ void placeJungleShrines(Random &rnd, World &world)
             continue;
         }
         usedLocations.emplace_back(x, y);
-        std::set<Point> chests;
-        for (int i = 0; i < shrine.getWidth(); ++i) {
-            for (int j = 0; j < shrine.getHeight(); ++j) {
-                Tile &shrineTile = shrine.getTile(i, j);
-                if (shrineTile.blockID == TileID::cloud) {
-                    continue;
-                }
-                Tile &tile = world.getTile(x + i, y + j);
-                if (shrineTile.blockID == TileID::chest &&
-                    !chests.contains({i - 1, j}) &&
-                    !chests.contains({i, j - 1}) &&
-                    !chests.contains({i - 1, j - 1})) {
-                    chests.emplace(i, j);
-                }
-                if (shrineTile.wallID == WallID::empty) {
-                    shrineTile.wallID = tile.wallID;
-                } else if (shrineTile.wallID == WallID::Safe::cloud) {
-                    shrineTile.wallID = WallID::empty;
-                }
-                tile = shrineTile;
-                tile.guarded = true;
-            }
-        }
+        std::vector<Point> chests = world.placeBuffer(x, y, shrine);
         for (int i = 0; i < shrine.getWidth(); ++i) {
             for (int j = 0; j < shrine.getHeight(); ++j) {
                 Tile &tile = world.getTile(x + i, y + j);
@@ -516,8 +494,8 @@ void placeJungleShrines(Random &rnd, World &world)
                 }
             }
         }
-        for (auto [i, j] : chests) {
-            Chest &chest = world.placeChest(x + i, y + j, Variant::ivy);
+        for (auto [chestX, chestY] : chests) {
+            Chest &chest = world.placeChest(chestX, chestY, Variant::ivy);
             if (y < world.getCavernLevel()) {
                 fillUndergroundIvyChest(chest, rnd, world);
             } else {

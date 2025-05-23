@@ -21,6 +21,8 @@ public:
 
     Tile &getTile(int x, int y);
 
+    const Tile &getTile(int x, int y) const;
+
     /**
      * Existing tiles are invalidated if height changes.
      */

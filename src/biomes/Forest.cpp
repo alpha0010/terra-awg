@@ -310,27 +310,11 @@ void growTapRoot(double x, double y, int roomId, Random &rnd, World &world)
                 tile.wallID = WallID::Unsafe::livingWood;
             }
         }
-        std::set<Point> chests;
-        for (int i = 0; i < room.getWidth(); ++i) {
-            for (int j = 0; j < room.getHeight(); ++j) {
-                Tile &roomTile = room.getTile(i, j);
-                if (roomTile.blockID == TileID::cloud) {
-                    continue;
-                }
-                if (roomTile.blockID == TileID::chest &&
-                    !chests.contains({i - 1, j}) &&
-                    !chests.contains({i, j - 1}) &&
-                    !chests.contains({i - 1, j - 1})) {
-                    chests.emplace(i, j);
-                }
-                roomTile.guarded = true;
-                world.getTile(x + i, anchorY + j) = roomTile;
-            }
-        }
-        for (auto [i, j] : chests) {
-            Chest &chest =
-                world.placeChest(x + i, anchorY + j, Variant::livingWood);
-            fillSurfaceLivingWoodChest(chest, rnd, world);
+        for (auto [chestX, chestY] : world.placeBuffer(x, anchorY, room)) {
+            fillSurfaceLivingWoodChest(
+                world.registerStorage(chestX, chestY),
+                rnd,
+                world);
         }
     });
 }

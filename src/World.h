@@ -9,6 +9,9 @@
 #include <vector>
 
 class Random;
+class TileBuffer;
+
+enum class Blend { normal, blockOnly };
 
 uint32_t fnv1a32pt(uint32_t x, uint32_t y);
 
@@ -37,6 +40,11 @@ public:
     {
         return getTile(pt.first, pt.second);
     }
+    std::vector<std::pair<int, int>> placeBuffer(
+        int x,
+        int y,
+        const TileBuffer &data,
+        Blend blendMode = Blend::normal);
     void
     placeFramedTile(int x, int y, int blockID, Variant type = Variant::none);
     void placePainting(int x, int y, Painting painting);

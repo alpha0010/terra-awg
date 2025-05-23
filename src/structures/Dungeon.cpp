@@ -574,8 +574,8 @@ private:
              {std::pair{TileID::alchemyTable, Variant::alchemy},
               {TileID::bewitchingTable, Variant::oilRagSconce},
               {TileID::boneWelder, Variant::bone}}) {
-            int numPlacements =
-                std::round(rnd.getDouble(0.5, 3.2) + world.getHeight() / 1600);
+            int numPlacements = std::round(
+                rnd.getDouble(0.5, 3.2) + world.getHeight() / 1600.0);
             while (numPlacements > 0) {
                 auto [x, y] = rnd.select(locations);
                 if (isValidPlacementLocation(x, y, 3, 3, true)) {
@@ -606,13 +606,24 @@ private:
                 5,
                 2,
                 [](Tile &tile) { return tile.blockID == TileID::empty; }) ||
-            !world.regionPasses(x, ceiling - 1, 3, 1, [this](Tile &tile) {
+            !world.regionPasses(x - 1, ceiling - 1, 5, 1, [this](Tile &tile) {
                 return tile.blockID == theme.brick;
             })) {
             return;
         }
-        world.placeFramedTile(x, ceiling, TileID::lantern, lanternStyle);
-        world.placeFramedTile(x + 2, ceiling, TileID::lantern, lanternStyle);
+        if (world.regionPasses(x - 1, ceiling + 2, 5, 5, [](Tile &tile) {
+                return tile.blockID == TileID::empty;
+            })) {
+            TileBuffer hangingLantern =
+                Data::getChainLantern(lanternStyle, world.getFramedTiles());
+            world.placeBuffer(x - 1, ceiling, hangingLantern, Blend::blockOnly);
+            world.placeBuffer(x + 3, ceiling, hangingLantern, Blend::blockOnly);
+        } else {
+            world
+                .placeFramedTile(x - 1, ceiling, TileID::lantern, lanternStyle);
+            world
+                .placeFramedTile(x + 3, ceiling, TileID::lantern, lanternStyle);
+        }
     }
 
     Point selectPaintingLocation(
@@ -833,25 +844,9 @@ private:
                 continue;
             }
             usedLocations.emplace_back(x, y);
-            for (int i = 0; i < data.getWidth(); ++i) {
-                for (int j = 0; j < data.getHeight(); ++j) {
-                    Tile &dataTile = data.getTile(i, j);
-                    if (dataTile.blockID == TileID::empty ||
-                        dataTile.blockID == TileID::cloud) {
-                        continue;
-                    }
-                    Tile &tile = world.getTile(x + i, y + j);
-                    tile.blockID = dataTile.blockID;
-                    tile.frameX = dataTile.frameX;
-                    tile.frameY = dataTile.frameY;
-                    if (((tile.blockID == TileID::dresser &&
-                          tile.frameX % 54 == 0) ||
-                         (tile.blockID == TileID::chest &&
-                          tile.frameX % 36 == 0)) &&
-                        tile.frameY == 0) {
-                        fillDresser(world.registerStorage(x + i, y + j), rnd);
-                    }
-                }
+            for (auto [chestX, chestY] :
+                 world.placeBuffer(x, y, data, Blend::blockOnly)) {
+                fillDresser(world.registerStorage(chestX, chestY), rnd);
             }
             --numPlacements;
         }

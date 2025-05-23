@@ -1,6 +1,8 @@
 #include "World.h"
 
 #include "Random.h"
+#include "TileBuffer.h"
+#include "ids/WallID.h"
 #include <iostream>
 
 constexpr std::vector<bool> genFramedTileLookup()
@@ -113,6 +115,57 @@ Tile &World::getTile(int x, int y)
         return scratchTile;
     }
     return tiles[y + x * height];
+}
+
+std::vector<std::pair<int, int>>
+World::placeBuffer(int x, int y, const TileBuffer &data, Blend blendMode)
+{
+    std::vector<std::pair<int, int>> storageLocations;
+    for (int i = 0; i < data.getWidth(); ++i) {
+        for (int j = 0; j < data.getHeight(); ++j) {
+            const Tile &dataTile = data.getTile(i, j);
+            if (blendMode == Blend::blockOnly &&
+                dataTile.blockID == TileID::empty) {
+                continue;
+            }
+            Tile &tile = getTile(x + i, y + j);
+            if (dataTile.blockID == TileID::cloud) {
+                if (dataTile.slope != Slope::none &&
+                    tile.blockID != TileID::empty) {
+                    tile.slope = dataTile.slope;
+                    tile.guarded = true;
+                }
+                continue;
+            }
+            if (blendMode == Blend::blockOnly) {
+                tile.blockID = dataTile.blockID;
+                tile.frameX = dataTile.frameX;
+                tile.frameY = dataTile.frameY;
+                tile.blockPaint = dataTile.blockPaint;
+                tile.slope = dataTile.slope;
+            } else {
+                int wallId = tile.wallID;
+                int wallPaint = tile.wallPaint;
+                tile = dataTile;
+                if (dataTile.wallID == WallID::Safe::cloud) {
+                    tile.wallID = WallID::empty;
+                } else if (dataTile.wallID == WallID::empty) {
+                    tile.wallID = wallId;
+                    tile.wallPaint = wallPaint;
+                }
+            }
+            tile.guarded =
+                tile.blockID != TileID::empty || tile.wallID != WallID::empty;
+            if (((tile.blockID == TileID::dresser && tile.frameX % 54 == 0) ||
+                 ((tile.blockID == TileID::chest ||
+                   tile.blockID == TileID::chestGroup2) &&
+                  tile.frameX % 36 == 0)) &&
+                tile.frameY == 0) {
+                storageLocations.emplace_back(x + i, y + j);
+            }
+        }
+    }
+    return storageLocations;
 }
 
 struct FrameDetails {

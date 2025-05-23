@@ -74,6 +74,11 @@ Tile &TileBuffer::getTile(int x, int y)
     return tiles[y + x * height];
 }
 
+const Tile &TileBuffer::getTile(int x, int y) const
+{
+    return tiles[y + x * height];
+}
+
 void TileBuffer::resize(int w, int h)
 {
     width = w;

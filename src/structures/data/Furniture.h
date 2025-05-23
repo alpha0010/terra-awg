@@ -2,6 +2,7 @@
 #define FURNITURE_H
 
 #include "TileBuffer.h"
+#include "ids/TileVariant.h"
 #include <ranges>
 
 namespace Data
@@ -28,6 +29,9 @@ TileBuffer getFurniture(
     int id,
     Variant furnitureSet,
     const std::vector<bool> &framedTiles);
+
+TileBuffer
+getChainLantern(::Variant lanternStyle, const std::vector<bool> &framedTiles);
 
 } // namespace Data
 

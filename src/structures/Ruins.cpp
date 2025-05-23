@@ -361,25 +361,9 @@ void genRuins(Random &rnd, World &world)
         if (!canPlaceFurniture(x, y, data, world)) {
             continue;
         }
-        for (int i = 0; i < data.getWidth(); ++i) {
-            for (int j = 0; j < data.getHeight(); ++j) {
-                Tile &dataTile = data.getTile(i, j);
-                if (dataTile.blockID == TileID::empty ||
-                    dataTile.blockID == TileID::cloud) {
-                    continue;
-                }
-                Tile &tile = world.getTile(x + i, y + j);
-                tile.blockID = dataTile.blockID;
-                tile.frameX = dataTile.frameX;
-                tile.frameY = dataTile.frameY;
-                if (((tile.blockID == TileID::dresser &&
-                      tile.frameX % 54 == 0) ||
-                     (tile.blockID == TileID::chest &&
-                      tile.frameX % 36 == 0)) &&
-                    tile.frameY == 0) {
-                    fillDresser(world.registerStorage(x + i, y + j), rnd);
-                }
-            }
+        for (auto [chestX, chestY] :
+             world.placeBuffer(x, y, data, Blend::blockOnly)) {
+            fillDresser(world.registerStorage(chestX, chestY), rnd);
         }
         tries = 0;
         --numPlacements;

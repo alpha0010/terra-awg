@@ -133,9 +133,9 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     w.putBitVec(world.getFramedTiles());
     std::vector<uint32_t> sectionPointers{w.tellp()};
 
-    w.putString(conf.name); // Map name.
-    w.putString("AWG");     // Seed.
-    w.skipBytes(8);         // Generator version. (Is this needed?)
+    w.putString(conf.name);     // Map name.
+    w.putString("AWG");         // Seed.
+    w.putUint64(1198295875585); // Generator version.
     for (int i = 0; i < 16; ++i) {
         w.putUint8(rnd.getByte()); // GUID.
     }

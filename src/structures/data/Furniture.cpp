@@ -215,6 +215,21 @@ std::vector<std::vector<uint16_t>> furnitureData{
     18, 4096, 189, 2, 4096, 15, 0, 0, 4096, 15, 0, 18, 4096, 189, 4, 4096, 189
 },
 };
+
+std::vector<std::vector<uint16_t>> lanternData{
+// chainLantern1
+{
+    263, 4099, 214, 4096, 19, 90, 162, 4096, 42, 0, 144, 4096, 42, 0, 162
+},
+// chainLantern2
+{
+    263, 4099, 214, 4096, 19, 90, 162, 4096, 42, 0, 216, 4096, 42, 0, 234
+},
+// chainLantern3
+{
+    263, 4099, 214, 4096, 19, 90, 162, 4096, 42, 18, 900, 4096, 42, 18, 918
+},
+};
 // clang-format on
 } // namespace
 
@@ -432,6 +447,21 @@ getFurniture(int id, Variant furnitureSet, const std::vector<bool> &framedTiles)
         }
     }
     return data;
+}
+
+TileBuffer
+getChainLantern(::Variant lanternStyle, const std::vector<bool> &framedTiles)
+{
+    switch (lanternStyle) {
+    case ::Variant::alchemy:
+        return {lanternData[0].data(), framedTiles};
+    case ::Variant::oilRagSconce:
+        return {lanternData[1].data(), framedTiles};
+    case ::Variant::bone:
+        return {lanternData[2].data(), framedTiles};
+    default:
+        return {};
+    }
 }
 
 } // namespace Data
