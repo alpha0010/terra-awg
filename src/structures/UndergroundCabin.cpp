@@ -90,7 +90,7 @@ void addCabinPainting(std::vector<Point> &locations, Random &rnd, World &world)
     }
 }
 
-void addCabinStatue(std::vector<Point> &locations, int statue, World &world)
+Point addCabinStatue(std::vector<Point> &locations, int statue, World &world)
 {
     for (auto [x, y] : locations) {
         if (!world.regionPasses(
@@ -105,8 +105,9 @@ void addCabinStatue(std::vector<Point> &locations, int statue, World &world)
             continue;
         }
         placeStatue(x, y, statue, world);
-        break;
+        return {x, y};
     }
+    return {-1, -1};
 }
 
 void addCabinDebris(std::vector<Point> &locations, World &world)
@@ -246,7 +247,8 @@ void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
     std::shuffle(locations.begin(), locations.end(), rnd.getPRNG());
     addCabinPainting(locations, rnd, world);
     addCabinStatue(locations, rnd.select(StatueVariants::deco), world);
-    addCabinStatue(locations, rnd.select(StatueVariants::enemy), world);
+    Point trap =
+        addCabinStatue(locations, rnd.select(StatueVariants::enemy), world);
     switch (rnd.getInt(0, 5)) {
     case 0:
         addCabinStation(locations, rnd, world);
@@ -262,4 +264,15 @@ void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
         break;
     }
     addCabinDebris(locations, world);
+    if (trap.first != -1 && rnd.getDouble(0, 1) < 0.2) {
+        world.queuedTraps.emplace_back(
+            [chestX, chestY, trap](Random &, World &world) {
+                world.placeFramedTile(
+                    chestX,
+                    chestY,
+                    TileID::chestGroup2,
+                    Variant::deadMans);
+                placeWire(trap, {chestX, chestY}, Wire::red, world);
+            });
+    }
 }
