@@ -273,7 +273,9 @@ void genCloud(Random &rnd, World &world)
         int width = rnd.getInt(90, 160);
         int height = rnd.getInt(35, 50);
         int x = rnd.getInt(200, world.getWidth() - 200 - width);
-        int y = rnd.getInt(100, 0.45 * world.getUndergroundLevel() - height);
+        int maxY = 0.45 * world.getUndergroundLevel() - height;
+        int y =
+            rnd.getInt(numClouds == 3 ? std::midpoint(100, maxY) : 100, maxY);
         if (!world.regionPasses(
                 x - 25,
                 y - 25,
