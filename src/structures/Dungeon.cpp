@@ -570,15 +570,17 @@ private:
             }
         }
         addDartTraps(locations);
-        for (auto furnitureTile :
-             {TileID::alchemyTable,
-              TileID::bewitchingTable,
-              TileID::boneWelder}) {
-            int numPlacements = rnd.getInt(1, 4);
+        for (auto [furnitureTile, lanternStyle] :
+             {std::pair{TileID::alchemyTable, Variant::alchemy},
+              {TileID::bewitchingTable, Variant::oilRagSconce},
+              {TileID::boneWelder, Variant::bone}}) {
+            int numPlacements =
+                std::round(rnd.getDouble(0.5, 3.2) + world.getHeight() / 1600);
             while (numPlacements > 0) {
                 auto [x, y] = rnd.select(locations);
                 if (isValidPlacementLocation(x, y, 3, 3, true)) {
                     world.placeFramedTile(x, y - 2, furnitureTile);
+                    addLanternsFor(x, y, lanternStyle);
                     --numPlacements;
                 }
             }
@@ -592,6 +594,25 @@ private:
                 --numChests;
             }
         }
+    }
+
+    void addLanternsFor(int x, int y, Variant lanternStyle)
+    {
+        int ceiling = scanWhileNotSolid({x, y}, {0, -1}, world).second;
+        if (y - ceiling > 16 ||
+            !world.regionPasses(
+                x - 1,
+                ceiling,
+                5,
+                2,
+                [](Tile &tile) { return tile.blockID == TileID::empty; }) ||
+            !world.regionPasses(x, ceiling - 1, 3, 1, [this](Tile &tile) {
+                return tile.blockID == theme.brick;
+            })) {
+            return;
+        }
+        world.placeFramedTile(x, ceiling, TileID::lantern, lanternStyle);
+        world.placeFramedTile(x + 2, ceiling, TileID::lantern, lanternStyle);
     }
 
     Point selectPaintingLocation(

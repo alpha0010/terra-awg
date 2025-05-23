@@ -3,6 +3,7 @@
 
 enum class Variant {
     none,
+    alchemy,
     ankh,
     ash,
     ashWood,
@@ -43,6 +44,7 @@ enum class Variant {
     meteorite,
     mushroom,
     obsidian,
+    oilRagSconce,
     omega,
     palmWood,
     pyramid,
