@@ -44,10 +44,15 @@ bool tryPlaceWreck(int x, int y, TileBuffer &wreck, World &world)
         for (int i = 0; i < wreck.getWidth(); ++i) {
             for (int j = 0; j < wreck.getHeight(); ++j) {
                 Tile &wreckTile = wreck.getTile(i, j);
+                Tile &tile = world.getTile(x + i, y + j);
                 if (wreckTile.blockID == TileID::cloud) {
+                    if (wreckTile.slope != Slope::none &&
+                        tile.blockID != TileID::empty) {
+                        tile.slope = wreckTile.slope;
+                        tile.guarded = true;
+                    }
                     continue;
                 }
-                Tile &tile = world.getTile(x + i, y + j);
                 tile = wreckTile;
                 tile.guarded = tile.blockID != TileID::empty ||
                                tile.wallID != WallID::empty;
