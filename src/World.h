@@ -106,6 +106,9 @@ public:
     int dungeonX;
     int dungeonY;
     int oceanCaveCenter;
+    int gemGroveX;
+    int gemGroveY;
+    int gemGroveSize;
     std::vector<std::pair<int, int>> mushroomCenter;
 
     std::vector<std::function<void(Random &, World &)>> queuedDeco;

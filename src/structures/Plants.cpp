@@ -236,6 +236,12 @@ void growTree(
     }
 }
 
+bool inGemGrove(int x, int y, World &world)
+{
+    return std::hypot(world.gemGroveX - x, world.gemGroveY - y) <
+           world.gemGroveSize;
+}
+
 void genPlants(const LocationBins &locations, Random &rnd, World &world)
 {
     std::cout << "Growing trees\n";
@@ -339,9 +345,10 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
             case TileID::stone:
                 if (y > world.getCavernLevel() &&
                     world.getTile(x, y - 1).liquid == Liquid::none &&
-                    static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
-                            100 ==
-                        0) {
+                    (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
+                             100 ==
+                         0 ||
+                     (inGemGrove(x, y, world) && rnd.getDouble(0, 1) < 0.85))) {
                     growTree(
                         x,
                         y,

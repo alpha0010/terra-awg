@@ -479,7 +479,7 @@ bool addChestBoulderTraps(int x, int y, Random &rnd, World &world)
         for (int i = 0; i < 2; ++i) {
             for (int wireY = trap.second + 2; wireY < y; ++wireY) {
                 Tile &tile = world.getTile(trap.first + i, wireY);
-                if (tile.blockID != TileID::empty) {
+                if (isSolidBlock(tile.blockID)) {
                     tile.actuator = true;
                     placeWire(
                         {trap.first, trap.second + 2},

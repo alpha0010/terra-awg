@@ -13,6 +13,7 @@
 #include "biomes/Desert.h"
 #include "biomes/Forest.h"
 #include "biomes/GemCave.h"
+#include "biomes/GemGrove.h"
 #include "biomes/GlowingMoss.h"
 #include "biomes/GlowingMushroom.h"
 #include "biomes/GraniteCave.h"
@@ -86,6 +87,7 @@ void doWorldGen(Config &conf, Random &rnd, World &world)
     genGemCave(rnd, world);
     genSpiderNest(rnd, world);
     genGlowingMoss(rnd, world);
+    genGemGrove(rnd, world);
     genDungeon(rnd, world);
     genTemple(rnd, world);
     genPyramid(rnd, world);
