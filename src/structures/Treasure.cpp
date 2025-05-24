@@ -901,6 +901,10 @@ LocationBins genTreasure(Random &rnd, World &world)
         }
     }
     std::cout << "Placing treasures\n";
+    std::shuffle(
+        world.queuedTreasures.begin(),
+        world.queuedTreasures.end(),
+        rnd.getPRNG());
     for (const auto &applyQueuedTreasure : world.queuedTreasures) {
         applyQueuedTreasure(rnd, world);
     }
