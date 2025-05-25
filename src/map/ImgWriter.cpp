@@ -4,7 +4,7 @@
 #include "map/TileColor.h"
 #include "vendor/fpng.h"
 
-void savePreviewImage(World &world)
+void savePreviewImage(std::string basename, World &world)
 {
     std::vector<uint8_t> img;
     img.reserve(3 * world.getWidth() * world.getHeight());
@@ -15,8 +15,9 @@ void savePreviewImage(World &world)
         }
     }
     fpng::fpng_init();
+    basename += "-map.png";
     fpng::fpng_encode_image_to_file(
-        "map.png",
+        basename.c_str(),
         img.data(),
         world.getWidth(),
         world.getHeight(),

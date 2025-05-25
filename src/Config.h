@@ -14,6 +14,8 @@ struct Config {
     GameMode mode;
     bool starterHome;
     bool mapPreview;
+
+    std::string getFilename();
 };
 
 Config readConfig(Random &rnd);

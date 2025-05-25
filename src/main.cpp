@@ -114,14 +114,7 @@ void doWorldGen(Config &conf, Random &rnd, World &world)
 
 void saveWorldFile(Config &conf, Random &rnd, World &world)
 {
-    std::string filename(conf.name);
-    for (char &c : filename) {
-        if (!std::isalnum(c)) {
-            c = '_';
-        }
-    }
-    filename += ".wld";
-    Writer w(filename);
+    Writer w(conf.getFilename() + ".wld");
     w.putUint32(279); // File format version.
     w.write("relogic", 7);
     w.putUint8(2);    // File type "world".
@@ -534,7 +527,7 @@ int main()
 
     if (conf.mapPreview) {
         std::cout << "Rendering map preview\n";
-        savePreviewImage(world);
+        savePreviewImage(conf.getFilename(), world);
     }
     return 0;
 }

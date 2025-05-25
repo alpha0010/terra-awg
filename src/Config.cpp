@@ -381,6 +381,17 @@ std::string genRandomName(Random &rnd)
     }
 }
 
+std::string Config::getFilename()
+{
+    std::string filename(name);
+    for (char &c : filename) {
+        if (!std::isalnum(c)) {
+            c = '_';
+        }
+    }
+    return filename;
+}
+
 Config readConfig(Random &rnd)
 {
     Config conf{"Terra AWG World", 6400, 1800, GameMode::classic, false, true};
