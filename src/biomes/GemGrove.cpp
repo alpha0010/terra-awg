@@ -3,9 +3,102 @@
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
+#include "ids/Paint.h"
 #include "ids/WallID.h"
+#include "structures/data/DecoGems.h"
 #include <iostream>
 #include <set>
+
+typedef std::array<std::pair<int, int>, 5> GemSwatch;
+
+inline const std::array gemSwatches = std::to_array<GemSwatch>({
+    {{{TileID::amethystGemspark, Paint::pink},
+      {TileID::amethystGemspark, Paint::violet},
+      {TileID::amethystGemspark, Paint::none},
+      {TileID::amethystGemspark, Paint::purple},
+      {TileID::amethystGemspark, Paint::deepPurple}}},
+    {{{TileID::diamondGemspark, Paint::none},
+      {TileID::topazGemspark, Paint::yellow},
+      {TileID::topazGemspark, Paint::none},
+      {TileID::topazGemspark, Paint::brown},
+      {TileID::topazGemspark, Paint::orange}}},
+    {{{TileID::sapphireGemspark, Paint::skyBlue},
+      {TileID::sapphireGemspark, Paint::deepSkyBlue},
+      {TileID::sapphireGemspark, Paint::none},
+      {TileID::sapphireGemspark, Paint::blue},
+      {TileID::sapphireGemspark, Paint::deepBlue}}},
+    {{{TileID::emeraldGemspark, Paint::yellow},
+      {TileID::emeraldGemspark, Paint::teal},
+      {TileID::emeraldGemspark, Paint::lime},
+      {TileID::emeraldGemspark, Paint::none},
+      {TileID::emeraldGemspark, Paint::green}}},
+    {{{TileID::rubyGemspark, Paint::deepViolet},
+      {TileID::rubyGemspark, Paint::pink},
+      {TileID::rubyGemspark, Paint::deepPink},
+      {TileID::rubyGemspark, Paint::none},
+      {TileID::rubyGemspark, Paint::deepRed}}},
+    {{{TileID::amberGemspark, Paint::yellow},
+      {TileID::amberGemspark, Paint::brown},
+      {TileID::amberGemspark, Paint::orange},
+      {TileID::amberGemspark, Paint::deepOrange},
+      {TileID::amberGemspark, Paint::none}}},
+    {{{TileID::diamondGemspark, Paint::white},
+      {TileID::diamondGemspark, Paint::gray},
+      {TileID::diamondGemspark, Paint::none},
+      {TileID::diamondGemspark, Paint::black},
+      {TileID::diamondGemspark, Paint::shadow}}},
+});
+
+TileBuffer getDecoGem(Random &rnd, World &world)
+{
+    TileBuffer gem =
+        Data::getDecoGem(rnd.select(Data::gems), world.getFramedTiles());
+    const GemSwatch &swatch = rnd.pool(gemSwatches);
+    int offset = rnd.getInt(0, 6 - gem.getWidth() - gem.getHeight());
+    for (int i = 0; i < gem.getWidth(); ++i) {
+        for (int j = 0; j < gem.getHeight(); ++j) {
+            Tile &tile = gem.getTile(i, j);
+            if (tile.blockID != TileID::empty) {
+                int idx = offset + i + j;
+                tile.blockID = swatch[idx].first;
+                tile.blockPaint = swatch[idx].second;
+            }
+        }
+    }
+    return gem;
+}
+
+void placeDecoGems(Random &rnd, World &world)
+{
+    int groveSize = world.gemGroveSize;
+    std::vector<Point> rawLocations;
+    for (int i = -groveSize; i < groveSize; ++i) {
+        for (int j = -groveSize; j < groveSize; ++j) {
+            if (world.getTile(world.gemGroveX + i, world.gemGroveY + j)
+                        .blockID == TileID::empty &&
+                std::hypot(i, j) < groveSize) {
+                rawLocations.emplace_back(
+                    world.gemGroveX + i,
+                    world.gemGroveY + j);
+            }
+        }
+    }
+    std::vector<Point> locations;
+    std::sample(
+        rawLocations.begin(),
+        rawLocations.end(),
+        std::back_inserter(locations),
+        rawLocations.size() / 100,
+        rnd.getPRNG());
+    for (auto [x, y] : locations) {
+        if (world.regionPasses(x - 1, y - 1, 5, 5, [](Tile &tile) {
+                return tile.blockID == TileID::empty &&
+                       tile.liquid == Liquid::none && !tile.wireRed;
+            })) {
+            world.placeBuffer(x, y, getDecoGem(rnd, world));
+        }
+    }
+}
 
 Point selectGroveLocation(int groveSize, Random &rnd, World &world)
 {
@@ -32,6 +125,9 @@ Point selectGroveLocation(int groveSize, Random &rnd, World &world)
             world.getUnderworldLevel() - groveSize,
             rnd,
             world);
+        if (x < 75 + groveSize || x > world.getWidth() - 75 - groveSize) {
+            continue;
+        }
         if (world.regionPasses(
                 x - groveSize,
                 y - groveSize,
@@ -77,4 +173,5 @@ void genGemGrove(Random &rnd, World &world)
     world.gemGroveX = x;
     world.gemGroveY = y;
     world.gemGroveSize = groveSize;
+    world.queuedDeco.emplace_back(placeDecoGems);
 }
