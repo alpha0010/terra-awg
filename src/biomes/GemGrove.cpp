@@ -6,6 +6,7 @@
 #include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/data/DecoGems.h"
+#include <algorithm>
 #include <iostream>
 #include <set>
 
@@ -88,11 +89,17 @@ void placeDecoGems(Random &rnd, World &world)
         rawLocations.begin(),
         rawLocations.end(),
         std::back_inserter(locations),
-        rawLocations.size() / 100,
+        rawLocations.size() / 80,
         rnd.getPRNG());
     for (auto [x, y] : locations) {
-        if (world.regionPasses(x - 1, y - 1, 5, 5, [](Tile &tile) {
-                return tile.blockID == TileID::empty &&
+        if (world.regionPasses(
+                x - 2,
+                y - 2,
+                7,
+                7,
+                [](Tile &tile) { return tile.blockID == TileID::empty; }) &&
+            world.regionPasses(x, y, 3, 3, [](Tile &tile) {
+                return tile.wallID != WallID::empty &&
                        tile.liquid == Liquid::none && !tile.wireRed;
             })) {
             world.placeBuffer(x, y, getDecoGem(rnd, world));
@@ -149,7 +156,7 @@ void genGemGrove(Random &rnd, World &world)
     int noiseShuffleX = rnd.getInt(0, world.getWidth());
     int noiseShuffleY = rnd.getInt(0, world.getHeight());
     int groveSize =
-        world.getWidth() * world.getHeight() / 329000 + rnd.getInt(45, 75);
+        world.getWidth() * world.getHeight() / 329000 + rnd.getInt(60, 75);
     auto [x, y] = selectGroveLocation(groveSize, rnd, world);
     for (int i = -groveSize; i < groveSize; ++i) {
         for (int j = -groveSize; j < groveSize; ++j) {
