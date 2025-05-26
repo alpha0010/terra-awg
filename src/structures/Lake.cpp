@@ -9,7 +9,8 @@
 bool isLiquidPathable(World &world, int x, int y)
 {
     Tile &tile = world.getTile(x, y);
-    return tile.blockID == TileID::empty && tile.liquid == Liquid::none;
+    return (tile.blockID == TileID::empty || tile.actuated) &&
+           tile.liquid == Liquid::none;
 }
 
 template <typename Func>
