@@ -69,7 +69,7 @@ void genOreVeins(Random &rnd, World &world, int oreRoof, int oreFloor, int ore)
         std::views::iota(0, world.getWidth()),
         [oreRoof, oreFloor, ore, &rnd, &world](int x) {
             for (int y = oreRoof; y < oreFloor; ++y) {
-                if (rnd.getFineNoise(x, y) < -0.71) {
+                if (rnd.getFineNoise(x, y) < -0.645) {
                     Tile &tile = world.getTile(x, y);
                     if (tile.blockID != TileID::empty) {
                         tile.blockID = ore;
