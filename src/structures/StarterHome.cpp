@@ -102,7 +102,10 @@ void placeHomeAt(
                 continue;
             }
             Tile &tile = world.getTile(x + i, y + j);
-            if (tile.blockID != TileID::empty && j > home.getHeight() / 2) {
+            if (tile.blockID != TileID::empty &&
+                (tile.blockID != TileID::thinIce ||
+                 world.getTile(x + i, y + j + 1).blockID != TileID::empty) &&
+                j > home.getHeight() / 2) {
                 continue;
             }
             if (homeTile.blockID == TileID::chest &&
@@ -118,6 +121,11 @@ void placeHomeAt(
             if (wallItr != themeWalls.end()) {
                 homeTile.wallID = wallItr->second;
             }
+            if (tile.blockID == TileID::thinIce &&
+                homeTile.blockID == TileID::empty) {
+                homeTile.blockID = TileID::thinIce;
+            }
+            homeTile.liquid = tile.liquid;
             tile = homeTile;
             tile.guarded = true;
         }
