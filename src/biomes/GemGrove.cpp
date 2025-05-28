@@ -90,7 +90,7 @@ void placeDecoGems(Random &rnd, World &world)
         rawLocations.begin(),
         rawLocations.end(),
         std::back_inserter(locations),
-        rawLocations.size() / 80,
+        rawLocations.size() / 70,
         rnd.getPRNG());
     for (auto [x, y] : locations) {
         if (world.regionPasses(
