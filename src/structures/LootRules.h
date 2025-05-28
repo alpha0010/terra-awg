@@ -46,6 +46,7 @@ void fillSkywareChest(Chest &chest, Random &rnd, World &world);
 void fillShadowChest(Chest &chest, Random &rnd, World &world);
 void fillPyramidChest(Chest &chest, Random &rnd, World &world);
 void fillWebCoveredChest(Chest &chest, Random &rnd, World &world);
+void fillCrystalChest(Chest &chest, Random &rnd, World &world);
 void fillDungeonChest(Chest &chest, Random &rnd, World &world);
 void fillDungeonBiomeChest(Chest &chest, Random &rnd, Item &&primaryItem);
 void fillLihzahrdChest(Chest &chest, Random &rnd);

@@ -5,6 +5,7 @@
 #include "biomes/BiomeUtil.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
+#include "structures/LootRules.h"
 #include "structures/data/DecoGems.h"
 #include <algorithm>
 #include <iostream>
@@ -107,6 +108,45 @@ void placeDecoGems(Random &rnd, World &world)
     }
 }
 
+void placeGemChest(Random &rnd, World &world)
+{
+    int scanDist = 1.5 * world.gemGroveSize;
+    for (int iSwap = 0; iSwap < scanDist; ++iSwap) {
+        int i = iSwap / 2;
+        if (iSwap % 2 == 0) {
+            i = -i;
+        }
+        for (int jSwap = 0; jSwap < scanDist; ++jSwap) {
+            int j = jSwap / 2;
+            if (jSwap % 2 == 0) {
+                j = -j;
+            }
+            if (world.regionPasses(
+                    world.gemGroveX + i,
+                    world.gemGroveY + j - 1,
+                    2,
+                    3,
+                    [](Tile &tile) {
+                        return tile.blockID == TileID::empty &&
+                               tile.liquid == Liquid::none;
+                    }) &&
+                world.regionPasses(
+                    world.gemGroveX + i,
+                    world.gemGroveY + j + 2,
+                    2,
+                    1,
+                    [](Tile &tile) { return tile.blockID == TileID::stone; })) {
+                Chest &chest = world.placeChest(
+                    world.gemGroveX + i,
+                    world.gemGroveY + j,
+                    Variant::crystal);
+                fillCrystalChest(chest, rnd, world);
+                return;
+            }
+        }
+    }
+}
+
 Point selectGroveLocation(int groveSize, Random &rnd, World &world)
 {
     std::set<int> allowedTiles{
@@ -181,4 +221,5 @@ void genGemGrove(Random &rnd, World &world)
     world.gemGroveY = y;
     world.gemGroveSize = groveSize;
     world.queuedDeco.emplace_back(placeDecoGems);
+    world.queuedTreasures.emplace_back(placeGemChest);
 }

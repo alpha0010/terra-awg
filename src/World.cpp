@@ -300,9 +300,10 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
 void World::placeFramedTile(int x, int y, int blockID, Variant type)
 {
     if (blockID == TileID::chest &&
-        (type == Variant::ashWood || type == Variant::deadMans ||
-         type == Variant::desert || type == Variant::lesion ||
-         type == Variant::reef || type == Variant::sandstone)) {
+        (type == Variant::ashWood || type == Variant::crystal ||
+         type == Variant::deadMans || type == Variant::desert ||
+         type == Variant::lesion || type == Variant::reef ||
+         type == Variant::sandstone)) {
         blockID = TileID::chestGroup2;
     }
     int offsetX = 0;

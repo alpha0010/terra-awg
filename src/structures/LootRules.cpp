@@ -1728,6 +1728,69 @@ void fillWebCoveredChest(Chest &chest, Random &rnd, World &world)
         });
 }
 
+void fillCrystalChest(Chest &chest, Random &rnd, World &world)
+{
+    fillLoot(
+        chest,
+        rnd,
+        {
+            {1,
+             {world.goldVariant == TileID::goldOre ? ItemID::goldCrown
+                                                   : ItemID::platinumCrown,
+              Prefix::none,
+              1}},
+            {0.5,
+             {rnd.select({ItemID::diamond, ItemID::amber, ItemID::ruby}),
+              Prefix::none,
+              rnd.getInt(3, 5)}},
+            {0.5,
+             {rnd.select({ItemID::emerald, ItemID::sapphire}),
+              Prefix::none,
+              rnd.getInt(3, 5)}},
+            {0.5,
+             {rnd.select({ItemID::topaz, ItemID::amethyst}),
+              Prefix::none,
+              rnd.getInt(3, 5)}},
+            {0.3,
+             {rnd.select(
+                  {ItemID::diamondGemcorn,
+                   ItemID::amberGemcorn,
+                   ItemID::rubyGemcorn}),
+              Prefix::none,
+              rnd.getInt(1, 2)}},
+            {0.3,
+             {rnd.select({ItemID::emeraldGemcorn, ItemID::sapphireGemcorn}),
+              Prefix::none,
+              rnd.getInt(1, 2)}},
+            {0.3,
+             {rnd.select({ItemID::topazGemcorn, ItemID::amethystGemcorn}),
+              Prefix::none,
+              rnd.getInt(1, 2)}},
+            {1.0 / 3,
+             {rnd.select(
+                  {ItemID::lesserLuckPotion,
+                   ItemID::nightOwlPotion,
+                   ItemID::shinePotion,
+                   ItemID::spelunkerPotion}),
+              Prefix::none,
+              rnd.getInt(1, 2)}},
+            {0.4,
+             {rnd.select(
+                  {ItemID::whiteTorch, ItemID::orangeTorch, ItemID::redTorch}),
+              Prefix::none,
+              rnd.getInt(10, 20)}},
+            {0.4,
+             {rnd.select({ItemID::greenTorch, ItemID::blueTorch}),
+              Prefix::none,
+              rnd.getInt(10, 20)}},
+            {0.4,
+             {rnd.select({ItemID::yellowTorch, ItemID::purpleTorch}),
+              Prefix::none,
+              rnd.getInt(10, 20)}},
+            {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}},
+        });
+}
+
 void fillDungeonChest(Chest &chest, Random &rnd, World &world)
 {
     fillLoot(
