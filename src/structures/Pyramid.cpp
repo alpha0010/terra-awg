@@ -192,11 +192,16 @@ void genPyramid(Random &rnd, World &world)
     int size = 80;
     double scanDist = 0.061 * world.getWidth() - size;
     int x = world.surfaceEvilCenter;
+    int numTries = 0;
     while (std::abs(x - world.surfaceEvilCenter) < 1.5 * size ||
            std::abs(x - world.getWidth() / 2) < 2 * size) {
         x = rnd.getInt(
             world.desertCenter - scanDist,
             world.desertCenter + scanDist);
+        ++numTries;
+        if (numTries > 1000) {
+            return;
+        }
     }
     int y = world.getSurfaceLevel(x);
     std::set<int> ignoreBlocks{TileID::empty, TileID::lesion, TileID::flesh};

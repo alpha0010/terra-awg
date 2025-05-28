@@ -349,8 +349,9 @@ void growLivingTree(double x, double y, int roomId, Random &rnd, World &world)
 
 void growLivingTrees(Random &rnd, World &world)
 {
-    auto partitions =
-        rnd.partitionRange(world.getWidth() / 1280, world.getWidth());
+    auto partitions = rnd.partitionRange(
+        std::max(world.getWidth() / 1280, 2),
+        world.getWidth());
     std::vector<int> rooms(Data::treeRooms.begin(), Data::treeRooms.end());
     std::shuffle(rooms.begin(), rooms.end(), rnd.getPRNG());
     for (int partition : partitions) {

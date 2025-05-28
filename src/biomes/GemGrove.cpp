@@ -166,7 +166,7 @@ Point selectGroveLocation(int groveSize, Random &rnd, World &world)
         WallVariants::dirt.begin(),
         WallVariants::dirt.end()};
     allowedWalls.insert(WallID::empty);
-    while (true) {
+    for (int numTries = 0; numTries < 1000; ++numTries) {
         auto [x, y] = findStoneCave(
             world.getCavernLevel() + groveSize,
             world.getUnderworldLevel() - groveSize,
@@ -187,6 +187,7 @@ Point selectGroveLocation(int groveSize, Random &rnd, World &world)
             return {x, y};
         }
     }
+    return {-1, -1};
 }
 
 void genGemGrove(Random &rnd, World &world)
@@ -198,6 +199,9 @@ void genGemGrove(Random &rnd, World &world)
     int groveSize =
         world.getWidth() * world.getHeight() / 329000 + rnd.getInt(60, 75);
     auto [x, y] = selectGroveLocation(groveSize, rnd, world);
+    if (x == -1) {
+        return;
+    }
     for (int i = -groveSize; i < groveSize; ++i) {
         for (int j = -groveSize; j < groveSize; ++j) {
             double threshold = std::min(std::hypot(i, j) / groveSize, 1.0);

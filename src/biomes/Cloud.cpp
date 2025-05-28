@@ -269,13 +269,18 @@ void genCloud(Random &rnd, World &world)
     std::vector<int> rooms(Data::skyBoxes.begin(), Data::skyBoxes.end());
     std::shuffle(rooms.begin(), rooms.end(), rnd.getPRNG());
     auto roomItr = rooms.begin();
+    double cloudScale = std::min(0.1 + world.getHeight() / 1400.0, 1.0);
     while (numClouds > 0) {
-        int width = rnd.getInt(90, 160);
-        int height = rnd.getInt(35, 50);
-        int x = rnd.getInt(200, world.getWidth() - 200 - width);
+        int width = cloudScale * rnd.getInt(90, 160);
+        int height = cloudScale * rnd.getInt(35, 50);
+        int x = rnd.getInt(
+            cloudScale * 200,
+            world.getWidth() - cloudScale * 200 - width);
         int maxY = 0.45 * world.getUndergroundLevel() - height;
-        int y =
-            rnd.getInt(numClouds == 3 ? std::midpoint(100, maxY) : 100, maxY);
+        int y = rnd.getInt(
+            numClouds == 3 ? std::midpoint<int>(cloudScale * 100, maxY)
+                           : cloudScale * 100,
+            maxY);
         if (!world.regionPasses(
                 x - 25,
                 y - 25,

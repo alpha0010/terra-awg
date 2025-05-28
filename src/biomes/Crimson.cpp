@@ -81,13 +81,15 @@ void genCrimson(Random &rnd, World &world)
         TileID::leaf,
         TileID::livingMahogany,
         TileID::mahoganyLeaf};
+    int scaleFactor =
+        std::midpoint<int>(world.getWidth(), 3.5 * world.getHeight());
     // Dig surface smooth tunnel network, edged with crimstone.
     for (int x = surfaceX - scanDist; x < surfaceX + scanDist; ++x) {
         for (int y = 0.45 * world.getUndergroundLevel();
              y < world.getCavernLevel();
              ++y) {
             double threshold = std::min(
-                {2 - 50.0 * std::abs(x - surfaceX) / world.getWidth(),
+                {2 - 50.0 * std::abs(x - surfaceX) / scaleFactor,
                  0.01 * (world.getCavernLevel() - y),
                  0.16});
             if (std::abs(rnd.getBlurNoise(2 * x, 2 * y) + 0.1) < threshold) {
@@ -115,13 +117,13 @@ void genCrimson(Random &rnd, World &world)
                     double threshold =
                         1 - std::sqrt(
                                 18 * std::hypot(x - sourceX, y - sourceY) /
-                                world.getWidth());
+                                scaleFactor);
                     if (std::abs(rnd.getBlurNoise(x, y)) < threshold) {
                         Tile &tile = world.getTile(x, y);
                         threshold =
                             1 - std::pow(
                                     21 * std::hypot(x - sourceX, y - sourceY) /
-                                        world.getWidth(),
+                                        scaleFactor,
                                     0.028);
                         if (std::abs(rnd.getBlurNoise(x, y)) < threshold) {
                             // Crimson spreads from tendrils of flesh blocks.
