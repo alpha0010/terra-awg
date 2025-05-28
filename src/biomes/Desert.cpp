@@ -12,6 +12,8 @@ void genDesert(Random &rnd, World &world)
 {
     std::cout << "Desertification\n";
     rnd.shuffleNoise();
+    int noiseShuffleX = rnd.getInt(0, world.getWidth());
+    int noiseShuffleY = rnd.getInt(0, world.getHeight());
     double center = world.desertCenter;
     double scanDist = 0.08 * world.getWidth();
     double desertFloor =
@@ -32,7 +34,13 @@ void genDesert(Random &rnd, World &world)
         std::views::iota(
             static_cast<int>(center - scanDist),
             static_cast<int>(center + scanDist)),
-        [center, desertFloor, &sandWalls, &rnd, &world](int x) {
+        [center,
+         desertFloor,
+         noiseShuffleX,
+         noiseShuffleY,
+         &sandWalls,
+         &rnd,
+         &world](int x) {
             for (int y = 0; y < world.getUnderworldLevel(); ++y) {
                 double threshold = std::max(
                     std::abs(x - center) / 100.0 - (world.getWidth() / 1700.0),
@@ -78,6 +86,27 @@ void genDesert(Random &rnd, World &world)
                     tile.wallID = WallID::Unsafe::hardenedSand;
                 } else {
                     tile.wallID = sandWalls[tile.wallID];
+                }
+
+                threshold = std::max(
+                    threshold,
+                    3.0 * (world.getUndergroundLevel() - y) /
+                        world.getHeight());
+                bool shouldClear =
+                    std::abs(rnd.getBlurNoise(x, 5 * y)) >
+                        std::max(threshold + 1.2, 0.4) &&
+                    rnd.getFineNoise(noiseShuffleX + x, noiseShuffleY + y) >
+                        -0.3;
+                if (shouldClear && (tile.blockID == TileID::sandstone ||
+                                    ((tile.blockID == TileID::sand ||
+                                      tile.blockID == TileID::hardenedSand) &&
+                                     rnd.getFineNoise(x, y) > 0))) {
+                    tile.blockID = TileID::empty;
+                }
+                if (tile.wallID == WallID::empty &&
+                    y > world.getCavernLevel() &&
+                    rnd.getFineNoise(x, y) < 0.5) {
+                    tile.wallID = WallID::Unsafe::sandstone;
                 }
             }
         });
