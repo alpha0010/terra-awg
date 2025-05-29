@@ -28,6 +28,8 @@ private:
 public:
     Random();
 
+    void setSeed(const std::string &seed);
+
     std::default_random_engine &getPRNG()
     {
         return rnd;

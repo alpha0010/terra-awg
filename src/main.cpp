@@ -129,7 +129,7 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     std::vector<uint32_t> sectionPointers{w.tellp()};
 
     w.putString(conf.name);     // Map name.
-    w.putString("AWG");         // Seed.
+    w.putString(conf.seed);     // Seed.
     w.putUint64(1198295875585); // Generator version.
     for (int i = 0; i < 16; ++i) {
         w.putUint8(rnd.getByte()); // GUID.
@@ -507,6 +507,7 @@ int main()
 
     Random rnd;
     Config conf = readConfig(rnd);
+    rnd.setSeed(conf.seed);
     World world{conf.width, conf.height};
 
     world.isCrimson = rnd.getBool();

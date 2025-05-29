@@ -16,6 +16,13 @@ inline const char *defaultConfigStr = R"([world]
 # for a randomly generated name.
 name = Terra AWG World
 
+# World generation seed. (Other settings must match for seed to
+# produce an equivalent world.)
+# Use the value:
+#   RANDOM
+# for a randomly generated seed.
+seed = RANDOM
+
 # World size:
 # - Small: 4200 x 1200
 # - Medium: 6400 x 1800
@@ -381,6 +388,15 @@ std::string genRandomName(Random &rnd)
     }
 }
 
+std::string processSeed(const std::string &baseSeed, Random &rnd)
+{
+    if (baseSeed == "RANDOM") {
+        return "AWG-" + std::to_string(
+                            rnd.getInt(0, std::numeric_limits<int32_t>::max()));
+    }
+    return baseSeed; // TODO: Strip prefix.
+}
+
 std::string Config::getFilename()
 {
     std::string filename(name);
@@ -394,7 +410,14 @@ std::string Config::getFilename()
 
 Config readConfig(Random &rnd)
 {
-    Config conf{"Terra AWG World", 6400, 1800, GameMode::classic, false, true};
+    Config conf{
+        "Terra AWG World",
+        "RANDOM",
+        6400,
+        1800,
+        GameMode::classic,
+        false,
+        true};
     if (!std::filesystem::exists(confName)) {
         std::ofstream out(confName, std::ios::out);
         out.write(defaultConfigStr, std::strlen(defaultConfigStr));
@@ -402,12 +425,14 @@ Config readConfig(Random &rnd)
     INIReader reader(confName);
     if (reader.ParseError() < 0) {
         std::cout << "Unable to load config from'" << confName << "'\n";
+        conf.seed = processSeed(conf.seed, rnd);
         return conf;
     }
     conf.name = reader.Get("world", "name", conf.name);
     if (conf.name == "RANDOM") {
         conf.name = genRandomName(rnd);
     }
+    conf.seed = processSeed(reader.Get("world", "seed", conf.seed), rnd);
     conf.width = reader.GetInteger("world", "width", conf.width);
     conf.height = reader.GetInteger("world", "height", conf.height);
     conf.mode = parseGameMode(reader.Get("world", "mode", "classic"));

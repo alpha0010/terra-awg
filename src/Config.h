@@ -9,6 +9,7 @@ enum class GameMode { journey = 3, classic = 0, expert = 1, master = 2 };
 
 struct Config {
     std::string name;
+    std::string seed;
     int width;
     int height;
     GameMode mode;

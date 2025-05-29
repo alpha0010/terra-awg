@@ -5,10 +5,26 @@
 #include <iostream>
 #include <numbers>
 
-Random::Random()
-    : noiseWidth(0), noiseHeight(0), noiseDeltaX(0), noiseDeltaY(0),
-      rnd(std::random_device{}())
+Random::Random() : noiseWidth(0), noiseHeight(0), noiseDeltaX(0), noiseDeltaY(0)
 {
+    std::string tmpSeed = std::to_string(std::random_device{}());
+    tmpSeed += '-';
+    auto now = std::chrono::high_resolution_clock::now();
+    tmpSeed +=
+        std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(
+                           now.time_since_epoch())
+                           .count());
+    setSeed(tmpSeed);
+}
+
+void Random::setSeed(const std::string &seed)
+{
+    uint64_t hash = 14695981039346656037u;
+    for (auto c : seed) {
+        hash ^= c;
+        hash *= 1099511628211;
+    }
+    rnd.seed(hash);
 }
 
 void Random::initNoise(int width, int height, double scale)
