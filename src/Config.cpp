@@ -390,11 +390,19 @@ std::string genRandomName(Random &rnd)
 
 std::string processSeed(const std::string &baseSeed, Random &rnd)
 {
-    if (baseSeed == "RANDOM") {
+    if (baseSeed == "RANDOM" || baseSeed.empty()) {
         return "AWG-" + std::to_string(
                             rnd.getInt(0, std::numeric_limits<int32_t>::max()));
     }
-    return baseSeed; // TODO: Strip prefix.
+    if (baseSeed.size() < 7) {
+        return baseSeed;
+    }
+    for (int i = 0; i < 3; ++i) {
+        if (!std::isdigit(baseSeed[2 * i]) || baseSeed[2 * i + 1] != '.') {
+            return baseSeed;
+        }
+    }
+    return baseSeed.substr(6);
 }
 
 std::string Config::getFilename()

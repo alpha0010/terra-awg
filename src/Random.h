@@ -19,7 +19,7 @@ private:
     int savedNoiseDeltaX;
     int savedNoiseDeltaY;
     std::map<std::string, int> poolState;
-    std::default_random_engine rnd;
+    std::mt19937_64 rnd;
 
     void computeBlurNoise();
 
@@ -30,7 +30,7 @@ public:
 
     void setSeed(const std::string &seed);
 
-    std::default_random_engine &getPRNG()
+    std::mt19937_64 &getPRNG()
     {
         return rnd;
     }
