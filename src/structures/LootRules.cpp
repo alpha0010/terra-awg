@@ -289,6 +289,7 @@ void fillSurfaceLivingWoodChest(Chest &chest, Random &rnd, World &world)
                   {ItemID::greenString, rnd.select(PrefixSet::accessory), 1},
                   {ItemID::brownAndSilverDye, Prefix::none, rnd.getInt(3, 6)},
                   {ItemID::greenAndBlackDye, Prefix::none, rnd.getInt(3, 6)},
+                  {ItemID::wandOfSparking, rnd.select(PrefixSet::magic), 1},
               }),
               {ItemID::livingWoodWand, Prefix::none, 1},
               {ItemID::finchStaff, rnd.select(PrefixSet::magic), 1},

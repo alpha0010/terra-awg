@@ -506,6 +506,14 @@ void placeJungleShrines(Random &rnd, World &world)
     }
 }
 
+bool fuzzyIsSurfaceChest(int x, int y, World &world)
+{
+    return y < world.getUndergroundLevel() ||
+           (y < (2 * world.getUndergroundLevel() + world.getCavernLevel()) /
+                    3 &&
+            fnv1a32pt(x, y) % 2 == 0);
+}
+
 Variant getChestType(int x, int y, World &world)
 {
     Tile &probeTile = world.getTile(x, y - 2);
@@ -626,7 +634,8 @@ Variant getChestType(int x, int y, World &world)
     }
     for (auto [type, count] : zoneCounts) {
         if (count > radius * 4) {
-            if (type == Variant::sandstone && y < world.getUndergroundLevel()) {
+            if (type == Variant::sandstone &&
+                fuzzyIsSurfaceChest(x, y, world)) {
                 return Variant::palmWood;
             }
             return type;
@@ -637,7 +646,7 @@ Variant getChestType(int x, int y, World &world)
             return evil;
         }
     }
-    return y < world.getUndergroundLevel() ? Variant::none : Variant::gold;
+    return fuzzyIsSurfaceChest(x, y, world) ? Variant::none : Variant::gold;
 }
 
 void placeChest(
@@ -658,7 +667,7 @@ void placeChest(
         torchID = ItemID::crimsonTorch;
         break;
     case Variant::frozen:
-        if (y < world.getUndergroundLevel()) {
+        if (fuzzyIsSurfaceChest(x, y, world)) {
             fillSurfaceFrozenChest(chest, rnd, world);
         } else if (y < world.getCavernLevel()) {
             fillUndergroundFrozenChest(chest, rnd, world);
@@ -712,7 +721,7 @@ void placeChest(
         }
         return;
     case Variant::richMahogany:
-        if (y < world.getUndergroundLevel()) {
+        if (fuzzyIsSurfaceChest(x, y, world)) {
             fillSurfaceRichMahoganyChest(chest, rnd, world);
         } else if (y < world.getCavernLevel()) {
             fillUndergroundRichMahoganyChest(chest, rnd, world);
@@ -740,7 +749,7 @@ void placeChest(
     if (isTrapped && origType == Variant::richMahogany) {
         torchID = ItemID::jungleTorch;
     }
-    if (y < world.getUndergroundLevel()) {
+    if (fuzzyIsSurfaceChest(x, y, world)) {
         fillSurfaceChest(chest, torchID, rnd, world);
     } else if (y < world.getCavernLevel()) {
         fillUndergroundChest(chest, torchID, isTrapped, rnd, world);
