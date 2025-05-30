@@ -225,6 +225,20 @@ void genWorldBase(Random &rnd, World &world)
                     tile.blockID = TileID::empty;
                     isEmpty = true;
                 }
+                threshold =
+                    y > world.getUnderworldLevel()
+                        ? (world.getUnderworldLevel() - y) / 10.0
+                        : static_cast<double>(y - world.getUndergroundLevel()) /
+                                  (world.getUnderworldLevel() -
+                                   world.getUndergroundLevel()) -
+                              1;
+                if (std::abs(rnd.getCoarseNoise(x, 2 * y)) > 0.55 &&
+                    rnd.getFineNoise(x, y) < threshold + 0.1) {
+                    // Increasingly large isolated deep caves.
+                    Tile &tile = world.getTile(x, y);
+                    tile.blockID = TileID::empty;
+                    isEmpty = true;
+                }
                 switch (scanState) {
                 case 0:
                     if (isEmpty) {
