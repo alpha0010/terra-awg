@@ -90,11 +90,15 @@ void addOceanCave(int waterTable, Random &rnd, World &world)
                 continue;
             }
             Tile &tile = world.getTile(x, y);
-            if (tile.blockID == TileID::stone) {
+            if (tile.blockID == TileID::stone ||
+                tile.blockID == TileID::sandstone ||
+                tile.blockID == TileID::ice || tile.blockID == TileID::clay ||
+                tile.blockID == TileID::silt) {
                 tile.blockID = fnv1a32pt(x, y) % 7 == 0 ? TileID::sand
                                                         : TileID::coralstone;
             } else if (
                 tile.blockID == TileID::dirt || tile.blockID == TileID::mud ||
+                tile.blockID == TileID::jungleGrass ||
                 (tile.blockID == TileID::empty &&
                  tile.liquid == Liquid::none)) {
                 tile.blockID = fnv1a32pt(x, y) % 5 == 0 ? TileID::hardenedSand
@@ -179,13 +183,22 @@ void genOceans(Random &rnd, World &world)
                         } else {
                             tile.wallID = WallID::empty;
                         }
-                        if (y + i > waterTable + 20) {
-                            if (tile.blockID == TileID::stone) {
+                        if (tile.blockID == TileID::mud ||
+                            tile.blockID == TileID::jungleGrass) {
+                            tile.blockID = TileID::silt;
+                        } else if (y + i > waterTable + 20) {
+                            if (tile.blockID == TileID::stone ||
+                                tile.blockID == TileID::sandstone ||
+                                tile.blockID == TileID::ice) {
                                 tile.blockID = TileID::coralstone;
                             } else {
                                 tile.blockID = TileID::sand;
                             }
-                        } else if (tile.blockID != TileID::dirt) {
+                        } else if (
+                            tile.blockID != TileID::dirt &&
+                            tile.blockID != TileID::grass &&
+                            tile.blockID != TileID::sand &&
+                            tile.blockID != TileID::snow) {
                             tile.blockID = TileID::shellPile;
                         } else {
                             tile.blockID = TileID::sand;

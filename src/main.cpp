@@ -24,6 +24,7 @@
 #include "biomes/Snow.h"
 #include "biomes/SpiderNest.h"
 #include "biomes/Underworld.h"
+#include "biomes/patches/Base.h"
 #include "map/ImgWriter.h"
 #include "structures/BuriedBoat.h"
 #include "structures/DesertTomb.h"
@@ -60,7 +61,7 @@ uint64_t getBinaryTime()
     return ms * 10000 + 621355968000000000ull;
 }
 
-void doWorldGen(Config &conf, Random &rnd, World &world)
+void doWorldGenColumns(Config &conf, Random &rnd, World &world)
 {
     world.planBiomes(rnd);
     rnd.initNoise(world.getWidth(), world.getHeight(), 0.07);
@@ -110,6 +111,15 @@ void doWorldGen(Config &conf, Random &rnd, World &world)
     finalizeWalls(rnd, world);
     genVines(rnd, world);
     genGrasses(flatLocations, rnd, world);
+}
+
+void doWorldGenPatches(Random &rnd, World &world)
+{
+    rnd.initNoise(world.getWidth(), world.getHeight(), 0.07);
+    rnd.initBiomeNoise(0.001);
+    genWorldBasePatches(rnd, world);
+    genOceans(rnd, world);
+    genMarbleCave(rnd, world);
 }
 
 void saveWorldFile(Config &conf, Random &rnd, World &world)
@@ -516,7 +526,7 @@ int main()
     world.silverVariant = rnd.select({TileID::silverOre, TileID::tungstenOre});
     world.goldVariant = rnd.select({TileID::goldOre, TileID::platinumOre});
 
-    doWorldGen(conf, rnd, world);
+    doWorldGenPatches(rnd, world);
     saveWorldFile(conf, rnd, world);
 
     auto mainEnd = std::chrono::high_resolution_clock::now();

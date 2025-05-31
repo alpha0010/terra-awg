@@ -32,6 +32,7 @@ void fillMarbleCave(int x, int y, Random &rnd, World &world)
             case TileID::dirt:
             case TileID::stone:
             case TileID::mud:
+            case TileID::jungleGrass:
                 tile.blockID = TileID::marble;
                 if (nextTileIsEmpty) {
                     stalactiteLen = std::max(
