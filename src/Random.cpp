@@ -95,6 +95,32 @@ void Random::computeBlurNoise()
     });
 }
 
+void Random::initBiomeNoise(double scale)
+{
+    std::cout << "Measuring weather\n";
+    humidity.resize(noiseWidth * noiseHeight);
+    temperature.resize(noiseWidth * noiseHeight);
+    std::uniform_int_distribution<int64_t> dist(
+        0,
+        std::numeric_limits<int64_t>::max());
+    OpenSimplexNoise noise{dist(rnd)};
+    parallelFor(std::views::iota(0, noiseWidth), [scale, &noise, this](int x) {
+        double offset = scale * (noiseWidth + noiseHeight);
+        double xS = 1.4 * scale * x;
+        for (int y = 0; y < noiseHeight; ++y) {
+            double yS = scale * y;
+            humidity[x * noiseHeight + y] =
+                noise.Evaluate(xS, yS) + 0.5 * noise.Evaluate(2 * xS, 2 * yS) +
+                0.25 * noise.Evaluate(4 * xS, 4 * yS);
+            temperature[x * noiseHeight + y] =
+                noise.Evaluate(offset + xS, offset + yS) +
+                0.5 * noise.Evaluate(offset + 2 * xS, offset + 2 * yS) +
+                0.25 * noise.Evaluate(offset + 4 * xS, offset + 4 * yS) +
+                std::max(0.01 * (y + 310 - noiseHeight), 0.0);
+        }
+    });
+}
+
 int Random::getPoolIndex(int size, std::source_location origin)
 {
     std::string key = std::to_string(origin.line()) + ':' +
@@ -169,6 +195,20 @@ double Random::getFineNoise(int x, int y) const
     return fineNoise
         [noiseHeight * ((x + noiseDeltaX) % noiseWidth) +
          ((y + noiseDeltaY) % noiseHeight)];
+}
+
+double Random::getHumidity(int x, int y) const
+{
+    return x < 0 || y < 0 || x >= noiseWidth || y >= noiseHeight
+               ? 0
+               : humidity[noiseHeight * x + y];
+}
+
+double Random::getTemperature(int x, int y) const
+{
+    return x < 0 || y < 0 || x >= noiseWidth || y >= noiseHeight
+               ? 0
+               : temperature[noiseHeight * x + y];
 }
 
 std::vector<int> Random::partitionRange(int numSegments, int range)

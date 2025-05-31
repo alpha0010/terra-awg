@@ -25,6 +25,7 @@
 #include "biomes/Snow.h"
 #include "biomes/SpiderNest.h"
 #include "biomes/Underworld.h"
+#include "biomes/patches/Base.h"
 #include "structures/BuriedBoat.h"
 #include "structures/DesertTomb.h"
 #include "structures/Dungeon.h"
@@ -92,9 +93,12 @@ enum class Step {
     finalizeWalls,
     genVines,
     genGrasses,
+    // Patches.
+    initBiomeNoise,
+    genWorldBasePatches,
 };
 
-inline std::array baseRules{
+inline std::array baseBiomeRules{
     Step::planBiomes,
     Step::initNoise,
     Step::genWorldBase,
@@ -119,27 +123,24 @@ inline std::array baseRules{
     Step::genSpiderNest,
     Step::genGlowingMoss,
     Step::genGemGrove,
-    Step::genDungeon,
-    Step::genTemple,
-    Step::genPyramid,
-    Step::genDesertTomb,
-    Step::genBuriedBoat,
-    Step::genSpiderHall,
-    Step::genRuins,
-    Step::genTorchArena,
-    Step::genLake,
-    Step::genStarterHome,
-    Step::genIgloo,
-    Step::genMushroomCabin,
-    Step::genOceanWreck,
-    Step::genTreasure,
-    Step::genPlants,
-    Step::genTraps,
-    Step::genTracks,
-    Step::smoothSurfaces,
-    Step::finalizeWalls,
-    Step::genVines,
-    Step::genGrasses,
+};
+
+inline std::array baseStructureRules{
+    Step::genDungeon,     Step::genTemple,     Step::genPyramid,
+    Step::genDesertTomb,  Step::genBuriedBoat, Step::genSpiderHall,
+    Step::genRuins,       Step::genTorchArena, Step::genLake,
+    Step::genStarterHome, Step::genIgloo,      Step::genMushroomCabin,
+    Step::genOceanWreck,  Step::genTreasure,   Step::genPlants,
+    Step::genTraps,       Step::genTracks,     Step::smoothSurfaces,
+    Step::finalizeWalls,  Step::genVines,      Step::genGrasses,
+};
+
+inline std::array patchesBiomeRules{
+    Step::initNoise,
+    Step::initBiomeNoise,
+    Step::genWorldBasePatches,
+    Step::genOceans,
+    Step::genMarbleCave,
 };
 
 #define GEN_STEP(step)                                                         \
@@ -214,6 +215,10 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
     case Step::genGrasses:
         genGrasses(locations, rnd, world);
         break;
+    case Step::initBiomeNoise:
+        rnd.initBiomeNoise(0.001);
+        break;
+        GEN_STEP(genWorldBasePatches)
     }
 }
 
@@ -225,9 +230,10 @@ void doWorldGen(Random &rnd, World &world)
         excludes.insert(Step::genStarterHome);
     }
     LocationBins locations;
-    for (Step step : baseRules | std::views::filter([&excludes](Step s) {
-                         return !excludes.contains(s);
-                     })) {
+    for (Step step :
+         patchesBiomeRules | std::views::filter([&excludes](Step s) {
+             return !excludes.contains(s);
+         })) {
         doGenStep(step, locations, rnd, world);
     }
 }

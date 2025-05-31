@@ -12,6 +12,8 @@ private:
     std::vector<double> blurNoise;
     std::vector<double> coarseNoise;
     std::vector<double> fineNoise;
+    std::vector<double> humidity;
+    std::vector<double> temperature;
     int noiseWidth;
     int noiseHeight;
     int noiseDeltaX;
@@ -39,6 +41,7 @@ public:
      * Precompute noise samples for other noise functions.
      */
     void initNoise(int width, int height, double scale);
+    void initBiomeNoise(double scale);
     /**
      * Shift cached noise samples, effectively producing new noise samples,
      * cheaply.
@@ -82,6 +85,8 @@ public:
      * Get a sample of the fine detailed noise at the specified location.
      */
     double getFineNoise(int x, int y) const;
+    double getHumidity(int x, int y) const;
+    double getTemperature(int x, int y) const;
     /**
      * Randomly select integers in a range to split the range into segments.
      */
