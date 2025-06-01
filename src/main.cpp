@@ -39,6 +39,7 @@
 #include "structures/StarterHome.h"
 #include "structures/SurfaceIgloo.h"
 #include "structures/Temple.h"
+#include "structures/TorchArena.h"
 #include "structures/Traps.h"
 #include "structures/Treasure.h"
 #include "structures/Vines.h"
@@ -95,6 +96,7 @@ void doWorldGen(Config &conf, Random &rnd, World &world)
     genBuriedBoat(rnd, world);
     genSpiderHall(rnd, world);
     genRuins(rnd, world);
+    genTorchArena(rnd, world);
     genLake(world);
     if (conf.starterHome) {
         genStarterHome(rnd, world);
