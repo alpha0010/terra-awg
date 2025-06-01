@@ -194,4 +194,14 @@ void genDesertTomb(Random &rnd, World &world)
     });
     degradeTombWalls(locations, rnd, world);
     addTombTreasure(locations, rnd, world);
+    world.queuedDeco.emplace_back(
+        [x, y, tW = tomb.getWidth(), tH = tomb.getHeight()](
+            Random &,
+            World &world) {
+            for (int i = 4; i < tW - 4; ++i) {
+                for (int j = 4; j < tH - 4; ++j) {
+                    world.getTile(x + i, y + j).liquid = Liquid::none;
+                }
+            }
+        });
 }
