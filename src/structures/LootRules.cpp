@@ -101,6 +101,55 @@ Item getUndergroundPrimaryLoot(Random &rnd)
     });
 }
 
+Item getCavernPrimaryLoot(Random &rnd)
+{
+    return rnd.pool<Item>({
+        {ItemID::bandOfRegeneration, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::magicMirror, Prefix::none, 1},
+        {ItemID::cloudInABottle, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::hermesBoots, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::shoeSpikes, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::flareGun, Prefix::none, 1},
+    });
+}
+
+Item getFrozenPrimaryLoot(Random &rnd)
+{
+    return rnd.pool<Item>({
+        {ItemID::iceBoomerang, rnd.select(PrefixSet::universal), 1},
+        {ItemID::iceBlade, rnd.select(PrefixSet::melee), 1},
+        {ItemID::iceSkates, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::snowballCannon, rnd.select(PrefixSet::ranged), 1},
+        {ItemID::blizzardInABottle, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::flurryBoots, rnd.select(PrefixSet::accessory), 1},
+    });
+}
+
+Item getHoneyPrimaryLoot(Random &rnd)
+{
+    return {
+        rnd.pool(
+            {ItemID::abeemination,
+             ItemID::beeMinecart,
+             ItemID::hiveWand,
+             ItemID::honeyDispenser}),
+        Prefix::none,
+        1};
+}
+
+Item getIvyPrimaryLoot(Random &rnd)
+{
+    return rnd.pool<Item>({
+        {ItemID::feralClaws, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::ankletOfTheWind, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::staffOfRegrowth, rnd.select(PrefixSet::melee), 1},
+        {ItemID::boomstick, rnd.select(PrefixSet::ranged), 1},
+        rnd.select<Item>(
+            {{ItemID::flowerBoots, rnd.select(PrefixSet::accessory), 1},
+             {ItemID::fiberglassFishingPole, Prefix::none, 1}}),
+    });
+}
+
 Item getMushroomPrimaryLoot(Random &rnd)
 {
     return rnd.pool<Item>({
@@ -221,15 +270,7 @@ void fillSurfaceFrozenChest(Chest &chest, Random &rnd, World &world)
     fillLoot(
         chest,
         rnd,
-        {{1,
-          rnd.pool<Item>({
-              {ItemID::iceBoomerang, rnd.select(PrefixSet::universal), 1},
-              {ItemID::iceBlade, rnd.select(PrefixSet::melee), 1},
-              {ItemID::iceSkates, rnd.select(PrefixSet::accessory), 1},
-              {ItemID::snowballCannon, rnd.select(PrefixSet::ranged), 1},
-              {ItemID::blizzardInABottle, rnd.select(PrefixSet::accessory), 1},
-              {ItemID::flurryBoots, rnd.select(PrefixSet::accessory), 1},
-          })},
+        {{1, getFrozenPrimaryLoot(rnd)},
          {0.05, {ItemID::extractinator, Prefix::none, 1}},
          {0.02, {ItemID::fish, Prefix::none, 1}},
          {1.0 / 7, {ItemID::iceMachine, Prefix::none, 1}},
@@ -300,7 +341,7 @@ void fillSurfaceLivingWoodChest(Chest &chest, Random &rnd, World &world)
            1}},
          {1.0 / 6, {ItemID::glowstick, Prefix::none, rnd.getInt(40, 75)}},
          {1.0 / 6, {ItemID::throwingKnife, Prefix::none, rnd.getInt(150, 300)}},
-         {0.2,
+         {0.4,
           {rnd.select({ItemID::herbBag, ItemID::canOfWorms}),
            Prefix::none,
            rnd.getInt(1, 4)}},
@@ -556,17 +597,7 @@ void fillUndergroundFrozenChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1,
-             rnd.pool<Item>({
-                 {ItemID::iceBoomerang, rnd.select(PrefixSet::universal), 1},
-                 {ItemID::iceBlade, rnd.select(PrefixSet::melee), 1},
-                 {ItemID::iceSkates, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::snowballCannon, rnd.select(PrefixSet::ranged), 1},
-                 {ItemID::blizzardInABottle,
-                  rnd.select(PrefixSet::accessory),
-                  1},
-                 {ItemID::flurryBoots, rnd.select(PrefixSet::accessory), 1},
-             })},
+            {1, getFrozenPrimaryLoot(rnd)},
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
             {0.02, {ItemID::fish, Prefix::none, 1}},
             {1.0 / 7, {ItemID::iceMachine, Prefix::none, 1}},
@@ -616,14 +647,7 @@ void fillUndergroundHoneyChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1,
-             {rnd.pool(
-                  {ItemID::abeemination,
-                   ItemID::beeMinecart,
-                   ItemID::hiveWand,
-                   ItemID::honeyDispenser}),
-              Prefix::none,
-              1}},
+            {1, getHoneyPrimaryLoot(rnd)},
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
             {0.05, {ItemID::flareGun, Prefix::none, 1}},
             {1.0 / 3, {ItemID::honeyBomb, Prefix::none, rnd.getInt(3, 5)}},
@@ -670,18 +694,7 @@ void fillUndergroundIvyChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1,
-             rnd.pool<Item>({
-                 {ItemID::feralClaws, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::ankletOfTheWind, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::staffOfRegrowth, rnd.select(PrefixSet::melee), 1},
-                 {ItemID::boomstick, rnd.select(PrefixSet::ranged), 1},
-                 rnd.select<Item>(
-                     {{ItemID::flowerBoots,
-                       rnd.select(PrefixSet::accessory),
-                       1},
-                      {ItemID::fiberglassFishingPole, Prefix::none, 1}}),
-             })},
+            {1, getIvyPrimaryLoot(rnd)},
             {1.0 / 6, {ItemID::livingMahoganyWand, Prefix::none, 1}},
             {0.1, {ItemID::beeMinecart, Prefix::none, 1}},
             {0.2, {ItemID::honeyDispenser, Prefix::none, 1}},
@@ -949,17 +962,7 @@ void fillCavernChest(
         chest,
         rnd,
         {
-            {1,
-             rnd.pool<Item>({
-                 {ItemID::bandOfRegeneration,
-                  rnd.select(PrefixSet::accessory),
-                  1},
-                 {ItemID::magicMirror, Prefix::none, 1},
-                 {ItemID::cloudInABottle, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::hermesBoots, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::shoeSpikes, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::flareGun, Prefix::none, 1},
-             })},
+            {1, getCavernPrimaryLoot(rnd)},
             {isTrapped ? 1.0 / 3 : 0,
              {ItemID::deadMansSweater, Prefix::none, 1}},
             {chest.y < lavaLevel ? 0.05 : 0.15,
@@ -1018,17 +1021,7 @@ void fillCavernFrozenChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1,
-             rnd.pool<Item>({
-                 {ItemID::iceBoomerang, rnd.select(PrefixSet::universal), 1},
-                 {ItemID::iceBlade, rnd.select(PrefixSet::melee), 1},
-                 {ItemID::iceSkates, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::snowballCannon, rnd.select(PrefixSet::ranged), 1},
-                 {ItemID::blizzardInABottle,
-                  rnd.select(PrefixSet::accessory),
-                  1},
-                 {ItemID::flurryBoots, rnd.select(PrefixSet::accessory), 1},
-             })},
+            {1, getFrozenPrimaryLoot(rnd)},
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
             {0.02, {ItemID::fish, Prefix::none, 1}},
             {1.0 / 7, {ItemID::iceMachine, Prefix::none, 1}},
@@ -1088,14 +1081,7 @@ void fillCavernHoneyChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1,
-             {rnd.pool(
-                  {ItemID::abeemination,
-                   ItemID::beeMinecart,
-                   ItemID::hiveWand,
-                   ItemID::honeyDispenser}),
-              Prefix::none,
-              1}},
+            {1, getHoneyPrimaryLoot(rnd)},
             {1.0 / 3, {ItemID::honeyBomb, Prefix::none, rnd.getInt(3, 5)}},
             {chest.y < lavaLevel ? 0.05 : 0.15,
              {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
@@ -1156,18 +1142,7 @@ void fillCavernIvyChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1,
-             rnd.pool<Item>({
-                 {ItemID::feralClaws, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::ankletOfTheWind, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::staffOfRegrowth, rnd.select(PrefixSet::melee), 1},
-                 {ItemID::boomstick, rnd.select(PrefixSet::ranged), 1},
-                 rnd.select<Item>(
-                     {{ItemID::flowerBoots,
-                       rnd.select(PrefixSet::accessory),
-                       1},
-                      {ItemID::fiberglassFishingPole, Prefix::none, 1}}),
-             })},
+            {1, getIvyPrimaryLoot(rnd)},
             {1.0 / 6, {ItemID::livingMahoganyWand, Prefix::none, 1}},
             {0.1, {ItemID::beeMinecart, Prefix::none, 1}},
             {0.2, {ItemID::honeyDispenser, Prefix::none, 1}},
@@ -1364,17 +1339,7 @@ void fillCavernRichMahoganyChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1,
-             rnd.pool<Item>({
-                 {ItemID::bandOfRegeneration,
-                  rnd.select(PrefixSet::accessory),
-                  1},
-                 {ItemID::magicMirror, Prefix::none, 1},
-                 {ItemID::cloudInABottle, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::hermesBoots, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::shoeSpikes, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::flareGun, Prefix::none, 1},
-             })},
+            {1, getCavernPrimaryLoot(rnd)},
             {chest.y < lavaLevel ? 0.05 : 0.15,
              {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
               Prefix::none,
