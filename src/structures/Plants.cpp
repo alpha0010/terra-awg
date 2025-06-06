@@ -689,7 +689,7 @@ void growGrass(int x, int y, Random &rnd, World &world)
     if (probeTile.liquid != Liquid::none) {
         return;
     }
-    if (randInt % 61 == 0) {
+    if (randInt % 61 < 2) {
         probeTile.blockID = TileID::herb;
         switch (baseTile.blockID) {
         case TileID::ash:
@@ -711,18 +711,26 @@ void growGrass(int x, int y, Random &rnd, World &world)
         case TileID::grass:
             return;
         case TileID::jungleGrass:
-            probeTile.frameX = 18;
-            return;
+            if (randInt % 61 == 0) {
+                probeTile.frameX = 18;
+                return;
+            }
+            break;
         case TileID::sand:
-            probeTile.frameX = 72;
-            return;
+            if (x > 350 && x < world.getWidth() - 350) {
+                probeTile.frameX = 72;
+                return;
+            }
+            break;
         case TileID::snow:
         case TileID::ice:
-            probeTile.frameX = 108;
-            return;
-        default:
-            probeTile.blockID = TileID::empty;
+            if (randInt % 61 == 0) {
+                probeTile.frameX = 108;
+                return;
+            }
+            break;
         }
+        probeTile.blockID = TileID::empty;
     }
     bool increasedPileRate = probeTile.wallID == WallID::Unsafe::granite ||
                              probeTile.wallID == WallID::Unsafe::marble;
