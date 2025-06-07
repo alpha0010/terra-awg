@@ -4,6 +4,7 @@
 #include "World.h"
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
+#include <algorithm>
 #include <set>
 
 Point getEmbeddedPos(

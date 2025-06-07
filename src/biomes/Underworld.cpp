@@ -182,7 +182,9 @@ void genUnderworld(Random &rnd, World &world)
                     tile.wallID = WallID::empty;
                 } else if (
                     std::abs(rnd.getFineNoise(2 * x, 2 * y + aspectRatio * x)) <
-                    0.1) {
+                        0.12 ||
+                    std::abs(rnd.getFineNoise(3 * x, 3 * y + aspectRatio * x)) <
+                        0.06) {
                     tile.wallID = WallID::empty;
                 }
                 if (y > lavaLevel && tile.blockID == TileID::empty) {
