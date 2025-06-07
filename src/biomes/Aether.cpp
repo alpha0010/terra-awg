@@ -131,4 +131,11 @@ void genAether(Random &rnd, World &world)
             }
         }
     }
+    embedWaterfalls(
+        {centerX - size, centerY - size},
+        {centerX + size, centerY + size},
+        {TileID::aetherium},
+        Liquid::shimmer,
+        rnd,
+        world);
 }

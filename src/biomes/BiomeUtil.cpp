@@ -3,6 +3,84 @@
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
+#include "structures/StructureUtil.h"
+#include <set>
+
+Point getEmbeddedPos(
+    int x,
+    int y,
+    int deltaX,
+    const std::set<int> &blocks,
+    World &world)
+{
+    x += deltaX;
+    for (int dist = 0; dist < 3 && blocks.contains(world.getTile(x, y).blockID);
+         ++dist, x += deltaX) {
+        if (world.regionPasses(x - 1, y - 1, 3, 3, [&blocks](Tile &tile) {
+                return blocks.contains(tile.blockID);
+            })) {
+            return {x, y};
+        }
+    }
+    return {-1, -1};
+}
+
+void embedWaterfalls(
+    Point from,
+    Point to,
+    std::initializer_list<int> allowedBlocks,
+    Liquid liquid,
+    Random &rnd,
+    World &world)
+{
+    std::set<int> blocks{allowedBlocks.begin(), allowedBlocks.end()};
+    std::vector<std::tuple<int, int, int>> waterSources;
+    for (int y = from.second; y < to.second; ++y) {
+        int state = 0;
+        for (int x = from.first; x < to.first; ++x) {
+            Tile &tile = world.getTile(x, y);
+            int nextState = tile.blockID != TileID::empty ? -1
+                            : tile.liquid != Liquid::none ? 0
+                                                          : 1;
+            if (state != 0 && nextState != 0 && state != nextState) {
+                auto [sourceX, sourceY] =
+                    getEmbeddedPos(x, y, state, blocks, world);
+                if (sourceX != -1) {
+                    waterSources.emplace_back(sourceX, sourceY, nextState);
+                }
+            }
+            state = nextState;
+        }
+    }
+    std::shuffle(waterSources.begin(), waterSources.end(), rnd.getPRNG());
+    std::vector<Point> usedLocations;
+    std::vector<Point> waterStream;
+    for (auto [x, y, deltaX] : waterSources) {
+        if (isLocationUsed(x, y, 14, usedLocations)) {
+            continue;
+        }
+        usedLocations.emplace_back(x, y);
+        Tile &sourceTile = world.getTile(x, y);
+        sourceTile.blockID = TileID::empty;
+        sourceTile.liquid = liquid;
+        for (int i = deltaX; world.getTile(x + i, y).blockID != TileID::empty;
+             i += deltaX) {
+            waterStream.emplace_back(x + i, y);
+        }
+    }
+    world.queuedDeco.emplace_back(
+        [blocks, waterStream](Random &, World &world) {
+            for (auto [x, y] : waterStream) {
+                Tile &tile = world.getTile(x, y);
+                Tile &aboveTile = world.getTile(x, y - 1);
+                if (blocks.contains(tile.blockID) &&
+                    (aboveTile.blockID == TileID::empty ||
+                     isSolidBlock(aboveTile.blockID))) {
+                    tile.slope = Slope::half;
+                }
+            }
+        });
+}
 
 void fillLargeWallGaps(Point from, Point to, Random &rnd, World &world)
 {
