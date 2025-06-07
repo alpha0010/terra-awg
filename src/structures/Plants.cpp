@@ -767,7 +767,7 @@ void growGrass(int x, int y, Random &rnd, World &world)
                                          : TileID::grassPlant);
         break;
     case TileID::jungleGrass:
-        if (isRegionEmpty(x + 1, y - 2, 2, 2, world) &&
+        if (isRegionEmpty(x, y - 2, 3, 2, world) &&
             world.regionPasses(
                 x + 1,
                 y,
