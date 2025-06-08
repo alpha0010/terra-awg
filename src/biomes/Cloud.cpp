@@ -49,6 +49,7 @@ void makeFishingCloud(
         {startX + width, startY + height},
         {TileID::cloud, TileID::rainCloud, TileID::snowCloud},
         Liquid::water,
+        14,
         rnd,
         world);
 }

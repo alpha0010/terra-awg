@@ -14,6 +14,7 @@ void embedWaterfalls(
     Point to,
     std::initializer_list<int> allowedBlocks,
     Liquid liquid,
+    int proximity,
     Random &rnd,
     World &world);
 

@@ -136,6 +136,7 @@ void genAether(Random &rnd, World &world)
         {centerX + size, centerY + size},
         {TileID::aetherium},
         Liquid::shimmer,
+        16,
         rnd,
         world);
 }

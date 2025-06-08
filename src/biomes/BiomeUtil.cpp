@@ -31,6 +31,7 @@ void embedWaterfalls(
     Point to,
     std::initializer_list<int> allowedBlocks,
     Liquid liquid,
+    int proximity,
     Random &rnd,
     World &world)
 {
@@ -57,7 +58,7 @@ void embedWaterfalls(
     std::vector<Point> usedLocations;
     std::vector<Point> waterStream;
     for (auto [x, y, deltaX] : waterSources) {
-        if (isLocationUsed(x, y, 14, usedLocations)) {
+        if (isLocationUsed(x, y, proximity, usedLocations)) {
             continue;
         }
         usedLocations.emplace_back(x, y);

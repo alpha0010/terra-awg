@@ -2,6 +2,7 @@
 
 #include "Random.h"
 #include "World.h"
+#include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/StructureUtil.h"
@@ -83,7 +84,7 @@ Point selectLarvaeLocation(
 void fillHive(Random &rnd, World &world)
 {
     rnd.shuffleNoise();
-    double size = world.getWidth() / rnd.getDouble(70, 120);
+    double size = 15 + world.getWidth() / rnd.getDouble(84, 166);
     int hiveX = rnd.getInt(
         world.jungleCenter - 0.075 * world.getWidth(),
         world.jungleCenter + 0.075 * world.getWidth());
@@ -163,6 +164,14 @@ void fillHive(Random &rnd, World &world)
                     }
                 }
             }
+            embedWaterfalls(
+                {hiveX - size, hiveY - size / 2.5},
+                {hiveX + size, hiveY + size / 3.5},
+                {TileID::hive},
+                Liquid::honey,
+                35,
+                rnd,
+                world);
         });
 }
 
