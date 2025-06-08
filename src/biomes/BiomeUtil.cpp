@@ -20,6 +20,16 @@ Point getEmbeddedPos(
         if (world.regionPasses(x - 1, y - 1, 3, 3, [&blocks](Tile &tile) {
                 return blocks.contains(tile.blockID);
             })) {
+            if (world.regionPasses(
+                    x + deltaX - 1,
+                    y - 2,
+                    3,
+                    5,
+                    [&blocks](Tile &tile) {
+                        return blocks.contains(tile.blockID);
+                    })) {
+                return {x + deltaX, y};
+            }
             return {x, y};
         }
     }
