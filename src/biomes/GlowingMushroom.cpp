@@ -45,6 +45,10 @@ void fillMushroomField(
                         prevTile.blockID = TileID::mushroomGrass;
                     }
                 }
+                Tile &leftTile = world.getTile(x - 1, y);
+                if (leftTile.blockID == TileID::mud) {
+                    leftTile.blockID = TileID::mushroomGrass;
+                }
             } else {
                 switch (tile.blockID) {
                 case TileID::stone:
