@@ -100,7 +100,7 @@ void clearTempleSurface(Point center, Random &rnd, World &world)
         TileID::tungstenOre,
         TileID::goldOre,
         TileID::platinumOre};
-    int scanDist = 0.019 * world.getWidth();
+    int scanDist = std::max<int>(0.019 * world.getWidth(), 82);
     for (int x = center.first - scanDist; x < center.first + scanDist; ++x) {
         for (int y = center.second - scanDist; y < center.second + scanDist;
              ++y) {
@@ -113,6 +113,10 @@ void clearTempleSurface(Point center, Random &rnd, World &world)
                     break;
                 } else if (clearableTiles.contains(tile.blockID)) {
                     tile.blockID = TileID::empty;
+                    Tile &leftTile = world.getTile(x - 1, y);
+                    if (leftTile.blockID == TileID::mud) {
+                        leftTile.blockID = TileID::jungleGrass;
+                    }
                 }
             } else if (tile.blockID == TileID::mud && world.isExposed(x, y)) {
                 tile.blockID = TileID::jungleGrass;
