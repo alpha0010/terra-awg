@@ -111,6 +111,7 @@ public:
     int gemGroveSize;
     std::vector<std::pair<int, int>> mushroomCenter;
 
+    std::vector<std::function<void(Random &, World &)>> queuedEvil;
     std::vector<std::function<void(Random &, World &)>> queuedDeco;
     std::vector<std::function<void(Random &, World &)>> queuedTraps;
     std::vector<std::function<void(Random &, World &)>> queuedTreasures;

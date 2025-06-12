@@ -32,8 +32,6 @@ bool isLocationUsed(
     return false;
 }
 
-// -rwxrwxr-x 1 alpha alpha 1088864 Jun 10 18:33 terra-awg*
-
 inline constexpr auto nonSolidTiles = frozen::make_set<int>({
     TileID::empty,
     TileID::alchemyTable,

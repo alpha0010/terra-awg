@@ -84,6 +84,9 @@ void doWorldGen(Config &conf, Random &rnd, World &world)
     } else {
         genCorruption(rnd, world);
     }
+    for (const auto &applyQueuedEvil : world.queuedEvil) {
+        applyQueuedEvil(rnd, world);
+    }
     genAsteroidField(rnd, world);
     genGemCave(rnd, world);
     genSpiderNest(rnd, world);
