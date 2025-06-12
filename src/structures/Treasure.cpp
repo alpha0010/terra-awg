@@ -10,9 +10,10 @@
 #include "structures/Traps.h"
 #include "structures/UndergroundCabin.h"
 #include "structures/data/JungleShrines.h"
+#include "vendor/frozen/map.h"
+#include "vendor/frozen/set.h"
 #include <algorithm>
 #include <iostream>
-#include <set>
 
 enum class Gem {
     topaz = 18,
@@ -29,7 +30,7 @@ bool listContains(const T &list, const U &value)
     return std::find(std::begin(list), std::end(list), value) != std::end(list);
 }
 
-inline const std::set<int> placementAvoidTiles{
+inline constexpr auto placementAvoidTiles = frozen::make_set<int>({
     TileID::grate,
     TileID::leaf,
     TileID::livingWood,
@@ -37,7 +38,7 @@ inline const std::set<int> placementAvoidTiles{
     TileID::thinIce,
     TileID::spike,
     TileID::woodenSpike,
-};
+});
 
 bool isPlacementCandidate(int x, int y, World &world)
 {
@@ -70,21 +71,21 @@ int testOrbHeartCandidate(int x, int y, World &world)
     if (tendrilID == TileID::empty) {
         return tendrilID;
     }
-    std::set<int> allowedTiles{
-        TileID::clay,
-        TileID::mud,
-        TileID::ebonstone,
-        TileID::ebonsand,
-        TileID::corruptIce,
-        TileID::ebonsandstone,
-        TileID::hardenedEbonsand,
-        TileID::lesion,
-        TileID::crimstone,
-        TileID::crimsand,
-        TileID::crimsonIce,
-        TileID::crimsandstone,
-        TileID::hardenedCrimsand,
-        TileID::flesh};
+    constexpr auto allowedTiles = frozen::make_set<int>(
+        {TileID::clay,
+         TileID::mud,
+         TileID::ebonstone,
+         TileID::ebonsand,
+         TileID::corruptIce,
+         TileID::ebonsandstone,
+         TileID::hardenedEbonsand,
+         TileID::lesion,
+         TileID::crimstone,
+         TileID::crimsand,
+         TileID::crimsonIce,
+         TileID::crimsandstone,
+         TileID::hardenedCrimsand,
+         TileID::flesh});
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
             if (((i == 0 || i == 7) && (j < 2 || j > 5)) ||
@@ -118,17 +119,17 @@ void placeGems(Random &rnd, World &world)
     int numGems =
         world.getWidth() * world.getHeight() / rnd.getInt(65800, 76800);
     int scanDist = 0.08 * world.getWidth();
-    std::set<int> validAnchors{
-        TileID::sand,
-        TileID::hardenedSand,
-        TileID::sandstone,
-        TileID::ebonsand,
-        TileID::hardenedEbonsand,
-        TileID::ebonsandstone,
-        TileID::crimsand,
-        TileID::hardenedCrimsand,
-        TileID::crimsandstone,
-        TileID::coralstone};
+    constexpr auto validAnchors = frozen::make_set<int>(
+        {TileID::sand,
+         TileID::hardenedSand,
+         TileID::sandstone,
+         TileID::ebonsand,
+         TileID::hardenedEbonsand,
+         TileID::ebonsandstone,
+         TileID::crimsand,
+         TileID::hardenedCrimsand,
+         TileID::crimsandstone,
+         TileID::coralstone});
     while (numGems > 0) {
         int x = rnd.getInt(
             world.desertCenter - scanDist,
@@ -238,26 +239,26 @@ void placeFallenLogs(
 void placeAltars(int maxBin, LocationBins &locations, Random &rnd, World &world)
 {
     int altarCount = std::max(8, world.getWidth() / 200);
-    std::set<int> corruptTiles{
-        TileID::ebonstone,
-        TileID::corruptGrass,
-        TileID::demonite,
-        TileID::ebonsand,
-        TileID::corruptJungleGrass,
-        TileID::corruptIce,
-        TileID::ebonsandstone,
-        TileID::hardenedEbonsand,
-        TileID::lesion};
-    std::set<int> crimsonTiles{
-        TileID::crimstone,
-        TileID::crimsonGrass,
-        TileID::crimtane,
-        TileID::crimsand,
-        TileID::crimsonJungleGrass,
-        TileID::crimsonIce,
-        TileID::crimsandstone,
-        TileID::hardenedCrimsand,
-        TileID::flesh};
+    constexpr auto corruptTiles = frozen::make_set<int>(
+        {TileID::ebonstone,
+         TileID::corruptGrass,
+         TileID::demonite,
+         TileID::ebonsand,
+         TileID::corruptJungleGrass,
+         TileID::corruptIce,
+         TileID::ebonsandstone,
+         TileID::hardenedEbonsand,
+         TileID::lesion});
+    constexpr auto crimsonTiles = frozen::make_set<int>(
+        {TileID::crimstone,
+         TileID::crimsonGrass,
+         TileID::crimtane,
+         TileID::crimsand,
+         TileID::crimsonJungleGrass,
+         TileID::crimsonIce,
+         TileID::crimsandstone,
+         TileID::hardenedCrimsand,
+         TileID::flesh});
     while (altarCount > 0) {
         int binId = rnd.getInt(0, maxBin);
         if (locations[binId].empty()) {
@@ -362,22 +363,22 @@ Point selectShrineLocation(
     if (minOpenHeight == -1) {
         minOpenHeight = shrine.getHeight();
     }
-    std::set<int> clearableTiles{
-        TileID::empty,
-        TileID::dirt,
-        TileID::mud,
-        TileID::jungleGrass,
-        TileID::stone,
-        TileID::clay,
-        TileID::silt,
-        TileID::copperOre,
-        TileID::tinOre,
-        TileID::ironOre,
-        TileID::leadOre,
-        TileID::silverOre,
-        TileID::tungstenOre,
-        TileID::goldOre,
-        TileID::platinumOre};
+    constexpr auto clearableTiles = frozen::make_set<int>(
+        {TileID::empty,
+         TileID::dirt,
+         TileID::mud,
+         TileID::jungleGrass,
+         TileID::stone,
+         TileID::clay,
+         TileID::silt,
+         TileID::copperOre,
+         TileID::tinOre,
+         TileID::ironOre,
+         TileID::leadOre,
+         TileID::silverOre,
+         TileID::tungstenOre,
+         TileID::goldOre,
+         TileID::platinumOre});
     for (int numTries = 0; numTries < 10000; ++numTries) {
         int x = rnd.getInt(
             world.jungleCenter - 0.09 * world.getWidth(),
@@ -541,79 +542,79 @@ Variant getChestType(int x, int y, World &world)
     } else if (probeTile.wallID == WallID::Unsafe::lihzahrdBrick) {
         return Variant::lihzahrd;
     }
-    std::map<int, Variant> blockTypes{
-        {TileID::ash, Variant::ashWood},
-        {TileID::ashGrass, Variant::ashWood},
-        {TileID::obsidian, Variant::ashWood},
-        {TileID::crimstone, Variant::flesh},
-        {TileID::crimsonGrass, Variant::flesh},
-        {TileID::crimsand, Variant::flesh},
-        {TileID::crimsonJungleGrass, Variant::flesh},
-        {TileID::crimsonIce, Variant::flesh},
-        {TileID::crimsandstone, Variant::flesh},
-        {TileID::hardenedCrimsand, Variant::flesh},
-        {TileID::snow, Variant::frozen},
-        {TileID::ice, Variant::frozen},
-        {TileID::thinIce, Variant::frozen},
-        {TileID::slush, Variant::frozen},
-        {TileID::ebonstone, Variant::lesion},
-        {TileID::corruptGrass, Variant::lesion},
-        {TileID::ebonsand, Variant::lesion},
-        {TileID::corruptJungleGrass, Variant::lesion},
-        {TileID::corruptIce, Variant::lesion},
-        {TileID::ebonsandstone, Variant::lesion},
-        {TileID::hardenedEbonsand, Variant::lesion},
-        {TileID::lesion, Variant::lesion},
-        {TileID::granite, Variant::granite},
-        {TileID::smoothGranite, Variant::granite},
-        {TileID::marble, Variant::marble},
-        {TileID::smoothMarble, Variant::marble},
-        {TileID::heliumMossStone, Variant::meteorite},
-        {TileID::aetherium, Variant::meteorite},
-        {TileID::mushroomGrass, Variant::mushroom},
-        {TileID::jungleGrass, Variant::richMahogany},
-        {TileID::livingMahogany, Variant::richMahogany},
-        {TileID::mahoganyLeaf, Variant::richMahogany},
-        {TileID::sand, Variant::sandstone},
-        {TileID::sandstone, Variant::sandstone},
-        {TileID::sandstoneBrick, Variant::sandstone},
-        {TileID::hardenedSand, Variant::sandstone},
-        {TileID::desertFossil, Variant::sandstone}};
-    std::map<int, Variant> wallTypes{
-        {WallID::Unsafe::ember, Variant::ashWood},
-        {WallID::Unsafe::cinder, Variant::ashWood},
-        {WallID::Unsafe::magma, Variant::ashWood},
-        {WallID::Unsafe::smoulderingStone, Variant::ashWood},
-        {WallID::Unsafe::crimsonGrass, Variant::flesh},
-        {WallID::Unsafe::crimsandstone, Variant::flesh},
-        {WallID::Unsafe::hardenedCrimsand, Variant::flesh},
-        {WallID::Unsafe::crimstone, Variant::flesh},
-        {WallID::Unsafe::crimsonCrust, Variant::flesh},
-        {WallID::Unsafe::crimsonScab, Variant::flesh},
-        {WallID::Unsafe::crimsonTeeth, Variant::flesh},
-        {WallID::Unsafe::crimsonBlister, Variant::flesh},
-        {WallID::Unsafe::snow, Variant::frozen},
-        {WallID::Unsafe::ice, Variant::frozen},
-        {WallID::Unsafe::corruptGrass, Variant::lesion},
-        {WallID::Unsafe::ebonsandstone, Variant::lesion},
-        {WallID::Unsafe::hardenedEbonsand, Variant::lesion},
-        {WallID::Unsafe::ebonstone, Variant::lesion},
-        {WallID::Unsafe::corruptGrowth, Variant::lesion},
-        {WallID::Unsafe::corruptMass, Variant::lesion},
-        {WallID::Unsafe::corruptPustule, Variant::lesion},
-        {WallID::Unsafe::corruptTendril, Variant::lesion},
-        {WallID::Unsafe::granite, Variant::granite},
-        {WallID::Unsafe::marble, Variant::marble},
-        {WallID::Unsafe::mushroom, Variant::mushroom},
-        {WallID::Unsafe::jungle, Variant::richMahogany},
-        {WallID::Unsafe::mud, Variant::richMahogany},
-        {WallID::Unsafe::lichenStone, Variant::richMahogany},
-        {WallID::Unsafe::leafyJungle, Variant::richMahogany},
-        {WallID::Unsafe::ivyStone, Variant::richMahogany},
-        {WallID::Unsafe::jungleVine, Variant::richMahogany},
-        {WallID::Unsafe::sandstone, Variant::sandstone},
-        {WallID::Safe::sandstoneBrick, Variant::sandstone},
-        {WallID::Unsafe::hardenedSand, Variant::sandstone}};
+    constexpr auto blockTypes = frozen::make_map<int, Variant>(
+        {{TileID::ash, Variant::ashWood},
+         {TileID::ashGrass, Variant::ashWood},
+         {TileID::obsidian, Variant::ashWood},
+         {TileID::crimstone, Variant::flesh},
+         {TileID::crimsonGrass, Variant::flesh},
+         {TileID::crimsand, Variant::flesh},
+         {TileID::crimsonJungleGrass, Variant::flesh},
+         {TileID::crimsonIce, Variant::flesh},
+         {TileID::crimsandstone, Variant::flesh},
+         {TileID::hardenedCrimsand, Variant::flesh},
+         {TileID::snow, Variant::frozen},
+         {TileID::ice, Variant::frozen},
+         {TileID::thinIce, Variant::frozen},
+         {TileID::slush, Variant::frozen},
+         {TileID::ebonstone, Variant::lesion},
+         {TileID::corruptGrass, Variant::lesion},
+         {TileID::ebonsand, Variant::lesion},
+         {TileID::corruptJungleGrass, Variant::lesion},
+         {TileID::corruptIce, Variant::lesion},
+         {TileID::ebonsandstone, Variant::lesion},
+         {TileID::hardenedEbonsand, Variant::lesion},
+         {TileID::lesion, Variant::lesion},
+         {TileID::granite, Variant::granite},
+         {TileID::smoothGranite, Variant::granite},
+         {TileID::marble, Variant::marble},
+         {TileID::smoothMarble, Variant::marble},
+         {TileID::heliumMossStone, Variant::meteorite},
+         {TileID::aetherium, Variant::meteorite},
+         {TileID::mushroomGrass, Variant::mushroom},
+         {TileID::jungleGrass, Variant::richMahogany},
+         {TileID::livingMahogany, Variant::richMahogany},
+         {TileID::mahoganyLeaf, Variant::richMahogany},
+         {TileID::sand, Variant::sandstone},
+         {TileID::sandstone, Variant::sandstone},
+         {TileID::sandstoneBrick, Variant::sandstone},
+         {TileID::hardenedSand, Variant::sandstone},
+         {TileID::desertFossil, Variant::sandstone}});
+    constexpr auto wallTypes = frozen::make_map<int, Variant>(
+        {{WallID::Unsafe::ember, Variant::ashWood},
+         {WallID::Unsafe::cinder, Variant::ashWood},
+         {WallID::Unsafe::magma, Variant::ashWood},
+         {WallID::Unsafe::smoulderingStone, Variant::ashWood},
+         {WallID::Unsafe::crimsonGrass, Variant::flesh},
+         {WallID::Unsafe::crimsandstone, Variant::flesh},
+         {WallID::Unsafe::hardenedCrimsand, Variant::flesh},
+         {WallID::Unsafe::crimstone, Variant::flesh},
+         {WallID::Unsafe::crimsonCrust, Variant::flesh},
+         {WallID::Unsafe::crimsonScab, Variant::flesh},
+         {WallID::Unsafe::crimsonTeeth, Variant::flesh},
+         {WallID::Unsafe::crimsonBlister, Variant::flesh},
+         {WallID::Unsafe::snow, Variant::frozen},
+         {WallID::Unsafe::ice, Variant::frozen},
+         {WallID::Unsafe::corruptGrass, Variant::lesion},
+         {WallID::Unsafe::ebonsandstone, Variant::lesion},
+         {WallID::Unsafe::hardenedEbonsand, Variant::lesion},
+         {WallID::Unsafe::ebonstone, Variant::lesion},
+         {WallID::Unsafe::corruptGrowth, Variant::lesion},
+         {WallID::Unsafe::corruptMass, Variant::lesion},
+         {WallID::Unsafe::corruptPustule, Variant::lesion},
+         {WallID::Unsafe::corruptTendril, Variant::lesion},
+         {WallID::Unsafe::granite, Variant::granite},
+         {WallID::Unsafe::marble, Variant::marble},
+         {WallID::Unsafe::mushroom, Variant::mushroom},
+         {WallID::Unsafe::jungle, Variant::richMahogany},
+         {WallID::Unsafe::mud, Variant::richMahogany},
+         {WallID::Unsafe::lichenStone, Variant::richMahogany},
+         {WallID::Unsafe::leafyJungle, Variant::richMahogany},
+         {WallID::Unsafe::ivyStone, Variant::richMahogany},
+         {WallID::Unsafe::jungleVine, Variant::richMahogany},
+         {WallID::Unsafe::sandstone, Variant::sandstone},
+         {WallID::Safe::sandstoneBrick, Variant::sandstone},
+         {WallID::Unsafe::hardenedSand, Variant::sandstone}});
     std::map<Variant, int> zoneCounts;
     int radius = 5;
     for (int i = -radius; i < radius; ++i) {

@@ -6,9 +6,9 @@
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
 #include "structures/data/Wrecks.h"
+#include "vendor/frozen/set.h"
 #include <algorithm>
 #include <iostream>
-#include <set>
 
 bool tryPlaceWreck(int x, int y, TileBuffer &wreck, World &world)
 {
@@ -18,10 +18,8 @@ bool tryPlaceWreck(int x, int y, TileBuffer &wreck, World &world)
         scanWhileEmpty({rightX, world.getSurfaceLevel(rightX)}, {0, 1}, world)
             .second +
         1;
-    std::set<int> clearableTiles{
-        TileID::empty,
-        TileID::sand,
-        TileID::coralstone};
+    constexpr auto clearableTiles = frozen::make_set<int>(
+        {TileID::empty, TileID::sand, TileID::coralstone});
     for (y += 1 - wreck.getHeight(); y <= surfaceLeft; ++y) {
         int jLeft = surfaceLeft - y;
         int jRight = surfaceRight - y;

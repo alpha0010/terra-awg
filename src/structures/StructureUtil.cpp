@@ -1,8 +1,8 @@
 #include "structures/StructureUtil.h"
 
 #include "World.h"
+#include "vendor/frozen/set.h"
 #include <cmath>
-#include <set>
 
 int binLocation(int x, int y, int maxY)
 {
@@ -32,7 +32,9 @@ bool isLocationUsed(
     return false;
 }
 
-inline const std::set<int> nonSolidTiles{
+// -rwxrwxr-x 1 alpha alpha 1088864 Jun 10 18:33 terra-awg*
+
+inline constexpr auto nonSolidTiles = frozen::make_set<int>({
     TileID::empty,
     TileID::alchemyTable,
     TileID::altar,
@@ -148,7 +150,7 @@ inline const std::set<int> nonSolidTiles{
     TileID::woodenBeam,
     TileID::workBench,
     TileID::yellowWillowTree,
-};
+});
 
 bool isSolidBlock(int tileId)
 {

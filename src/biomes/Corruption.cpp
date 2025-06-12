@@ -5,10 +5,11 @@
 #include "World.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
+#include "vendor/frozen/map.h"
+#include "vendor/frozen/set.h"
 #include <algorithm>
 #include <iostream>
 #include <map>
-#include <set>
 
 void genCorruption(Random &rnd, World &world)
 {
@@ -26,26 +27,26 @@ void genCorruption(Random &rnd, World &world)
     world.surfaceEvilCenter = surfaceX;
     int scanDist = 0.08 * world.getWidth();
     // Conversion mappings.
-    std::map<int, int> corruptBlocks{
-        {TileID::stone, TileID::ebonstone},
-        {TileID::grass, TileID::corruptGrass},
-        {TileID::ironOre, TileID::ebonstone},
-        {TileID::leadOre, TileID::ebonstone},
-        {TileID::silverOre, TileID::demonite},
-        {TileID::tungstenOre, TileID::demonite},
-        {TileID::goldOre, TileID::demonite},
-        {TileID::platinumOre, TileID::demonite},
-        {TileID::leaf, TileID::empty},
-        {TileID::mahoganyLeaf, TileID::empty},
-        {TileID::sand, TileID::ebonsand},
-        {TileID::jungleGrass, TileID::corruptJungleGrass},
-        {TileID::mushroomGrass, TileID::corruptJungleGrass},
-        {TileID::silt, TileID::ebonstone},
-        {TileID::slime, TileID::ebonstone},
-        {TileID::ice, TileID::corruptIce},
-        {TileID::slush, TileID::ebonstone},
-        {TileID::sandstone, TileID::ebonsandstone},
-        {TileID::hardenedSand, TileID::hardenedEbonsand}};
+    constexpr auto corruptBlocks = frozen::make_map<int, int>(
+        {{TileID::stone, TileID::ebonstone},
+         {TileID::grass, TileID::corruptGrass},
+         {TileID::ironOre, TileID::ebonstone},
+         {TileID::leadOre, TileID::ebonstone},
+         {TileID::silverOre, TileID::demonite},
+         {TileID::tungstenOre, TileID::demonite},
+         {TileID::goldOre, TileID::demonite},
+         {TileID::platinumOre, TileID::demonite},
+         {TileID::leaf, TileID::empty},
+         {TileID::mahoganyLeaf, TileID::empty},
+         {TileID::sand, TileID::ebonsand},
+         {TileID::jungleGrass, TileID::corruptJungleGrass},
+         {TileID::mushroomGrass, TileID::corruptJungleGrass},
+         {TileID::silt, TileID::ebonstone},
+         {TileID::slime, TileID::ebonstone},
+         {TileID::ice, TileID::corruptIce},
+         {TileID::slush, TileID::ebonstone},
+         {TileID::sandstone, TileID::ebonsandstone},
+         {TileID::hardenedSand, TileID::hardenedEbonsand}});
     std::map<int, int> corruptWalls{
         {WallID::Safe::livingLeaf, WallID::empty},
         {WallID::Unsafe::grass, WallID::Unsafe::corruptGrass},
@@ -70,11 +71,11 @@ void genCorruption(Random &rnd, World &world)
           WallID::Unsafe::granite}) {
         corruptWalls[wallId] = rnd.select(WallVariants::corruption);
     }
-    std::set<int> chasmSkipTiles{
-        TileID::livingWood,
-        TileID::leaf,
-        TileID::livingMahogany,
-        TileID::mahoganyLeaf};
+    constexpr auto chasmSkipTiles = frozen::make_set<int>(
+        {TileID::livingWood,
+         TileID::leaf,
+         TileID::livingMahogany,
+         TileID::mahoganyLeaf});
     int scaleFactor =
         std::midpoint<int>(world.getWidth(), 3.5 * world.getHeight());
     // Dig surface chasms, edged with ebonstone.

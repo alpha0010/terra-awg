@@ -4,24 +4,24 @@
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
+#include "vendor/frozen/set.h"
 #include <iostream>
-#include <set>
 
 void fillGraniteCave(int centerX, int centerY, Random &rnd, World &world)
 {
     double caveSize = rnd.getDouble(70, 150);
     int noiseShuffleX = rnd.getInt(0, world.getWidth());
     int noiseShuffleY = rnd.getInt(0, world.getHeight());
-    std::set<int> bgOverrideExcl{
-        TileID::sand,
-        TileID::hardenedSand,
-        TileID::sandstone,
-        TileID::ice,
-        TileID::snow,
-        TileID::marble,
-        TileID::mud,
-        TileID::mushroomGrass,
-        TileID::jungleGrass};
+    constexpr auto bgOverrideExcl = frozen::make_set<int>(
+        {TileID::sand,
+         TileID::hardenedSand,
+         TileID::sandstone,
+         TileID::ice,
+         TileID::snow,
+         TileID::marble,
+         TileID::mud,
+         TileID::mushroomGrass,
+         TileID::jungleGrass});
     fillLargeWallGaps(
         {centerX - 0.71 * caveSize, centerY - 0.71 * caveSize},
         {centerX + 0.71 * caveSize, centerY + 0.71 * caveSize},

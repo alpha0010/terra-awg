@@ -8,10 +8,10 @@
 #include "structures/StructureUtil.h"
 #include "structures/data/Rooms.h"
 #include "structures/data/SwordShrines.h"
+#include "vendor/frozen/set.h"
 #include <algorithm>
 #include <iostream>
 #include <numbers>
-#include <set>
 
 typedef std::pair<double, double> Pointf;
 
@@ -267,28 +267,28 @@ void growTapRoot(double x, double y, int roomId, Random &rnd, World &world)
         if (!placeOnRight) {
             x -= room.getWidth();
         }
-        std::set<int> clearableTiles{
-            TileID::dirt,
-            TileID::grass,
-            TileID::stone,
-            TileID::livingWood,
-            TileID::leaf,
-            TileID::corruptGrass,
-            TileID::corruptJungleGrass,
-            TileID::crimsonGrass,
-            TileID::crimsonJungleGrass,
-            TileID::mud,
-            TileID::jungleGrass,
-            TileID::clay,
-            TileID::sand,
-            TileID::sandstone,
-            TileID::hardenedSand,
-            TileID::snow,
-            TileID::ice,
-            TileID::copperOre,
-            TileID::tinOre,
-            TileID::ironOre,
-            TileID::leadOre};
+        constexpr auto clearableTiles = frozen::make_set<int>(
+            {TileID::dirt,
+             TileID::grass,
+             TileID::stone,
+             TileID::livingWood,
+             TileID::leaf,
+             TileID::corruptGrass,
+             TileID::corruptJungleGrass,
+             TileID::crimsonGrass,
+             TileID::crimsonJungleGrass,
+             TileID::mud,
+             TileID::jungleGrass,
+             TileID::clay,
+             TileID::sand,
+             TileID::sandstone,
+             TileID::hardenedSand,
+             TileID::snow,
+             TileID::ice,
+             TileID::copperOre,
+             TileID::tinOre,
+             TileID::ironOre,
+             TileID::leadOre});
         if (!world.regionPasses(
                 x,
                 anchorY,

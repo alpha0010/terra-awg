@@ -6,9 +6,9 @@
 #include "ids/WallID.h"
 #include "structures/Platforms.h"
 #include "structures/StructureUtil.h"
+#include "vendor/frozen/set.h"
 #include <algorithm>
 #include <iostream>
-#include <set>
 
 namespace Track
 {
@@ -31,7 +31,7 @@ enum {
 
 enum class Mode { none, flat, asc, desc };
 
-inline const std::set<int> trackClearTiles{
+inline constexpr auto trackClearTiles = frozen::make_set<int>({
     TileID::empty,
     TileID::dirt,
     TileID::stone,
@@ -87,7 +87,7 @@ inline const std::set<int> trackClearTiles{
     TileID::ashGrass,
     TileID::corruptJungleGrass,
     TileID::crimsonJungleGrass,
-};
+});
 
 std::vector<Point> planTrack(Random &rnd, World &world)
 {
@@ -140,11 +140,11 @@ std::vector<Point> planTrack(Random &rnd, World &world)
 
 int findGrassInColumn(int x, int y, World &world)
 {
-    std::set<int> grasses{
-        TileID::jungleGrass,
-        TileID::mushroomGrass,
-        TileID::corruptJungleGrass,
-        TileID::crimsonJungleGrass};
+    constexpr auto grasses = frozen::make_set<int>(
+        {TileID::jungleGrass,
+         TileID::mushroomGrass,
+         TileID::corruptJungleGrass,
+         TileID::crimsonJungleGrass});
     for (int swapJ = 0; swapJ < 100; ++swapJ) {
         int j = swapJ / 2;
         int minI = -j / 4;
@@ -174,7 +174,8 @@ void applyMudGrass(int x, int y, World &world)
 
 void applyTrackSupport(int x, int y, World &world)
 {
-    std::set<int> allowed{TileID::platform, TileID::woodenBeam};
+    constexpr auto allowed =
+        frozen::make_set<int>({TileID::platform, TileID::woodenBeam});
     if (!allowed.contains(world.getTile(x - 1, y).blockID) ||
         !allowed.contains(world.getTile(x + 1, y).blockID)) {
         return;

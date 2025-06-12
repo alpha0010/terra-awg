@@ -7,6 +7,7 @@
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/data/DecoGems.h"
+#include "vendor/frozen/set.h"
 #include <algorithm>
 #include <iostream>
 #include <set>
@@ -149,19 +150,19 @@ void placeGemChest(Random &rnd, World &world)
 
 Point selectGroveLocation(int groveSize, Random &rnd, World &world)
 {
-    std::set<int> allowedTiles{
-        TileID::empty,
-        TileID::dirt,
-        TileID::stone,
-        TileID::clay,
-        TileID::mud,
-        TileID::sand,
-        TileID::ironOre,
-        TileID::leadOre,
-        TileID::silverOre,
-        TileID::tungstenOre,
-        TileID::goldOre,
-        TileID::platinumOre};
+    constexpr auto allowedTiles = frozen::make_set<int>(
+        {TileID::empty,
+         TileID::dirt,
+         TileID::stone,
+         TileID::clay,
+         TileID::mud,
+         TileID::sand,
+         TileID::ironOre,
+         TileID::leadOre,
+         TileID::silverOre,
+         TileID::tungstenOre,
+         TileID::goldOre,
+         TileID::platinumOre});
     std::set<int> allowedWalls{
         WallVariants::dirt.begin(),
         WallVariants::dirt.end()};

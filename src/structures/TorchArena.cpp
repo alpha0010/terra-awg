@@ -5,8 +5,8 @@
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
 #include "structures/data/Torches.h"
+#include "vendor/frozen/set.h"
 #include <iostream>
-#include <set>
 
 Point selectArenaLocation(
     int arenaWidth,
@@ -14,7 +14,7 @@ Point selectArenaLocation(
     Random &rnd,
     World &world)
 {
-    std::set<int> clearableTiles{
+    constexpr auto clearableTiles = frozen::make_set<int>({
         TileID::empty,
         TileID::dirt,
         TileID::stone,
@@ -27,7 +27,7 @@ Point selectArenaLocation(
         TileID::tungstenOre,
         TileID::goldOre,
         TileID::platinumOre,
-    };
+    });
     int minX = 100;
     int maxX = world.getWidth() - 100 - arenaWidth;
     int minY =

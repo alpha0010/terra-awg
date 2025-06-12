@@ -7,10 +7,10 @@
 #include "structures/Statues.h"
 #include "structures/StructureUtil.h"
 #include "structures/data/DynCabin.h"
+#include "vendor/frozen/set.h"
 #include <algorithm>
-#include <set>
 
-inline const std::set<int> cabinClearTiles{
+inline constexpr auto cabinClearTiles = frozen::make_set<int>({
     TileID::empty,
     TileID::dirt,
     TileID::stone,
@@ -25,7 +25,7 @@ inline const std::set<int> cabinClearTiles{
     TileID::tungstenOre,
     TileID::goldOre,
     TileID::platinumOre,
-};
+});
 
 bool canPlaceOnCabinGround(int x, int y, int width, int height, World &world)
 {

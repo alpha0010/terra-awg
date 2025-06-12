@@ -7,9 +7,9 @@
 #include "structures/LootRules.h"
 #include "structures/StructureUtil.h"
 #include "structures/data/Igloos.h"
+#include "vendor/frozen/set.h"
 #include <algorithm>
 #include <iostream>
-#include <set>
 
 bool canPlaceIglooAt(int x, int y, TileBuffer &igloo, World &world)
 {
@@ -29,12 +29,12 @@ bool canPlaceIglooAt(int x, int y, TileBuffer &igloo, World &world)
             Paint::red) {
         return false;
     }
-    std::set<int> clearableTiles{
-        TileID::empty,
-        TileID::snow,
-        TileID::ice,
-        TileID::copperOre,
-        TileID::tinOre};
+    constexpr auto clearableTiles = frozen::make_set<int>(
+        {TileID::empty,
+         TileID::snow,
+         TileID::ice,
+         TileID::copperOre,
+         TileID::tinOre});
     return world.regionPasses(
         x,
         y,

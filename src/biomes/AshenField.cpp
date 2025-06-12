@@ -4,8 +4,8 @@
 #include "World.h"
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
+#include "vendor/frozen/set.h"
 #include <iostream>
-#include <set>
 
 void genAshenField(Random &rnd, World &world)
 {
@@ -17,10 +17,8 @@ void genAshenField(Random &rnd, World &world)
     int maxX = world.getWidth() / 2 + width;
     int minY = world.spawnY - 20;
     int maxY = std::midpoint<double>(minY + width, world.getUndergroundLevel());
-    std::set<int> avoidTiles{
-        TileID::snow,
-        TileID::sandstone,
-        TileID::livingWood};
+    constexpr auto avoidTiles = frozen::make_set<int>(
+        {TileID::snow, TileID::sandstone, TileID::livingWood});
     if (!world.regionPasses(
             minX,
             minY,

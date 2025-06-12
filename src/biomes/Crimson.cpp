@@ -5,10 +5,11 @@
 #include "World.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
+#include "vendor/frozen/map.h"
+#include "vendor/frozen/set.h"
 #include <algorithm>
 #include <iostream>
 #include <map>
-#include <set>
 
 void genCrimson(Random &rnd, World &world)
 {
@@ -26,26 +27,26 @@ void genCrimson(Random &rnd, World &world)
     world.surfaceEvilCenter = surfaceX;
     int scanDist = 0.08 * world.getWidth();
     // Conversion mappings.
-    std::map<int, int> crimsonBlocks{
-        {TileID::stone, TileID::crimstone},
-        {TileID::grass, TileID::crimsonGrass},
-        {TileID::ironOre, TileID::crimstone},
-        {TileID::leadOre, TileID::crimstone},
-        {TileID::silverOre, TileID::crimtane},
-        {TileID::tungstenOre, TileID::crimtane},
-        {TileID::goldOre, TileID::crimtane},
-        {TileID::platinumOre, TileID::crimtane},
-        {TileID::leaf, TileID::empty},
-        {TileID::mahoganyLeaf, TileID::empty},
-        {TileID::sand, TileID::crimsand},
-        {TileID::jungleGrass, TileID::crimsonJungleGrass},
-        {TileID::mushroomGrass, TileID::crimsonJungleGrass},
-        {TileID::silt, TileID::crimstone},
-        {TileID::slime, TileID::crimstone},
-        {TileID::ice, TileID::crimsonIce},
-        {TileID::slush, TileID::crimstone},
-        {TileID::sandstone, TileID::crimsandstone},
-        {TileID::hardenedSand, TileID::hardenedCrimsand}};
+    constexpr auto crimsonBlocks = frozen::make_map<int, int>(
+        {{TileID::stone, TileID::crimstone},
+         {TileID::grass, TileID::crimsonGrass},
+         {TileID::ironOre, TileID::crimstone},
+         {TileID::leadOre, TileID::crimstone},
+         {TileID::silverOre, TileID::crimtane},
+         {TileID::tungstenOre, TileID::crimtane},
+         {TileID::goldOre, TileID::crimtane},
+         {TileID::platinumOre, TileID::crimtane},
+         {TileID::leaf, TileID::empty},
+         {TileID::mahoganyLeaf, TileID::empty},
+         {TileID::sand, TileID::crimsand},
+         {TileID::jungleGrass, TileID::crimsonJungleGrass},
+         {TileID::mushroomGrass, TileID::crimsonJungleGrass},
+         {TileID::silt, TileID::crimstone},
+         {TileID::slime, TileID::crimstone},
+         {TileID::ice, TileID::crimsonIce},
+         {TileID::slush, TileID::crimstone},
+         {TileID::sandstone, TileID::crimsandstone},
+         {TileID::hardenedSand, TileID::hardenedCrimsand}});
     std::map<int, int> crimsonWalls{
         {WallID::Safe::livingLeaf, WallID::empty},
         {WallID::Unsafe::grass, WallID::Unsafe::crimsonGrass},
@@ -70,17 +71,17 @@ void genCrimson(Random &rnd, World &world)
           WallID::Unsafe::granite}) {
         crimsonWalls[wallId] = rnd.select(WallVariants::crimson);
     }
-    std::set<int> tunnelBorderExclusions{
-        TileID::empty,
-        TileID::ironOre,
-        TileID::leadOre,
-        TileID::silverOre,
-        TileID::tungstenOre};
-    std::set<int> tunnelSkipTiles{
-        TileID::livingWood,
-        TileID::leaf,
-        TileID::livingMahogany,
-        TileID::mahoganyLeaf};
+    constexpr auto tunnelBorderExclusions = frozen::make_set<int>(
+        {TileID::empty,
+         TileID::ironOre,
+         TileID::leadOre,
+         TileID::silverOre,
+         TileID::tungstenOre});
+    constexpr auto tunnelSkipTiles = frozen::make_set<int>(
+        {TileID::livingWood,
+         TileID::leaf,
+         TileID::livingMahogany,
+         TileID::mahoganyLeaf});
     int scaleFactor =
         std::midpoint<int>(world.getWidth(), 3.5 * world.getHeight());
     // Dig surface smooth tunnel network, edged with crimstone.

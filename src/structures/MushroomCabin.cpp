@@ -8,9 +8,9 @@
 #include "structures/StructureUtil.h"
 #include "structures/data/Furniture.h"
 #include "structures/data/Mushrooms.h"
+#include "vendor/frozen/set.h"
 #include <algorithm>
 #include <iostream>
-#include <set>
 
 Point selectCabinLocation(
     Point center,
@@ -20,12 +20,12 @@ Point selectCabinLocation(
 {
     int scanX = 0.02 * world.getWidth();
     int scanY = scanX / 2;
-    std::set<int> allowedTiles{
-        TileID::empty,
-        TileID::mud,
-        TileID::mushroomGrass,
-        TileID::silt,
-        TileID::slime};
+    constexpr auto allowedTiles = frozen::make_set<int>(
+        {TileID::empty,
+         TileID::mud,
+         TileID::mushroomGrass,
+         TileID::silt,
+         TileID::slime});
     for (int tries = 0; tries < 1000; ++tries) {
         int x =
             rnd.getInt(center.first - scanX - cabinWidth, center.first + scanX);

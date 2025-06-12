@@ -7,13 +7,13 @@
 #include "structures/LootRules.h"
 #include "structures/StructureUtil.h"
 #include "structures/data/Buildings.h"
+#include "vendor/frozen/set.h"
 #include <algorithm>
 #include <iostream>
-#include <set>
 
 Point selectTombLocation(TileBuffer &tomb, Random &rnd, World &world)
 {
-    std::set<int> clearableTiles{
+    constexpr auto clearableTiles = frozen::make_set<int>({
         TileID::empty,
         TileID::sand,
         TileID::hardenedSand,
@@ -27,7 +27,7 @@ Point selectTombLocation(TileBuffer &tomb, Random &rnd, World &world)
         TileID::tungstenOre,
         TileID::goldOre,
         TileID::platinumOre,
-    };
+    });
     int minX = world.desertCenter - 0.06 * world.getWidth();
     int maxX = world.desertCenter + 0.06 * world.getWidth() - tomb.getWidth();
     int minY = world.getCavernLevel();

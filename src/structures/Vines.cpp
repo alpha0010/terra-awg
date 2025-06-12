@@ -5,23 +5,23 @@
 #include "World.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
+#include "vendor/frozen/map.h"
+#include "vendor/frozen/set.h"
 #include <iostream>
-#include <map>
-#include <set>
 
 enum class ScanState { n, s, se, see, seee, e, ee, eee, eees };
 
-inline const std::set<int> attatchTiles{
-    TileID::ice,
-    TileID::stone,
-    TileID::stoneSlab,
-    TileID::ebonstone,
-    TileID::crimstone,
-    TileID::sandstone,
-    TileID::granite,
-    TileID::marble,
-    TileID::corruptIce,
-    TileID::crimsonIce};
+inline constexpr auto attatchTiles = frozen::make_set<int>(
+    {TileID::ice,
+     TileID::stone,
+     TileID::stoneSlab,
+     TileID::ebonstone,
+     TileID::crimstone,
+     TileID::sandstone,
+     TileID::granite,
+     TileID::marble,
+     TileID::corruptIce,
+     TileID::crimsonIce});
 
 ScanState scanTransition(Tile &tile, ScanState state)
 {
@@ -63,16 +63,16 @@ ScanState scanTransition(Tile &tile, ScanState state)
     return ScanState::n;
 }
 
-inline const std::map<int, int> stalactiteTypes{
-    {TileID::ice, 0},
-    {TileID::stone, 54},
-    {TileID::ebonstone, 270},
-    {TileID::crimstone, 324},
-    {TileID::sandstone, 378},
-    {TileID::granite, 432},
-    {TileID::marble, 486},
-    {TileID::corruptIce, 594},
-    {TileID::crimsonIce, 648}};
+inline constexpr auto stalactiteTypes = frozen::make_map<int, int>(
+    {{TileID::ice, 0},
+     {TileID::stone, 54},
+     {TileID::ebonstone, 270},
+     {TileID::crimstone, 324},
+     {TileID::sandstone, 378},
+     {TileID::granite, 432},
+     {TileID::marble, 486},
+     {TileID::corruptIce, 594},
+     {TileID::crimsonIce, 648}});
 
 void placeStalactite(int x, int y, World &world)
 {
@@ -107,13 +107,13 @@ void placeStalactite(int x, int y, World &world)
     }
 }
 
-inline const std::map<int, int> stalagmiteTypes{
-    {TileID::stone, 54},
-    {TileID::ebonstone, 270},
-    {TileID::crimstone, 324},
-    {TileID::sandstone, 378},
-    {TileID::granite, 432},
-    {TileID::marble, 486}};
+inline constexpr auto stalagmiteTypes = frozen::make_map<int, int>(
+    {{TileID::stone, 54},
+     {TileID::ebonstone, 270},
+     {TileID::crimstone, 324},
+     {TileID::sandstone, 378},
+     {TileID::granite, 432},
+     {TileID::marble, 486}});
 
 void placeStalagmite(int x, int y, World &world)
 {
@@ -141,43 +141,43 @@ void placeStalagmite(int x, int y, World &world)
 void genVines(Random &rnd, World &world)
 {
     std::cout << "Growing vines\n";
-    std::map<int, int> vineTypes{
-        {TileID::grass, TileID::vines},
-        {TileID::leaf, TileID::vines},
-        {TileID::jungleGrass, TileID::jungleVines},
-        {TileID::mahoganyLeaf, TileID::vineRope},
-        {TileID::lihzahrdBrick, TileID::vineRope},
-        {TileID::corruptGrass, TileID::corruptVines},
-        {TileID::corruptJungleGrass, TileID::corruptVines},
-        {TileID::crimsonGrass, TileID::crimsonVines},
-        {TileID::crimsonJungleGrass, TileID::crimsonVines},
-        {TileID::mushroomGrass, TileID::mushroomVines},
-        {TileID::ashGrass, TileID::ashVines}};
-    std::map<int, int> dropperTypes{
-        {TileID::dirt, TileID::waterDrip},
-        {TileID::stone, TileID::waterDrip},
-        {TileID::jungleGrass, TileID::waterDrip},
-        {TileID::cloud, TileID::waterDrip},
-        {TileID::rainCloud, TileID::waterDrip},
-        {TileID::granite, TileID::waterDrip},
-        {TileID::marble, TileID::waterDrip},
-        {TileID::livingMahogany, TileID::waterDrip},
-        {TileID::mahoganyLeaf, TileID::waterDrip},
-        {TileID::lihzahrdBrick, TileID::waterDrip},
-        {TileID::ash, TileID::lavaDrip},
-        {TileID::ashGrass, TileID::lavaDrip},
-        {TileID::obsidianBrick, TileID::lavaDrip},
-        {TileID::hellstoneBrick, TileID::lavaDrip},
-        {TileID::sand, TileID::sandDrip},
-        {TileID::hardenedSand, TileID::sandDrip},
-        {TileID::sandstone, TileID::sandDrip},
-        {TileID::ebonsand, TileID::sandDrip},
-        {TileID::hardenedEbonsand, TileID::sandDrip},
-        {TileID::ebonsandstone, TileID::sandDrip},
-        {TileID::crimsand, TileID::sandDrip},
-        {TileID::hardenedCrimsand, TileID::sandDrip},
-        {TileID::crimsandstone, TileID::sandDrip},
-        {TileID::hive, TileID::honeyDrip}};
+    constexpr auto vineTypes = frozen::make_map<int, int>(
+        {{TileID::grass, TileID::vines},
+         {TileID::leaf, TileID::vines},
+         {TileID::jungleGrass, TileID::jungleVines},
+         {TileID::mahoganyLeaf, TileID::vineRope},
+         {TileID::lihzahrdBrick, TileID::vineRope},
+         {TileID::corruptGrass, TileID::corruptVines},
+         {TileID::corruptJungleGrass, TileID::corruptVines},
+         {TileID::crimsonGrass, TileID::crimsonVines},
+         {TileID::crimsonJungleGrass, TileID::crimsonVines},
+         {TileID::mushroomGrass, TileID::mushroomVines},
+         {TileID::ashGrass, TileID::ashVines}});
+    constexpr auto dropperTypes = frozen::make_map<int, int>(
+        {{TileID::dirt, TileID::waterDrip},
+         {TileID::stone, TileID::waterDrip},
+         {TileID::jungleGrass, TileID::waterDrip},
+         {TileID::cloud, TileID::waterDrip},
+         {TileID::rainCloud, TileID::waterDrip},
+         {TileID::granite, TileID::waterDrip},
+         {TileID::marble, TileID::waterDrip},
+         {TileID::livingMahogany, TileID::waterDrip},
+         {TileID::mahoganyLeaf, TileID::waterDrip},
+         {TileID::lihzahrdBrick, TileID::waterDrip},
+         {TileID::ash, TileID::lavaDrip},
+         {TileID::ashGrass, TileID::lavaDrip},
+         {TileID::obsidianBrick, TileID::lavaDrip},
+         {TileID::hellstoneBrick, TileID::lavaDrip},
+         {TileID::sand, TileID::sandDrip},
+         {TileID::hardenedSand, TileID::sandDrip},
+         {TileID::sandstone, TileID::sandDrip},
+         {TileID::ebonsand, TileID::sandDrip},
+         {TileID::hardenedEbonsand, TileID::sandDrip},
+         {TileID::ebonsandstone, TileID::sandDrip},
+         {TileID::crimsand, TileID::sandDrip},
+         {TileID::hardenedCrimsand, TileID::sandDrip},
+         {TileID::crimsandstone, TileID::sandDrip},
+         {TileID::hive, TileID::honeyDrip}});
     int lavaLevel =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     parallelFor(std::views::iota(0, world.getWidth()), [&](int x) {

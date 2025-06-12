@@ -3,11 +3,11 @@
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
+#include "vendor/frozen/set.h"
 #include <algorithm>
 #include <iostream>
-#include <set>
 
-inline const std::set<int> trappableTiles{
+inline constexpr auto trappableTiles = frozen::make_set<int>({
     TileID::empty,
     TileID::dirt,
     TileID::stone,
@@ -42,7 +42,7 @@ inline const std::set<int> trappableTiles{
     TileID::neonMossStone,
     TileID::corruptJungleGrass,
     TileID::crimsonJungleGrass,
-};
+});
 
 bool isTrappable(Tile &tile)
 {
@@ -143,17 +143,18 @@ void placeSandTraps(Random &rnd, World &world)
         world.getUnderworldLevel());
     int numSandTraps =
         world.getWidth() * world.getHeight() / rnd.getInt(240000, 360000);
-    std::set<int> validFloors{
-        TileID::sand,
-        TileID::hardenedSand,
-        TileID::sandstone,
-        TileID::ebonsand,
-        TileID::hardenedEbonsand,
-        TileID::ebonsandstone,
-        TileID::crimsand,
-        TileID::hardenedCrimsand,
-        TileID::crimsandstone};
-    std::set<int> looseBlocks{TileID::sand, TileID::ebonsand, TileID::crimsand};
+    constexpr auto validFloors = frozen::make_set<int>(
+        {TileID::sand,
+         TileID::hardenedSand,
+         TileID::sandstone,
+         TileID::ebonsand,
+         TileID::hardenedEbonsand,
+         TileID::ebonsandstone,
+         TileID::crimsand,
+         TileID::hardenedCrimsand,
+         TileID::crimsandstone});
+    constexpr auto looseBlocks = frozen::make_set<int>(
+        {TileID::sand, TileID::ebonsand, TileID::crimsand});
     while (numSandTraps > 0) {
         int binId = rnd.getInt(minBin, maxBin);
         if (locations[binId].empty()) {
@@ -195,13 +196,13 @@ void placeSandTraps(Random &rnd, World &world)
 
 bool isValidBoulderPlacement(int x, int y, World &world)
 {
-    std::set<int> validTiles{
-        TileID::crimstone,
-        TileID::ebonstone,
-        TileID::granite,
-        TileID::sandstone,
-        TileID::slime,
-        TileID::stone};
+    constexpr auto validTiles = frozen::make_set<int>(
+        {TileID::crimstone,
+         TileID::ebonstone,
+         TileID::granite,
+         TileID::sandstone,
+         TileID::slime,
+         TileID::stone});
     return world.regionPasses(x, y, 6, 6, [&validTiles](Tile &tile) {
         return !tile.guarded && validTiles.contains(tile.blockID);
     }) && world.regionPasses(x + 2, y + 6, 2, 1, [](Tile &tile) {
@@ -531,15 +532,15 @@ bool addChestLavaTrap(int x, int y, Random &rnd, World &world)
         return false;
     }
     pos = addPts(pos, {0, -5});
-    std::set<int> oreTiles{
-        TileID::ironOre,
-        TileID::copperOre,
-        TileID::goldOre,
-        TileID::silverOre,
-        TileID::tinOre,
-        TileID::leadOre,
-        TileID::tungstenOre,
-        TileID::platinumOre};
+    constexpr auto oreTiles = frozen::make_set<int>(
+        {TileID::ironOre,
+         TileID::copperOre,
+         TileID::goldOre,
+         TileID::silverOre,
+         TileID::tinOre,
+         TileID::leadOre,
+         TileID::tungstenOre,
+         TileID::platinumOre});
     int numEmpty = 0;
     if (!world.regionPasses(
             pos.first - 10,

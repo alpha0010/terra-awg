@@ -2,10 +2,11 @@
 
 #include "World.h"
 #include "ids/WallID.h"
+#include "vendor/frozen/map.h"
 #include <algorithm>
 #include <map>
 
-inline const std::map<int, int> tileToRepTile{
+inline constexpr auto tileToRepTile = frozen::make_map<int, int>({
     {TileID::aetherium, TileID::offlineAmethystGemspark},
     {TileID::amberGemspark, TileID::emeraldStone},
     {TileID::amberTree, TileID::emeraldStone},
@@ -163,9 +164,9 @@ inline const std::map<int, int> tileToRepTile{
     {TileID::woodenBeam, TileID::wood},
     {TileID::xenonMossStone, TileID::stone},
     {TileID::yellowWillowTree, TileID::wood},
-};
+});
 
-inline const std::map<int, int> wallToRepTile{
+inline constexpr auto wallToRepTile = frozen::make_map<int, int>({
     {WallID::Safe::ashWood, TileID::wood},
     {WallID::Safe::borealWood, TileID::wood},
     {WallID::Safe::cloud, TileID::cloud},
@@ -273,7 +274,7 @@ inline const std::map<int, int> wallToRepTile{
     {WallID::Unsafe::topazStone, TileID::topazStone},
     {WallID::Unsafe::wavyDirt, TileID::dirt},
     {WallID::Unsafe::wornStone, TileID::stone},
-};
+});
 
 int getRepColorTile(int x, int y, World &world)
 {

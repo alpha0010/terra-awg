@@ -4,12 +4,13 @@
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
+#include "vendor/frozen/set.h"
 #include <iostream>
-#include <set>
 
 bool isSolidArea(int x, int y, int size, World &world)
 {
-    std::set<int> allowedTiles{TileID::dirt, TileID::stone, TileID::clay};
+    constexpr auto allowedTiles =
+        frozen::make_set<int>({TileID::dirt, TileID::stone, TileID::clay});
     return world.regionPasses(x, y, size, size, [&allowedTiles](Tile &tile) {
         return allowedTiles.contains(tile.blockID);
     });

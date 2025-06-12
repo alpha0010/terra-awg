@@ -5,8 +5,8 @@
 #include "ids/WallID.h"
 #include "structures/Traps.h"
 #include "structures/data/Trees.h"
+#include "vendor/frozen/set.h"
 #include <iostream>
-#include <set>
 
 bool isRegionEmpty(int x, int y, int width, int height, World &world)
 {
@@ -193,18 +193,18 @@ void growTree(
             return;
         }
     }
-    std::set<int> treeTiles{
-        TileID::tree,
-        TileID::sakuraTree,
-        TileID::yellowWillowTree,
-        TileID::ashTree,
-        TileID::amethystTree,
-        TileID::topazTree,
-        TileID::sapphireTree,
-        TileID::emeraldTree,
-        TileID::rubyTree,
-        TileID::amberTree,
-        TileID::diamondTree};
+    constexpr auto treeTiles = frozen::make_set<int>(
+        {TileID::tree,
+         TileID::sakuraTree,
+         TileID::yellowWillowTree,
+         TileID::ashTree,
+         TileID::amethystTree,
+         TileID::topazTree,
+         TileID::sapphireTree,
+         TileID::emeraldTree,
+         TileID::rubyTree,
+         TileID::amberTree,
+         TileID::diamondTree});
     if (treeTiles.contains(world.getTile(x - 1, y - 2).blockID) ||
         treeTiles.contains(world.getTile(x - 2, y - 2).blockID)) {
         return;

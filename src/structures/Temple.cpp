@@ -6,6 +6,7 @@
 #include "structures/LootRules.h"
 #include "structures/Platforms.h"
 #include "structures/StructureUtil.h"
+#include "vendor/frozen/set.h"
 #include <algorithm>
 #include <iostream>
 #include <set>
@@ -41,7 +42,7 @@ template <typename Func> void iterateTemple(Point center, World &world, Func f)
 
 bool testTempleSelection(Point center, World &world)
 {
-    std::set<int> avoidBlocks{
+    constexpr auto avoidBlocks = frozen::make_set<int>({
         TileID::aetherium,
         TileID::ash,
         TileID::blueBrick,
@@ -53,7 +54,7 @@ bool testTempleSelection(Point center, World &world)
         TileID::marble,
         TileID::mushroomGrass,
         TileID::pinkBrick,
-    };
+    });
     bool isValid = true;
     iterateTemple(
         center,
@@ -85,21 +86,21 @@ Point selectTempleCenter(Random &rnd, World &world)
 void clearTempleSurface(Point center, Random &rnd, World &world)
 {
     rnd.shuffleNoise();
-    std::set<int> clearableTiles{
-        TileID::dirt,
-        TileID::mud,
-        TileID::jungleGrass,
-        TileID::stone,
-        TileID::clay,
-        TileID::silt,
-        TileID::copperOre,
-        TileID::tinOre,
-        TileID::ironOre,
-        TileID::leadOre,
-        TileID::silverOre,
-        TileID::tungstenOre,
-        TileID::goldOre,
-        TileID::platinumOre};
+    constexpr auto clearableTiles = frozen::make_set<int>(
+        {TileID::dirt,
+         TileID::mud,
+         TileID::jungleGrass,
+         TileID::stone,
+         TileID::clay,
+         TileID::silt,
+         TileID::copperOre,
+         TileID::tinOre,
+         TileID::ironOre,
+         TileID::leadOre,
+         TileID::silverOre,
+         TileID::tungstenOre,
+         TileID::goldOre,
+         TileID::platinumOre});
     int scanDist = std::max<int>(0.019 * world.getWidth(), 82);
     for (int x = center.first - scanDist; x < center.first + scanDist; ++x) {
         for (int y = center.second - scanDist; y < center.second + scanDist;
@@ -247,7 +248,8 @@ void addDeadEndPlatforms(
 
 bool canPlaceTempleTreasureAt(int x, int y, World &world)
 {
-    std::set<int> baseTiles{TileID::lihzahrdBrick, TileID::platform};
+    constexpr auto baseTiles =
+        frozen::make_set<int>({TileID::lihzahrdBrick, TileID::platform});
     return baseTiles.contains(world.getTile(x, y).blockID) &&
            baseTiles.contains(world.getTile(x + 1, y).blockID) &&
            world.regionPasses(x, y - 4, 2, 4, [](Tile &tile) {

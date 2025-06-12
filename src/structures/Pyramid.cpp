@@ -5,35 +5,43 @@
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/data/Rooms.h"
+#include "vendor/frozen/map.h"
+#include "vendor/frozen/set.h"
 #include <iostream>
 #include <map>
 #include <set>
 
 typedef std::pair<int, int> Point;
 
+template <typename T> constexpr int getOrKey(const T &data, int key)
+{
+    auto itr = data.find(key);
+    return itr == data.end() ? key : itr->second;
+}
+
 Point makeHall(int x, int y, int steps, Point delta, World &world)
 {
-    std::map<int, int> accent1{
-        {WallID::Safe::sandstoneBrick, WallID::Safe::smoothSandstone},
-        {WallID::Safe::ebonstoneBrick, WallID::Unsafe::ebonsandstone},
-        {WallID::Safe::crimstoneBrick, WallID::Unsafe::crimsandstone}};
-    std::map<int, int> accent2{
-        {WallID::Safe::sandstoneBrick, WallID::Safe::goldBrick},
-        {WallID::Safe::ebonstoneBrick, WallID::Safe::demoniteBrick},
-        {WallID::Safe::crimstoneBrick, WallID::Safe::crimtaneBrick}};
-    std::set<int> validBlocks{
-        TileID::sandstoneBrick,
-        TileID::ebonstoneBrick,
-        TileID::crimstoneBrick};
+    constexpr auto accent1 = frozen::make_map<int, int>(
+        {{WallID::Safe::sandstoneBrick, WallID::Safe::smoothSandstone},
+         {WallID::Safe::ebonstoneBrick, WallID::Unsafe::ebonsandstone},
+         {WallID::Safe::crimstoneBrick, WallID::Unsafe::crimsandstone}});
+    constexpr auto accent2 = frozen::make_map<int, int>(
+        {{WallID::Safe::sandstoneBrick, WallID::Safe::goldBrick},
+         {WallID::Safe::ebonstoneBrick, WallID::Safe::demoniteBrick},
+         {WallID::Safe::crimstoneBrick, WallID::Safe::crimtaneBrick}});
+    constexpr auto validBlocks = frozen::make_set<int>(
+        {TileID::sandstoneBrick,
+         TileID::ebonstoneBrick,
+         TileID::crimstoneBrick});
     for (; steps > 0; --steps, x += delta.first, y += delta.second) {
         for (int j = 0; j < 7; ++j) {
             Tile &tile = world.getTile(x, y + j);
             if (validBlocks.contains(tile.blockID)) {
                 tile.blockID = TileID::empty;
                 if (j == 0) {
-                    tile.wallID = accent1[tile.wallID];
+                    tile.wallID = getOrKey(accent1, tile.wallID);
                 } else if (j == 1) {
-                    tile.wallID = accent2[tile.wallID];
+                    tile.wallID = getOrKey(accent2, tile.wallID);
                 }
             }
         }
@@ -54,14 +62,15 @@ Point fillTreasureRoom(int x, int y, Random &rnd, World &world)
             break;
         }
     }
-    std::set<Point> chests;
     for (int i = 0; i < treasureRoom.getWidth(); ++i) {
         for (int j = 0; j < treasureRoom.getHeight(); ++j) {
             Tile &roomTile = treasureRoom.getTile(i, j);
             if (roomTile.blockID == TileID::chest &&
-                !chests.contains({i - 1, j}) && !chests.contains({i, j - 1}) &&
-                !chests.contains({i - 1, j - 1})) {
-                chests.emplace(i, j);
+                roomTile.frameX % 36 == 0 && roomTile.frameY == 0) {
+                fillPyramidChest(
+                    world.registerStorage(x + i, y + j + align),
+                    rnd,
+                    world);
             }
             Tile &tile = world.getTile(x + i, y + j + align);
             std::map<int, int> blockMap{{roomTile.blockID, roomTile.blockID}};
@@ -87,10 +96,6 @@ Point fillTreasureRoom(int x, int y, Random &rnd, World &world)
             roomTile.wallID = wallMap[roomTile.wallID];
             tile = roomTile;
         }
-    }
-    for (auto [i, j] : chests) {
-        Chest &chest = world.placeChest(x + i, y + j + align, Variant::gold);
-        fillPyramidChest(chest, rnd, world);
     }
     for (int i = 0; i < treasureRoom.getWidth(); ++i) {
         if (world.regionPasses(
@@ -131,10 +136,8 @@ Point fillTreasureRoom(int x, int y, Random &rnd, World &world)
 
 void applyGravity(int x, int y, int width, int height, World &world)
 {
-    std::set<int> unstableBlocks{
-        TileID::sand,
-        TileID::ebonsand,
-        TileID::crimsand};
+    constexpr auto unstableBlocks = frozen::make_set<int>(
+        {TileID::sand, TileID::ebonsand, TileID::crimsand});
     for (int i = 0; i < width; ++i) {
         int lastGap = -1;
         std::set<int> fallenTiles;
@@ -204,27 +207,25 @@ void genPyramid(Random &rnd, World &world)
         }
     }
     int y = world.getSurfaceLevel(x);
-    std::set<int> ignoreBlocks{TileID::empty, TileID::lesion, TileID::flesh};
+    constexpr auto ignoreBlocks =
+        frozen::make_set<int>({TileID::empty, TileID::lesion, TileID::flesh});
     while (ignoreBlocks.contains(world.getTile(x, y).blockID) &&
            y < 0.85 * world.getUndergroundLevel()) {
         ++y;
     }
     x -= size;
     y -= 5;
-    std::map<int, int> convertTiles{
-        {TileID::ebonstone, TileID::ebonstoneBrick},
-        {TileID::ebonsand, TileID::ebonstoneBrick},
-        {TileID::ebonsandstone, TileID::ebonstoneBrick},
-        {TileID::hardenedEbonsand, TileID::ebonstoneBrick},
-        {TileID::crimstone, TileID::crimstoneBrick},
-        {TileID::crimsand, TileID::crimstoneBrick},
-        {TileID::crimsandstone, TileID::crimstoneBrick},
-        {TileID::hardenedCrimsand, TileID::crimstoneBrick}};
-    std::set<int> skipTiles{
-        TileID::demonite,
-        TileID::lesion,
-        TileID::crimtane,
-        TileID::flesh};
+    constexpr auto convertTiles = frozen::make_map<int, int>(
+        {{TileID::ebonstone, TileID::ebonstoneBrick},
+         {TileID::ebonsand, TileID::ebonstoneBrick},
+         {TileID::ebonsandstone, TileID::ebonstoneBrick},
+         {TileID::hardenedEbonsand, TileID::ebonstoneBrick},
+         {TileID::crimstone, TileID::crimstoneBrick},
+         {TileID::crimsand, TileID::crimstoneBrick},
+         {TileID::crimsandstone, TileID::crimstoneBrick},
+         {TileID::hardenedCrimsand, TileID::crimstoneBrick}});
+    constexpr auto skipTiles = frozen::make_set<int>(
+        {TileID::demonite, TileID::lesion, TileID::crimtane, TileID::flesh});
     for (int i = 0; i < 2 * size; ++i) {
         for (int j = std::abs(i - size); j < size; ++j) {
             Tile &tile = world.getTile(x + i, y + j);
@@ -266,12 +267,12 @@ void genPyramid(Random &rnd, World &world)
     ++y;
     Point cave = findLinkingCave(x, y, world);
     if (cave.first != -1 && cave.second > y + 2) {
-        std::set<int> clearTiles{
-            TileID::sand,
-            TileID::hardenedSand,
-            TileID::sandstone,
-            TileID::ebonsand,
-            TileID::crimsand};
+        constexpr auto clearTiles = frozen::make_set<int>(
+            {TileID::sand,
+             TileID::hardenedSand,
+             TileID::sandstone,
+             TileID::ebonsand,
+             TileID::crimsand});
         double aspect = static_cast<double>(cave.first - x) / (cave.second - y);
         for (int j = 0; y + j < cave.second; ++j) {
             int minI = aspect * j - 3 + 4 * rnd.getFineNoise(0, j);

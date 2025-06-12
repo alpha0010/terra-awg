@@ -5,8 +5,8 @@
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/data/Boats.h"
+#include "vendor/frozen/set.h"
 #include <iostream>
-#include <set>
 
 typedef std::pair<int, int> Point;
 
@@ -16,7 +16,7 @@ Point selectBoatLocation(int width, int height, Random &rnd, World &world)
     int xMax = world.snowCenter + 0.06 * world.getWidth();
     int yMax =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3 - height;
-    std::set<int> avoidBlocks{
+    constexpr auto avoidBlocks = frozen::make_set<int>({
         TileID::aetherium,
         TileID::blueBrick,
         TileID::corruptIce,
@@ -28,7 +28,7 @@ Point selectBoatLocation(int width, int height, Random &rnd, World &world)
         TileID::mushroomGrass,
         TileID::pinkBrick,
         TileID::stone,
-    };
+    });
     while (true) {
         int x = rnd.getInt(xMin, xMax);
         int y = rnd.getInt(world.getCavernLevel(), yMax);
@@ -47,12 +47,11 @@ void genBuriedBoat(Random &rnd, World &world)
     TileBuffer boat = Data::getBoat(Data::Boat::frozen, world.getFramedTiles());
     auto [x, y] =
         selectBoatLocation(boat.getWidth(), boat.getHeight(), rnd, world);
-    std::set<int> clearableTiles{
-        TileID::borealWood,
-        TileID::richMahogany,
-        TileID::richMahoganyBeam,
-        TileID::rope};
-    std::set<Point> chests;
+    constexpr auto clearableTiles = frozen::make_set<int>(
+        {TileID::borealWood,
+         TileID::richMahogany,
+         TileID::richMahoganyBeam,
+         TileID::rope});
     for (int i = 0; i < boat.getWidth(); ++i) {
         for (int j = 0; j < boat.getHeight(); ++j) {
             Tile &boatTile = boat.getTile(i, j);
@@ -74,9 +73,11 @@ void genBuriedBoat(Random &rnd, World &world)
                 }
             }
             if (boatTile.blockID == TileID::chest &&
-                !chests.contains({i - 1, j}) && !chests.contains({i, j - 1}) &&
-                !chests.contains({i - 1, j - 1})) {
-                chests.emplace(i, j);
+                boatTile.frameX % 36 == 0 && boatTile.frameY == 0) {
+                fillCavernFrozenChest(
+                    world.registerStorage(x + i, y + j),
+                    rnd,
+                    world);
             }
             if (boatTile.wallID == WallID::empty) {
                 boatTile.wallID = tile.wallID;
@@ -84,9 +85,5 @@ void genBuriedBoat(Random &rnd, World &world)
             tile = boatTile;
             tile.guarded = true;
         }
-    }
-    for (auto [i, j] : chests) {
-        Chest &chest = world.placeChest(x + i, y + j, Variant::frozen);
-        fillCavernFrozenChest(chest, rnd, world);
     }
 }

@@ -3,6 +3,7 @@
 #include "Util.h"
 #include "World.h"
 #include "ids/WallID.h"
+#include "vendor/frozen/set.h"
 #include <iostream>
 #include <set>
 
@@ -63,28 +64,28 @@ void simulateRain(World &world, int x)
     }
     int lavaLevel =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
-    std::set<int> surfaceDryBlocks{
-        TileID::ebonstone,
-        TileID::ebonsand,
-        TileID::lesion,
-        TileID::corruptGrass,
-        TileID::corruptJungleGrass,
-        TileID::crimstone,
-        TileID::crimsand,
-        TileID::flesh,
-        TileID::crimsonGrass,
-        TileID::crimsonJungleGrass,
-        TileID::livingWood,
-        TileID::leaf,
-        TileID::livingMahogany,
-        TileID::mahoganyLeaf,
-        TileID::ashGrass,
-        TileID::sandstoneBrick,
-        TileID::ebonstoneBrick,
-        TileID::crimstoneBrick,
-        TileID::blueBrick,
-        TileID::greenBrick,
-        TileID::pinkBrick};
+    constexpr auto surfaceDryBlocks = frozen::make_set<int>(
+        {TileID::ebonstone,
+         TileID::ebonsand,
+         TileID::lesion,
+         TileID::corruptGrass,
+         TileID::corruptJungleGrass,
+         TileID::crimstone,
+         TileID::crimsand,
+         TileID::flesh,
+         TileID::crimsonGrass,
+         TileID::crimsonJungleGrass,
+         TileID::livingWood,
+         TileID::leaf,
+         TileID::livingMahogany,
+         TileID::mahoganyLeaf,
+         TileID::ashGrass,
+         TileID::sandstoneBrick,
+         TileID::ebonstoneBrick,
+         TileID::crimstoneBrick,
+         TileID::blueBrick,
+         TileID::greenBrick,
+         TileID::pinkBrick});
     std::set<int> dryWalls{
         WallID::Safe::sandstoneBrick,
         WallID::Unsafe::sandstone,

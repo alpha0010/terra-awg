@@ -4,6 +4,7 @@
 #include "World.h"
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
+#include "vendor/frozen/map.h"
 #include <algorithm>
 #include <set>
 
@@ -166,18 +167,18 @@ Point findStoneCave(int yMin, int yMax, Random &rnd, World &world, int minSize)
     }
 }
 
-inline const std::map<int, int> mossFrameX{
-    {TileID::greenMossStone, 0},
-    {TileID::brownMossStone, 22},
-    {TileID::redMossStone, 44},
-    {TileID::blueMossStone, 66},
-    {TileID::purpleMossStone, 88},
-    {TileID::lavaMossStone, 110},
-    {TileID::kryptonMossStone, 132},
-    {TileID::xenonMossStone, 154},
-    {TileID::argonMossStone, 176},
-    {TileID::neonMossStone, 198},
-    {TileID::heliumMossStone, 220}};
+inline constexpr auto mossFrameX = frozen::make_map<int, int>(
+    {{TileID::greenMossStone, 0},
+     {TileID::brownMossStone, 22},
+     {TileID::redMossStone, 44},
+     {TileID::blueMossStone, 66},
+     {TileID::purpleMossStone, 88},
+     {TileID::lavaMossStone, 110},
+     {TileID::kryptonMossStone, 132},
+     {TileID::xenonMossStone, 154},
+     {TileID::argonMossStone, 176},
+     {TileID::neonMossStone, 198},
+     {TileID::heliumMossStone, 220}});
 
 void growMossOn(int x, int y, World &world)
 {

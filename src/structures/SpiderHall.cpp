@@ -6,9 +6,9 @@
 #include "structures/LootRules.h"
 #include "structures/StructureUtil.h"
 #include "structures/data/Buildings.h"
+#include "vendor/frozen/set.h"
 #include <algorithm>
 #include <iostream>
-#include <set>
 
 bool canPlaceSpiderDecoAt(int x, int y, int width, int height, World &world)
 {
@@ -151,7 +151,7 @@ Point selectSpiderHallLocation(
     Random &rnd,
     World &world)
 {
-    std::set<int> clearableTiles{
+    constexpr auto clearableTiles = frozen::make_set<int>({
         TileID::empty,
         TileID::dirt,
         TileID::stone,
@@ -166,7 +166,7 @@ Point selectSpiderHallLocation(
         TileID::tungstenOre,
         TileID::goldOre,
         TileID::platinumOre,
-    };
+    });
     int minY = (world.getUndergroundLevel() + 2 * world.getCavernLevel()) / 3;
     int maxY = (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3 -
                hall.getHeight() / 2;
