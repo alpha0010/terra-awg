@@ -1,48 +1,9 @@
-#include "Cleanup.h"
 #include "Config.h"
+#include "GenRules.h"
 #include "Random.h"
 #include "World.h"
 #include "Writer.h"
-#include "biomes/Aether.h"
-#include "biomes/AshenField.h"
-#include "biomes/AsteroidField.h"
-#include "biomes/Base.h"
-#include "biomes/Cloud.h"
-#include "biomes/Corruption.h"
-#include "biomes/Crimson.h"
-#include "biomes/Desert.h"
-#include "biomes/Forest.h"
-#include "biomes/GemCave.h"
-#include "biomes/GemGrove.h"
-#include "biomes/GlowingMoss.h"
-#include "biomes/GlowingMushroom.h"
-#include "biomes/GraniteCave.h"
-#include "biomes/Hive.h"
-#include "biomes/Jungle.h"
-#include "biomes/MarbleCave.h"
-#include "biomes/Ocean.h"
-#include "biomes/Snow.h"
-#include "biomes/SpiderNest.h"
-#include "biomes/Underworld.h"
 #include "map/ImgWriter.h"
-#include "structures/BuriedBoat.h"
-#include "structures/DesertTomb.h"
-#include "structures/Dungeon.h"
-#include "structures/Lake.h"
-#include "structures/MinecartTracks.h"
-#include "structures/MushroomCabin.h"
-#include "structures/OceanWreck.h"
-#include "structures/Plants.h"
-#include "structures/Pyramid.h"
-#include "structures/Ruins.h"
-#include "structures/SpiderHall.h"
-#include "structures/StarterHome.h"
-#include "structures/SurfaceIgloo.h"
-#include "structures/Temple.h"
-#include "structures/TorchArena.h"
-#include "structures/Traps.h"
-#include "structures/Treasure.h"
-#include "structures/Vines.h"
 #include <array>
 #include <chrono>
 #include <iostream>
@@ -59,62 +20,6 @@ uint64_t getBinaryTime()
                       std::chrono::system_clock::now().time_since_epoch())
                       .count();
     return ms * 10000 + 621355968000000000ull;
-}
-
-void doWorldGen(Config &conf, Random &rnd, World &world)
-{
-    world.planBiomes(rnd);
-    rnd.initNoise(world.getWidth(), world.getHeight(), 0.07);
-    genWorldBase(rnd, world);
-    genOceans(rnd, world);
-    genCloud(rnd, world);
-    genMarbleCave(rnd, world);
-    genSnow(rnd, world);
-    genDesert(rnd, world);
-    genJungle(rnd, world);
-    genForest(rnd, world);
-    genAshenField(rnd, world);
-    genUnderworld(rnd, world);
-    genGlowingMushroom(rnd, world);
-    genGraniteCave(rnd, world);
-    genHive(rnd, world);
-    genAether(rnd, world);
-    if (world.isCrimson) {
-        genCrimson(rnd, world);
-    } else {
-        genCorruption(rnd, world);
-    }
-    for (const auto &applyQueuedEvil : world.queuedEvil) {
-        applyQueuedEvil(rnd, world);
-    }
-    genAsteroidField(rnd, world);
-    genGemCave(rnd, world);
-    genSpiderNest(rnd, world);
-    genGlowingMoss(rnd, world);
-    genGemGrove(rnd, world);
-    genDungeon(rnd, world);
-    genTemple(rnd, world);
-    genPyramid(rnd, world);
-    genDesertTomb(rnd, world);
-    genBuriedBoat(rnd, world);
-    genSpiderHall(rnd, world);
-    genRuins(rnd, world);
-    genTorchArena(rnd, world);
-    genLake(world);
-    if (conf.starterHome) {
-        genStarterHome(rnd, world);
-    }
-    genIgloo(rnd, world);
-    genMushroomCabin(rnd, world);
-    genOceanWreck(rnd, world);
-    auto flatLocations = genTreasure(rnd, world);
-    genPlants(flatLocations, rnd, world);
-    genTraps(rnd, world);
-    genTracks(rnd, world);
-    smoothSurfaces(world);
-    finalizeWalls(rnd, world);
-    genVines(rnd, world);
-    genGrasses(flatLocations, rnd, world);
 }
 
 void saveWorldFile(Config &conf, Random &rnd, World &world)
