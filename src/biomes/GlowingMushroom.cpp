@@ -18,7 +18,6 @@ void fillMushroomField(
     int secondaryBlock = rnd.select({TileID::silt, TileID::slime});
     for (int x = centerX - 1.4 * fieldSize; x < centerX + 1.4 * fieldSize;
          ++x) {
-        int lastTileID = TileID::empty;
         for (int y = fieldFloor - fieldSize; y < fieldFloor + fieldSize / 2;
              ++y) {
             double threshold =
@@ -39,18 +38,22 @@ void fillMushroomField(
                 y < fieldFloor + 10 * rnd.getCoarseNoise(x, 0)) {
                 tile.blockID = TileID::empty;
                 tile.wallID = WallID::empty;
-                if (lastTileID == TileID::mud) {
-                    Tile &prevTile = world.getTile(x, y - 1);
-                    if (prevTile.blockID == TileID::mud) {
+                for (auto [i, j] : {std::pair{-1, -1}, {-1, 0}, {0, -1}}) {
+                    Tile &prevTile = world.getTile(x + i, y + j);
+                    if (prevTile.blockID == TileID::mud ||
+                        (prevTile.blockID == TileID::marble &&
+                         fnv1a32pt(x + i, y + j) % 11 > 4)) {
                         prevTile.blockID = TileID::mushroomGrass;
                     }
                 }
-                Tile &leftTile = world.getTile(x - 1, y);
-                if (leftTile.blockID == TileID::mud) {
-                    leftTile.blockID = TileID::mushroomGrass;
-                }
             } else {
                 switch (tile.blockID) {
+                case TileID::marble:
+                    if (world.isExposed(x, y) && fnv1a32pt(x, y) % 11 > 4) {
+                        tile.blockID = TileID::mushroomGrass;
+                        tile.wallID = WallID::Unsafe::mushroom;
+                    }
+                    break;
                 case TileID::stone:
                 case TileID::clay:
                 case TileID::sand:
@@ -74,7 +77,6 @@ void fillMushroomField(
                     break;
                 }
             }
-            lastTileID = tile.blockID;
         }
     }
 }
