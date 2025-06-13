@@ -8,6 +8,7 @@
 #include <functional>
 #include <vector>
 
+struct Config;
 class Random;
 class TileBuffer;
 
@@ -27,7 +28,7 @@ private:
     std::vector<int> surface;
 
 public:
-    World(int w, int h);
+    World(const Config &c);
 
     int getWidth() const;
     int getHeight() const;
@@ -90,6 +91,8 @@ public:
      * Select desert, jungle, and snow locations.
      */
     void planBiomes(Random &rnd);
+
+    const Config &conf;
 
     bool isCrimson;
     int copperVariant;

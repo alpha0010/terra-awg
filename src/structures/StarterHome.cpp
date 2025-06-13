@@ -1,9 +1,11 @@
 #include "structures/StarterHome.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
+#include "structures/LootRules.h"
 #include "structures/StructureUtil.h"
 #include "structures/data/Furniture.h"
 #include "structures/data/Homes.h"
@@ -110,7 +112,10 @@ void placeHomeAt(
             }
             if (homeTile.blockID == TileID::chest &&
                 homeTile.frameX % 36 == 0 && homeTile.frameY == 0) {
-                world.registerStorage(x + i, y + j);
+                fillStarterChest(
+                    world.conf.equipment,
+                    world.registerStorage(x + i, y + j),
+                    rnd);
             }
             convertFurniture(homeTile, theme);
             auto tileItr = themeTiles.find(homeTile.blockID);

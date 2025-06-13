@@ -1909,6 +1909,88 @@ void fillLihzahrdChest(Chest &chest, Random &rnd)
         });
 }
 
+void fillStarterChestIron(Chest &chest, Random &rnd)
+{
+    fillLoot(
+        chest,
+        rnd,
+        {
+            {1, {ItemID::ironHelmet, Prefix::none, 1}},
+            {1, {ItemID::ironChainmail, Prefix::none, 1}},
+            {1, {ItemID::ironGreaves, Prefix::none, 1}},
+            {1, {ItemID::ironBar, Prefix::none, rnd.getInt(80, 85)}},
+            {1, {ItemID::cloudInABottle, rnd.select(PrefixSet::accessory), 1}},
+            {1, {ItemID::silverCoin, Prefix::none, rnd.getInt(12, 24)}},
+        });
+}
+
+void fillStarterChestPlatinum(Chest &chest, Random &rnd)
+{
+    fillLoot(
+        chest,
+        rnd,
+        {
+            {1, {ItemID::platinumHelmet, Prefix::none, 1}},
+            {1, {ItemID::platinumChainmail, Prefix::none, 1}},
+            {1, {ItemID::platinumGreaves, Prefix::none, 1}},
+            {1, {ItemID::platinumBar, Prefix::none, rnd.getInt(95, 100)}},
+            {1, {ItemID::grapplingHook, Prefix::none, 1}},
+            {1, {ItemID::silverCoin, Prefix::none, rnd.getInt(70, 99)}},
+        });
+}
+
+void fillStarterChestHellstone(Chest &chest, Random &rnd)
+{
+    fillLoot(
+        chest,
+        rnd,
+        {
+            {1, {ItemID::moltenHelmet, Prefix::none, 1}},
+            {1, {ItemID::moltenBreastplate, Prefix::none, 1}},
+            {1, {ItemID::moltenGreaves, Prefix::none, 1}},
+            {1, {ItemID::hellstoneBar, Prefix::none, rnd.getInt(85, 90)}},
+            {1, {ItemID::hellfireTreads, rnd.select(PrefixSet::accessory), 1}},
+            {1, {ItemID::lifeCrystal, Prefix::none, rnd.getInt(2, 4)}},
+            {1, {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}},
+        });
+}
+
+void fillStarterChestMythril(Chest &chest, Random &rnd)
+{
+    fillLoot(
+        chest,
+        rnd,
+        {
+            {1, {ItemID::mythrilHood, Prefix::none, 1}},
+            {1, {ItemID::mythrilHelmet, Prefix::none, 1}},
+            {1, {ItemID::mythrilHat, Prefix::none, 1}},
+            {1, {ItemID::mythrilChainmail, Prefix::none, 1}},
+            {1, {ItemID::mythrilGreaves, Prefix::none, 1}},
+            {1, {ItemID::mythrilBar, Prefix::none, rnd.getInt(75, 80)}},
+            {1, {ItemID::fledglingWings, rnd.select(PrefixSet::accessory), 1}},
+            {1, {ItemID::lifeCrystal, Prefix::none, rnd.getInt(4, 6)}},
+            {1, {ItemID::goldCoin, Prefix::none, rnd.getInt(3, 6)}},
+        });
+}
+
+void fillStarterChest(int level, Chest &chest, Random &rnd)
+{
+    switch (level) {
+    case ItemID::ironBar:
+        fillStarterChestIron(chest, rnd);
+        break;
+    case ItemID::platinumBar:
+        fillStarterChestPlatinum(chest, rnd);
+        break;
+    case ItemID::hellstoneBar:
+        fillStarterChestHellstone(chest, rnd);
+        break;
+    case ItemID::mythrilBar:
+        fillStarterChestMythril(chest, rnd);
+        break;
+    }
+}
+
 void fillBarrel(Chest &chest, Random &rnd)
 {
     fillLoot(

@@ -1,6 +1,7 @@
 #include "Config.h"
 
 #include "Random.h"
+#include "ids/ItemID.h"
 #include "vendor/INIReader.h"
 #include <cstring>
 #include <filesystem>
@@ -36,6 +37,11 @@ mode = classic
 
 # Add a starter home at the spawn point.
 home = false
+
+[variation]
+# Add starter equipment at the spawn point. Options:
+#   none/iron/platinum/hellstone/mythril
+equipment = none
 
 [extra]
 # Output a map preview image.
@@ -361,6 +367,22 @@ GameMode parseGameMode(const std::string &mode)
     return GameMode::classic;
 }
 
+int parseEquipment(const std::string &equipment)
+{
+    if (equipment == "iron") {
+        return ItemID::ironBar;
+    } else if (equipment == "platinum") {
+        return ItemID::platinumBar;
+    } else if (equipment == "hellstone") {
+        return ItemID::hellstoneBar;
+    } else if (equipment == "mythril") {
+        return ItemID::mythrilBar;
+    } else if (equipment != "none") {
+        std::cout << "Unknown equipment '" << equipment << "'\n";
+    }
+    return 0;
+}
+
 std::string genRandomName(Random &rnd)
 {
     switch (rnd.getInt(0, 7)) {
@@ -405,7 +427,7 @@ std::string processSeed(const std::string &baseSeed, Random &rnd)
     return baseSeed.substr(6);
 }
 
-std::string Config::getFilename()
+std::string Config::getFilename() const
 {
     std::string filename(name);
     for (char &c : filename) {
@@ -425,6 +447,7 @@ Config readConfig(Random &rnd)
         1800,
         GameMode::classic,
         false,
+        0,
         true};
     if (!std::filesystem::exists(confName)) {
         std::ofstream out(confName, std::ios::out);
@@ -445,6 +468,8 @@ Config readConfig(Random &rnd)
     conf.height = reader.GetInteger("world", "height", conf.height);
     conf.mode = parseGameMode(reader.Get("world", "mode", "classic"));
     conf.starterHome = reader.GetBoolean("world", "home", conf.starterHome);
+    conf.equipment =
+        parseEquipment(reader.Get("variation", "equipment", "none"));
     conf.mapPreview = reader.GetBoolean("extra", "map", conf.mapPreview);
     return conf;
 }

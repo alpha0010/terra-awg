@@ -14,9 +14,10 @@ struct Config {
     int height;
     GameMode mode;
     bool starterHome;
+    int equipment;
     bool mapPreview;
 
-    std::string getFilename();
+    std::string getFilename() const;
 };
 
 Config readConfig(Random &rnd);

@@ -418,7 +418,7 @@ int main()
     Random rnd;
     Config conf = readConfig(rnd);
     rnd.setSeed(conf.seed);
-    World world{conf.width, conf.height};
+    World world{conf};
 
     world.isCrimson = rnd.getBool();
     world.copperVariant = rnd.select({TileID::copperOre, TileID::tinOre});
@@ -426,7 +426,7 @@ int main()
     world.silverVariant = rnd.select({TileID::silverOre, TileID::tungstenOre});
     world.goldVariant = rnd.select({TileID::goldOre, TileID::platinumOre});
 
-    doWorldGen(conf, rnd, world);
+    doWorldGen(rnd, world);
     saveWorldFile(conf, rnd, world);
 
     auto mainEnd = std::chrono::high_resolution_clock::now();

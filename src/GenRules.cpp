@@ -217,11 +217,11 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
     }
 }
 
-void doWorldGen(Config &conf, Random &rnd, World &world)
+void doWorldGen(Random &rnd, World &world)
 {
     std::set<Step> excludes;
     excludes.insert(world.isCrimson ? Step::genCorruption : Step::genCrimson);
-    if (!conf.starterHome) {
+    if (!world.conf.starterHome) {
         excludes.insert(Step::genStarterHome);
     }
     LocationBins locations;

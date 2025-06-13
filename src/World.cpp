@@ -1,5 +1,6 @@
 #include "World.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "TileBuffer.h"
 #include "ids/WallID.h"
@@ -72,9 +73,9 @@ uint32_t fnv1a32pt(uint32_t x, uint32_t y)
     return hash;
 }
 
-World::World(int w, int h)
-    : width(w), height(h), tiles(width * height),
-      framedTiles(genFramedTileLookup()), surface(width)
+World::World(const Config &c)
+    : width(c.width), height(c.height), tiles(width * height),
+      framedTiles(genFramedTileLookup()), surface(width), conf(c)
 {
 }
 

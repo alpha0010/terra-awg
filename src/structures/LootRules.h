@@ -50,6 +50,7 @@ void fillCrystalChest(Chest &chest, Random &rnd, World &world);
 void fillDungeonChest(Chest &chest, Random &rnd, World &world);
 void fillDungeonBiomeChest(Chest &chest, Random &rnd, Item &&primaryItem);
 void fillLihzahrdChest(Chest &chest, Random &rnd);
+void fillStarterChest(int level, Chest &chest, Random &rnd);
 void fillBarrel(Chest &chest, Random &rnd);
 void fillDresser(Chest &chest, Random &rnd);
 

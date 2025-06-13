@@ -1,5 +1,6 @@
 #include "structures/Treasure.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
@@ -650,6 +651,23 @@ Variant getChestType(int x, int y, World &world)
     return fuzzyIsSurfaceChest(x, y, world) ? Variant::none : Variant::gold;
 }
 
+void placeStarterChest(Random &rnd, World &world)
+{
+    int centerX = world.getWidth() / 2;
+    for (int iSwap = 0; iSwap < 20; ++iSwap) {
+        int x = iSwap % 2 == 0 ? centerX - iSwap / 2 : centerX + iSwap / 2;
+        int surfaceLevel = world.getSurfaceLevel(x);
+        for (int y = surfaceLevel - 4; y < surfaceLevel + 4; ++y) {
+            if (isPlacementCandidate(x, y, world)) {
+                Chest &chest =
+                    world.placeChest(x, y - 2, getChestType(x, y, world));
+                fillStarterChest(world.conf.equipment, chest, rnd);
+                return;
+            }
+        }
+    }
+}
+
 void placeChest(
     int x,
     int y,
@@ -911,6 +929,9 @@ LocationBins genTreasure(Random &rnd, World &world)
         }
     }
     std::cout << "Placing treasures\n";
+    if (!world.conf.starterHome && world.conf.equipment != 0) {
+        placeStarterChest(rnd, world);
+    }
     std::shuffle(
         world.queuedTreasures.begin(),
         world.queuedTreasures.end(),
