@@ -10,7 +10,6 @@
 #include <array>
 #include <vector>
 #include <memory> // unique_ptr
-#include <ctime> // time for random seed
 
 class OpenSimplexNoise
 {
@@ -318,10 +317,6 @@ protected:
   inline static StaticConstructor staticConstructor;
 
 public:
-  OpenSimplexNoise()
-    : OpenSimplexNoise(static_cast<int64_t>(time(nullptr)))
-  {}
-
   OpenSimplexNoise(int64_t seed)
   {
     std::array<char, 256> source;
@@ -329,9 +324,6 @@ public:
     {
       source[i] = i;
     }
-    seed = seed * 6364136223846793005L + 1442695040888963407L;
-    seed = seed * 6364136223846793005L + 1442695040888963407L;
-    seed = seed * 6364136223846793005L + 1442695040888963407L;
     for (int i = 255; i >= 0; i--)
     {
       seed = seed * 6364136223846793005L + 1442695040888963407L;

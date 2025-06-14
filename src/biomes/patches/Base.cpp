@@ -4,6 +4,7 @@
 #include "Util.h"
 #include "World.h"
 #include "biomes/Base.h"
+#include "ids/WallID.h"
 #include <algorithm>
 #include <iostream>
 
@@ -106,6 +107,21 @@ inline std::array const underworldTiles{
     TileID::ash,
     TileID::ash};
 
+int getWallVarIndex(
+    int x,
+    int y,
+    const std::vector<std::pair<int, int>> &wallVarNoise,
+    Random &rnd)
+{
+    for (size_t idx = 0; idx < wallVarNoise.size(); ++idx) {
+        auto [i, j] = wallVarNoise[idx];
+        if (std::abs(rnd.getCoarseNoise(x + i, y + j)) < 0.07) {
+            return idx;
+        }
+    }
+    return -1;
+}
+
 void genWorldBasePatches(Random &rnd, World &world)
 {
     std::cout << "Generating base terrain\n";
@@ -115,11 +131,17 @@ void genWorldBasePatches(Random &rnd, World &world)
             rnd.getInt(0, world.getWidth()),
             rnd.getInt(0, world.getHeight()));
     }
+    std::vector<std::pair<int, int>> wallVarNoise;
+    for (size_t iter = 0; iter < WallVariants::dirt.size(); ++iter) {
+        wallVarNoise.emplace_back(
+            rnd.getInt(0, world.getWidth()),
+            rnd.getInt(0, world.getHeight()));
+    }
     computeSurfaceLevel(rnd, world);
     std::vector<BiomeData> biomeMap(world.getWidth() * world.getHeight());
     parallelFor(
         std::views::iota(0, world.getWidth()),
-        [&depositNoise, &biomeMap, &rnd, &world](int x) {
+        [&depositNoise, &wallVarNoise, &biomeMap, &rnd, &world](int x) {
             bool nearEdge = x < 350 || x > world.getWidth() - 350;
             for (int y = 0; y < world.getHeight(); ++y) {
                 BiomeData biome = computeBiomeData(x, y, rnd);
@@ -153,9 +175,21 @@ void genWorldBasePatches(Random &rnd, World &world)
                 }
                 Tile &tile = world.getTile(x, y);
                 switch (biome.active) {
-                case Biome::snow:
+                case Biome::snow: {
                     tile.blockID = snowTiles[tileType];
+                    int index = getWallVarIndex(x, y, wallVarNoise, rnd);
+                    if (index != -1 &&
+                        fnv1a32pt(index, wallVarNoise[0].second) % 5 == 0) {
+                        tile.wallID = WallVariants::stone
+                            [wallVarNoise[0].first %
+                             WallVariants::stone.size()];
+                    } else if (index != -1 || y < world.getUndergroundLevel()) {
+                        tile.wallID = tile.blockID == TileID::snow
+                                          ? WallID::Unsafe::snow
+                                          : WallID::Unsafe::ice;
+                    }
                     break;
+                }
                 case Biome::desert:
                     tile.blockID = desertTiles[tileType];
                     if (y > world.getCavernLevel() &&
@@ -175,16 +209,45 @@ void genWorldBasePatches(Random &rnd, World &world)
                             tile.blockID = TileID::hardenedSand;
                         }
                     }
+                    tile.wallID = tile.blockID == TileID::sandstone
+                                      ? WallID::Unsafe::sandstone
+                                      : WallID::Unsafe::hardenedSand;
                     break;
                 case Biome::jungle:
                     tile.blockID = jungleTiles[tileType];
+                    if (y < world.getUndergroundLevel()) {
+                        tile.wallID = WallID::Unsafe::mud;
+                    } else {
+                        int index = getWallVarIndex(x, y, wallVarNoise, rnd);
+                        if (index != -1) {
+                            tile.wallID = WallVariants::jungle
+                                [fnv1a32pt(index, wallVarNoise[1].first) %
+                                 WallVariants::jungle.size()];
+                        }
+                    }
                     break;
-                case Biome::forest:
+                case Biome::forest: {
                     tile.blockID = forestTiles[tileType];
+                    int index = getWallVarIndex(x, y, wallVarNoise, rnd);
+                    if (index != -1) {
+                        tile.wallID = WallVariants::dirt[index];
+                    } else if (y < world.getUndergroundLevel()) {
+                        tile.wallID = tile.blockID == TileID::stone
+                                          ? WallID::Unsafe::rockyDirt
+                                          : WallID::Unsafe::dirt;
+                    }
                     break;
-                case Biome::underworld:
+                }
+                case Biome::underworld: {
                     tile.blockID = underworldTiles[tileType];
+                    int index = getWallVarIndex(x, y, wallVarNoise, rnd);
+                    if (index != -1) {
+                        tile.wallID = WallVariants::underworld
+                            [fnv1a32pt(index, wallVarNoise[2].first) %
+                             WallVariants::underworld.size()];
+                    }
                     break;
+                }
                 }
                 for (auto [idx, oreRoof, oreFloor, ore] :
                      {std::tuple{
@@ -270,6 +333,27 @@ void genWorldBasePatches(Random &rnd, World &world)
                         tile.blockID = tile.blockID == TileID::snow
                                            ? TileID::thinIce
                                            : TileID::empty;
+                    }
+                }
+                if (tile.blockID == TileID::empty &&
+                    y < world.getUndergroundLevel()) {
+                    if (biome.active == Biome::jungle) {
+                        int index = getWallVarIndex(x, y, wallVarNoise, rnd);
+                        if (fnv1a32pt(index, wallVarNoise[3].second) % 3 == 0) {
+                            tile.wallID = WallVariants::stone
+                                [fnv1a32pt(index, wallVarNoise[3].first) %
+                                 WallVariants::stone.size()];
+                        } else {
+                            tile.wallID = WallID::Unsafe::jungle;
+                        }
+                    } else if (
+                        biome.active == Biome::forest &&
+                        getWallVarIndex(x, y, wallVarNoise, rnd) < 1) {
+                        tile.wallID = rnd.getFineNoise(
+                                          x + wallVarNoise[4].first,
+                                          y + wallVarNoise[4].second) > 0
+                                          ? WallID::Unsafe::grass
+                                          : WallID::Unsafe::flower;
                     }
                 }
             }
