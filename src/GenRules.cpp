@@ -26,6 +26,8 @@
 #include "biomes/SpiderNest.h"
 #include "biomes/Underworld.h"
 #include "biomes/patches/Base.h"
+#include "biomes/patches/Cloud.h"
+#include "biomes/patches/Hive.h"
 #include "structures/BuriedBoat.h"
 #include "structures/DesertTomb.h"
 #include "structures/Dungeon.h"
@@ -96,6 +98,8 @@ enum class Step {
     // Patches.
     initBiomeNoise,
     genWorldBasePatches,
+    genCloudPatches,
+    genHivePatches,
 };
 
 inline std::array baseBiomeRules{
@@ -136,11 +140,13 @@ inline std::array baseStructureRules{
 };
 
 inline std::array patchesBiomeRules{
-    Step::initNoise,
-    Step::initBiomeNoise,
-    Step::genWorldBasePatches,
-    Step::genOceans,
-    Step::genMarbleCave,
+    Step::initNoise,        Step::initBiomeNoise,  Step::genWorldBasePatches,
+    Step::genOceans,        Step::genCloudPatches, Step::genMarbleCave,
+    Step::genAshenField,    Step::genUnderworld,   Step::genGlowingMushroom,
+    Step::genGraniteCave,   Step::genHivePatches,  Step::genAether,
+    Step::genCrimson,       Step::genCorruption,   Step::applyQueuedEvil,
+    Step::genAsteroidField, Step::genGemCave,      Step::genSpiderNest,
+    Step::genGlowingMoss,   Step::genGemGrove,
 };
 
 #define GEN_STEP(step)                                                         \
@@ -219,6 +225,8 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         rnd.initBiomeNoise(0.001);
         break;
         GEN_STEP(genWorldBasePatches)
+        GEN_STEP(genCloudPatches)
+        GEN_STEP(genHivePatches)
     }
 }
 

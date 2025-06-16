@@ -81,16 +81,10 @@ Point selectLarvaeLocation(
     return {-1, -1};
 }
 
-void fillHive(Random &rnd, World &world)
+void fillHive(int hiveX, int hiveY, Random &rnd, World &world)
 {
     rnd.shuffleNoise();
     double size = 15 + world.getWidth() / rnd.getDouble(84, 166);
-    int hiveX = rnd.getInt(
-        world.jungleCenter - 0.075 * world.getWidth(),
-        world.jungleCenter + 0.075 * world.getWidth());
-    int hiveY = rnd.getInt(
-        (world.getUndergroundLevel() + world.getCavernLevel()) / 2,
-        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3);
     for (int x = hiveX - size; x < hiveX + size; ++x) {
         for (int y = hiveY - size; y < hiveY + size; ++y) {
             auto [centroidX, centroidY] = getHexCentroid(x, y);
@@ -181,6 +175,14 @@ void genHive(Random &rnd, World &world)
     int bonusHives = world.getWidth() * world.getHeight() / 5750000;
     int numHives = bonusHives > 0 ? 2 + rnd.getInt(0, bonusHives) : 2;
     for (int i = 0; i < numHives; ++i) {
-        fillHive(rnd, world);
+        fillHive(
+            rnd.getInt(
+                world.jungleCenter - 0.075 * world.getWidth(),
+                world.jungleCenter + 0.075 * world.getWidth()),
+            rnd.getInt(
+                (world.getUndergroundLevel() + world.getCavernLevel()) / 2,
+                (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3),
+            rnd,
+            world);
     }
 }

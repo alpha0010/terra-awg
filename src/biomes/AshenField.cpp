@@ -17,8 +17,13 @@ void genAshenField(Random &rnd, World &world)
     int maxX = world.getWidth() / 2 + width;
     int minY = world.spawnY - 20;
     int maxY = std::midpoint<double>(minY + width, world.getUndergroundLevel());
-    constexpr auto avoidTiles = frozen::make_set<int>(
-        {TileID::snow, TileID::sandstone, TileID::livingWood});
+    constexpr auto avoidTiles = frozen::make_set<int>({
+        TileID::snow,
+        TileID::sandstone,
+        TileID::marble,
+        TileID::jungleGrass,
+        TileID::livingWood,
+    });
     if (!world.regionPasses(
             minX,
             minY,

@@ -116,7 +116,7 @@ void Random::initBiomeNoise(double scale)
                 noise.Evaluate(offset + xS, offset + yS) +
                 0.5 * noise.Evaluate(offset + 2 * xS, offset + 2 * yS) +
                 0.25 * noise.Evaluate(offset + 4 * xS, offset + 4 * yS) +
-                std::max(0.01 * (y + 310 - noiseHeight), 0.0);
+                std::max(0.01 * (y + 350 - noiseHeight), 0.0);
         }
     });
 }

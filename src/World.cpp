@@ -79,6 +79,11 @@ World::World(const Config &c)
 {
 }
 
+void World::initBiomeData()
+{
+    biomeMap.resize(width * height);
+}
+
 int World::getWidth() const
 {
     return width;
@@ -116,6 +121,14 @@ Tile &World::getTile(int x, int y)
         return scratchTile;
     }
     return tiles[y + x * height];
+}
+
+BiomeData &World::getBiome(int x, int y)
+{
+    if (x < 0 || x >= width || y < 0 || y >= height) {
+        return biomeMap.front();
+    }
+    return biomeMap[y + x * height];
 }
 
 std::vector<std::pair<int, int>>

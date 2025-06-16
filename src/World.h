@@ -16,6 +16,17 @@ enum class Blend { normal, blockOnly };
 
 uint32_t fnv1a32pt(uint32_t x, uint32_t y);
 
+enum class Biome { forest, snow, desert, jungle, underworld };
+
+struct BiomeData {
+    Biome active;
+    double forest;
+    double snow;
+    double desert;
+    double jungle;
+    double underworld;
+};
+
 class World
 {
 private:
@@ -26,9 +37,12 @@ private:
     std::vector<Chest> chests;
     std::vector<bool> framedTiles;
     std::vector<int> surface;
+    std::vector<BiomeData> biomeMap;
 
 public:
     World(const Config &c);
+
+    void initBiomeData();
 
     int getWidth() const;
     int getHeight() const;
@@ -41,6 +55,7 @@ public:
     {
         return getTile(pt.first, pt.second);
     }
+    BiomeData &getBiome(int x, int y);
     std::vector<std::pair<int, int>> placeBuffer(
         int x,
         int y,

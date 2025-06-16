@@ -199,7 +199,7 @@ void genUnderworld(Random &rnd, World &world)
         if (x == skipFrom) {
             x = skipTo;
         }
-        for (int y = world.getUnderworldLevel(); y < lavaLevel; ++y) {
+        for (int y = world.getUnderworldLevel() - 50; y < lavaLevel; ++y) {
             Tile &tile = world.getTile(x, y);
             if (tile.blockID == TileID::ash && world.isExposed(x, y)) {
                 tile.blockID = TileID::ashGrass;

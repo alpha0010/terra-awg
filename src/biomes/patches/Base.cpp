@@ -8,17 +8,6 @@
 #include <algorithm>
 #include <iostream>
 
-enum class Biome { forest, snow, desert, jungle, underworld };
-
-struct BiomeData {
-    Biome active;
-    double forest;
-    double snow;
-    double desert;
-    double jungle;
-    double underworld;
-};
-
 BiomeData computeBiomeData(int x, int y, Random &rnd)
 {
     double snow = std::clamp(
@@ -122,7 +111,7 @@ int getWallVarIndex(
     return -1;
 }
 
-void identifySurfaceBiomes(const std::vector<BiomeData> &biomeMap, World &world)
+void identifySurfaceBiomes(World &world)
 {
     double maxDesert = 0;
     double maxJungle = 0;
@@ -139,7 +128,7 @@ void identifySurfaceBiomes(const std::vector<BiomeData> &biomeMap, World &world)
         curSnow *= 0.99;
         int surface = world.getSurfaceLevel(x);
         for (int y = surface; y < surface + 30; ++y) {
-            const BiomeData &biome = biomeMap[x * world.getHeight() + y];
+            const BiomeData &biome = world.getBiome(x, y);
             curDesert += 0.01 * biome.desert;
             curJungle += 0.01 * biome.jungle;
             curSnow += 0.01 * biome.snow;
@@ -204,14 +193,15 @@ void genWorldBasePatches(Random &rnd, World &world)
             rnd.getInt(0, world.getHeight()));
     }
     computeSurfaceLevel(rnd, world);
-    std::vector<BiomeData> biomeMap(world.getWidth() * world.getHeight());
+    world.spawnY = world.getSurfaceLevel(world.getWidth() / 2) - 1;
+    world.initBiomeData();
     parallelFor(
         std::views::iota(0, world.getWidth()),
-        [&depositNoise, &wallVarNoise, &biomeMap, &rnd, &world](int x) {
+        [&depositNoise, &wallVarNoise, &rnd, &world](int x) {
             bool nearEdge = x < 350 || x > world.getWidth() - 350;
             for (int y = 0; y < world.getHeight(); ++y) {
                 BiomeData biome = computeBiomeData(x, y, rnd);
-                biomeMap[x * world.getHeight() + y] = biome;
+                world.getBiome(x, y) = biome;
                 if (y < world.getSurfaceLevel(x)) {
                     continue;
                 }
@@ -430,53 +420,78 @@ void genWorldBasePatches(Random &rnd, World &world)
                 }
             }
         });
+
     parallelFor(
         std::views::iota(0, world.getWidth()),
-        [&biomeMap, &rnd, &world](int x) {
-            int stalactiteLen = 0;
-            int stalacIter = 0;
-            for (int y = 0; y < world.getHeight(); ++y) {
-                if (y % 500 == 0) {
-                    stalacIter = y / 35;
-                }
+        [underworldHeight = world.getHeight() - world.getUnderworldLevel(),
+         &rnd,
+         &world](int x) {
+            int underworldRoof =
+                world.getUnderworldLevel() + 0.22 * underworldHeight +
+                19 * rnd.getCoarseNoise(x, 0.33 * world.getHeight());
+            int underworldFloor =
+                world.getUnderworldLevel() + 0.42 * underworldHeight +
+                35 * rnd.getCoarseNoise(x, 0.66 * world.getHeight());
+            for (int y =
+                     world.getUnderworldLevel() + 20 * rnd.getCoarseNoise(x, 0);
+                 y < world.getHeight();
+                 ++y) {
                 Tile &tile = world.getTile(x, y);
-                if (tile.blockID == TileID::empty) {
-                    if (stalactiteLen > 0 &&
-                        world.getTile(x, y + 1).blockID == TileID::empty) {
-                        tile.blockID = TileID::marble;
-                        if (tile.wallID != WallID::Unsafe::marble) {
-                            stalactiteLen /= 2;
-                        }
-                        --stalactiteLen;
+                if (y > underworldFloor) {
+                    if (std::abs(rnd.getFineNoise(x, y)) > 0.5) {
+                        tile.blockID = TileID::hellstone;
                     }
-                    continue;
-                }
-                if (!world.isExposed(x, y)) {
-                    continue;
-                }
-                if (world.isIsolated(x, y)) {
+                } else if (y > underworldRoof && tile.blockID == TileID::ash) {
                     tile.blockID = TileID::empty;
-                    continue;
-                }
-                if (tile.blockID == TileID::marble &&
-                    world.getTile(x, y + 1).blockID == TileID::empty) {
-                    stalactiteLen = std::max(
-                        0.0,
-                        16 * rnd.getFineNoise(4 * x, 100 * stalacIter));
-                    ++stalacIter;
-                }
-                BiomeData &biome = biomeMap[x * world.getHeight() + y];
-                if (biome.active == Biome::forest &&
-                    y < world.getUndergroundLevel()) {
-                    if (tile.blockID == TileID::dirt) {
-                        tile.blockID = TileID::grass;
-                    }
-                } else if (biome.active == Biome::jungle) {
-                    if (tile.blockID == TileID::mud) {
-                        tile.blockID = TileID::jungleGrass;
-                    }
                 }
             }
         });
-    identifySurfaceBiomes(biomeMap, world);
+
+    parallelFor(std::views::iota(0, world.getWidth()), [&rnd, &world](int x) {
+        int stalactiteLen = 0;
+        int stalacIter = 0;
+        for (int y = 0; y < world.getHeight(); ++y) {
+            if (y % 500 == 0) {
+                stalacIter = y / 35;
+            }
+            Tile &tile = world.getTile(x, y);
+            if (tile.blockID == TileID::empty) {
+                if (stalactiteLen > 0 &&
+                    world.getTile(x, y + 1).blockID == TileID::empty) {
+                    tile.blockID = TileID::marble;
+                    if (tile.wallID != WallID::Unsafe::marble) {
+                        stalactiteLen /= 2;
+                    }
+                    --stalactiteLen;
+                }
+                continue;
+            }
+            if (!world.isExposed(x, y)) {
+                continue;
+            }
+            if (world.isIsolated(x, y)) {
+                tile.blockID = TileID::empty;
+                continue;
+            }
+            if (tile.blockID == TileID::marble &&
+                world.getTile(x, y + 1).blockID == TileID::empty) {
+                stalactiteLen = std::max(
+                    0.0,
+                    16 * rnd.getFineNoise(4 * x, 100 * stalacIter));
+                ++stalacIter;
+            }
+            BiomeData &biome = world.getBiome(x, y);
+            if (biome.active == Biome::forest &&
+                y < world.getUndergroundLevel()) {
+                if (tile.blockID == TileID::dirt) {
+                    tile.blockID = TileID::grass;
+                }
+            } else if (biome.active == Biome::jungle) {
+                if (tile.blockID == TileID::mud) {
+                    tile.blockID = TileID::jungleGrass;
+                }
+            }
+        }
+    });
+    identifySurfaceBiomes(world);
 }
