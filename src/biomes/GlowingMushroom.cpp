@@ -1,5 +1,6 @@
 #include "GlowingMushroom.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
@@ -88,14 +89,21 @@ void genGlowingMushroom(Random &rnd, World &world)
     int buffer = 0.06 * world.getWidth();
     while (numFields > 0) {
         int centerX = world.getWidth() * rnd.getDouble(0.05, 0.95);
-        if (std::abs(world.desertCenter - centerX) < buffer ||
+        int fieldFloor =
+            rnd.getInt(world.getCavernLevel(), world.getUnderworldLevel() - 50);
+        if (world.conf.patches) {
+            if (world.getBiome(centerX, fieldFloor).forest < 0.99) {
+                continue;
+            }
+        } else if (
+            std::abs(world.desertCenter - centerX) < buffer ||
             std::abs(world.jungleCenter - centerX) < buffer ||
             std::abs(world.snowCenter - centerX) < buffer) {
             continue;
         }
         fillMushroomField(
             centerX,
-            rnd.getInt(world.getCavernLevel(), world.getUnderworldLevel() - 50),
+            fieldFloor,
             rnd.getInt(buffer / 4, buffer / 2),
             rnd,
             world);

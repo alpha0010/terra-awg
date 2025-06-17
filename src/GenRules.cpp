@@ -238,10 +238,22 @@ void doWorldGen(Random &rnd, World &world)
         excludes.insert(Step::genStarterHome);
     }
     LocationBins locations;
-    for (Step step :
-         patchesBiomeRules | std::views::filter([&excludes](Step s) {
-             return !excludes.contains(s);
-         })) {
+    std::vector<Step> steps;
+    if (world.conf.patches) {
+        steps.insert(
+            steps.end(),
+            patchesBiomeRules.begin(),
+            patchesBiomeRules.end());
+    } else {
+        steps.insert(steps.end(), baseBiomeRules.begin(), baseBiomeRules.end());
+    }
+    steps.insert(
+        steps.end(),
+        baseStructureRules.begin(),
+        baseStructureRules.end());
+    for (Step step : steps | std::views::filter([&excludes](Step s) {
+                         return !excludes.contains(s);
+                     })) {
         doGenStep(step, locations, rnd, world);
     }
 }

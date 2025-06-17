@@ -197,3 +197,36 @@ void growMossOn(int x, int y, World &world)
         }
     }
 }
+
+bool isInBiome(int x, int y, int scanDist, Biome biome, World &world)
+{
+    double threshold = 2 * scanDist;
+    threshold *= threshold;
+    threshold *= 0.05;
+    for (int i = -scanDist; i < scanDist; ++i) {
+        for (int j = -scanDist; j < scanDist; ++j) {
+            switch (biome) {
+            case Biome::forest:
+                threshold += world.getBiome(x + i, y + j).forest;
+                break;
+            case Biome::snow:
+                threshold += world.getBiome(x + i, y + j).snow;
+                break;
+            case Biome::desert:
+                threshold += world.getBiome(x + i, y + j).desert;
+                break;
+            case Biome::jungle:
+                threshold += world.getBiome(x + i, y + j).jungle;
+                break;
+            case Biome::underworld:
+                threshold += world.getBiome(x + i, y + j).underworld;
+                break;
+            }
+            threshold -= 1;
+            if (threshold < 0) {
+                return false;
+            }
+        }
+    }
+    return true;
+}

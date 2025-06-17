@@ -1,7 +1,9 @@
 #include "structures/DesertTomb.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
+#include "biomes/BiomeUtil.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
@@ -28,19 +30,30 @@ Point selectTombLocation(TileBuffer &tomb, Random &rnd, World &world)
         TileID::goldOre,
         TileID::platinumOre,
     });
-    int minX = world.desertCenter - 0.06 * world.getWidth();
-    int maxX = world.desertCenter + 0.06 * world.getWidth() - tomb.getWidth();
+    int minX =
+        world.conf.patches ? 350 : world.desertCenter - 0.06 * world.getWidth();
+    int maxX =
+        world.conf.patches
+            ? world.getWidth() - 350
+            : world.desertCenter + 0.06 * world.getWidth() - tomb.getWidth();
     int minY = world.getCavernLevel();
     int maxY = (world.getCavernLevel() + 4 * world.getUnderworldLevel()) / 5 -
                tomb.getHeight();
     int maxFoundationEmpty = 0.4 * tomb.getWidth();
+    int biomeScan = std::max(tomb.getWidth(), tomb.getHeight()) / 2;
     for (int tries = 0; tries < 8000; ++tries) {
         int x = rnd.getInt(minX, maxX);
         int y = rnd.getInt(minY, maxY);
         int numEmpty = 0;
         int numFilled = 0;
         int maxEntryFilled = tries / 250;
-        if (world.regionPasses(
+        if ((!world.conf.patches || isInBiome(
+                                        x + biomeScan,
+                                        y + biomeScan,
+                                        biomeScan,
+                                        Biome::desert,
+                                        world)) &&
+            world.regionPasses(
                 x - 3,
                 y + tomb.getHeight() - 9,
                 4,

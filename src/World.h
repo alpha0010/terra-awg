@@ -3,6 +3,7 @@
 
 #include "Chest.h"
 #include "Tile.h"
+#include "ids/Biome.h"
 #include "ids/TileVariant.h"
 #include <cstdint>
 #include <functional>
@@ -15,8 +16,6 @@ class TileBuffer;
 enum class Blend { normal, blockOnly };
 
 uint32_t fnv1a32pt(uint32_t x, uint32_t y);
-
-enum class Biome { forest, snow, desert, jungle, underworld };
 
 struct BiomeData {
     Biome active;

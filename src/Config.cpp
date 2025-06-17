@@ -43,6 +43,9 @@ home = false
 #   none/iron/platinum/hellstone/mythril
 equipment = none
 
+# Distribute biomes in patches (instead of columns).
+patches = false
+
 [extra]
 # Output a map preview image.
 map = true
@@ -446,8 +449,9 @@ Config readConfig(Random &rnd)
         6400,
         1800,
         GameMode::classic,
-        false,
-        0,
+        false, // starterHome
+        0,     // equipment
+        false, // patches
         true};
     if (!std::filesystem::exists(confName)) {
         std::ofstream out(confName, std::ios::out);
@@ -470,6 +474,7 @@ Config readConfig(Random &rnd)
     conf.starterHome = reader.GetBoolean("world", "home", conf.starterHome);
     conf.equipment =
         parseEquipment(reader.Get("variation", "equipment", "none"));
+    conf.patches = reader.GetBoolean("variation", "patches", conf.patches);
     conf.mapPreview = reader.GetBoolean("extra", "map", conf.mapPreview);
     return conf;
 }

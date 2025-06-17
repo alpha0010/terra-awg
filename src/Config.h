@@ -15,6 +15,7 @@ struct Config {
     GameMode mode;
     bool starterHome;
     int equipment;
+    bool patches;
     bool mapPreview;
 
     std::string getFilename() const;

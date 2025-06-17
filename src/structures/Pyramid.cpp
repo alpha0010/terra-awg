@@ -1,5 +1,6 @@
 #include "structures/Pyramid.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
@@ -189,18 +190,49 @@ Point findLinkingCave(int x, int y, World &world)
     return {-1, -1};
 }
 
+std::vector<int> getDesertSurfaceCols(int size, World &world)
+{
+    std::vector<int> vals;
+    double scanDist = 0.061 * world.getWidth() - size;
+    if (world.conf.patches) {
+        for (int x = 350; x < world.getWidth() - 350; ++x) {
+            if (world.getBiome(x, world.getSurfaceLevel(x)).desert > 0.99) {
+                vals.push_back(x);
+            }
+        }
+    } else {
+        for (int x = world.desertCenter - scanDist;
+             x < world.desertCenter + scanDist;
+             ++x) {
+            vals.push_back(x);
+        }
+    }
+    return vals;
+}
+
 void genPyramid(Random &rnd, World &world)
 {
     std::cout << "Building monuments\n";
     int size = 80;
-    double scanDist = 0.061 * world.getWidth() - size;
     int x = world.surfaceEvilCenter;
     int numTries = 0;
+    auto desertSurface = getDesertSurfaceCols(size, world);
+    if (desertSurface.empty()) {
+        return;
+    }
+    constexpr auto avoidTiles = frozen::make_set<int>(
+        {TileID::blueBrick, TileID::greenBrick, TileID::pinkBrick});
     while (std::abs(x - world.surfaceEvilCenter) < 1.5 * size ||
-           std::abs(x - world.getWidth() / 2) < 2 * size) {
-        x = rnd.getInt(
-            world.desertCenter - scanDist,
-            world.desertCenter + scanDist);
+           std::abs(x - world.getWidth() / 2) < 2 * size ||
+           !world.regionPasses(
+               x - size,
+               world.getSurfaceLevel(x),
+               2 * size,
+               size,
+               [&avoidTiles](Tile &tile) {
+                   return !avoidTiles.contains(tile.blockID);
+               })) {
+        x = rnd.select(desertSurface);
         ++numTries;
         if (numTries > 1000) {
             return;

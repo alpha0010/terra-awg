@@ -1,7 +1,9 @@
 #include "structures/BuriedBoat.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
+#include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/data/Boats.h"
@@ -12,8 +14,11 @@ typedef std::pair<int, int> Point;
 
 Point selectBoatLocation(int width, int height, Random &rnd, World &world)
 {
-    int xMin = world.snowCenter - 0.06 * world.getWidth() - width;
-    int xMax = world.snowCenter + 0.06 * world.getWidth();
+    int xMin = world.conf.patches
+                   ? 350
+                   : world.snowCenter - 0.06 * world.getWidth() - width;
+    int xMax = world.conf.patches ? world.getWidth() - width - 350
+                                  : world.snowCenter + 0.06 * world.getWidth();
     int yMax =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3 - height;
     constexpr auto avoidBlocks = frozen::make_set<int>({
@@ -29,10 +34,17 @@ Point selectBoatLocation(int width, int height, Random &rnd, World &world)
         TileID::pinkBrick,
         TileID::stone,
     });
+    int biomeScan = std::max(width, height) / 2;
     while (true) {
         int x = rnd.getInt(xMin, xMax);
         int y = rnd.getInt(world.getCavernLevel(), yMax);
-        if (world.regionPasses(x, y, width, height, [&avoidBlocks](Tile &tile) {
+        if ((!world.conf.patches || isInBiome(
+                                        x + biomeScan,
+                                        y + biomeScan,
+                                        biomeScan,
+                                        Biome::snow,
+                                        world)) &&
+            world.regionPasses(x, y, width, height, [&avoidBlocks](Tile &tile) {
                 return !avoidBlocks.contains(tile.blockID);
             })) {
             return {x, y};

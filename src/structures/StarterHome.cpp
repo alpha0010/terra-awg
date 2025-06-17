@@ -9,6 +9,7 @@
 #include "structures/StructureUtil.h"
 #include "structures/data/Furniture.h"
 #include "structures/data/Homes.h"
+#include "vendor/frozen/map.h"
 #include <iostream>
 #include <map>
 
@@ -57,6 +58,39 @@ void placeHomeAt(
              {WallID::Safe::stone,
               rnd.select({WallID::Safe::mudstoneBrick, WallID::Safe::stone})}});
         break;
+    case Data::Variant::mahogany:
+        themeTiles.insert(
+            {{TileID::wood, TileID::richMahogany},
+             {TileID::woodenBeam, TileID::richMahoganyBeam},
+             {TileID::grayBrick,
+              rnd.select({TileID::iridescentBrick, TileID::mudstoneBrick})}});
+        themeWalls.insert(
+            {{WallID::Safe::wood, WallID::Safe::richMahogany},
+             {WallID::Safe::planked,
+              rnd.select(
+                  {WallID::Safe::whiteDynasty, WallID::Safe::blueDynasty})},
+             {WallID::Safe::stone,
+              rnd.select(
+                  {WallID::Safe::bamboo,
+                   WallID::Safe::largeBamboo,
+                   WallID::Safe::richMahoganyFence})}});
+        break;
+    case Data::Variant::marble:
+        themeTiles.insert(
+            {{TileID::wood, TileID::smoothMarble},
+             {TileID::woodenBeam, TileID::marbleColumn},
+             {TileID::grayBrick,
+              rnd.select({TileID::grayBrick, TileID::pearlstoneBrick})}});
+        themeWalls.insert(
+            {{WallID::Safe::wood, WallID::Safe::smoothMarble},
+             {WallID::Safe::planked,
+              rnd.select(
+                  {WallID::Safe::fancyGrayWallpaper,
+                   WallID::Safe::platinumBrick})},
+             {WallID::Safe::stone,
+              rnd.select(
+                  {WallID::Safe::marble, WallID::Safe::stalactiteStone})}});
+        break;
     case Data::Variant::palm:
         themeTiles.insert(
             {{TileID::wood, TileID::palmWood},
@@ -78,23 +112,19 @@ void placeHomeAt(
         themeTiles[TileID::grayBrick] =
             rnd.select({TileID::grayBrick, TileID::redBrick, TileID::tinBrick});
     }
-    switch (themeTiles[TileID::grayBrick]) {
-    case TileID::iceBrick:
-        themeWalls[WallID::Safe::grayBrick] = WallID::Safe::iceBrick;
-        break;
-    case TileID::redBrick:
-        themeWalls[WallID::Safe::grayBrick] = WallID::Safe::redBrick;
-        break;
-    case TileID::sandstoneBrick:
-        themeWalls[WallID::Safe::grayBrick] = WallID::Safe::sandstoneBrick;
-        break;
-    case TileID::snowBrick:
-        themeWalls[WallID::Safe::grayBrick] = WallID::Safe::snowBrick;
-        break;
-    case TileID::tinBrick:
-        themeWalls[WallID::Safe::grayBrick] = WallID::Safe::tinBrick;
-        break;
-    }
+    constexpr auto brickToWall = frozen::make_map<int, int>({
+        {TileID::grayBrick, WallID::Safe::grayBrick},
+        {TileID::iceBrick, WallID::Safe::iceBrick},
+        {TileID::iridescentBrick, WallID::Safe::iridescentBrick},
+        {TileID::mudstoneBrick, WallID::Safe::mudstoneBrick},
+        {TileID::pearlstoneBrick, WallID::Safe::pearlstoneBrick},
+        {TileID::redBrick, WallID::Safe::redBrick},
+        {TileID::sandstoneBrick, WallID::Safe::sandstoneBrick},
+        {TileID::snowBrick, WallID::Safe::snowBrick},
+        {TileID::tinBrick, WallID::Safe::tinBrick},
+    });
+    themeWalls[WallID::Safe::grayBrick] =
+        brickToWall.at(themeTiles[TileID::grayBrick]);
     for (int i = 0; i < home.getWidth(); ++i) {
         for (int j = 0; j < home.getHeight(); ++j) {
             Tile &homeTile = home.getTile(i, j);
@@ -158,6 +188,11 @@ void genStarterHome(Random &rnd, World &world)
         theme = Data::Variant::ashWood;
     } else if (tileCounts[TileID::snow] > 2) {
         theme = Data::Variant::boreal;
+    } else if (
+        tileCounts[TileID::jungleGrass] > 0 && tileCounts[TileID::mud] > 1) {
+        theme = Data::Variant::mahogany;
+    } else if (tileCounts[TileID::marble] > 2) {
+        theme = Data::Variant::marble;
     } else if (tileCounts[TileID::sand] > 2) {
         theme = Data::Variant::palm;
     } else if (!world.regionPasses(x - 100, y, 200, 1, [](Tile &tile) {

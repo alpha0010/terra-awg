@@ -2,25 +2,9 @@
 
 #include "Random.h"
 #include "World.h"
+#include "biomes/BiomeUtil.h"
 #include "biomes/Hive.h"
 #include <iostream>
-
-bool isValidHiveLocation(int x, int y, World &world)
-{
-    int scanDist = 15 + world.getWidth() / 120;
-    double threshold = 2 * scanDist;
-    threshold *= threshold;
-    threshold *= 0.05;
-    for (int i = -scanDist; i < scanDist; ++i) {
-        for (int j = -scanDist; j < scanDist; ++j) {
-            threshold += world.getBiome(x + i, y + j).jungle - 1;
-            if (threshold < 0) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
 
 std::pair<int, int> selectHiveLocation(Random &rnd, World &world)
 {
@@ -29,7 +13,12 @@ std::pair<int, int> selectHiveLocation(Random &rnd, World &world)
         int y = rnd.getInt(
             (world.getUndergroundLevel() + world.getCavernLevel()) / 2,
             (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3);
-        if (isValidHiveLocation(x, y, world)) {
+        if (isInBiome(
+                x,
+                y,
+                15 + world.getWidth() / 120,
+                Biome::jungle,
+                world)) {
             return {x, y};
         }
     }

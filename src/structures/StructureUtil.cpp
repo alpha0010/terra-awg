@@ -101,6 +101,7 @@ inline constexpr auto nonSolidTiles = frozen::make_set<int>({
     TileID::lihzahrdAltar,
     TileID::loom,
     TileID::manaCrystal,
+    TileID::marbleColumn,
     TileID::minecartTrack,
     TileID::mossPlant,
     TileID::mushroomPlant,

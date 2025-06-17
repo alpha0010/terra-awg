@@ -18,6 +18,8 @@ enum class Variant {
     boreal,
     forest,
     livingWood,
+    mahogany,
+    marble,
     palm
 };
 

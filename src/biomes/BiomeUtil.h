@@ -2,6 +2,7 @@
 #define BIOMEUTIL_H
 
 #include "Tile.h"
+#include "ids/Biome.h"
 #include <utility>
 
 class World;
@@ -35,5 +36,7 @@ Point findStoneCave(
     int minSize = 6);
 
 void growMossOn(int x, int y, World &world);
+
+bool isInBiome(int x, int y, int scanDist, Biome biome, World &world);
 
 #endif // BIOMEUTIL_H

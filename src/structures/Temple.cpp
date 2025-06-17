@@ -1,7 +1,9 @@
 #include "structures/Temple.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
+#include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/Platforms.h"
@@ -71,16 +73,25 @@ bool testTempleSelection(Point center, World &world)
 
 Point selectTempleCenter(Random &rnd, World &world)
 {
-    int xMin = world.jungleCenter - 0.079 * world.getWidth();
-    int xMax = world.jungleCenter + 0.079 * world.getWidth();
+    int xMin = world.conf.patches
+                   ? 350
+                   : world.jungleCenter - 0.079 * world.getWidth();
+    int xMax = world.conf.patches
+                   ? world.getWidth() - 350
+                   : world.jungleCenter + 0.079 * world.getWidth();
     int yMin = (world.getUndergroundLevel() + world.getCavernLevel()) / 2;
-    while (true) {
+    for (int numTries = 0; numTries < 1000; ++numTries) {
         int x = rnd.getInt(xMin, xMax);
         int y = rnd.getInt(yMin, world.getUnderworldLevel());
-        if (testTempleSelection({x, y}, world)) {
+        if ((!world.conf.patches ||
+             isInBiome(x, y, 200 - 0.19 * numTries, Biome::jungle, world)) &&
+            testTempleSelection({x, y}, world)) {
             return {x, y};
         }
     }
+    return {
+        world.jungleCenter,
+        std::midpoint(yMin, world.getUnderworldLevel())};
 }
 
 void clearTempleSurface(Point center, Random &rnd, World &world)
