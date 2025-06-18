@@ -202,7 +202,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genSpiderHall)
         GEN_STEP(genRuins)
         GEN_STEP(genTorchArena)
-        GEN_STEP_WORLD(genLake)
+        GEN_STEP(genLake)
         GEN_STEP(genStarterHome)
         GEN_STEP(genIgloo)
         GEN_STEP(genMushroomCabin)
@@ -222,7 +222,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         genGrasses(locations, rnd, world);
         break;
     case Step::initBiomeNoise:
-        rnd.initBiomeNoise(0.001);
+        rnd.initBiomeNoise(0.00097);
         break;
         GEN_STEP(genWorldBasePatches)
         GEN_STEP(genCloudPatches)

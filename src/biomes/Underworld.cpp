@@ -178,6 +178,12 @@ void genUnderworld(Random &rnd, World &world)
                 Tile &tile = world.getTile(x, y);
                 if (std::abs(rnd.getCoarseNoise(2 * x, y + aspectRatio * x)) <
                     threshold) {
+                    if (tile.blockID == TileID::mud) {
+                        Tile &prevTile = world.getTile(x, y - 1);
+                        if (prevTile.blockID == TileID::mud) {
+                            prevTile.blockID = TileID::jungleGrass;
+                        }
+                    }
                     tile.blockID = TileID::empty;
                     tile.wallID = WallID::empty;
                 } else if (

@@ -1,5 +1,6 @@
 #include "structures/SurfaceIgloo.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
@@ -118,13 +119,23 @@ bool placeIgloo(Point pt, TileBuffer &igloo, Random &rnd, World &world)
 void genIgloo(Random &rnd, World &world)
 {
     std::cout << "Piling snow\n";
-    int scanDist = 0.05 * world.getWidth();
     std::vector<int> locations;
     int spawnX = world.getWidth() / 2;
-    for (int x = world.snowCenter - scanDist; x < world.snowCenter + scanDist;
-         ++x) {
-        if (std::abs(x - spawnX) > 100) {
-            locations.push_back(x);
+    if (world.conf.patches) {
+        for (int x = 350; x < world.getWidth() - 350; ++x) {
+            if (std::abs(x - spawnX) > 100 &&
+                world.getBiome(x, world.getSurfaceLevel(x)).snow > 0.99) {
+                locations.push_back(x);
+            }
+        }
+    } else {
+        int scanDist = 0.05 * world.getWidth();
+        for (int x = world.snowCenter - scanDist;
+             x < world.snowCenter + scanDist;
+             ++x) {
+            if (std::abs(x - spawnX) > 100) {
+                locations.push_back(x);
+            }
         }
     }
     std::shuffle(locations.begin(), locations.end(), rnd.getPRNG());

@@ -1,5 +1,6 @@
 #include "GemGrove.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -148,7 +149,7 @@ void placeGemChest(Random &rnd, World &world)
     }
 }
 
-Point selectGroveLocation(int groveSize, Random &rnd, World &world)
+Point selectGroveLocation(double &groveSize, Random &rnd, World &world)
 {
     constexpr auto allowedTiles = frozen::make_set<int>(
         {TileID::empty,
@@ -167,7 +168,36 @@ Point selectGroveLocation(int groveSize, Random &rnd, World &world)
         WallVariants::dirt.begin(),
         WallVariants::dirt.end()};
     allowedWalls.insert(WallID::empty);
-    for (int numTries = 0; numTries < 1000; ++numTries) {
+    constexpr auto partialTiles = frozen::make_set<int>(
+        {TileID::snow,
+         TileID::ice,
+         TileID::thinIce,
+         TileID::slush,
+         TileID::hardenedSand,
+         TileID::sandstone,
+         TileID::desertFossil,
+         TileID::jungleGrass,
+         TileID::silt,
+         TileID::ash,
+         TileID::ashGrass,
+         TileID::marble,
+         TileID::granite});
+    std::set<int> partialWalls{
+        WallID::Unsafe::snow,
+        WallID::Unsafe::ice,
+        WallID::Unsafe::hardenedSand,
+        WallID::Unsafe::sandstone,
+        WallID::Unsafe::marble,
+        WallID::Unsafe::granite};
+    partialWalls.insert(
+        WallVariants::jungle.begin(),
+        WallVariants::jungle.end());
+    partialWalls.insert(WallVariants::stone.begin(), WallVariants::stone.end());
+    partialWalls.insert(
+        WallVariants::underworld.begin(),
+        WallVariants::underworld.end());
+    double shrink = groveSize / 10000.0;
+    for (int numTries = 0; numTries < 5000; ++numTries, groveSize -= shrink) {
         auto [x, y] = findStoneCave(
             world.getCavernLevel() + groveSize,
             world.getUnderworldLevel() - groveSize,
@@ -176,12 +206,24 @@ Point selectGroveLocation(int groveSize, Random &rnd, World &world)
         if (x < 75 + groveSize || x > world.getWidth() - 75 - groveSize) {
             continue;
         }
+        int threshold =
+            groveSize * groveSize * (world.conf.patches ? 0.8 : 0.1);
         if (world.regionPasses(
                 x - groveSize,
                 y - groveSize,
                 2 * groveSize,
                 2 * groveSize,
-                [&allowedTiles, &allowedWalls](Tile &tile) {
+                [&threshold,
+                 &allowedTiles,
+                 &allowedWalls,
+                 &partialTiles,
+                 &partialWalls](Tile &tile) {
+                    if (partialTiles.contains(tile.blockID) ||
+                        (tile.blockID == TileID::empty &&
+                         partialWalls.contains(tile.wallID))) {
+                        --threshold;
+                        return threshold > 0;
+                    }
                     return allowedTiles.contains(tile.blockID) &&
                            allowedWalls.contains(tile.wallID);
                 })) {
@@ -197,7 +239,7 @@ void genGemGrove(Random &rnd, World &world)
     rnd.restoreShuffleState();
     int noiseShuffleX = rnd.getInt(0, world.getWidth());
     int noiseShuffleY = rnd.getInt(0, world.getHeight());
-    int groveSize =
+    double groveSize =
         world.getWidth() * world.getHeight() / 329000 + rnd.getInt(60, 75);
     auto [x, y] = selectGroveLocation(groveSize, rnd, world);
     if (x == -1) {

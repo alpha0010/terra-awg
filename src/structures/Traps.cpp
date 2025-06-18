@@ -1,5 +1,6 @@
 #include "structures/Traps.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
@@ -107,10 +108,11 @@ void placePressurePlate(int x, int y, bool isSingleUse, World &world)
 void placeSandTraps(Random &rnd, World &world)
 {
     double scanDist = 0.065 * world.getWidth();
+    int minX = world.conf.patches ? 350 : world.desertCenter - scanDist;
+    int maxX = world.conf.patches ? world.getWidth() - 350
+                                  : world.desertCenter + scanDist;
     LocationBins locations;
-    for (int x = world.desertCenter - scanDist;
-         x < world.desertCenter + scanDist;
-         ++x) {
+    for (int x = minX; x < maxX; ++x) {
         int fallingCount = 0;
         for (int y = world.getUndergroundLevel();
              y < world.getUnderworldLevel();
@@ -134,11 +136,11 @@ void placeSandTraps(Random &rnd, World &world)
         }
     }
     int minBin = binLocation(
-        world.desertCenter - scanDist,
+        minX,
         world.getUndergroundLevel(),
         world.getUnderworldLevel());
     int maxBin = binLocation(
-        world.desertCenter + scanDist,
+        maxX,
         world.getUnderworldLevel(),
         world.getUnderworldLevel());
     int numSandTraps =

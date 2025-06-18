@@ -1,5 +1,7 @@
 #include "structures/Lake.h"
 
+#include "Config.h"
+#include "Random.h"
 #include "Util.h"
 #include "World.h"
 #include "ids/WallID.h"
@@ -57,7 +59,7 @@ followRainFrom(World &world, int x, int y, Func isPathable)
     }
 }
 
-void simulateRain(World &world, int x)
+void simulateRain(Random &rnd, World &world, int x)
 {
     if (x % 4 != 0) {
         return;
@@ -97,15 +99,19 @@ void simulateRain(World &world, int x)
         WallID::Unsafe::spider};
     dryWalls.insert(WallVariants::dungeon.begin(), WallVariants::dungeon.end());
     double pendingWater =
-        std::abs(x - world.jungleCenter) < 0.08 * world.getWidth() ? 15 : -4;
+        world.conf.patches                                           ? 0
+        : std::abs(x - world.jungleCenter) < 0.08 * world.getWidth() ? 15
+                                                                     : -4;
     for (int y = world.spawnY - 45; y < world.getUnderworldLevel(); y += 3) {
         if (!isLiquidPathable(world, x, y) ||
             (y < lavaLevel && dryWalls.contains(world.getTile(x, y).wallID))) {
             pendingWater = 2.1;
             continue;
         }
-        pendingWater +=
-            world.getTile(x, y).wallID == WallID::Unsafe::hive ? 2.4 : 1.6;
+        pendingWater += world.getTile(x, y).wallID == WallID::Unsafe::hive ? 2.4
+                        : world.conf.patches && y < lavaLevel
+                            ? 1.15 + rnd.getHumidity(x, y)
+                            : 1.6;
         auto [minDropX, maxDropX, dropY] =
             followRainFrom(world, x, y, isLiquidPathable);
         if (maxDropX - minDropX < pendingWater) {
@@ -182,11 +188,11 @@ void evaporateSmallPools(World &world, int x)
     }
 }
 
-void genLake(World &world)
+void genLake(Random &rnd, World &world)
 {
     std::cout << "Raining\n";
-    parallelFor(std::views::iota(0, world.getWidth()), [&world](int x) {
-        simulateRain(world, x);
+    parallelFor(std::views::iota(0, world.getWidth()), [&rnd, &world](int x) {
+        simulateRain(rnd, world, x);
     });
     parallelFor(std::views::iota(0, world.getWidth()), [&world](int x) {
         evaporateSmallPools(world, x);

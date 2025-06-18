@@ -12,13 +12,13 @@ BiomeData computeBiomeData(int x, int y, Random &rnd)
 {
     double snow = std::clamp(
         std::min(
-            -10.31 * rnd.getTemperature(x, y) - 3.917,
+            -10.31 * rnd.getTemperature(x, y) - 4.712,
             6.67 * rnd.getHumidity(x, y) + 4.67),
         0.0,
         1.0);
     double desert = std::clamp(
         std::min(
-            -10.31 * rnd.getHumidity(x, y) - 3.917,
+            -10.31 * rnd.getHumidity(x, y) - 4.712,
             6.67 * rnd.getTemperature(x, y) + 4.67),
         0.0,
         1.0);
@@ -29,8 +29,11 @@ BiomeData computeBiomeData(int x, int y, Random &rnd)
         1.0);
     double underworld =
         std::clamp(14.286 * rnd.getTemperature(x, y) - 14.5, 0.0, 1.0);
-    if (underworld > 0.99) {
-        snow = desert = jungle = 0;
+    if (underworld > 0.5) {
+        double mult = 2 - 2 * underworld;
+        snow *= mult;
+        desert *= mult;
+        jungle *= mult;
     }
     double total = snow + desert + jungle + underworld;
     double forest = std::clamp(1 - total, 0.0, 1.0);
@@ -41,20 +44,48 @@ BiomeData computeBiomeData(int x, int y, Random &rnd)
     jungle *= total;
     forest *= total;
     underworld *= total;
-    int quantFactor = 1400;
-    int target = fnv1a32pt(x, y) % (quantFactor - 1);
-    int accu = 0;
+
+    std::array biomes = std::to_array({
+        std::pair{forest, Biome::forest},
+        {desert, Biome::desert},
+        {jungle, Biome::jungle},
+        {snow, Biome::snow},
+        {underworld, Biome::underworld},
+    });
+    std::vector<std::pair<double, Biome>> activeBiomes;
+    if (fnv1a32pt(x, y) % 37 > 4) {
+        std::vector<std::pair<double, Biome>> looseActiveBiomes;
+        for (auto [prob, biome] : biomes) {
+            if (prob > 0.02) {
+                activeBiomes.emplace_back(prob, biome);
+            }
+            if (prob > 0.1) {
+                looseActiveBiomes.emplace_back(prob, biome);
+            }
+        }
+        if (looseActiveBiomes.size() == 2) {
+            activeBiomes = looseActiveBiomes;
+        }
+    }
     Biome active = Biome::forest;
-    for (auto [prob, biome] :
-         {std::pair{snow, Biome::snow},
-          {desert, Biome::desert},
-          {jungle, Biome::jungle},
-          {underworld, Biome::underworld},
-          {forest, Biome::forest}}) {
-        accu += prob * quantFactor;
-        if (accu > target) {
-            active = biome;
-            break;
+    if (activeBiomes.size() == 2) {
+        int offset =
+            static_cast<int>(99999 * (1 + rnd.getFineNoise(0, 0))) % 997;
+        active = activeBiomes[0].first +
+                             0.6 * rnd.getFineNoise(x + offset, y + offset) >
+                         0.5
+                     ? activeBiomes[0].second
+                     : activeBiomes[1].second;
+    } else {
+        int quantFactor = 1400;
+        int target = fnv1a32pt(x, y) % (quantFactor - 1);
+        int accu = 0;
+        for (auto [prob, biome] : biomes) {
+            accu += prob * quantFactor;
+            if (accu > target) {
+                active = biome;
+                break;
+            }
         }
     }
     return {active, forest, snow, desert, jungle, underworld};
@@ -180,6 +211,8 @@ void identifySurfaceBiomes(World &world)
 void genWorldBasePatches(Random &rnd, World &world)
 {
     std::cout << "Generating base terrain\n";
+    rnd.shuffleNoise();
+    rnd.saveShuffleState();
     std::vector<std::pair<int, int>> depositNoise;
     for (int iter = 0; iter < 7; ++iter) {
         depositNoise.emplace_back(

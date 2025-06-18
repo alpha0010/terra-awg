@@ -13,6 +13,7 @@
 #include "structures/StructureUtil.h"
 #include "structures/data/DungeonRooms.h"
 #include "structures/data/Furniture.h"
+#include "vendor/frozen/map.h"
 #include <algorithm>
 #include <iostream>
 #include <set>
@@ -1015,11 +1016,14 @@ private:
                     }
                 }
                 if (tile.blockID != TileID::empty) {
-                    if (tile.blockID == TileID::grass) {
-                        tile.blockID = TileID::dirt;
+                    constexpr auto grassMap = frozen::make_map<int, int>(
+                        {{TileID::grass, TileID::dirt},
+                         {TileID::jungleGrass, TileID::mud}});
+                    if (grassMap.contains(tile.blockID)) {
+                        tile.blockID = grassMap.at(tile.blockID);
                         Tile &nextTile = world.getTile(x + i, y + j + 1);
-                        if (nextTile.blockID == TileID::grass) {
-                            nextTile.blockID = TileID::dirt;
+                        if (grassMap.contains(nextTile.blockID)) {
+                            nextTile.blockID = grassMap.at(nextTile.blockID);
                         }
                     }
                     break;
