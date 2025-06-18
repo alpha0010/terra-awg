@@ -73,16 +73,16 @@ bool testTempleSelection(Point center, World &world)
 
 Point selectTempleCenter(Random &rnd, World &world)
 {
-    int xMin = world.conf.patches
+    int minX = world.conf.patches
                    ? 350
                    : world.jungleCenter - 0.079 * world.getWidth();
-    int xMax = world.conf.patches
+    int maxX = world.conf.patches
                    ? world.getWidth() - 350
                    : world.jungleCenter + 0.079 * world.getWidth();
-    int yMin = (world.getUndergroundLevel() + world.getCavernLevel()) / 2;
+    int minY = (world.getUndergroundLevel() + world.getCavernLevel()) / 2;
     for (int numTries = 0; numTries < 1000; ++numTries) {
-        int x = rnd.getInt(xMin, xMax);
-        int y = rnd.getInt(yMin, world.getUnderworldLevel());
+        int x = rnd.getInt(minX, maxX);
+        int y = rnd.getInt(minY, world.getUnderworldLevel());
         if ((!world.conf.patches ||
              isInBiome(x, y, 200 - 0.19 * numTries, Biome::jungle, world)) &&
             testTempleSelection({x, y}, world)) {

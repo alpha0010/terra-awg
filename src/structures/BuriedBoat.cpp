@@ -14,12 +14,12 @@ typedef std::pair<int, int> Point;
 
 Point selectBoatLocation(int width, int height, Random &rnd, World &world)
 {
-    int xMin = world.conf.patches
+    int minX = world.conf.patches
                    ? 350
                    : world.snowCenter - 0.06 * world.getWidth() - width;
-    int xMax = world.conf.patches ? world.getWidth() - width - 350
+    int maxX = world.conf.patches ? world.getWidth() - width - 350
                                   : world.snowCenter + 0.06 * world.getWidth();
-    int yMax =
+    int maxY =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3 - height;
     constexpr auto avoidBlocks = frozen::make_set<int>({
         TileID::aetherium,
@@ -36,8 +36,8 @@ Point selectBoatLocation(int width, int height, Random &rnd, World &world)
     });
     int biomeScan = std::max(width, height) / 2;
     while (true) {
-        int x = rnd.getInt(xMin, xMax);
-        int y = rnd.getInt(world.getCavernLevel(), yMax);
+        int x = rnd.getInt(minX, maxX);
+        int y = rnd.getInt(world.getCavernLevel(), maxY);
         if ((!world.conf.patches || isInBiome(
                                         x + biomeScan,
                                         y + biomeScan,

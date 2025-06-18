@@ -4,6 +4,7 @@
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
+#include "biomes/BiomeUtil.h"
 #include "ids/ItemID.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
@@ -120,6 +121,9 @@ void placeGems(Random &rnd, World &world)
     int numGems =
         world.getWidth() * world.getHeight() / rnd.getInt(65800, 76800);
     int scanDist = 0.08 * world.getWidth();
+    int minX = world.conf.patches ? 350 : world.desertCenter - scanDist;
+    int maxX = world.conf.patches ? world.getWidth() - 350
+                                  : world.desertCenter + scanDist;
     constexpr auto validAnchors = frozen::make_set<int>(
         {TileID::sand,
          TileID::hardenedSand,
@@ -132,12 +136,11 @@ void placeGems(Random &rnd, World &world)
          TileID::crimsandstone,
          TileID::coralstone});
     while (numGems > 0) {
-        int x = rnd.getInt(
-            world.desertCenter - scanDist,
-            world.desertCenter + scanDist);
+        int x = rnd.getInt(minX, maxX);
         int y =
             rnd.getInt(world.getUndergroundLevel(), world.getUnderworldLevel());
-        if (!validAnchors.contains(world.getTile(x, y).blockID)) {
+        if ((world.conf.patches && world.getBiome(x, y).desert < 0.99) ||
+            !validAnchors.contains(world.getTile(x, y).blockID)) {
             continue;
         }
         if (attachGemTo(Gem::amber, x, y, rnd, world)) {
@@ -380,13 +383,18 @@ Point selectShrineLocation(
          TileID::tungstenOre,
          TileID::goldOre,
          TileID::platinumOre});
+    int minX =
+        world.conf.patches ? 350 : world.jungleCenter - 0.09 * world.getWidth();
+    int maxX = world.conf.patches
+                   ? world.getWidth() - 350
+                   : world.jungleCenter + 0.09 * world.getWidth();
     for (int numTries = 0; numTries < 10000; ++numTries) {
-        int x = rnd.getInt(
-            world.jungleCenter - 0.09 * world.getWidth(),
-            world.jungleCenter + 0.09 * world.getWidth());
+        int x = rnd.getInt(minX, maxX);
         int y =
             rnd.getInt(world.getUndergroundLevel(), world.getUnderworldLevel());
-        if (!world.regionPasses(
+        if ((world.conf.patches &&
+             !isInBiome(x, y, 10, Biome::jungle, world)) ||
+            !world.regionPasses(
                 x,
                 y,
                 shrine.getWidth(),
