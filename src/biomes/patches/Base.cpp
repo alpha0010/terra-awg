@@ -338,9 +338,10 @@ void genWorldBasePatches(Random &rnd, World &world)
                     break;
                 }
                 }
-                if ((biome.desert > 0.4 && biome.snow > 0.4) ||
-                    (biome.snow > 0.6 && biome.active == Biome::desert) ||
-                    (biome.desert > 0.6 && biome.active == Biome::snow)) {
+                threshold = 0.4 + 0.03 * rnd.getFineNoise(x, y);
+                if ((biome.desert > threshold && biome.snow > threshold) ||
+                    (biome.snow > 0.57 && biome.active == Biome::desert) ||
+                    (biome.desert > 0.57 && biome.active == Biome::snow)) {
                     tile.blockID = TileID::marble;
                     tile.wallID = WallID::Unsafe::marble;
                 }

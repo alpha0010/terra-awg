@@ -1,5 +1,6 @@
 #include "Forest.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
@@ -538,11 +539,8 @@ void buryEnchantedSwords(Random &rnd, World &world)
     }
 }
 
-void genForest(Random &rnd, World &world)
+void applyForestGrass(Random &rnd, World &world)
 {
-    std::cout << "Nurturing forests\n";
-    rnd.shuffleNoise();
-    // Grow grass.
     for (int x = 0; x < world.getWidth(); ++x) {
         for (int y = 0; y < world.getUndergroundLevel(); ++y) {
             Tile &tile = world.getTile(x, y);
@@ -561,6 +559,16 @@ void genForest(Random &rnd, World &world)
                                   : WallID::Unsafe::flower;
             }
         }
+    }
+}
+
+void genForest(Random &rnd, World &world)
+{
+    std::cout << "Nurturing forests\n";
+    rnd.shuffleNoise();
+    // Grow grass.
+    if (!world.conf.patches) {
+        applyForestGrass(rnd, world);
     }
     // Add living tree clumps.
     growLivingTrees(rnd, world);

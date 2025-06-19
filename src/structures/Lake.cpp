@@ -188,6 +188,25 @@ void evaporateSmallPools(World &world, int x)
     }
 }
 
+void fillLavaHotzones(Random &rnd, World &world, int x)
+{
+    int lavaLevel =
+        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
+    for (int y = world.getSurfaceLevel(x) + 10; y < lavaLevel; ++y) {
+        if (world.getBiome(x, y).underworld < 0.99) {
+            continue;
+        }
+        Tile &tile = world.getTile(x, y);
+        if (tile.blockID == TileID::empty && tile.liquid != Liquid::shimmer) {
+            if (std::abs(rnd.getFineNoise(x, y)) < 0.06) {
+                tile.blockID = TileID::obsidian;
+            } else {
+                tile.liquid = Liquid::lava;
+            }
+        }
+    }
+}
+
 void genLake(Random &rnd, World &world)
 {
     std::cout << "Raining\n";
@@ -197,4 +216,10 @@ void genLake(Random &rnd, World &world)
     parallelFor(std::views::iota(0, world.getWidth()), [&world](int x) {
         evaporateSmallPools(world, x);
     });
+    if (world.conf.patches) {
+        rnd.shuffleNoise();
+        parallelFor(
+            std::views::iota(0, world.getWidth()),
+            [&rnd, &world](int x) { fillLavaHotzones(rnd, world, x); });
+    }
 }

@@ -91,7 +91,7 @@ Point selectTempleCenter(Random &rnd, World &world)
     }
     return {
         world.jungleCenter,
-        std::midpoint(yMin, world.getUnderworldLevel())};
+        std::midpoint(minY, world.getUnderworldLevel())};
 }
 
 void clearTempleSurface(Point center, Random &rnd, World &world)

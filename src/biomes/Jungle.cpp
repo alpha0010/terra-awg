@@ -143,15 +143,12 @@ void connectSurfaceCaves(int xMin, int xMax, Random &rnd, World &world)
     rnd.shuffleNoise();
 }
 
-void levitateIslands(Random &rnd, World &world)
+void levitateIslands(int lb, int ub, Random &rnd, World &world)
 {
-    int centerX =
-        world.jungleCenter + rnd.getDouble(-0.05, 0.05) * world.getWidth();
-    double scanDist = rnd.getDouble(0.03, 0.035) * world.getWidth();
     int minSurface = world.getUndergroundLevel();
-    int xMin = centerX - scanDist;
-    int xMax = centerX - scanDist;
-    while (xMax < centerX + scanDist) {
+    int xMin = lb;
+    int xMax = lb;
+    while (xMax < ub) {
         int width = rnd.getInt(20, 35);
         xMax += width;
         minSurface =
@@ -204,9 +201,13 @@ void genJungle(Random &rnd, World &world)
 {
     std::cout << "Generating jungle\n";
     rnd.shuffleNoise();
-    levitateIslands(rnd, world);
-    double center = world.jungleCenter;
-    double scanDist = 0.11 * world.getWidth();
+    double center =
+        world.jungleCenter + rnd.getDouble(-0.05, 0.05) * world.getWidth();
+    double scanDist = rnd.getDouble(0.03, 0.035) * world.getWidth();
+    levitateIslands(center - scanDist, center + scanDist, rnd, world);
+
+    center = world.jungleCenter;
+    scanDist = 0.11 * world.getWidth();
     std::map<int, int> surfaceJungleWalls{
         {WallID::Safe::cloud, WallID::Safe::cloud}};
     for (int wallId : WallVariants::dirt) {
