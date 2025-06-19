@@ -46,6 +46,11 @@ equipment = none
 # Distribute biomes in patches (instead of columns).
 patches = false
 
+# Tuning options for biome patches. Reasonable values
+# are between -0.5 and 0.5.
+patchesHumidity = 0.0
+patchesTemperature = 0.0
+
 [extra]
 # Output a map preview image.
 map = true
@@ -441,6 +446,9 @@ std::string Config::getFilename() const
     return filename;
 }
 
+#define READ_CONF_VALUE(SECTION, KEY, TYPE)                                    \
+    conf.KEY = reader.Get##TYPE(#SECTION, #KEY, conf.KEY)
+
 Config readConfig(Random &rnd)
 {
     Config conf{
@@ -452,6 +460,8 @@ Config readConfig(Random &rnd)
         false, // starterHome
         0,     // equipment
         false, // patches
+        0.0,   // patchesHumidity
+        0.0,   // patchesTemperature
         true};
     if (!std::filesystem::exists(confName)) {
         std::ofstream out(confName, std::ios::out);
@@ -468,13 +478,15 @@ Config readConfig(Random &rnd)
         conf.name = genRandomName(rnd);
     }
     conf.seed = processSeed(reader.Get("world", "seed", conf.seed), rnd);
-    conf.width = reader.GetInteger("world", "width", conf.width);
-    conf.height = reader.GetInteger("world", "height", conf.height);
+    READ_CONF_VALUE(world, width, Integer);
+    READ_CONF_VALUE(world, height, Integer);
     conf.mode = parseGameMode(reader.Get("world", "mode", "classic"));
-    conf.starterHome = reader.GetBoolean("world", "home", conf.starterHome);
+    READ_CONF_VALUE(world, home, Boolean);
     conf.equipment =
         parseEquipment(reader.Get("variation", "equipment", "none"));
-    conf.patches = reader.GetBoolean("variation", "patches", conf.patches);
-    conf.mapPreview = reader.GetBoolean("extra", "map", conf.mapPreview);
+    READ_CONF_VALUE(variation, patches, Boolean);
+    READ_CONF_VALUE(variation, patchesHumidity, Real);
+    READ_CONF_VALUE(variation, patchesTemperature, Real);
+    READ_CONF_VALUE(extra, map, Boolean);
     return conf;
 }

@@ -169,9 +169,11 @@ void placeHomeAt(
 
 int realSurfaceAt(int x, World &world)
 {
-    return scanWhileEmpty({x, world.getSurfaceLevel(x) - 2}, {0, 1}, world)
-               .second +
-           1;
+    int minY = world.getSurfaceLevel(x) - 75;
+    while (world.getTile(x, minY).blockID != TileID::empty) {
+        --minY;
+    }
+    return scanWhileEmpty({x, minY}, {0, 1}, world).second + 1;
 }
 
 void genStarterHome(Random &rnd, World &world)

@@ -524,6 +524,13 @@ void genWorldBasePatches(Random &rnd, World &world)
                 if (tile.blockID == TileID::mud) {
                     tile.blockID = TileID::jungleGrass;
                 }
+            } else if (
+                biome.active == Biome::underworld &&
+                y < world.getSurfaceLevel(x) + 10 &&
+                std::abs(x - world.getWidth() / 2) < 100) {
+                if (tile.blockID == TileID::ash) {
+                    tile.blockID = TileID::ashGrass;
+                }
             }
         }
     });

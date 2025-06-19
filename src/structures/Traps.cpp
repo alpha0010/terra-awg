@@ -157,7 +157,8 @@ void placeSandTraps(Random &rnd, World &world)
          TileID::crimsandstone});
     constexpr auto looseBlocks = frozen::make_set<int>(
         {TileID::sand, TileID::ebonsand, TileID::crimsand});
-    while (numSandTraps > 0) {
+    for (int tries = 50 * numSandTraps; numSandTraps > 0 && tries > 0;
+         --tries) {
         int binId = rnd.getInt(minBin, maxBin);
         if (locations[binId].empty()) {
             continue;

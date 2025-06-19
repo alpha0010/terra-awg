@@ -148,6 +148,11 @@ void genCrimson(Random &rnd, World &world)
                                 tile.blockID == TileID::livingWood ||
                                 tile.blockID == TileID::livingMahogany) {
                                 tile.blockPaint = Paint::gray;
+                            } else if (
+                                tile.blockID == TileID::ash &&
+                                y < world.getUnderworldLevel() +
+                                        10 * rnd.getFineNoise(x, y) - 20) {
+                                tile.blockID = TileID::crimstone;
                             }
                             auto wallItr = crimsonWalls.find(tile.wallID);
                             if (wallItr != crimsonWalls.end()) {

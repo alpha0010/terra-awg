@@ -473,6 +473,9 @@ void genTemple(Random &rnd, World &world)
 {
     std::cout << "Training acolytes\n";
     Point center = selectTempleCenter(rnd, world);
+    if (center.first < 100) {
+        return;
+    }
     iterateTemple(center, world, [&world](int x, int y) {
         Tile &tile = world.getTile(x, y);
         tile.blockID = TileID::lihzahrdBrick;

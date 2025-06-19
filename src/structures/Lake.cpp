@@ -192,12 +192,26 @@ void fillLavaHotzones(Random &rnd, World &world, int x)
 {
     int lavaLevel =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
+    constexpr auto skipWalls = frozen::make_set<int>({
+        WallID::empty,
+        WallID::Unsafe::blueBrick,
+        WallID::Unsafe::blueSlab,
+        WallID::Unsafe::blueTiled,
+        WallID::Unsafe::greenBrick,
+        WallID::Unsafe::greenSlab,
+        WallID::Unsafe::greenTiled,
+        WallID::Unsafe::pinkBrick,
+        WallID::Unsafe::pinkSlab,
+        WallID::Unsafe::pinkTiled,
+        WallID::Unsafe::lihzahrdBrick,
+    });
     for (int y = world.getSurfaceLevel(x) + 10; y < lavaLevel; ++y) {
         if (world.getBiome(x, y).underworld < 0.99) {
             continue;
         }
         Tile &tile = world.getTile(x, y);
-        if (tile.blockID == TileID::empty && tile.liquid != Liquid::shimmer) {
+        if (tile.blockID == TileID::empty && !skipWalls.contains(tile.wallID) &&
+            tile.liquid != Liquid::shimmer) {
             if (std::abs(rnd.getFineNoise(x, y)) < 0.06) {
                 tile.blockID = TileID::obsidian;
             } else {

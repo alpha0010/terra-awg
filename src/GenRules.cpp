@@ -225,7 +225,10 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         genGrasses(locations, rnd, world);
         break;
     case Step::initBiomeNoise:
-        rnd.initBiomeNoise(0.00097);
+        rnd.initBiomeNoise(
+            0.00097,
+            world.conf.patchesHumidity,
+            world.conf.patchesTemperature);
         break;
         GEN_STEP(genWorldBasePatches)
         GEN_STEP(genCloudPatches)
@@ -238,7 +241,7 @@ void doWorldGen(Random &rnd, World &world)
 {
     std::set<Step> excludes;
     excludes.insert(world.isCrimson ? Step::genCorruption : Step::genCrimson);
-    if (!world.conf.starterHome) {
+    if (!world.conf.home) {
         excludes.insert(Step::genStarterHome);
     }
     LocationBins locations;

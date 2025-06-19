@@ -135,7 +135,7 @@ void placeGems(Random &rnd, World &world)
          TileID::hardenedCrimsand,
          TileID::crimsandstone,
          TileID::coralstone});
-    while (numGems > 0) {
+    for (int tries = 800 * numGems; numGems > 0 && tries > 0; --tries) {
         int x = rnd.getInt(minX, maxX);
         int y =
             rnd.getInt(world.getUndergroundLevel(), world.getUnderworldLevel());
@@ -486,7 +486,7 @@ void placeJungleShrines(Random &rnd, World &world)
     std::vector<Point> usedLocations;
     std::vector<int> shrines(Data::shrines.begin(), Data::shrines.end());
     std::shuffle(shrines.begin(), shrines.end(), rnd.getPRNG());
-    while (shrineCount > 0) {
+    for (int tries = 2 * shrineCount; shrineCount > 0 && tries > 0; --tries) {
         TileBuffer shrine =
             Data::getShrine(rnd.pool(shrines), world.getFramedTiles());
         auto [x, y] = selectShrineLocation(shrine, usedLocations, rnd, world);
@@ -937,7 +937,7 @@ LocationBins genTreasure(Random &rnd, World &world)
         }
     }
     std::cout << "Placing treasures\n";
-    if (!world.conf.starterHome && world.conf.equipment != 0) {
+    if (!world.conf.home && world.conf.equipment != 0) {
         placeStarterChest(rnd, world);
     }
     std::shuffle(

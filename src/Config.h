@@ -13,10 +13,12 @@ struct Config {
     int width;
     int height;
     GameMode mode;
-    bool starterHome;
+    bool home;
     int equipment;
     bool patches;
-    bool mapPreview;
+    double patchesHumidity;
+    double patchesTemperature;
+    bool map;
 
     std::string getFilename() const;
 };

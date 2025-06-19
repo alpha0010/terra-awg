@@ -436,7 +436,7 @@ int main()
                              .count()
               << "s\n\n";
 
-    if (conf.mapPreview) {
+    if (conf.map) {
         std::cout << "Rendering map preview\n";
         savePreviewImage(conf.getFilename(), world);
     }

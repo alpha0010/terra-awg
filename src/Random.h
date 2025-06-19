@@ -41,7 +41,10 @@ public:
      * Precompute noise samples for other noise functions.
      */
     void initNoise(int width, int height, double scale);
-    void initBiomeNoise(double scale);
+    void initBiomeNoise(
+        double scale,
+        double humidityOffset,
+        double temperatureOffset);
     /**
      * Shift cached noise samples, effectively producing new noise samples,
      * cheaply.

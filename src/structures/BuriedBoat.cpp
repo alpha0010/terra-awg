@@ -35,7 +35,7 @@ Point selectBoatLocation(int width, int height, Random &rnd, World &world)
         TileID::stone,
     });
     int biomeScan = std::max(width, height) / 2;
-    while (true) {
+    for (int tries = 0; tries < 8000; ++tries) {
         int x = rnd.getInt(minX, maxX);
         int y = rnd.getInt(world.getCavernLevel(), maxY);
         if ((!world.conf.patches || isInBiome(
@@ -50,6 +50,7 @@ Point selectBoatLocation(int width, int height, Random &rnd, World &world)
             return {x, y};
         }
     }
+    return {-1, -1};
 }
 
 void genBuriedBoat(Random &rnd, World &world)
@@ -59,6 +60,9 @@ void genBuriedBoat(Random &rnd, World &world)
     TileBuffer boat = Data::getBoat(Data::Boat::frozen, world.getFramedTiles());
     auto [x, y] =
         selectBoatLocation(boat.getWidth(), boat.getHeight(), rnd, world);
+    if (x == -1) {
+        return;
+    }
     constexpr auto clearableTiles = frozen::make_set<int>(
         {TileID::borealWood,
          TileID::richMahogany,

@@ -178,8 +178,8 @@ void genUnderworld(Random &rnd, World &world)
                 Tile &tile = world.getTile(x, y);
                 if (std::abs(rnd.getCoarseNoise(2 * x, y + aspectRatio * x)) <
                     threshold) {
-                    if (tile.blockID == TileID::mud) {
-                        Tile &prevTile = world.getTile(x, y - 1);
+                    for (auto [i, j] : {std::pair{-1, -1}, {-1, 0}, {0, -1}}) {
+                        Tile &prevTile = world.getTile(x + i, y + j);
                         if (prevTile.blockID == TileID::mud) {
                             prevTile.blockID = TileID::jungleGrass;
                         }
@@ -193,8 +193,13 @@ void genUnderworld(Random &rnd, World &world)
                         0.06) {
                     tile.wallID = WallID::empty;
                 }
-                if (y > lavaLevel && tile.blockID == TileID::empty) {
-                    tile.liquid = Liquid::lava;
+                if (y > lavaLevel) {
+                    if (tile.blockID == TileID::empty) {
+                        tile.liquid = Liquid::lava;
+                    }
+                } else if (
+                    tile.blockID == TileID::mud && world.isExposed(x, y)) {
+                    tile.blockID = TileID::jungleGrass;
                 }
             }
         });
