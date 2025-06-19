@@ -10,6 +10,8 @@ class Random;
 
 typedef std::pair<int, int> Point;
 
+double computeOreThreshold(double oreMultiplier);
+
 void embedWaterfalls(
     Point from,
     Point to,

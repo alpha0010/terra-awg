@@ -1,5 +1,6 @@
 #include "structures/Dungeon.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
@@ -591,7 +592,7 @@ private:
                 }
             }
         }
-        int numChests = world.getHeight() / 150;
+        int numChests = world.conf.chests * world.getHeight() / 150;
         while (numChests > 0) {
             auto [x, y] = rnd.select(locations);
             if (isValidPlacementLocation(x, y, 2, 3, true)) {

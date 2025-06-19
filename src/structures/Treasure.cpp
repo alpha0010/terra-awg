@@ -184,7 +184,8 @@ void placeLifeCrystals(
     Random &rnd,
     World &world)
 {
-    int lifeCrystalCount = world.getWidth() * world.getHeight() / 50000;
+    int lifeCrystalCount =
+        world.conf.lifeCrystals * world.getWidth() * world.getHeight() / 50000;
     int maxDungeonPlacements = 3;
     std::vector<Point> usedLocations;
     while (lifeCrystalCount > 0) {
@@ -332,7 +333,8 @@ void placeManaCrystals(
     Random &rnd,
     World &world)
 {
-    int manaCrystalCount = world.getWidth() * world.getHeight() / 310000;
+    int manaCrystalCount =
+        world.conf.manaCrystals * world.getWidth() * world.getHeight() / 310000;
     while (manaCrystalCount > 0) {
         int binId = rnd.getInt(0, maxBin);
         if (locations[binId].empty()) {
@@ -481,8 +483,8 @@ Point selectShrineLocation(
 
 void placeJungleShrines(Random &rnd, World &world)
 {
-    int shrineCount =
-        world.getWidth() * world.getHeight() / rnd.getInt(590700, 677600);
+    int shrineCount = world.conf.chests * world.getWidth() * world.getHeight() /
+                      rnd.getInt(590700, 677600);
     std::vector<Point> usedLocations;
     std::vector<int> shrines(Data::shrines.begin(), Data::shrines.end());
     std::shuffle(shrines.begin(), shrines.end(), rnd.getPRNG());
@@ -793,7 +795,8 @@ void placeChest(
 void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
 {
     int chestCount =
-        world.getWidth() * world.getHeight() / 41800 - world.getChests().size();
+        world.conf.chests * world.getWidth() * world.getHeight() / 41800 -
+        world.getChests().size();
     std::vector<Point> usedLocations;
     for (auto &chest : world.getChests()) {
         usedLocations.emplace_back(chest.x, chest.y);
@@ -876,7 +879,8 @@ Variant getPotType(int x, int y, World &world)
 
 void placePots(int maxBin, LocationBins &locations, Random &rnd, World &world)
 {
-    int potCount = world.getWidth() * world.getHeight() / 10000;
+    int potCount =
+        world.conf.pots * world.getWidth() * world.getHeight() / 10000;
     while (potCount > 0) {
         int binId = rnd.getInt(0, maxBin);
         if (locations[binId].empty()) {

@@ -1,5 +1,6 @@
 #include "structures/MinecartTracks.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
@@ -201,8 +202,8 @@ void genTracks(Random &rnd, World &world)
 {
     std::cout << "Installing tracks\n";
     rnd.shuffleNoise();
-    int numTracks =
-        world.getWidth() * world.getHeight() / rnd.getInt(640000, 960000);
+    int numTracks = world.conf.minecartTracks * world.getWidth() *
+                    world.getHeight() / rnd.getInt(640000, 960000);
     while (numTracks > 0) {
         auto track = planTrack(rnd, world);
         if (track.empty()) {

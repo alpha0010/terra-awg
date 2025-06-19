@@ -284,7 +284,7 @@ addTempleTreasures(Point center, int numRooms, Random &rnd, World &world)
         }
         return true;
     });
-    int numChests = numRooms / 17.5;
+    int numChests = world.conf.chests * numRooms / 17.5;
     std::vector<Point> usedLocations;
     while (numChests > 0) {
         auto [x, y] = rnd.select(locations);

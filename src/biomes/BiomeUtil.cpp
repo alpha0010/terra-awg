@@ -8,6 +8,12 @@
 #include <algorithm>
 #include <set>
 
+double computeOreThreshold(double oreMultiplier)
+{
+    return (std::pow(std::max(0, oreMultiplier), 0.172) - 2.25614064334831) /
+           1.9476581743693;
+}
+
 Point getEmbeddedPos(
     int x,
     int y,

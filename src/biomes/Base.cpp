@@ -1,8 +1,10 @@
 #include "Base.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
+#include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
 #include <algorithm>
 #include <iostream>
@@ -65,11 +67,12 @@ void scatterResource(Random &rnd, World &world, int resource)
 void genOreVeins(Random &rnd, World &world, int oreRoof, int oreFloor, int ore)
 {
     rnd.shuffleNoise();
+    double threshold = computeOreThreshold(world.conf.ore);
     parallelFor(
         std::views::iota(0, world.getWidth()),
-        [oreRoof, oreFloor, ore, &rnd, &world](int x) {
+        [oreRoof, oreFloor, ore, threshold, &rnd, &world](int x) {
             for (int y = oreRoof; y < oreFloor; ++y) {
-                if (rnd.getFineNoise(x, y) < -0.645) {
+                if (rnd.getFineNoise(x, y) < threshold) {
                     Tile &tile = world.getTile(x, y);
                     if (tile.blockID != TileID::empty) {
                         tile.blockID = ore;
@@ -137,9 +140,11 @@ void genWorldBase(Random &rnd, World &world)
     for (int wallId : WallVariants::dirt) {
         underworldWalls[wallId] = rnd.select(WallVariants::underworld);
     }
+    double hellstoneThreshold = -computeOreThreshold(4.24492 * world.conf.ore);
     parallelFor(
         std::views::iota(0, world.getWidth()),
-        [underworldHeight, &underworldWalls, &rnd, &world](int x) {
+        [underworldHeight, hellstoneThreshold, &underworldWalls, &rnd, &world](
+            int x) {
             int underworldRoof =
                 world.getUnderworldLevel() + 0.22 * underworldHeight +
                 19 * rnd.getCoarseNoise(x, 0.33 * world.getHeight());
@@ -154,9 +159,10 @@ void genWorldBase(Random &rnd, World &world)
                 // entire middle.
                 Tile &tile = world.getTile(x, y);
                 if (y > underworldFloor) {
-                    tile.blockID = std::abs(rnd.getFineNoise(x, y)) > 0.5
-                                       ? TileID::hellstone
-                                       : TileID::ash;
+                    tile.blockID =
+                        std::abs(rnd.getFineNoise(x, y)) > hellstoneThreshold
+                            ? TileID::hellstone
+                            : TileID::ash;
                 } else {
                     tile.blockID =
                         y < underworldRoof ? TileID::ash : TileID::empty;

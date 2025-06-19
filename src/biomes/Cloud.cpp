@@ -1,5 +1,6 @@
 #include "Cloud.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -220,7 +221,8 @@ void genCloud(Random &rnd, World &world)
 {
     std::cout << "Condensing clouds\n";
     rnd.shuffleNoise();
-    int numClouds = world.getWidth() / rnd.getInt(600, 1300);
+    int numClouds =
+        world.conf.clouds * world.getWidth() / rnd.getInt(600, 1300);
     std::vector<int> rooms(Data::skyBoxes.begin(), Data::skyBoxes.end());
     std::shuffle(rooms.begin(), rooms.end(), rnd.getPRNG());
     auto roomItr = rooms.begin();

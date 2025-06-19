@@ -51,6 +51,16 @@ patches = false
 patchesHumidity = 0.0
 patchesTemperature = 0.0
 
+# Placement frequency multipliers. 0.5 means half the
+# normal amount, 2.0 means double the normal amount.
+ore = 1.0
+lifeCrystals = 1.0
+manaCrystals = 1.0
+pots = 1.0
+chests = 1.0
+clouds = 1.0
+minecartTracks = 1.0
+
 [extra]
 # Output a map preview image.
 map = true
@@ -462,7 +472,14 @@ Config readConfig(Random &rnd)
         false, // patches
         0.0,   // patchesHumidity
         0.0,   // patchesTemperature
-        true};
+        1.0,   // ore
+        1.0,   // lifeCrystals
+        1.0,   // manaCrystals
+        1.0,   // pots
+        1.0,   // chests
+        1.0,   // clouds
+        1.0,   // minecartTracks
+        true}; // map
     if (!std::filesystem::exists(confName)) {
         std::ofstream out(confName, std::ios::out);
         out.write(defaultConfigStr, std::strlen(defaultConfigStr));
@@ -487,6 +504,13 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, patches, Boolean);
     READ_CONF_VALUE(variation, patchesHumidity, Real);
     READ_CONF_VALUE(variation, patchesTemperature, Real);
+    READ_CONF_VALUE(variation, ore, Real);
+    READ_CONF_VALUE(variation, lifeCrystals, Real);
+    READ_CONF_VALUE(variation, manaCrystals, Real);
+    READ_CONF_VALUE(variation, pots, Real);
+    READ_CONF_VALUE(variation, chests, Real);
+    READ_CONF_VALUE(variation, clouds, Real);
+    READ_CONF_VALUE(variation, minecartTracks, Real);
     READ_CONF_VALUE(extra, map, Boolean);
     return conf;
 }

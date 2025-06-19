@@ -1,5 +1,6 @@
 #include "structures/Ruins.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
@@ -422,7 +423,7 @@ void genRuins(Random &rnd, World &world)
         }
     }
     // Chests.
-    numPlacements = locations.size() / 640;
+    numPlacements = world.conf.chests * locations.size() / 640;
     usedLocations.clear();
     for (; locItr != locations.end() && numPlacements > 0; ++locItr) {
         auto [x, y] = *locItr;
