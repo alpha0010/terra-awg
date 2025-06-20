@@ -14,17 +14,26 @@
 void genCrimson(Random &rnd, World &world)
 {
     std::cout << "Infecting the world\n";
-    rnd.shuffleNoise();
     // Avoid selecting too near spawn.
     int surfaceX = world.getWidth() * rnd.getDouble(0.12, 0.39);
     if (rnd.getBool()) {
         surfaceX = world.getWidth() - surfaceX;
     }
+    // Register location for use in other generators.
+    world.surfaceEvilCenter = surfaceX;
+    genCrimsonAt(
+        surfaceX,
+        world.getWidth() * rnd.getDouble(0.08, 0.92),
+        rnd,
+        world);
+}
+
+void genCrimsonAt(int surfaceX, int undergroundX, Random &rnd, World &world)
+{
+    rnd.shuffleNoise();
     int surfaceY = rnd.getInt(
         0.95 * world.getUndergroundLevel(),
         (2 * world.getUndergroundLevel() + world.getCavernLevel()) / 3);
-    // Register location for use in other generators.
-    world.surfaceEvilCenter = surfaceX;
     int scanDist = 0.08 * world.getWidth();
     // Conversion mappings.
     constexpr auto crimsonBlocks = frozen::make_map<int, int>(
@@ -170,7 +179,7 @@ void genCrimson(Random &rnd, World &world)
     applyCrimson(surfaceX, surfaceY);
     // Underground crimson.
     applyCrimson(
-        world.getWidth() * rnd.getDouble(0.08, 0.92),
+        undergroundX,
         rnd.getInt(
             (2 * world.getCavernLevel() + world.getUnderworldLevel()) / 3,
             world.getUnderworldLevel()));

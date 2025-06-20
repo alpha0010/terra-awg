@@ -25,9 +25,10 @@ struct DungeonTheme {
     int brickWall;
     int slabWall;
     int tiledWall;
+    int paint;
     Data::Variant furniture;
 
-    void apply(int themeBrick)
+    void apply(int themeBrick, Random &rnd)
     {
         brick = themeBrick;
         if (themeBrick == TileID::blueBrick) {
@@ -35,18 +36,33 @@ struct DungeonTheme {
             brickWall = WallID::Unsafe::blueBrick;
             slabWall = WallID::Unsafe::blueSlab;
             tiledWall = WallID::Unsafe::blueTiled;
+            paint = rnd.select(
+                {Paint::deepCyan,
+                 Paint::deepSkyBlue,
+                 Paint::deepBlue,
+                 Paint::deepPurple});
             furniture = Data::Variant::blueDungeon;
         } else if (themeBrick == TileID::greenBrick) {
             crackedBrick = TileID::crackedGreenBrick;
             brickWall = WallID::Unsafe::greenBrick;
             slabWall = WallID::Unsafe::greenSlab;
             tiledWall = WallID::Unsafe::greenTiled;
+            paint = rnd.select(
+                {Paint::deepYellow,
+                 Paint::deepLime,
+                 Paint::deepGreen,
+                 Paint::deepTeal});
             furniture = Data::Variant::greenDungeon;
         } else {
             crackedBrick = TileID::crackedPinkBrick;
             brickWall = WallID::Unsafe::pinkBrick;
             slabWall = WallID::Unsafe::pinkSlab;
             tiledWall = WallID::Unsafe::pinkTiled;
+            paint = rnd.select(
+                {Paint::deepOrange,
+                 Paint::deepRed,
+                 Paint::deepPink,
+                 Paint::deepViolet});
             furniture = Data::Variant::pinkDungeon;
         }
     }
@@ -300,7 +316,7 @@ private:
                 world.getTile(x + i, y - 1).blockID = platformBlock;
             }
             Chest &chest = world.placeChest(x + 2, y - 3, chestType);
-            fillDungeonBiomeChest(chest, rnd, std::move(item));
+            fillDungeonBiomeChest(chest, rnd, world, std::move(item));
             world.placeFramedTile(x, y - 3, TileID::lamp, lampType);
             world.placeFramedTile(x + 5, y - 3, TileID::lamp, lampType);
         }
@@ -1092,12 +1108,55 @@ private:
         }
     }
 
+    void applyPaint(int dungeonCenter, int dungeonWidth)
+    {
+        int maxX = std::max(
+            world.dungeonX + 80,
+            dungeonCenter + dungeonWidth + roomSize);
+        int yDivide =
+            wallThickness +
+            (world.getUndergroundLevel() + 4 * world.getCavernLevel()) / 5;
+        for (int x =
+                 std::min(world.dungeonX - 80, dungeonCenter - dungeonWidth);
+             x < maxX;
+             ++x) {
+            for (int y = world.dungeonY - 40; y < yDivide; ++y) {
+                applyPaintAt(x, y);
+            }
+        }
+        for (int x = dungeonCenter - dungeonWidth;
+             x < dungeonCenter + dungeonWidth + roomSize;
+             ++x) {
+            for (int y = yDivide; y < world.getHeight(); ++y) {
+                applyPaintAt(x, y);
+            }
+        }
+    }
+
+    void applyPaintAt(int x, int y)
+    {
+        Tile &tile = world.getTile(x, y);
+        if (tile.blockID == theme.brick || tile.blockID == theme.crackedBrick) {
+            tile.blockPaint = theme.paint;
+        }
+        if (tile.wallID == theme.brickWall || tile.wallID == theme.slabWall ||
+            tile.wallID == theme.tiledWall) {
+            tile.wallPaint = theme.paint;
+            if (tile.blockID == TileID::pressurePlate ||
+                tile.blockID == TileID::trap) {
+                tile.blockPaint = theme.paint;
+            }
+        }
+    }
+
 public:
     Dungeon(Random &r, World &w)
         : rnd(r), world(w), roomSize(16), hallSize(9), wallThickness(5)
     {
-        theme.apply(rnd.select(
-            {TileID::blueBrick, TileID::greenBrick, TileID::pinkBrick}));
+        theme.apply(
+            rnd.select(
+                {TileID::blueBrick, TileID::greenBrick, TileID::pinkBrick}),
+            rnd);
     }
 
     void gen(int dungeonCenter)
@@ -1179,6 +1238,9 @@ public:
                            b.second + shuffleY);
             });
         applyWallVariety(zones);
+        if (world.conf.doubleTrouble) {
+            applyPaint(dungeonCenter, dungeonWidth);
+        }
     }
 };
 

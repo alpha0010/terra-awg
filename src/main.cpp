@@ -53,7 +53,7 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     w.putUint32(world.getHeight());                // Vertical tiles.
     w.putUint32(world.getWidth());                 // Horizontal tiles.
     w.putUint32(static_cast<uint32_t>(conf.mode)); // Game mode.
-    w.putBool(false);                              // Drunk world.
+    w.putBool(conf.doubleTrouble);                 // Drunk world.
     w.putBool(false);                              // For the worthy.
     w.putBool(false);                              // Celebrationmk10.
     w.putBool(false);                              // The constant.
@@ -335,15 +335,39 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
 
     w.putUint32(0);  // Number of shimmered NPCs.
     w.putBool(true); // Begin town NPC record.
-    w.putUint32(22); // The guide.
-    w.putString(rnd.select({"Andrew", "Asher", "Bradley", "Brandon", "Brett",
-                            "Brian",  "Cody",  "Cole",    "Colin",   "Connor",
-                            "Daniel", "Dylan", "Garrett", "Harley",  "Jack",
-                            "Jacob",  "Jake",  "Jan",     "Jeff",    "Jeffrey",
-                            "Joe",    "Kevin", "Kyle",    "Levi",    "Logan",
-                            "Luke",   "Marty", "Maxwell", "Ryan",    "Scott",
-                            "Seth",   "Steve", "Tanner",  "Trent",   "Wyatt",
-                            "Zach"}));       // NPC name.
+    if (conf.doubleTrouble) {
+        w.putUint32(208); // Party Girl.
+        w.putString(rnd.select(
+            {"Amanda",
+             "Bailey",
+             "Bambi",
+             "Bunny",
+             "Candy",
+             "Cherry",
+             "Dazzle",
+             "Destiny",
+             "Fantasia",
+             "Fantasy",
+             "Glitter",
+             "Isis",
+             "Lexus",
+             "Paris",
+             "Sparkle",
+             "Star",
+             "Sugar",
+             "Trixy"})); // NPC name.
+    } else {
+        w.putUint32(22); // The guide.
+        w.putString(
+            rnd.select({"Andrew", "Asher", "Bradley", "Brandon", "Brett",
+                        "Brian",  "Cody",  "Cole",    "Colin",   "Connor",
+                        "Daniel", "Dylan", "Garrett", "Harley",  "Jack",
+                        "Jacob",  "Jake",  "Jan",     "Jeff",    "Jeffrey",
+                        "Joe",    "Kevin", "Kyle",    "Levi",    "Logan",
+                        "Luke",   "Marty", "Maxwell", "Ryan",    "Scott",
+                        "Seth",   "Steve", "Tanner",  "Trent",   "Wyatt",
+                        "Zach"})); // NPC name.
+    }
     w.putFloat32(16 * world.getWidth() / 2); // NPC position X.
     w.putFloat32(16 * (world.spawnY - 2));   // NPC position Y.
     w.putBool(true);                         // NPC is homeless.

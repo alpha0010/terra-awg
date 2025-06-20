@@ -1,5 +1,6 @@
 #include "structures/Plants.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
@@ -276,7 +277,9 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
                         x,
                         y,
                         curTileID,
-                        curTileID == TileID::grass && rnd.getDouble(0, 1) < 0.1
+                        curTileID == TileID::grass &&
+                                rnd.getDouble(0, 1) <
+                                    (world.conf.doubleTrouble ? 0.23 : 0.1)
                             ? rnd.select(
                                   {TileID::sakuraTree,
                                    TileID::yellowWillowTree})

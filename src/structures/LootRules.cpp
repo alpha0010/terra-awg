@@ -1,5 +1,6 @@
 #include "structures/LootRules.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/ItemID.h"
@@ -71,6 +72,20 @@ void fillLoot(
     int minLoot = std::floor(0.9 * expectedValue - 0.5);
     while (doFillLoot(chest, rnd, loot) < minLoot) {
     }
+}
+
+std::pair<double, Item> getGlobalItemPrimary(World &world)
+{
+    return {
+        world.conf.doubleTrouble ? 1.0 / 15 : 0,
+        {ItemID::moonLordLegs, Prefix::none, 1}};
+}
+
+std::pair<double, Item> getGlobalItemPotion(World &world)
+{
+    return {
+        world.conf.doubleTrouble ? 1.0 / 30 : 0,
+        {ItemID::redPotion, Prefix::none, 1}};
 }
 
 Item getSurfacePrimaryLoot(Random &rnd)
@@ -179,6 +194,7 @@ void fillSurfaceChest(Chest &chest, int torchID, Random &rnd, World &world)
         chest,
         rnd,
         {{1, getSurfacePrimaryLoot(rnd)},
+         getGlobalItemPrimary(world),
          {1.0 / 6, {ItemID::glowstick, Prefix::none, rnd.getInt(40, 75)}},
          {1.0 / 6, {ItemID::throwingKnife, Prefix::none, rnd.getInt(150, 300)}},
          {0.2,
@@ -199,6 +215,7 @@ void fillSurfaceChest(Chest &chest, int torchID, Random &rnd, World &world)
           {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
            Prefix::none,
            rnd.getInt(25, 50)}},
+         getGlobalItemPotion(world),
          {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
          {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
          {2.0 / 3,
@@ -225,6 +242,7 @@ void fillSurfaceAshWoodChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {{1, getSurfacePrimaryLoot(rnd)},
+         getGlobalItemPrimary(world),
          {1.0 / 6, {ItemID::glowstick, Prefix::none, rnd.getInt(40, 75)}},
          {1.0 / 6, {ItemID::throwingKnife, Prefix::none, rnd.getInt(150, 300)}},
          {0.2,
@@ -245,6 +263,7 @@ void fillSurfaceAshWoodChest(Chest &chest, Random &rnd, World &world)
           {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
            Prefix::none,
            rnd.getInt(25, 50)}},
+         getGlobalItemPotion(world),
          {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
          {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
          {2.0 / 3,
@@ -271,6 +290,7 @@ void fillSurfaceFrozenChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {{1, getFrozenPrimaryLoot(rnd)},
+         getGlobalItemPrimary(world),
          {0.05, {ItemID::extractinator, Prefix::none, 1}},
          {0.02, {ItemID::fish, Prefix::none, 1}},
          {1.0 / 7, {ItemID::iceMachine, Prefix::none, 1}},
@@ -296,6 +316,7 @@ void fillSurfaceFrozenChest(Chest &chest, Random &rnd, World &world)
           {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
            Prefix::none,
            rnd.getInt(25, 50)}},
+         getGlobalItemPotion(world),
          {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
          {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
          {2.0 / 3,
@@ -335,6 +356,7 @@ void fillSurfaceLivingWoodChest(Chest &chest, Random &rnd, World &world)
               {ItemID::livingWoodWand, Prefix::none, 1},
               {ItemID::finchStaff, rnd.select(PrefixSet::magic), 1},
           })},
+         getGlobalItemPrimary(world),
          {0.1,
           {rnd.select({ItemID::sunflowerMinecart, ItemID::ladybugMinecart}),
            Prefix::none,
@@ -359,6 +381,7 @@ void fillSurfaceLivingWoodChest(Chest &chest, Random &rnd, World &world)
           {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
            Prefix::none,
            rnd.getInt(25, 50)}},
+         getGlobalItemPotion(world),
          {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
          {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
          {2.0 / 3,
@@ -396,6 +419,7 @@ void fillSurfacePalmWoodChest(Chest &chest, Random &rnd, World &world)
               {ItemID::radar, rnd.select(PrefixSet::accessory), 1},
               {ItemID::stepStool, rnd.select(PrefixSet::accessory), 1},
           })},
+         getGlobalItemPrimary(world),
          {0.05, {ItemID::whitePearl, Prefix::none, 1}},
          {1.0 / 6, {ItemID::glowstick, Prefix::none, rnd.getInt(40, 75)}},
          {1.0 / 6,
@@ -418,6 +442,7 @@ void fillSurfacePalmWoodChest(Chest &chest, Random &rnd, World &world)
           {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
            Prefix::none,
            rnd.getInt(25, 50)}},
+         getGlobalItemPotion(world),
          {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
          {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
          {2.0 / 3,
@@ -444,6 +469,7 @@ void fillSurfaceRichMahoganyChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {{1, getSurfacePrimaryLoot(rnd)},
+         getGlobalItemPrimary(world),
          {1.0 / 6, {ItemID::glowstick, Prefix::none, rnd.getInt(40, 75)}},
          {1.0 / 6, {ItemID::poisonedKnife, Prefix::none, rnd.getInt(150, 300)}},
          {0.2,
@@ -464,6 +490,7 @@ void fillSurfaceRichMahoganyChest(Chest &chest, Random &rnd, World &world)
           {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
            Prefix::none,
            rnd.getInt(25, 50)}},
+         getGlobalItemPotion(world),
          {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
          {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
          {2.0 / 3,
@@ -492,6 +519,7 @@ void fillSurfaceWaterChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {{1, getWaterPrimaryLoot(rnd)},
+         getGlobalItemPrimary(world),
          {nearEdge ? 0.05 : 0, {ItemID::whitePearl, Prefix::none, 1}},
          {0.5, {ItemID::sandcastleBucket, Prefix::none, 1}},
          {0.5, {ItemID::sharkBait, Prefix::none, 1}},
@@ -515,6 +543,7 @@ void fillSurfaceWaterChest(Chest &chest, Random &rnd, World &world)
           {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
            Prefix::none,
            rnd.getInt(25, 50)}},
+         getGlobalItemPotion(world),
          {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
          {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
          {2.0 / 3,
@@ -550,6 +579,7 @@ void fillUndergroundChest(
         rnd,
         {
             {1, getUndergroundPrimaryLoot(rnd)},
+            getGlobalItemPrimary(world),
             {isTrapped ? 1.0 / 3 : 0,
              {ItemID::deadMansSweater, Prefix::none, 1}},
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
@@ -570,6 +600,7 @@ void fillUndergroundChest(
              {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
               Prefix::none,
               rnd.getInt(25, 49)}},
+            getGlobalItemPotion(world),
             {0.5,
              {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
@@ -598,6 +629,7 @@ void fillUndergroundFrozenChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1, getFrozenPrimaryLoot(rnd)},
+            getGlobalItemPrimary(world),
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
             {0.02, {ItemID::fish, Prefix::none, 1}},
             {1.0 / 7, {ItemID::iceMachine, Prefix::none, 1}},
@@ -619,6 +651,7 @@ void fillUndergroundFrozenChest(Chest &chest, Random &rnd, World &world)
              {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
               Prefix::none,
               rnd.getInt(25, 49)}},
+            getGlobalItemPotion(world),
             {0.5,
              {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
@@ -648,6 +681,7 @@ void fillUndergroundHoneyChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1, getHoneyPrimaryLoot(rnd)},
+            getGlobalItemPrimary(world),
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
             {0.05, {ItemID::flareGun, Prefix::none, 1}},
             {1.0 / 3, {ItemID::honeyBomb, Prefix::none, rnd.getInt(3, 5)}},
@@ -666,6 +700,7 @@ void fillUndergroundHoneyChest(Chest &chest, Random &rnd, World &world)
              {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
               Prefix::none,
               rnd.getInt(25, 49)}},
+            getGlobalItemPotion(world),
             {0.5, {ItemID::bottledHoney, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
              {rnd.select(
@@ -695,6 +730,7 @@ void fillUndergroundIvyChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1, getIvyPrimaryLoot(rnd)},
+            getGlobalItemPrimary(world),
             {1.0 / 6, {ItemID::livingMahoganyWand, Prefix::none, 1}},
             {0.1, {ItemID::beeMinecart, Prefix::none, 1}},
             {0.2, {ItemID::honeyDispenser, Prefix::none, 1}},
@@ -716,6 +752,7 @@ void fillUndergroundIvyChest(Chest &chest, Random &rnd, World &world)
              {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
               Prefix::none,
               rnd.getInt(25, 49)}},
+            getGlobalItemPotion(world),
             {0.5, {ItemID::bottledHoney, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
              {rnd.select(
@@ -749,6 +786,7 @@ void fillUndergroundMushroomChest(Chest &chest, Random &rnd, World &world)
              {rnd.pool({ItemID::shroomMinecart, ItemID::mushroomHat}),
               Prefix::none,
               1}},
+            getGlobalItemPrimary(world),
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
             {0.05, {ItemID::flareGun, Prefix::none, 1}},
             {1.0 / 3, {ItemID::bomb, Prefix::none, rnd.getInt(10, 19)}},
@@ -767,6 +805,7 @@ void fillUndergroundMushroomChest(Chest &chest, Random &rnd, World &world)
              {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
               Prefix::none,
               rnd.getInt(25, 49)}},
+            getGlobalItemPotion(world),
             {0.5,
              {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
@@ -801,6 +840,7 @@ void fillUndergroundSandstoneChest(Chest &chest, Random &rnd, World &world)
                  {ItemID::ancientChisel, rnd.select(PrefixSet::accessory), 1},
                  {ItemID::duneriderBoots, rnd.select(PrefixSet::accessory), 1},
              })},
+            getGlobalItemPrimary(world),
             {0.05,
              {rnd.select({ItemID::whitePearl, ItemID::blackPearl}),
               Prefix::none,
@@ -825,6 +865,7 @@ void fillUndergroundSandstoneChest(Chest &chest, Random &rnd, World &world)
              {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
               Prefix::none,
               rnd.getInt(25, 49)}},
+            getGlobalItemPotion(world),
             {0.5,
              {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
@@ -853,6 +894,7 @@ void fillUndergroundRichMahoganyChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1, getUndergroundPrimaryLoot(rnd)},
+            getGlobalItemPrimary(world),
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
             {0.05, {ItemID::flareGun, Prefix::none, 1}},
             {1.0 / 3, {ItemID::bomb, Prefix::none, rnd.getInt(10, 19)}},
@@ -871,6 +913,7 @@ void fillUndergroundRichMahoganyChest(Chest &chest, Random &rnd, World &world)
              {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
               Prefix::none,
               rnd.getInt(25, 49)}},
+            getGlobalItemPotion(world),
             {0.5, {ItemID::bottledHoney, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
              {rnd.select(
@@ -901,6 +944,7 @@ void fillUndergroundWaterChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1, getWaterPrimaryLoot(rnd)},
+            getGlobalItemPrimary(world),
             {nearEdge ? 0.6 : 0,
              {rnd.select({ItemID::whitePearl, ItemID::blackPearl}),
               Prefix::none,
@@ -925,6 +969,7 @@ void fillUndergroundWaterChest(Chest &chest, Random &rnd, World &world)
              {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
               Prefix::none,
               rnd.getInt(25, 49)}},
+            getGlobalItemPotion(world),
             {0.5,
              {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
@@ -963,6 +1008,7 @@ void fillCavernChest(
         rnd,
         {
             {1, getCavernPrimaryLoot(rnd)},
+            getGlobalItemPrimary(world),
             {isTrapped ? 1.0 / 3 : 0,
              {ItemID::deadMansSweater, Prefix::none, 1}},
             {chest.y < lavaLevel ? 0.05 : 0.15,
@@ -985,6 +1031,7 @@ void fillCavernChest(
              {rnd.select({ItemID::flamingArrow, ItemID::throwingKnife}),
               Prefix::none,
               rnd.getInt(25, 50)}},
+            getGlobalItemPotion(world),
             {0.5, {ItemID::healingPotion, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
              {rnd.select(
@@ -1022,6 +1069,7 @@ void fillCavernFrozenChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1, getFrozenPrimaryLoot(rnd)},
+            getGlobalItemPrimary(world),
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
             {0.02, {ItemID::fish, Prefix::none, 1}},
             {1.0 / 7, {ItemID::iceMachine, Prefix::none, 1}},
@@ -1042,6 +1090,7 @@ void fillCavernFrozenChest(Chest &chest, Random &rnd, World &world)
              {rnd.select({ItemID::frostburnArrow, ItemID::frostDaggerfish}),
               Prefix::none,
               rnd.getInt(25, 50)}},
+            getGlobalItemPotion(world),
             {0.5, {ItemID::healingPotion, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
              {rnd.select(
@@ -1082,6 +1131,7 @@ void fillCavernHoneyChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1, getHoneyPrimaryLoot(rnd)},
+            getGlobalItemPrimary(world),
             {1.0 / 3, {ItemID::honeyBomb, Prefix::none, rnd.getInt(3, 5)}},
             {chest.y < lavaLevel ? 0.05 : 0.15,
              {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
@@ -1102,6 +1152,7 @@ void fillCavernHoneyChest(Chest &chest, Random &rnd, World &world)
              {rnd.select({ItemID::flamingArrow, ItemID::poisonedKnife}),
               Prefix::none,
               rnd.getInt(25, 50)}},
+            getGlobalItemPotion(world),
             {0.5, {ItemID::bottledHoney, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
              {rnd.select(
@@ -1143,6 +1194,7 @@ void fillCavernIvyChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1, getIvyPrimaryLoot(rnd)},
+            getGlobalItemPrimary(world),
             {1.0 / 6, {ItemID::livingMahoganyWand, Prefix::none, 1}},
             {0.1, {ItemID::beeMinecart, Prefix::none, 1}},
             {0.2, {ItemID::honeyDispenser, Prefix::none, 1}},
@@ -1166,6 +1218,7 @@ void fillCavernIvyChest(Chest &chest, Random &rnd, World &world)
              {rnd.select({ItemID::flamingArrow, ItemID::poisonedKnife}),
               Prefix::none,
               rnd.getInt(25, 50)}},
+            getGlobalItemPotion(world),
             {0.5, {ItemID::bottledHoney, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
              {rnd.select(
@@ -1211,6 +1264,7 @@ void fillCavernMushroomChest(Chest &chest, Random &rnd, World &world)
              {rnd.pool({ItemID::shroomMinecart, ItemID::mushroomHat}),
               Prefix::none,
               1}},
+            getGlobalItemPrimary(world),
             {chest.y < lavaLevel ? 0.05 : 0.15,
              {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
               Prefix::none,
@@ -1231,6 +1285,7 @@ void fillCavernMushroomChest(Chest &chest, Random &rnd, World &world)
              {rnd.select({ItemID::flamingArrow, ItemID::throwingKnife}),
               Prefix::none,
               rnd.getInt(25, 50)}},
+            getGlobalItemPotion(world),
             {0.5, {ItemID::healingPotion, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
              {rnd.select(
@@ -1275,6 +1330,7 @@ void fillCavernSandstoneChest(Chest &chest, Random &rnd, World &world)
                  {ItemID::thunderZapper, rnd.select(PrefixSet::magic), 1},
                  {ItemID::bastStatue, Prefix::none, 1},
              })},
+            getGlobalItemPrimary(world),
             {0.05,
              {rnd.select({ItemID::blackPearl, ItemID::pinkPearl}),
               Prefix::none,
@@ -1301,6 +1357,7 @@ void fillCavernSandstoneChest(Chest &chest, Random &rnd, World &world)
              {rnd.select({ItemID::flamingArrow, ItemID::boneThrowingKnife}),
               Prefix::none,
               rnd.getInt(25, 50)}},
+            getGlobalItemPotion(world),
             {0.5, {ItemID::healingPotion, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
              {rnd.select(
@@ -1340,6 +1397,7 @@ void fillCavernRichMahoganyChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1, getCavernPrimaryLoot(rnd)},
+            getGlobalItemPrimary(world),
             {chest.y < lavaLevel ? 0.05 : 0.15,
              {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
               Prefix::none,
@@ -1360,6 +1418,7 @@ void fillCavernRichMahoganyChest(Chest &chest, Random &rnd, World &world)
              {rnd.select({ItemID::flamingArrow, ItemID::poisonedKnife}),
               Prefix::none,
               rnd.getInt(25, 50)}},
+            getGlobalItemPotion(world),
             {0.5, {ItemID::bottledHoney, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
              {rnd.select(
@@ -1402,6 +1461,7 @@ void fillCavernWaterChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1, getWaterPrimaryLoot(rnd)},
+            getGlobalItemPrimary(world),
             {nearEdge ? 0.7 : 0,
              {rnd.select({ItemID::whitePearl, ItemID::blackPearl}),
               Prefix::none,
@@ -1428,6 +1488,7 @@ void fillCavernWaterChest(Chest &chest, Random &rnd, World &world)
              {rnd.select({ItemID::flamingArrow, ItemID::throwingKnife}),
               Prefix::none,
               rnd.getInt(25, 50)}},
+            getGlobalItemPotion(world),
             {0.5, {ItemID::healingPotion, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
              {rnd.select(
@@ -1470,6 +1531,7 @@ void fillSkywareChest(Chest &chest, Random &rnd, World &world)
               {ItemID::luckyHorseshoe, rnd.select(PrefixSet::accessory), 1},
               {ItemID::celestialMagnet, rnd.select(PrefixSet::accessory), 1},
           })},
+         getGlobalItemPrimary(world),
          {1.0 / 3, {ItemID::skyMill, Prefix::none, 1}},
          {0.025, {ItemID::fledglingWings, rnd.select(PrefixSet::accessory), 1}},
          {1,
@@ -1501,6 +1563,7 @@ void fillSkywareChest(Chest &chest, Random &rnd, World &world)
           {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
            Prefix::none,
            rnd.getInt(25, 50)}},
+         getGlobalItemPotion(world),
          {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
          {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
          {2.0 / 3,
@@ -1529,6 +1592,7 @@ void fillShadowChest(Chest &chest, Random &rnd, World &world)
                  {ItemID::darkLance, rnd.select(PrefixSet::universal), 1},
                  {ItemID::hellwingBow, rnd.select(PrefixSet::ranged), 1},
              })},
+            getGlobalItemPrimary(world),
             {0.1, {ItemID::demonicHellcart, Prefix::none, 1}},
             {0.1, {ItemID::ornateShadowKey, Prefix::none, 1}},
             {0.1, {ItemID::sliceOfHellCake, Prefix::none, 1}},
@@ -1549,6 +1613,7 @@ void fillShadowChest(Chest &chest, Random &rnd, World &world)
                        : ItemID::tungstenBullet}),
               Prefix::none,
               rnd.getInt(50, 74)}},
+            getGlobalItemPotion(world),
             {0.5,
              {ItemID::restorationPotion, Prefix::none, rnd.getInt(15, 20)}},
             {0.75,
@@ -1597,6 +1662,7 @@ void fillPyramidChest(Chest &chest, Random &rnd, World &world)
              {rnd.pool({ItemID::flyingCarpet, ItemID::sandstormInABottle}),
               rnd.select(PrefixSet::accessory),
               1}},
+            getGlobalItemPrimary(world),
             {0.1, {ItemID::pharaohsMask, Prefix::none, 1}},
             {1.0 / 15, {ItemID::desertMinecart, Prefix::none, 1}},
             {1.0 / 7, {ItemID::encumberingStone, Prefix::none, 1}},
@@ -1618,6 +1684,7 @@ void fillPyramidChest(Chest &chest, Random &rnd, World &world)
              {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
               Prefix::none,
               rnd.getInt(25, 49)}},
+            getGlobalItemPotion(world),
             {0.5,
              {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
@@ -1646,6 +1713,7 @@ void fillWebCoveredChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1, {ItemID::webSlinger, Prefix::none, 1}},
+            getGlobalItemPrimary(world),
             {1, {ItemID::cobweb, Prefix::none, rnd.getInt(10, 29)}},
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
             {0.2, {ItemID::suspiciousLookingEye, Prefix::none, 1}},
@@ -1664,6 +1732,7 @@ void fillWebCoveredChest(Chest &chest, Random &rnd, World &world)
              {rnd.select({ItemID::flamingArrow, ItemID::throwingKnife}),
               Prefix::none,
               rnd.getInt(25, 50)}},
+            getGlobalItemPotion(world),
             {0.5, {ItemID::healingPotion, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
              {rnd.select(
@@ -1773,6 +1842,7 @@ void fillDungeonChest(Chest &chest, Random &rnd, World &world)
                  {ItemID::valor, rnd.select(PrefixSet::universal), 1},
                  {ItemID::handgun, rnd.select(PrefixSet::ranged), 1},
              })},
+            getGlobalItemPrimary(world),
             {1.0 / 3, {ItemID::shadowKey, Prefix::none, 1}},
             {0.125, {ItemID::boneWelder, Prefix::none, 1}},
             {0.2,
@@ -1790,6 +1860,7 @@ void fillDungeonChest(Chest &chest, Random &rnd, World &world)
                                                        : ItemID::tungstenBullet,
               Prefix::none,
               rnd.getInt(25, 50)}},
+            getGlobalItemPotion(world),
             {0.5, {ItemID::healingPotion, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
              {rnd.select(
@@ -1823,16 +1894,27 @@ void fillDungeonChest(Chest &chest, Random &rnd, World &world)
         });
 }
 
-void fillDungeonBiomeChest(Chest &chest, Random &rnd, Item &&primaryItem)
+void fillDungeonBiomeChest(
+    Chest &chest,
+    Random &rnd,
+    World &world,
+    Item &&primaryItem)
 {
     fillLoot(
         chest,
         rnd,
         {{1, primaryItem},
+         getGlobalItemPrimary(world),
+         {0.5, {ItemID::remnantsOfDevotion, Prefix::none, 1}},
+         {1,
+          {rnd.select(
+               {ItemID::blueBrick, ItemID::greenBrick, ItemID::pinkBrick}),
+           Prefix::none,
+           rnd.getInt(30, 60)}},
          {1, {ItemID::chlorophyteBar, Prefix::none, rnd.getInt(5, 10)}},
          {1, {ItemID::lifeFruit, Prefix::none, rnd.getInt(1, 2)}},
+         getGlobalItemPotion(world),
          {1, {ItemID::greaterHealingPotion, Prefix::none, rnd.getInt(5, 10)}},
-         {1, {ItemID::goldCoin, Prefix::none, rnd.getInt(20, 30)}},
          {1,
           {rnd.select(
                {ItemID::wrathPotion,
@@ -1841,15 +1923,10 @@ void fillDungeonBiomeChest(Chest &chest, Random &rnd, Item &&primaryItem)
                 ItemID::endurancePotion}),
            Prefix::none,
            rnd.getInt(1, 2)}},
-         {0.5, {ItemID::remnantsOfDevotion, Prefix::none, 1}},
-         {1,
-          {rnd.select(
-               {ItemID::blueBrick, ItemID::greenBrick, ItemID::pinkBrick}),
-           Prefix::none,
-           rnd.getInt(30, 60)}}});
+         {1, {ItemID::goldCoin, Prefix::none, rnd.getInt(20, 30)}}});
 }
 
-void fillLihzahrdChest(Chest &chest, Random &rnd)
+void fillLihzahrdChest(Chest &chest, Random &rnd, World &world)
 {
     bool brokenTablet = rnd.getBool();
     fillLoot(
@@ -1860,6 +1937,7 @@ void fillLihzahrdChest(Chest &chest, Random &rnd)
             {brokenTablet ? 1.0 : 0.0,
              {ItemID::solarTabletFragment, Prefix::none, rnd.getInt(3, 7)}},
             {brokenTablet ? 0.0 : 1.0, {ItemID::solarTablet, Prefix::none, 1}},
+            getGlobalItemPrimary(world),
             {0.2, {ItemID::lihzahrdFurnace, Prefix::none, 1}},
             {0.2, {ItemID::lihzahrdBrick, Prefix::none, rnd.getInt(30, 60)}},
             {0.2,
@@ -1881,6 +1959,7 @@ void fillLihzahrdChest(Chest &chest, Random &rnd)
               rnd.getInt(2, 5)}},
             {0.5,
              {ItemID::chlorophyteBullet, Prefix::none, rnd.getInt(25, 50)}},
+            getGlobalItemPotion(world),
             {0.5,
              {ItemID::greaterHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,

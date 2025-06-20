@@ -244,6 +244,9 @@ void placeFallenLogs(
 void placeAltars(int maxBin, LocationBins &locations, Random &rnd, World &world)
 {
     int altarCount = std::max(8, world.getWidth() / 200);
+    if (world.conf.doubleTrouble) {
+        altarCount *= 2;
+    }
     constexpr auto corruptTiles = frozen::make_set<int>(
         {TileID::ebonstone,
          TileID::corruptGrass,
@@ -293,6 +296,9 @@ void placeOrbHearts(
     World &world)
 {
     int orbHeartCount = world.getWidth() * world.getHeight() / 240000;
+    if (world.conf.doubleTrouble) {
+        orbHeartCount *= 2;
+    }
     while (orbHeartCount > 0) {
         int binId = rnd.getInt(0, maxBin);
         if (locations[binId].empty()) {
@@ -721,7 +727,7 @@ void placeChest(
         torchID = ItemID::corruptTorch;
         break;
     case Variant::lihzahrd:
-        fillLihzahrdChest(chest, rnd);
+        fillLihzahrdChest(chest, rnd, world);
         return;
     case Variant::marble:
         torchID = ItemID::whiteTorch;

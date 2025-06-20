@@ -4,6 +4,7 @@
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
+#include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/Platforms.h"
@@ -294,7 +295,7 @@ addTempleTreasures(Point center, int numRooms, Random &rnd, World &world)
         }
         usedLocations.emplace_back(x, y);
         Chest &chest = world.placeChest(x, y - 2, Variant::lihzahrd);
-        fillLihzahrdChest(chest, rnd);
+        fillLihzahrdChest(chest, rnd, world);
         --numChests;
     }
     int numPots = numRooms / 14;
@@ -469,6 +470,22 @@ void addSpikes(Point center, Random &rnd, World &world)
     });
 }
 
+void paintTemple(Point center, World &world)
+{
+    iterateTemple(center, world, [&world](int x, int y) {
+        Tile &tile = world.getTile(x, y);
+        if (tile.blockID == TileID::lihzahrdBrick ||
+            tile.blockID == TileID::pressurePlate ||
+            tile.blockID == TileID::trap) {
+            tile.blockPaint = Paint::deepLime;
+        }
+        if (tile.wallID == WallID::Unsafe::lihzahrdBrick) {
+            tile.wallPaint = Paint::deepLime;
+        }
+        return true;
+    });
+}
+
 void genTemple(Random &rnd, World &world)
 {
     std::cout << "Training acolytes\n";
@@ -585,4 +602,7 @@ void genTemple(Random &rnd, World &world)
     std::shuffle(flatLocations.begin(), flatLocations.end(), rnd.getPRNG());
     addTraps(flatLocations, rnd, world);
     addSpikes(center, rnd, world);
+    if (world.conf.doubleTrouble) {
+        paintTemple(center, world);
+    }
 }
