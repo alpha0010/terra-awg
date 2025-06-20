@@ -227,7 +227,7 @@ void genCloud(Random &rnd, World &world)
     std::shuffle(rooms.begin(), rooms.end(), rnd.getPRNG());
     auto roomItr = rooms.begin();
     double cloudScale = std::min(0.1 + world.getHeight() / 1400.0, 1.0);
-    while (numClouds > 0) {
+    for (int tries = 500 * numClouds; numClouds > 0 && tries > 0; --tries) {
         int width = cloudScale * rnd.getInt(90, 160);
         int height = cloudScale * rnd.getInt(35, 50);
         int x = rnd.getInt(

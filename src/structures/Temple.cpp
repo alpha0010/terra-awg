@@ -475,6 +475,7 @@ void paintTemple(Point center, World &world)
     iterateTemple(center, world, [&world](int x, int y) {
         Tile &tile = world.getTile(x, y);
         if (tile.blockID == TileID::lihzahrdBrick ||
+            tile.blockID == TileID::platform ||
             tile.blockID == TileID::pressurePlate ||
             tile.blockID == TileID::trap) {
             tile.blockPaint = Paint::deepLime;

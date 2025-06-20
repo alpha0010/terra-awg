@@ -677,7 +677,7 @@ void placeStarterChest(Random &rnd, World &world)
             if (isPlacementCandidate(x, y, world)) {
                 Chest &chest =
                     world.placeChest(x, y - 2, getChestType(x, y, world));
-                fillStarterChest(world.conf.equipment, chest, rnd);
+                fillStarterChest(world.conf.equipment, chest, rnd, world);
                 return;
             }
         }

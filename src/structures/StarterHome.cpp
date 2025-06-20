@@ -145,7 +145,8 @@ void placeHomeAt(
                 fillStarterChest(
                     world.conf.equipment,
                     world.registerStorage(x + i, y + j),
-                    rnd);
+                    rnd,
+                    world);
             }
             convertFurniture(homeTile, theme);
             auto tileItr = themeTiles.find(homeTile.blockID);

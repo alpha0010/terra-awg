@@ -1988,27 +1988,45 @@ void fillLihzahrdChest(Chest &chest, Random &rnd, World &world)
         });
 }
 
-void fillStarterChestIron(Chest &chest, Random &rnd)
+void fillStarterChestIron(Chest &chest, Random &rnd, World &world)
 {
+    bool isIron = world.ironVariant == TileID::ironOre;
     fillLoot(
         chest,
         rnd,
         {
-            {1, {ItemID::ironHelmet, Prefix::none, 1}},
-            {1, {ItemID::ironChainmail, Prefix::none, 1}},
-            {1, {ItemID::ironGreaves, Prefix::none, 1}},
-            {1, {ItemID::ironBar, Prefix::none, rnd.getInt(80, 85)}},
+            {1,
+             {isIron ? ItemID::ironHelmet : ItemID::leadHelmet,
+              Prefix::none,
+              1}},
+            {1,
+             {isIron ? ItemID::ironChainmail : ItemID::leadChainmail,
+              Prefix::none,
+              1}},
+            {1,
+             {isIron ? ItemID::ironGreaves : ItemID::leadGreaves,
+              Prefix::none,
+              1}},
+            {1,
+             {isIron ? ItemID::ironBar : ItemID::leadBar,
+              Prefix::none,
+              rnd.getInt(80, 85)}},
             {1, {ItemID::cloudInABottle, rnd.select(PrefixSet::accessory), 1}},
             {1, {ItemID::silverCoin, Prefix::none, rnd.getInt(12, 24)}},
         });
 }
 
-void fillStarterChestPlatinum(Chest &chest, Random &rnd)
+void fillStarterChestPlatinum(Chest &chest, Random &rnd, World &world)
 {
     fillLoot(
         chest,
         rnd,
         {
+            {1,
+             {world.ironVariant == TileID::ironOre ? ItemID::ironAnvil
+                                                   : ItemID::leadAnvil,
+              Prefix::none,
+              1}},
             {1, {ItemID::platinumHelmet, Prefix::none, 1}},
             {1, {ItemID::platinumChainmail, Prefix::none, 1}},
             {1, {ItemID::platinumGreaves, Prefix::none, 1}},
@@ -2018,12 +2036,17 @@ void fillStarterChestPlatinum(Chest &chest, Random &rnd)
         });
 }
 
-void fillStarterChestHellstone(Chest &chest, Random &rnd)
+void fillStarterChestHellstone(Chest &chest, Random &rnd, World &world)
 {
     fillLoot(
         chest,
         rnd,
         {
+            {1,
+             {world.ironVariant == TileID::ironOre ? ItemID::ironAnvil
+                                                   : ItemID::leadAnvil,
+              Prefix::none,
+              1}},
             {1, {ItemID::moltenHelmet, Prefix::none, 1}},
             {1, {ItemID::moltenBreastplate, Prefix::none, 1}},
             {1, {ItemID::moltenGreaves, Prefix::none, 1}},
@@ -2034,12 +2057,17 @@ void fillStarterChestHellstone(Chest &chest, Random &rnd)
         });
 }
 
-void fillStarterChestMythril(Chest &chest, Random &rnd)
+void fillStarterChestMythril(Chest &chest, Random &rnd, World &world)
 {
     fillLoot(
         chest,
         rnd,
         {
+            {1,
+             {world.ironVariant == TileID::ironOre ? ItemID::ironAnvil
+                                                   : ItemID::leadAnvil,
+              Prefix::none,
+              1}},
             {1, {ItemID::mythrilHood, Prefix::none, 1}},
             {1, {ItemID::mythrilHelmet, Prefix::none, 1}},
             {1, {ItemID::mythrilHat, Prefix::none, 1}},
@@ -2052,20 +2080,20 @@ void fillStarterChestMythril(Chest &chest, Random &rnd)
         });
 }
 
-void fillStarterChest(int level, Chest &chest, Random &rnd)
+void fillStarterChest(int level, Chest &chest, Random &rnd, World &world)
 {
     switch (level) {
     case ItemID::ironBar:
-        fillStarterChestIron(chest, rnd);
+        fillStarterChestIron(chest, rnd, world);
         break;
     case ItemID::platinumBar:
-        fillStarterChestPlatinum(chest, rnd);
+        fillStarterChestPlatinum(chest, rnd, world);
         break;
     case ItemID::hellstoneBar:
-        fillStarterChestHellstone(chest, rnd);
+        fillStarterChestHellstone(chest, rnd, world);
         break;
     case ItemID::mythrilBar:
-        fillStarterChestMythril(chest, rnd);
+        fillStarterChestMythril(chest, rnd, world);
         break;
     }
 }

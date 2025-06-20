@@ -233,6 +233,7 @@ private:
                         for (int j = 0; j < mapHeight; ++j) {
                             Tile &tile = world.getTile(x + i, y + j);
                             tile.blockID = getSectorColor(i, j, scale, world);
+                            tile.blockPaint = Paint::none;
                             if (tile.blockID == TileID::torch) {
                                 tile.frameX = 66;
                                 tile.frameY = 286;
