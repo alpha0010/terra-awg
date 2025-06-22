@@ -168,9 +168,17 @@ void placeHomeAt(
     }
 }
 
-int realSurfaceAt(int x, World &world)
+int realSurfaceAt(int x, World &world, int prevY = -1)
 {
-    int minY = world.getSurfaceLevel(x) - 75;
+    int minY = world.getSurfaceLevel(x) - 2;
+    if (!world.regionPasses(x, minY - 5, 1, 4, [](Tile &tile) {
+            return tile.blockID == TileID::empty;
+        })) {
+        minY -= 73;
+    }
+    if (prevY != -1) {
+        minY = std::min(minY, prevY);
+    }
     while (world.getTile(x, minY).blockID != TileID::empty) {
         --minY;
     }
@@ -206,8 +214,10 @@ void genStarterHome(Random &rnd, World &world)
     TileBuffer home =
         Data::getHome(rnd.select(Data::homes), world.getFramedTiles());
     x -= home.getWidth() / 2;
-    for (int i = 7; i < home.getWidth() - 7; ++i) {
-        y = std::min(realSurfaceAt(x + i, world), y);
+    for (int iter = 0; iter < 2; ++iter) {
+        for (int i = 7; i < home.getWidth() - 7; ++i) {
+            y = std::min(realSurfaceAt(x + i, world, y), y);
+        }
     }
     world.spawnY = y - 1;
     for (int j = 0; j < home.getHeight(); ++j) {
