@@ -1005,7 +1005,11 @@ private:
                 if (tile.wallID != WallID::empty &&
                     std::abs(rnd.getFineNoise(x + 2 * i, y + 2 * j)) <
                         0.1 - 0.1 * j / entry.getHeight()) {
-                    tile.wallID = WallID::Unsafe::craggyStone;
+                    if (world.conf.doubleTrouble) {
+                        tile.wallPaint = theme.paint;
+                    } else {
+                        tile.wallID = WallID::Unsafe::craggyStone;
+                    }
                 }
                 if (!foundSolidTile && tile.blockID != TileID::empty) {
                     foundSolidTile = true;
@@ -1142,7 +1146,8 @@ private:
         }
         if (tile.wallID == theme.brickWall || tile.wallID == theme.slabWall ||
             tile.wallID == theme.tiledWall) {
-            tile.wallPaint = theme.paint;
+            tile.wallPaint =
+                tile.wallPaint == theme.paint ? Paint::none : theme.paint;
             if (tile.blockID == TileID::pressurePlate ||
                 tile.blockID == TileID::trap) {
                 tile.blockPaint = theme.paint;

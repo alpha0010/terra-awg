@@ -10,6 +10,7 @@
 #include "structures/data/Furniture.h"
 #include "structures/data/Homes.h"
 #include "vendor/frozen/map.h"
+#include "vendor/frozen/set.h"
 #include <iostream>
 #include <map>
 
@@ -25,7 +26,8 @@ void placeHomeAt(
     std::map<int, int> themeWalls;
     switch (theme) {
     case Data::Variant::ashWood:
-        themeTiles.insert({{TileID::wood, TileID::ashWood}});
+        themeTiles.insert(
+            {{TileID::wood, TileID::ashWood}, {TileID::dirt, TileID::ash}});
         themeWalls.insert(
             {{WallID::Safe::wood, WallID::Safe::ashWood},
              {WallID::Safe::planked,
@@ -38,7 +40,8 @@ void placeHomeAt(
             {{TileID::wood, TileID::borealWood},
              {TileID::woodenBeam, TileID::borealBeam},
              {TileID::grayBrick,
-              rnd.select({TileID::snowBrick, TileID::iceBrick})}});
+              rnd.select({TileID::snowBrick, TileID::iceBrick})},
+             {TileID::dirt, TileID::snow}});
         themeWalls.insert(
             {{WallID::Safe::wood, WallID::Safe::borealWood},
              {WallID::Safe::stone,
@@ -50,7 +53,8 @@ void placeHomeAt(
               rnd.select({WallID::Safe::mudstoneBrick, WallID::Safe::stone})}});
         break;
     case Data::Variant::livingWood:
-        themeTiles.insert({{TileID::wood, TileID::livingWood}});
+        themeTiles.insert(
+            {{TileID::wood, TileID::livingWood}, {TileID::dirt, TileID::leaf}});
         themeWalls.insert(
             {{WallID::Safe::wood, WallID::Safe::livingWood},
              {WallID::Safe::planked,
@@ -63,7 +67,8 @@ void placeHomeAt(
             {{TileID::wood, TileID::richMahogany},
              {TileID::woodenBeam, TileID::richMahoganyBeam},
              {TileID::grayBrick,
-              rnd.select({TileID::iridescentBrick, TileID::mudstoneBrick})}});
+              rnd.select({TileID::iridescentBrick, TileID::mudstoneBrick})},
+             {TileID::dirt, TileID::mud}});
         themeWalls.insert(
             {{WallID::Safe::wood, WallID::Safe::richMahogany},
              {WallID::Safe::planked,
@@ -80,7 +85,8 @@ void placeHomeAt(
             {{TileID::wood, TileID::smoothMarble},
              {TileID::woodenBeam, TileID::marbleColumn},
              {TileID::grayBrick,
-              rnd.select({TileID::grayBrick, TileID::pearlstoneBrick})}});
+              rnd.select({TileID::grayBrick, TileID::pearlstoneBrick})},
+             {TileID::dirt, TileID::marble}});
         themeWalls.insert(
             {{WallID::Safe::wood, WallID::Safe::smoothMarble},
              {WallID::Safe::planked,
@@ -96,7 +102,8 @@ void placeHomeAt(
             {{TileID::wood, TileID::palmWood},
              {TileID::woodenBeam, TileID::sandstoneColumn},
              {TileID::grayBrick,
-              rnd.select({TileID::sandstoneBrick, TileID::tinBrick})}});
+              rnd.select({TileID::sandstoneBrick, TileID::tinBrick})},
+             {TileID::dirt, TileID::sand}});
         themeWalls.insert(
             {{WallID::Safe::wood, WallID::Safe::palmWood},
              {WallID::Safe::planked,
@@ -125,19 +132,32 @@ void placeHomeAt(
     });
     themeWalls[WallID::Safe::grayBrick] =
         brickToWall.at(themeTiles[TileID::grayBrick]);
+    constexpr auto unguardedBlocks = frozen::make_set<int>(
+        {TileID::ash,
+         TileID::dirt,
+         TileID::leaf,
+         TileID::mud,
+         TileID::marble,
+         TileID::sand,
+         TileID::snow});
     for (int i = 0; i < home.getWidth(); ++i) {
+        int numSolid = 0;
         for (int j = 0; j < home.getHeight(); ++j) {
             Tile &homeTile = home.getTile(i, j);
-            if (homeTile.blockID == TileID::cloud ||
-                (homeTile.blockID == TileID::empty &&
-                 homeTile.wallID == WallID::empty)) {
-                continue;
+            if (numSolid > 1) {
+                homeTile.blockID = TileID::cloud;
             }
             Tile &tile = world.getTile(x + i, y + j);
             if (tile.blockID != TileID::empty &&
                 (tile.blockID != TileID::thinIce ||
                  world.getTile(x + i, y + j + 1).blockID != TileID::empty) &&
                 j > home.getHeight() / 2) {
+                ++numSolid;
+                continue;
+            }
+            if (homeTile.blockID == TileID::cloud ||
+                (homeTile.blockID == TileID::empty &&
+                 homeTile.wallID == WallID::empty)) {
                 continue;
             }
             if (homeTile.blockID == TileID::chest &&
@@ -163,7 +183,37 @@ void placeHomeAt(
             }
             homeTile.liquid = tile.liquid;
             tile = homeTile;
-            tile.guarded = true;
+            tile.guarded = !unguardedBlocks.contains(tile.blockID);
+        }
+    }
+    constexpr auto blockToGrass = frozen::make_map<int, int>(
+        {{TileID::ash, TileID::ashGrass},
+         {TileID::dirt, TileID::grass},
+         {TileID::mud, TileID::jungleGrass}});
+    constexpr auto grassToBlock = frozen::make_map<int, int>(
+        {{TileID::ashGrass, TileID::ash},
+         {TileID::grass, TileID::dirt},
+         {TileID::jungleGrass, TileID::mud}});
+    for (int i = 0; i < home.getWidth(); ++i) {
+        for (int j = home.getHeight() / 2; j < home.getHeight(); ++j) {
+            Tile &homeTile = home.getTile(i, j);
+            if (homeTile.blockID == TileID::cloud ||
+                (homeTile.blockID == TileID::empty &&
+                 homeTile.wallID == WallID::empty)) {
+                continue;
+            }
+            Tile &tile = world.getTile(x + i, y + j);
+            auto toGrassItr = blockToGrass.find(tile.blockID);
+            if (toGrassItr != blockToGrass.end() &&
+                world.isExposed(x + i, y + j)) {
+                tile.blockID = toGrassItr->second;
+            } else {
+                auto toBlockItr = grassToBlock.find(tile.blockID);
+                if (toBlockItr != grassToBlock.end() &&
+                    !world.isExposed(x + i, y + j)) {
+                    tile.blockID = toBlockItr->second;
+                }
+            }
         }
     }
 }
@@ -200,15 +250,18 @@ void genStarterHome(Random &rnd, World &world)
     } else if (tileCounts[TileID::snow] > 2) {
         theme = Data::Variant::boreal;
     } else if (
-        tileCounts[TileID::jungleGrass] > 0 && tileCounts[TileID::mud] > 1) {
+        (tileCounts[TileID::jungleGrass] > 0 && tileCounts[TileID::mud] > 1) ||
+        tileCounts[TileID::livingMahogany] > 2) {
         theme = Data::Variant::mahogany;
     } else if (tileCounts[TileID::marble] > 2) {
         theme = Data::Variant::marble;
     } else if (tileCounts[TileID::sand] > 2) {
         theme = Data::Variant::palm;
-    } else if (!world.regionPasses(x - 100, y, 200, 1, [](Tile &tile) {
-                   return tile.blockID != TileID::livingWood;
-               })) {
+    } else if (
+        tileCounts[TileID::leaf] > 2 ||
+        !world.regionPasses(x - 100, y, 200, 1, [](Tile &tile) {
+            return tile.blockID != TileID::livingWood;
+        })) {
         theme = Data::Variant::livingWood;
     }
     TileBuffer home =
