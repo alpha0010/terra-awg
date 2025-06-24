@@ -185,7 +185,7 @@ void applyGravity(int x, int y, int width, int height, World &world)
 
 Point findLinkingCave(int x, int y, World &world)
 {
-    for (int j = 0; j < 200; ++j) {
+    for (int j = 30; j < 200; ++j) {
         for (int iSwap = 0; iSwap < j; ++iSwap) {
             int i = iSwap / 2;
             if (iSwap % 2 == 0) {
@@ -325,7 +325,14 @@ void genPyramid(Random &rnd, World &world)
              TileID::hardenedSand,
              TileID::sandstone,
              TileID::ebonsand,
-             TileID::crimsand});
+             TileID::hardenedEbonsand,
+             TileID::ebonsandstone,
+             TileID::crimsand,
+             TileID::hardenedCrimsand,
+             TileID::crimsandstone,
+             TileID::pearlsand,
+             TileID::hardenedPearlsand,
+             TileID::pearlsandstone});
         double aspect = static_cast<double>(cave.first - x) / (cave.second - y);
         for (int j = 0; y + j < cave.second; ++j) {
             int minI = aspect * j - 3 + 4 * rnd.getFineNoise(0, j);
