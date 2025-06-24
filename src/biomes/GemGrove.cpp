@@ -163,7 +163,13 @@ Point selectGroveLocation(double &groveSize, Random &rnd, World &world)
          TileID::silverOre,
          TileID::tungstenOre,
          TileID::goldOre,
-         TileID::platinumOre});
+         TileID::platinumOre,
+         TileID::cobaltOre,
+         TileID::palladiumOre,
+         TileID::mythrilOre,
+         TileID::orichalcumOre,
+         TileID::adamantiteOre,
+         TileID::titaniumOre});
     std::set<int> allowedWalls{
         WallVariants::dirt.begin(),
         WallVariants::dirt.end()};

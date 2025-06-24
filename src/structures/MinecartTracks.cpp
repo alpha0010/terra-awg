@@ -51,12 +51,16 @@ inline constexpr auto trackClearTiles = frozen::make_set<int>({
     TileID::mud,
     TileID::jungleGrass,
     TileID::mushroomGrass,
+    TileID::hallowedGrass,
     TileID::ebonsand,
+    TileID::pearlsand,
+    TileID::pearlstone,
     TileID::silt,
     TileID::snow,
     TileID::ice,
     TileID::thinIce,
     TileID::corruptIce,
+    TileID::hallowedIce,
     TileID::tinOre,
     TileID::leadOre,
     TileID::tungstenOre,
@@ -73,6 +77,7 @@ inline constexpr auto trackClearTiles = frozen::make_set<int>({
     TileID::marble,
     TileID::granite,
     TileID::smoothGranite,
+    TileID::pinkSlime,
     TileID::lavaMossStone,
     TileID::sandstone,
     TileID::hardenedSand,
@@ -80,6 +85,8 @@ inline constexpr auto trackClearTiles = frozen::make_set<int>({
     TileID::hardenedCrimsand,
     TileID::ebonsandstone,
     TileID::crimsandstone,
+    TileID::hardenedPearlsand,
+    TileID::pearlsandstone,
     TileID::desertFossil,
     TileID::kryptonMossStone,
     TileID::xenonMossStone,
@@ -88,6 +95,13 @@ inline constexpr auto trackClearTiles = frozen::make_set<int>({
     TileID::ashGrass,
     TileID::corruptJungleGrass,
     TileID::crimsonJungleGrass,
+    TileID::cobaltOre,
+    TileID::palladiumOre,
+    TileID::mythrilOre,
+    TileID::orichalcumOre,
+    TileID::adamantiteOre,
+    TileID::titaniumOre,
+    TileID::chlorophyteOre,
 });
 
 std::vector<Point> planTrack(Random &rnd, World &world)
@@ -139,7 +153,7 @@ std::vector<Point> planTrack(Random &rnd, World &world)
     return track;
 }
 
-int findGrassInColumn(int x, int y, World &world)
+std::pair<int, int> findGrassInColumn(int x, int y, World &world)
 {
     constexpr auto grasses = frozen::make_set<int>(
         {TileID::jungleGrass,
@@ -155,11 +169,11 @@ int findGrassInColumn(int x, int y, World &world)
         for (int i = minI; i < 1 - minI; ++i) {
             Tile &tile = world.getTile(x + i, y + j);
             if (grasses.contains(tile.blockID)) {
-                return tile.blockID;
+                return {tile.blockID, tile.blockPaint};
             }
         }
     }
-    return TileID::mud;
+    return {TileID::mud, Paint::none};
 }
 
 void applyMudGrass(int x, int y, World &world)
@@ -169,7 +183,8 @@ void applyMudGrass(int x, int y, World &world)
         if (tile.blockID != TileID::mud || !world.isExposed(x, y + j)) {
             continue;
         }
-        tile.blockID = findGrassInColumn(x, y + j, world);
+        std::tie(tile.blockID, tile.blockPaint) =
+            findGrassInColumn(x, y + j, world);
     }
 }
 
@@ -232,6 +247,7 @@ void genTracks(Random &rnd, World &world)
                 continue;
             }
             tile.blockID = TileID::minecartTrack;
+            tile.blockPaint = Paint::none;
             Mode mode = idx + 2 == track.size()     ? Mode::none
                         : y > track[idx + 1].second ? Mode::asc
                         : y < track[idx + 1].second ? Mode::desc

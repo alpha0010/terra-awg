@@ -93,22 +93,23 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     for (int i = 0; i < 20; ++i) {
         w.putBool(false); // Bosses and npc saves.
     }
-    w.putUint8(0);                                // Shadow orbs smashed.
-    w.putUint32(0);                               // Alters smashed.
-    w.putBool(false);                             // Hard mode.
-    w.putBool(false);                             // After party of doom.
-    w.putUint32(0);                               // Invasion delay.
-    w.putUint32(0);                               // Invasion size.
-    w.putUint32(0);                               // Invasion type.
-    w.putFloat64(0);                              // Invasion X.
-    w.putFloat64(0);                              // Slime rain time.
-    w.putUint8(0);                                // Sundial cooldown.
-    w.putBool(false);                             // Raining.
-    w.putUint32(0);                               // Rain time left.
-    w.putFloat32(0);                              // Max rain.
-    w.putUint32(-1);                              // Cobalt ore variant.
-    w.putUint32(-1);                              // Mythril ore variant.
-    w.putUint32(-1);                              // Adamantite ore variant.
+    w.putUint8(0); // Shadow orbs smashed.
+    w.putUint32(
+        conf.hardmode ? conf.doubleTrouble ? 6 : 3 : 0); // Alters smashed.
+    w.putBool(conf.hardmode);                            // Hard mode.
+    w.putBool(false);                                    // After party of doom.
+    w.putUint32(0);                                      // Invasion delay.
+    w.putUint32(0);                                      // Invasion size.
+    w.putUint32(0);                                      // Invasion type.
+    w.putFloat64(0);                                     // Invasion X.
+    w.putFloat64(0);                                     // Slime rain time.
+    w.putUint8(0);                                       // Sundial cooldown.
+    w.putBool(false);                                    // Raining.
+    w.putUint32(0);                                      // Rain time left.
+    w.putFloat32(0);                                     // Max rain.
+    w.putUint32(world.cobaltVariant);                    // Cobalt ore variant.
+    w.putUint32(world.mythrilVariant);                   // Mythril ore variant.
+    w.putUint32(world.adamantiteVariant);         // Adamantite ore variant.
     w.putUint8(rnd.select({FOREST_BACKGROUNDS})); // Forest style.
     w.putUint8(rnd.getInt(0, 4));                 // Corruption style.
     w.putUint8(rnd.getInt(0, 1));                 // Underground jungle style.
@@ -449,6 +450,18 @@ int main()
     world.ironVariant = rnd.select({TileID::ironOre, TileID::leadOre});
     world.silverVariant = rnd.select({TileID::silverOre, TileID::tungstenOre});
     world.goldVariant = rnd.select({TileID::goldOre, TileID::platinumOre});
+    if (conf.hardmode) {
+        world.cobaltVariant =
+            rnd.select({TileID::cobaltOre, TileID::palladiumOre});
+        world.mythrilVariant =
+            rnd.select({TileID::mythrilOre, TileID::orichalcumOre});
+        world.adamantiteVariant =
+            rnd.select({TileID::adamantiteOre, TileID::titaniumOre});
+    } else {
+        world.cobaltVariant = TileID::empty;
+        world.mythrilVariant = TileID::empty;
+        world.adamantiteVariant = TileID::empty;
+    }
 
     doWorldGen(rnd, world);
     saveWorldFile(conf, rnd, world);

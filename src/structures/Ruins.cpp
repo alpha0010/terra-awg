@@ -71,7 +71,8 @@ private:
             for (int i = -roofCurve[j]; i < roofCurve[j]; ++i) {
                 Tile &tile = world.getTile(center + i, roofLevel + j);
                 if (tile.blockID == TileID::lesion ||
-                    tile.blockID == TileID::flesh) {
+                    tile.blockID == TileID::flesh ||
+                    tile.blockID == TileID::crystalBlock) {
                     continue;
                 }
                 tile.blockID = TileID::obsidianBrick;
@@ -115,7 +116,8 @@ private:
             for (int y = minY; y < maxY; ++y) {
                 Tile &tile = world.getTile(x, y);
                 if (tile.blockID == TileID::lesion ||
-                    tile.blockID == TileID::flesh) {
+                    tile.blockID == TileID::flesh ||
+                    tile.blockID == TileID::crystalBlock) {
                     continue;
                 }
                 tile.blockID =
@@ -168,7 +170,8 @@ private:
         for (int x = minX; x < maxX; ++x) {
             Tile &tile = world.getTile(x, cityBase);
             if (tile.blockID == TileID::lesion ||
-                tile.blockID == TileID::flesh) {
+                tile.blockID == TileID::flesh ||
+                tile.blockID == TileID::crystalBlock) {
                 continue;
             }
             // Base.

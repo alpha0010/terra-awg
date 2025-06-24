@@ -99,20 +99,13 @@ void clearTempleSurface(Point center, Random &rnd, World &world)
 {
     rnd.shuffleNoise();
     constexpr auto clearableTiles = frozen::make_set<int>(
-        {TileID::dirt,
-         TileID::mud,
-         TileID::jungleGrass,
-         TileID::stone,
-         TileID::clay,
-         TileID::silt,
-         TileID::copperOre,
-         TileID::tinOre,
-         TileID::ironOre,
-         TileID::leadOre,
-         TileID::silverOre,
-         TileID::tungstenOre,
-         TileID::goldOre,
-         TileID::platinumOre});
+        {TileID::dirt,          TileID::mud,         TileID::jungleGrass,
+         TileID::stone,         TileID::clay,        TileID::silt,
+         TileID::copperOre,     TileID::tinOre,      TileID::ironOre,
+         TileID::leadOre,       TileID::silverOre,   TileID::tungstenOre,
+         TileID::goldOre,       TileID::platinumOre, TileID::cobaltOre,
+         TileID::palladiumOre,  TileID::mythrilOre,  TileID::orichalcumOre,
+         TileID::adamantiteOre, TileID::titaniumOre, TileID::chlorophyteOre});
     int scanDist = std::max<int>(0.019 * world.getWidth(), 82);
     for (int x = center.first - scanDist; x < center.first + scanDist; ++x) {
         for (int y = center.second - scanDist; y < center.second + scanDist;

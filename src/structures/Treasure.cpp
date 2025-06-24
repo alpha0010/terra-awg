@@ -134,6 +134,9 @@ void placeGems(Random &rnd, World &world)
          TileID::crimsand,
          TileID::hardenedCrimsand,
          TileID::crimsandstone,
+         TileID::pearlsand,
+         TileID::hardenedPearlsand,
+         TileID::pearlsandstone,
          TileID::coralstone});
     for (int tries = 800 * numGems; numGems > 0 && tries > 0; --tries) {
         int x = rnd.getInt(minX, maxX);
@@ -376,21 +379,14 @@ Point selectShrineLocation(
         minOpenHeight = shrine.getHeight();
     }
     constexpr auto clearableTiles = frozen::make_set<int>(
-        {TileID::empty,
-         TileID::dirt,
-         TileID::mud,
-         TileID::jungleGrass,
-         TileID::stone,
-         TileID::clay,
-         TileID::silt,
-         TileID::copperOre,
-         TileID::tinOre,
-         TileID::ironOre,
-         TileID::leadOre,
-         TileID::silverOre,
-         TileID::tungstenOre,
-         TileID::goldOre,
-         TileID::platinumOre});
+        {TileID::empty,         TileID::dirt,          TileID::mud,
+         TileID::jungleGrass,   TileID::stone,         TileID::clay,
+         TileID::silt,          TileID::copperOre,     TileID::tinOre,
+         TileID::ironOre,       TileID::leadOre,       TileID::silverOre,
+         TileID::tungstenOre,   TileID::goldOre,       TileID::platinumOre,
+         TileID::cobaltOre,     TileID::palladiumOre,  TileID::mythrilOre,
+         TileID::orichalcumOre, TileID::adamantiteOre, TileID::titaniumOre,
+         TileID::chlorophyteOre});
     int minX =
         world.conf.patches ? 350 : world.jungleCenter - 0.09 * world.getWidth();
     int maxX = world.conf.patches

@@ -15,11 +15,13 @@ inline constexpr auto attatchTiles = frozen::make_set<int>(
     {TileID::ice,
      TileID::stone,
      TileID::stoneSlab,
+     TileID::pearlstone,
      TileID::ebonstone,
      TileID::crimstone,
      TileID::sandstone,
      TileID::granite,
      TileID::marble,
+     TileID::hallowedIce,
      TileID::corruptIce,
      TileID::crimsonIce});
 
@@ -66,11 +68,13 @@ ScanState scanTransition(Tile &tile, ScanState state)
 inline constexpr auto stalactiteTypes = frozen::make_map<int, int>(
     {{TileID::ice, 0},
      {TileID::stone, 54},
+     {TileID::pearlstone, 216},
      {TileID::ebonstone, 270},
      {TileID::crimstone, 324},
      {TileID::sandstone, 378},
      {TileID::granite, 432},
      {TileID::marble, 486},
+     {TileID::hallowedIce, 540},
      {TileID::corruptIce, 594},
      {TileID::crimsonIce, 648}});
 
@@ -109,6 +113,7 @@ void placeStalactite(int x, int y, World &world)
 
 inline constexpr auto stalagmiteTypes = frozen::make_map<int, int>(
     {{TileID::stone, 54},
+     {TileID::pearlstone, 216},
      {TileID::ebonstone, 270},
      {TileID::crimstone, 324},
      {TileID::sandstone, 378},
@@ -151,6 +156,7 @@ void genVines(Random &rnd, World &world)
          {TileID::corruptJungleGrass, TileID::corruptVines},
          {TileID::crimsonGrass, TileID::crimsonVines},
          {TileID::crimsonJungleGrass, TileID::crimsonVines},
+         {TileID::hallowedGrass, TileID::hallowedVines},
          {TileID::mushroomGrass, TileID::mushroomVines},
          {TileID::ashGrass, TileID::ashVines}});
     constexpr auto dropperTypes = frozen::make_map<int, int>(
@@ -177,11 +183,15 @@ void genVines(Random &rnd, World &world)
          {TileID::crimsand, TileID::sandDrip},
          {TileID::hardenedCrimsand, TileID::sandDrip},
          {TileID::crimsandstone, TileID::sandDrip},
+         {TileID::pearlsand, TileID::sandDrip},
+         {TileID::hardenedPearlsand, TileID::sandDrip},
+         {TileID::pearlsandstone, TileID::sandDrip},
          {TileID::hive, TileID::honeyDrip}});
     int lavaLevel =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     parallelFor(std::views::iota(0, world.getWidth()), [&](int x) {
         int vine = TileID::empty;
+        int vinePaint = Paint::none;
         int dropper = TileID::empty;
         int vineLen = 0;
         ScanState state = ScanState::n;
@@ -193,9 +203,7 @@ void genVines(Random &rnd, World &world)
                 if (tile.blockID == TileID::empty &&
                     tile.liquid == Liquid::none) {
                     tile.blockID = vine;
-                    if (vine == TileID::vineRope) {
-                        tile.blockPaint = Paint::lime;
-                    }
+                    tile.blockPaint = vinePaint;
                     state = ScanState::n;
                     --vineLen;
                     continue;
@@ -237,6 +245,8 @@ void genVines(Random &rnd, World &world)
             if (vine == TileID::vines && rnd.getCoarseNoise(x, y) > 0.12) {
                 vine = TileID::flowerVines;
             }
+            vinePaint =
+                vine == TileID::vineRope ? Paint::lime : tile.blockPaint;
             vineLen = 4 + randInt % 7;
         }
     });

@@ -310,7 +310,9 @@ void growTapRoot(double x, double y, int roomId, Random &rnd, World &world)
              TileID::copperOre,
              TileID::tinOre,
              TileID::ironOre,
-             TileID::leadOre});
+             TileID::leadOre,
+             TileID::cobaltOre,
+             TileID::palladiumOre});
         if (!world.regionPasses(
                 x,
                 anchorY,

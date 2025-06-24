@@ -28,6 +28,8 @@
 #include "biomes/doubleTrouble/Corruption.h"
 #include "biomes/doubleTrouble/Crimson.h"
 #include "biomes/doubleTrouble/ResourceSwap.h"
+#include "biomes/hardmode/Hallow.h"
+#include "biomes/hardmode/HmOres.h"
 #include "biomes/patches/Base.h"
 #include "biomes/patches/Cloud.h"
 #include "biomes/patches/Hive.h"
@@ -103,6 +105,9 @@ enum class Step {
     swapResources,
     genSecondaryCrimson,
     genSecondaryCorruption,
+    // Hardmode.
+    genHardmodeOres,
+    genHallow,
     // Patches.
     initBiomeNoise,
     genWorldBasePatches,
@@ -126,7 +131,6 @@ inline std::array baseBiomeRules{
     Step::genUnderworld,
     Step::genGlowingMushroom,
     Step::genGraniteCave,
-    Step::swapResources,
     Step::genHive,
     Step::genAether,
     Step::genCrimson,
@@ -134,6 +138,9 @@ inline std::array baseBiomeRules{
     Step::genSecondaryCrimson,
     Step::genSecondaryCorruption,
     Step::applyQueuedEvil,
+    Step::genHardmodeOres,
+    Step::genHallow,
+    Step::swapResources,
     Step::genAsteroidField,
     Step::genGemCave,
     Step::genSpiderNest,
@@ -152,30 +159,19 @@ inline std::array baseStructureRules{
 };
 
 inline std::array patchesBiomeRules{
-    Step::initNoise,
-    Step::initBiomeNoise,
-    Step::genWorldBasePatches,
-    Step::genOceans,
-    Step::genCloudPatches,
-    Step::genMarbleCave,
-    Step::genJunglePatches,
-    Step::genForest,
-    Step::genAshenField,
-    Step::genUnderworld,
-    Step::genGlowingMushroom,
-    Step::genGraniteCave,
-    Step::swapResources,
-    Step::genHivePatches,
-    Step::genAether,
-    Step::genCrimson,
-    Step::genCorruption,
-    Step::genSecondaryCrimson,
-    Step::genSecondaryCorruption,
-    Step::applyQueuedEvil,
-    Step::genAsteroidField,
-    Step::genGemCave,
-    Step::genSpiderNest,
-    Step::genGlowingMoss,
+    Step::initNoise,           Step::initBiomeNoise,
+    Step::genWorldBasePatches, Step::genOceans,
+    Step::genCloudPatches,     Step::genMarbleCave,
+    Step::genJunglePatches,    Step::genForest,
+    Step::genAshenField,       Step::genUnderworld,
+    Step::genGlowingMushroom,  Step::genGraniteCave,
+    Step::genHivePatches,      Step::genAether,
+    Step::genCrimson,          Step::genCorruption,
+    Step::genSecondaryCrimson, Step::genSecondaryCorruption,
+    Step::applyQueuedEvil,     Step::genHardmodeOres,
+    Step::genHallow,           Step::swapResources,
+    Step::genAsteroidField,    Step::genGemCave,
+    Step::genSpiderNest,       Step::genGlowingMoss,
     Step::genGemGrove,
 };
 
@@ -254,6 +250,8 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(swapResources)
         GEN_STEP(genSecondaryCrimson)
         GEN_STEP(genSecondaryCorruption)
+        GEN_STEP(genHardmodeOres)
+        GEN_STEP(genHallow)
     case Step::initBiomeNoise:
         rnd.initBiomeNoise(
             0.00097,
@@ -283,6 +281,9 @@ void doWorldGen(Random &rnd, World &world)
             {Step::swapResources,
              Step::genSecondaryCrimson,
              Step::genSecondaryCorruption});
+    }
+    if (!world.conf.hardmode) {
+        excludes.insert({Step::genHardmodeOres, Step::genHallow});
     }
     LocationBins locations;
     std::vector<Step> steps;

@@ -46,6 +46,9 @@ equipment = none
 # Include both evil biomes and all ore variants.
 doubleTrouble = false
 
+# Start with hardmode activated.
+hardmode = false
+
 # Distribute biomes in patches (instead of columns).
 patches = false
 
@@ -473,6 +476,7 @@ Config readConfig(Random &rnd)
         false, // starterHome
         0,     // equipment
         false, // doubleTrouble
+        false, // hardmode
         false, // patches
         0.0,   // patchesHumidity
         0.0,   // patchesTemperature
@@ -506,6 +510,7 @@ Config readConfig(Random &rnd)
     conf.equipment =
         parseEquipment(reader.Get("variation", "equipment", "none"));
     READ_CONF_VALUE(variation, doubleTrouble, Boolean);
+    READ_CONF_VALUE(variation, hardmode, Boolean);
     READ_CONF_VALUE(variation, patches, Boolean);
     READ_CONF_VALUE(variation, patchesHumidity, Real);
     READ_CONF_VALUE(variation, patchesTemperature, Real);

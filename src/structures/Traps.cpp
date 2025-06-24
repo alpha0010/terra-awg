@@ -19,9 +19,12 @@ inline constexpr auto trappableTiles = frozen::make_set<int>({
     TileID::mud,
     TileID::jungleGrass,
     TileID::mushroomGrass,
+    TileID::hallowedGrass,
+    TileID::pearlstone,
     TileID::snow,
     TileID::ice,
     TileID::corruptIce,
+    TileID::hallowedIce,
     TileID::slime,
     TileID::crimsonGrass,
     TileID::crimsonIce,
@@ -30,6 +33,7 @@ inline constexpr auto trappableTiles = frozen::make_set<int>({
     TileID::marble,
     TileID::granite,
     TileID::smoothGranite,
+    TileID::pinkSlime,
     TileID::lavaMossStone,
     TileID::sandstone,
     TileID::hardenedSand,
@@ -37,6 +41,8 @@ inline constexpr auto trappableTiles = frozen::make_set<int>({
     TileID::hardenedCrimsand,
     TileID::ebonsandstone,
     TileID::crimsandstone,
+    TileID::hardenedPearlsand,
+    TileID::pearlsandstone,
     TileID::kryptonMossStone,
     TileID::xenonMossStone,
     TileID::argonMossStone,
@@ -122,6 +128,7 @@ void placeSandTraps(Random &rnd, World &world)
             case TileID::sand:
             case TileID::ebonsand:
             case TileID::crimsand:
+            case TileID::pearlsand:
                 ++fallingCount;
                 break;
             case TileID::empty:
@@ -154,9 +161,12 @@ void placeSandTraps(Random &rnd, World &world)
          TileID::ebonsandstone,
          TileID::crimsand,
          TileID::hardenedCrimsand,
-         TileID::crimsandstone});
+         TileID::crimsandstone,
+         TileID::pearlsand,
+         TileID::hardenedPearlsand,
+         TileID::pearlsandstone});
     constexpr auto looseBlocks = frozen::make_set<int>(
-        {TileID::sand, TileID::ebonsand, TileID::crimsand});
+        {TileID::sand, TileID::ebonsand, TileID::crimsand, TileID::pearlsand});
     for (int tries = 50 * numSandTraps; numSandTraps > 0 && tries > 0;
          --tries) {
         int binId = rnd.getInt(minBin, maxBin);
@@ -262,8 +272,9 @@ void placeBoulderTraps(Random &rnd, World &world)
             x,
             y,
             probeTileId == TileID::sandstone ? TileID::rollingCactus
-            : probeTileId == TileID::slime   ? TileID::bouncyBoulder
-                                             : TileID::boulder);
+            : probeTileId == TileID::slime || probeTileId == TileID::pinkSlime
+                ? TileID::bouncyBoulder
+                : TileID::boulder);
         for (int i = -2; i < 4; ++i) {
             for (int j = -2; j < 4; ++j) {
                 world.getTile(x + i, y + j).guarded = true;
@@ -543,7 +554,14 @@ bool addChestLavaTrap(int x, int y, Random &rnd, World &world)
          TileID::tinOre,
          TileID::leadOre,
          TileID::tungstenOre,
-         TileID::platinumOre});
+         TileID::platinumOre,
+         TileID::cobaltOre,
+         TileID::palladiumOre,
+         TileID::mythrilOre,
+         TileID::orichalcumOre,
+         TileID::adamantiteOre,
+         TileID::titaniumOre,
+         TileID::chlorophyteOre});
     int numEmpty = 0;
     if (!world.regionPasses(
             pos.first - 10,

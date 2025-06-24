@@ -27,6 +27,12 @@ Point selectArenaLocation(
         TileID::tungstenOre,
         TileID::goldOre,
         TileID::platinumOre,
+        TileID::cobaltOre,
+        TileID::palladiumOre,
+        TileID::mythrilOre,
+        TileID::orichalcumOre,
+        TileID::adamantiteOre,
+        TileID::titaniumOre,
     });
     int minX = 100;
     int maxX = world.getWidth() - 100 - arenaWidth;

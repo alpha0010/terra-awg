@@ -25,15 +25,18 @@ Point makeHall(int x, int y, int steps, Point delta, World &world)
     constexpr auto accent1 = frozen::make_map<int, int>(
         {{WallID::Safe::sandstoneBrick, WallID::Safe::smoothSandstone},
          {WallID::Safe::ebonstoneBrick, WallID::Unsafe::ebonsandstone},
-         {WallID::Safe::crimstoneBrick, WallID::Unsafe::crimsandstone}});
+         {WallID::Safe::crimstoneBrick, WallID::Unsafe::crimsandstone},
+         {WallID::Safe::pearlstoneBrick, WallID::Unsafe::pearlsandstone}});
     constexpr auto accent2 = frozen::make_map<int, int>(
         {{WallID::Safe::sandstoneBrick, WallID::Safe::goldBrick},
          {WallID::Safe::ebonstoneBrick, WallID::Safe::demoniteBrick},
-         {WallID::Safe::crimstoneBrick, WallID::Safe::crimtaneBrick}});
+         {WallID::Safe::crimstoneBrick, WallID::Safe::crimtaneBrick},
+         {WallID::Safe::pearlstoneBrick, WallID::Safe::crystalBlock}});
     constexpr auto validBlocks = frozen::make_set<int>(
         {TileID::sandstoneBrick,
          TileID::ebonstoneBrick,
-         TileID::crimstoneBrick});
+         TileID::crimstoneBrick,
+         TileID::pearlstoneBrick});
     for (; steps > 0; --steps, x += delta.first, y += delta.second) {
         for (int j = 0; j < 7; ++j) {
             Tile &tile = world.getTile(x, y + j);
@@ -92,6 +95,14 @@ Point fillTreasureRoom(int x, int y, Random &rnd, World &world)
                 wallMap[WallID::Safe::goldBrick] = WallID::Safe::crimtaneBrick;
                 wallMap[WallID::Safe::sandstoneBrick] =
                     WallID::Safe::crimstoneBrick;
+            } else if (tile.blockID == TileID::pearlstoneBrick) {
+                blockMap[TileID::sand] = TileID::pearlsand;
+                blockMap[TileID::sandstoneBrick] = TileID::pearlstoneBrick;
+                wallMap[WallID::Safe::smoothSandstone] =
+                    WallID::Unsafe::pearlsandstone;
+                wallMap[WallID::Safe::goldBrick] = WallID::Safe::crystalBlock;
+                wallMap[WallID::Safe::sandstoneBrick] =
+                    WallID::Safe::pearlstoneBrick;
             }
             roomTile.blockID = blockMap[roomTile.blockID];
             roomTile.wallID = wallMap[roomTile.wallID];
@@ -239,8 +250,8 @@ void genPyramid(Random &rnd, World &world)
         }
     }
     int y = world.getSurfaceLevel(x);
-    constexpr auto ignoreBlocks =
-        frozen::make_set<int>({TileID::empty, TileID::lesion, TileID::flesh});
+    constexpr auto ignoreBlocks = frozen::make_set<int>(
+        {TileID::empty, TileID::lesion, TileID::flesh, TileID::crystalBlock});
     while (ignoreBlocks.contains(world.getTile(x, y).blockID) &&
            y < 0.85 * world.getUndergroundLevel()) {
         ++y;
@@ -255,9 +266,17 @@ void genPyramid(Random &rnd, World &world)
          {TileID::crimstone, TileID::crimstoneBrick},
          {TileID::crimsand, TileID::crimstoneBrick},
          {TileID::crimsandstone, TileID::crimstoneBrick},
-         {TileID::hardenedCrimsand, TileID::crimstoneBrick}});
+         {TileID::hardenedCrimsand, TileID::crimstoneBrick},
+         {TileID::pearlstone, TileID::pearlstoneBrick},
+         {TileID::pearlsand, TileID::pearlstoneBrick},
+         {TileID::pearlsandstone, TileID::pearlstoneBrick},
+         {TileID::hardenedPearlsand, TileID::pearlstoneBrick}});
     constexpr auto skipTiles = frozen::make_set<int>(
-        {TileID::demonite, TileID::lesion, TileID::crimtane, TileID::flesh});
+        {TileID::demonite,
+         TileID::lesion,
+         TileID::crimtane,
+         TileID::flesh,
+         TileID::crystalBlock});
     for (int i = 0; i < 2 * size; ++i) {
         for (int j = std::abs(i - size); j < size; ++j) {
             Tile &tile = world.getTile(x + i, y + j);
@@ -272,6 +291,8 @@ void genPyramid(Random &rnd, World &world)
                 tile.blockID = itr->second;
                 tile.wallID = itr->second == TileID::ebonstoneBrick
                                   ? WallID::Safe::ebonstoneBrick
+                              : itr->second == TileID::pearlstoneBrick
+                                  ? WallID::Safe::pearlstoneBrick
                                   : WallID::Safe::crimstoneBrick;
             }
         }

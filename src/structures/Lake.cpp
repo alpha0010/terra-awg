@@ -77,6 +77,10 @@ void simulateRain(Random &rnd, World &world, int x)
          TileID::flesh,
          TileID::crimsonGrass,
          TileID::crimsonJungleGrass,
+         TileID::pearlstone,
+         TileID::pearlsand,
+         TileID::aetherium,
+         TileID::crystalBlock,
          TileID::livingWood,
          TileID::leaf,
          TileID::livingMahogany,
@@ -85,6 +89,7 @@ void simulateRain(Random &rnd, World &world, int x)
          TileID::sandstoneBrick,
          TileID::ebonstoneBrick,
          TileID::crimstoneBrick,
+         TileID::pearlstoneBrick,
          TileID::blueBrick,
          TileID::greenBrick,
          TileID::pinkBrick});
@@ -94,8 +99,10 @@ void simulateRain(Random &rnd, World &world, int x)
         WallID::Unsafe::hardenedSand,
         WallID::Unsafe::hardenedEbonsand,
         WallID::Unsafe::hardenedCrimsand,
+        WallID::Unsafe::hardenedPearlsand,
         WallID::Unsafe::ebonsandstone,
         WallID::Unsafe::crimsandstone,
+        WallID::Unsafe::pearlsandstone,
         WallID::Unsafe::spider};
     dryWalls.insert(WallVariants::dungeon.begin(), WallVariants::dungeon.end());
     double pendingWater =

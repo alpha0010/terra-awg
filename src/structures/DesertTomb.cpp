@@ -16,19 +16,13 @@
 Point selectTombLocation(TileBuffer &tomb, Random &rnd, World &world)
 {
     constexpr auto clearableTiles = frozen::make_set<int>({
-        TileID::empty,
-        TileID::sand,
-        TileID::hardenedSand,
-        TileID::sandstone,
-        TileID::desertFossil,
-        TileID::copperOre,
-        TileID::tinOre,
-        TileID::ironOre,
-        TileID::leadOre,
-        TileID::silverOre,
-        TileID::tungstenOre,
-        TileID::goldOre,
-        TileID::platinumOre,
+        TileID::empty,       TileID::sand,          TileID::hardenedSand,
+        TileID::sandstone,   TileID::desertFossil,  TileID::copperOre,
+        TileID::tinOre,      TileID::ironOre,       TileID::leadOre,
+        TileID::silverOre,   TileID::tungstenOre,   TileID::goldOre,
+        TileID::platinumOre, TileID::cobaltOre,     TileID::palladiumOre,
+        TileID::mythrilOre,  TileID::orichalcumOre, TileID::adamantiteOre,
+        TileID::titaniumOre,
     });
     int minX =
         world.conf.patches ? 350 : world.desertCenter - 0.06 * world.getWidth();

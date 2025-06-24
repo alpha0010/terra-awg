@@ -20,6 +20,12 @@ void swapResources(Random &rnd, World &world)
         {TileID::tungstenOre, TileID::silverOre},
         {TileID::goldOre, TileID::platinumOre},
         {TileID::platinumOre, TileID::goldOre},
+        {TileID::cobaltOre, TileID::palladiumOre},
+        {TileID::palladiumOre, TileID::cobaltOre},
+        {TileID::mythrilOre, TileID::orichalcumOre},
+        {TileID::orichalcumOre, TileID::mythrilOre},
+        {TileID::adamantiteOre, TileID::titaniumOre},
+        {TileID::titaniumOre, TileID::adamantiteOre},
     });
     constexpr auto blockSwap = frozen::make_map<int, int>({
         {TileID::marble, TileID::granite},

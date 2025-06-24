@@ -11,20 +11,13 @@
 #include <algorithm>
 
 inline constexpr auto cabinClearTiles = frozen::make_set<int>({
-    TileID::empty,
-    TileID::dirt,
-    TileID::stone,
-    TileID::clay,
-    TileID::sand,
-    TileID::mud,
-    TileID::copperOre,
-    TileID::tinOre,
-    TileID::ironOre,
-    TileID::leadOre,
-    TileID::silverOre,
-    TileID::tungstenOre,
-    TileID::goldOre,
-    TileID::platinumOre,
+    TileID::empty,         TileID::dirt,        TileID::stone,
+    TileID::clay,          TileID::sand,        TileID::mud,
+    TileID::copperOre,     TileID::tinOre,      TileID::ironOre,
+    TileID::leadOre,       TileID::silverOre,   TileID::tungstenOre,
+    TileID::goldOre,       TileID::platinumOre, TileID::cobaltOre,
+    TileID::palladiumOre,  TileID::mythrilOre,  TileID::orichalcumOre,
+    TileID::adamantiteOre, TileID::titaniumOre, TileID::chlorophyteOre,
 });
 
 bool canPlaceOnCabinGround(int x, int y, int width, int height, World &world)

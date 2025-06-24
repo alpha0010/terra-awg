@@ -35,7 +35,9 @@ bool canPlaceIglooAt(int x, int y, TileBuffer &igloo, World &world)
          TileID::snow,
          TileID::ice,
          TileID::copperOre,
-         TileID::tinOre});
+         TileID::tinOre,
+         TileID::cobaltOre,
+         TileID::palladiumOre});
     return world.regionPasses(
         x,
         y,

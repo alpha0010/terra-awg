@@ -152,20 +152,13 @@ Point selectSpiderHallLocation(
     World &world)
 {
     constexpr auto clearableTiles = frozen::make_set<int>({
-        TileID::empty,
-        TileID::dirt,
-        TileID::stone,
-        TileID::clay,
-        TileID::sand,
-        TileID::mud,
-        TileID::copperOre,
-        TileID::tinOre,
-        TileID::ironOre,
-        TileID::leadOre,
-        TileID::silverOre,
-        TileID::tungstenOre,
-        TileID::goldOre,
-        TileID::platinumOre,
+        TileID::empty,         TileID::dirt,        TileID::stone,
+        TileID::clay,          TileID::sand,        TileID::mud,
+        TileID::copperOre,     TileID::tinOre,      TileID::ironOre,
+        TileID::leadOre,       TileID::silverOre,   TileID::tungstenOre,
+        TileID::goldOre,       TileID::platinumOre, TileID::cobaltOre,
+        TileID::palladiumOre,  TileID::mythrilOre,  TileID::orichalcumOre,
+        TileID::adamantiteOre, TileID::titaniumOre,
     });
     int minY = (world.getUndergroundLevel() + 2 * world.getCavernLevel()) / 3;
     int maxY = (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3 -

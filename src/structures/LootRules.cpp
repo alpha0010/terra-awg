@@ -2059,25 +2059,43 @@ void fillStarterChestHellstone(Chest &chest, Random &rnd, World &world)
 
 void fillStarterChestMythril(Chest &chest, Random &rnd, World &world)
 {
-    fillLoot(
-        chest,
-        rnd,
-        {
-            {1,
-             {world.ironVariant == TileID::ironOre ? ItemID::ironAnvil
-                                                   : ItemID::leadAnvil,
-              Prefix::none,
-              1}},
-            {1, {ItemID::mythrilHood, Prefix::none, 1}},
-            {1, {ItemID::mythrilHelmet, Prefix::none, 1}},
-            {1, {ItemID::mythrilHat, Prefix::none, 1}},
-            {1, {ItemID::mythrilChainmail, Prefix::none, 1}},
-            {1, {ItemID::mythrilGreaves, Prefix::none, 1}},
-            {1, {ItemID::mythrilBar, Prefix::none, rnd.getInt(75, 80)}},
-            {1, {ItemID::fledglingWings, rnd.select(PrefixSet::accessory), 1}},
-            {1, {ItemID::lifeCrystal, Prefix::none, rnd.getInt(4, 6)}},
-            {1, {ItemID::goldCoin, Prefix::none, rnd.getInt(3, 6)}},
-        });
+    int anvilVariant = world.ironVariant == TileID::ironOre ? ItemID::ironAnvil
+                                                            : ItemID::leadAnvil;
+    if (world.mythrilVariant == TileID::orichalcumOre) {
+        fillLoot(
+            chest,
+            rnd,
+            {
+                {1, {anvilVariant, Prefix::none, 1}},
+                {1, {ItemID::orichalcumHeadgear, Prefix::none, 1}},
+                {1, {ItemID::orichalcumMask, Prefix::none, 1}},
+                {1, {ItemID::orichalcumHelmet, Prefix::none, 1}},
+                {1, {ItemID::orichalcumBreastplate, Prefix::none, 1}},
+                {1, {ItemID::orichalcumLeggings, Prefix::none, 1}},
+                {1, {ItemID::orichalcumBar, Prefix::none, rnd.getInt(90, 95)}},
+                {1,
+                 {ItemID::fledglingWings, rnd.select(PrefixSet::accessory), 1}},
+                {1, {ItemID::lifeCrystal, Prefix::none, rnd.getInt(4, 6)}},
+                {1, {ItemID::goldCoin, Prefix::none, rnd.getInt(3, 6)}},
+            });
+    } else {
+        fillLoot(
+            chest,
+            rnd,
+            {
+                {1, {anvilVariant, Prefix::none, 1}},
+                {1, {ItemID::mythrilHood, Prefix::none, 1}},
+                {1, {ItemID::mythrilHelmet, Prefix::none, 1}},
+                {1, {ItemID::mythrilHat, Prefix::none, 1}},
+                {1, {ItemID::mythrilChainmail, Prefix::none, 1}},
+                {1, {ItemID::mythrilGreaves, Prefix::none, 1}},
+                {1, {ItemID::mythrilBar, Prefix::none, rnd.getInt(75, 80)}},
+                {1,
+                 {ItemID::fledglingWings, rnd.select(PrefixSet::accessory), 1}},
+                {1, {ItemID::lifeCrystal, Prefix::none, rnd.getInt(4, 6)}},
+                {1, {ItemID::goldCoin, Prefix::none, rnd.getInt(3, 6)}},
+            });
+    }
 }
 
 void fillStarterChest(int level, Chest &chest, Random &rnd, World &world)

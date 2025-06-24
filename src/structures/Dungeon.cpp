@@ -897,7 +897,9 @@ private:
                     30,
                     [](Tile &tile) {
                         return tile.blockID != TileID::livingWood &&
-                               tile.blockID != TileID::leaf;
+                               tile.blockID != TileID::leaf &&
+                               tile.blockID != TileID::aetherium &&
+                               tile.wallID != WallID::Unsafe::livingWood;
                     })) {
                 world.dungeonX = dungeonCenter + i;
                 break;
@@ -1250,10 +1252,8 @@ public:
     }
 };
 
-void genDungeon(Random &rnd, World &world)
+int computeDungeonCenter(World &world)
 {
-    std::cout << "Employing the undead\n";
-    rnd.shuffleNoise();
     std::vector avoidPoints{
         0,
         world.getWidth() / 2,
@@ -1272,6 +1272,13 @@ void genDungeon(Random &rnd, World &world)
             dungeonCenter = avoidPoints[i] + span / 2;
         }
     }
+    return dungeonCenter;
+}
+
+void genDungeon(Random &rnd, World &world)
+{
+    std::cout << "Employing the undead\n";
+    rnd.shuffleNoise();
     Dungeon structure(rnd, world);
-    structure.gen(dungeonCenter);
+    structure.gen(computeDungeonCenter(world));
 }

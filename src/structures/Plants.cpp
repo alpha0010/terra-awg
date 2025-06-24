@@ -219,6 +219,7 @@ void growTree(
             world.getTile(x + i, y).wallID = WallID::empty;
         }
     }
+    int paint = world.getTile(x + 1, y).blockPaint;
     for (int j = 0; j < height; ++j) {
         TileBuffer tree =
             Data::getTree(rnd.select(Data::trees), world.getFramedTiles());
@@ -231,6 +232,7 @@ void growTree(
             tile = tree.getTile(i, treeRow);
             if (tile.blockID != TileID::empty) {
                 tile.blockID = treeTile;
+                tile.blockPaint = paint;
             }
             tile.wallID = curWall;
         }
@@ -268,6 +270,7 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
             case TileID::crimsonGrass:
             case TileID::crimsonJungleGrass:
             case TileID::grass:
+            case TileID::hallowedGrass:
             case TileID::snow:
                 if (y < world.getUndergroundLevel() &&
                     world.getTile(x, y - 1).liquid == Liquid::none &&
@@ -519,6 +522,7 @@ bool placeSmallPile(int x, int y, World &world)
         world.placeFramedTile(x, y - 1, TileID::smallPile, Variant::granite);
         return true;
     case TileID::grass:
+    case TileID::hallowedGrass:
         world.placeFramedTile(x, y - 1, TileID::smallPile, Variant::forest);
         return true;
     case TileID::ice:
@@ -588,6 +592,7 @@ bool placeLargePile(int x, int y, World &world)
             Variant::granite);
         return true;
     case TileID::grass:
+    case TileID::hallowedGrass:
         world.placeFramedTile(
             x,
             y - 2,
@@ -629,6 +634,7 @@ bool placeLargePile(int x, int y, World &world)
     case TileID::sandstone:
     case TileID::ebonsandstone:
     case TileID::crimsandstone:
+    case TileID::pearlsandstone:
         world.placeFramedTile(
             x,
             y - 2,
@@ -712,6 +718,7 @@ void growGrass(int x, int y, Random &rnd, World &world)
             probeTile.frameX = 36;
             return;
         case TileID::grass:
+        case TileID::hallowedGrass:
             return;
         case TileID::jungleGrass:
             if (randInt % 61 == 0) {
@@ -720,6 +727,7 @@ void growGrass(int x, int y, Random &rnd, World &world)
             }
             break;
         case TileID::sand:
+        case TileID::pearlsand:
             if (x > 350 && x < world.getWidth() - 350) {
                 probeTile.frameX = 72;
                 return;

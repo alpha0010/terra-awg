@@ -113,6 +113,9 @@ public:
     int ironVariant;
     int silverVariant;
     int goldVariant;
+    int cobaltVariant;
+    int mythrilVariant;
+    int adamantiteVariant;
 
     int spawnY;
 

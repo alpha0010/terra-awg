@@ -46,6 +46,7 @@ enum {
     crimtaneBrick = 174,
     smoothMarble = 179,
     marble = 183,
+    crystalBlock = 186,
     crimstoneBrick = 234,
     smoothSandstone = 235,
     snow = 249,
@@ -58,6 +59,7 @@ enum {
     bamboo = 312,
     largeBamboo = 313,
     ashWood = 316,
+    aetherium = 321,
 };
 }
 
@@ -91,6 +93,7 @@ enum {
     jungle = 64,
     flower = 65,
     corruptGrass = 69,
+    hallowedGrass = 70,
     ice = 71,
     mushroom = 80,
     crimsonGrass = 81,
@@ -121,6 +124,10 @@ enum {
     crumblingDirt = 197,
     crackedDirt = 198,
     wavyDirt = 199,
+    hallowedPrism = 200,
+    hallowedCavern = 201,
+    hallowedShard = 202,
+    hallowedCrystalline = 203,
     lichenStone = 204,
     leafyJungle = 205,
     ivyStone = 206,
@@ -136,8 +143,10 @@ enum {
     hardenedSand = 216,
     hardenedEbonsand = 217,
     hardenedCrimsand = 218,
+    hardenedPearlsand = 219,
     ebonsandstone = 220,
     crimsandstone = 221,
+    pearlsandstone = 222,
     livingWood = 244,
 };
 }
@@ -183,6 +192,12 @@ inline std::array const corruption = {
     WallID::Unsafe::corruptGrowth,
     WallID::Unsafe::corruptMass,
     WallID::Unsafe::corruptPustule};
+
+inline std::array const hallow = {
+    WallID::Unsafe::hallowedPrism,
+    WallID::Unsafe::hallowedCavern,
+    WallID::Unsafe::hallowedShard,
+    WallID::Unsafe::hallowedCrystalline};
 
 inline std::array const dungeon = {
     WallID::Unsafe::blueBrick,
