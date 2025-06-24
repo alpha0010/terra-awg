@@ -44,9 +44,12 @@ inline constexpr auto placementAvoidTiles = frozen::make_set<int>({
 
 bool isPlacementCandidate(int x, int y, World &world)
 {
-    auto isFloorTile = [](const Tile &tile) {
+    auto isFloorTile = [x, y, &world](const Tile &tile) {
         return isSolidBlock(tile.blockID) && tile.slope == Slope::none &&
-               !tile.actuated && !placementAvoidTiles.contains(tile.blockID);
+               !tile.actuated && !placementAvoidTiles.contains(tile.blockID) &&
+               ((tile.blockID != TileID::aetherium &&
+                 tile.blockID != TileID::pearlstone) ||
+                y > world.getSurfaceLevel(x));
     };
     return isFloorTile(world.getTile(x, y)) &&
            isFloorTile(world.getTile(x + 1, y)) &&
@@ -406,7 +409,8 @@ Point selectShrineLocation(
                 [](Tile &tile) {
                     return tile.blockID == TileID::empty &&
                            (tile.wallID == WallID::empty ||
-                            listContains(WallVariants::jungle, tile.wallID)) &&
+                            listContains(WallVariants::jungle, tile.wallID) ||
+                            listContains(WallVariants::hallow, tile.wallID)) &&
                            (tile.liquid == Liquid::none ||
                             tile.liquid == Liquid::water);
                 })) {
@@ -498,6 +502,12 @@ void placeJungleShrines(Random &rnd, World &world)
             continue;
         }
         usedLocations.emplace_back(x, y);
+        bool isHallow = !world.regionPasses(
+            x,
+            y,
+            shrine.getWidth(),
+            shrine.getHeight(),
+            [](Tile &tile) { return tile.blockPaint != Paint::cyan; });
         std::vector<Point> chests = world.placeBuffer(x, y, shrine);
         for (int i = 0; i < shrine.getWidth(); ++i) {
             for (int j = 0; j < shrine.getHeight(); ++j) {
@@ -505,6 +515,7 @@ void placeJungleShrines(Random &rnd, World &world)
                 if (tile.blockID == TileID::mud &&
                     world.isExposed(x + i, y + j)) {
                     tile.blockID = TileID::jungleGrass;
+                    tile.blockPaint = isHallow ? Paint::cyan : Paint::none;
                 }
             }
         }
@@ -585,6 +596,13 @@ Variant getChestType(int x, int y, World &world)
          {TileID::heliumMossStone, Variant::meteorite},
          {TileID::aetherium, Variant::meteorite},
          {TileID::mushroomGrass, Variant::mushroom},
+         {TileID::hallowedGrass, Variant::pearlwood},
+         {TileID::pearlstone, Variant::pearlwood},
+         {TileID::hallowedIce, Variant::pearlwood},
+         {TileID::pearlsand, Variant::pearlwood},
+         {TileID::hardenedPearlsand, Variant::pearlwood},
+         {TileID::pearlsandstone, Variant::pearlwood},
+         {TileID::crystalBlock, Variant::pearlwood},
          {TileID::jungleGrass, Variant::richMahogany},
          {TileID::livingMahogany, Variant::richMahogany},
          {TileID::mahoganyLeaf, Variant::richMahogany},
@@ -619,6 +637,13 @@ Variant getChestType(int x, int y, World &world)
          {WallID::Unsafe::granite, Variant::granite},
          {WallID::Unsafe::marble, Variant::marble},
          {WallID::Unsafe::mushroom, Variant::mushroom},
+         {WallID::Unsafe::hallowedGrass, Variant::pearlwood},
+         {WallID::Unsafe::pearlsandstone, Variant::pearlwood},
+         {WallID::Unsafe::hardenedPearlsand, Variant::pearlwood},
+         {WallID::Unsafe::hallowedPrism, Variant::pearlwood},
+         {WallID::Unsafe::hallowedCavern, Variant::pearlwood},
+         {WallID::Unsafe::hallowedShard, Variant::pearlwood},
+         {WallID::Unsafe::hallowedCrystalline, Variant::pearlwood},
          {WallID::Unsafe::jungle, Variant::richMahogany},
          {WallID::Unsafe::mud, Variant::richMahogany},
          {WallID::Unsafe::lichenStone, Variant::richMahogany},
@@ -651,6 +676,16 @@ Variant getChestType(int x, int y, World &world)
             if (type == Variant::sandstone &&
                 fuzzyIsSurfaceChest(x, y, world)) {
                 return Variant::palmWood;
+            } else if (type == Variant::pearlwood) {
+                for (auto altType :
+                     {Variant::mushroom,
+                      Variant::marble,
+                      Variant::granite,
+                      Variant::richMahogany}) {
+                    if (zoneCounts[altType] > radius) {
+                        return altType;
+                    }
+                }
             }
             return type;
         }
@@ -740,6 +775,15 @@ void placeChest(
         return;
     case Variant::palmWood:
         fillSurfacePalmWoodChest(chest, rnd, world);
+        return;
+    case Variant::pearlwood:
+        if (fuzzyIsSurfaceChest(x, y, world)) {
+            fillSurfacePearlwoodChest(chest, rnd, world);
+        } else if (y < world.getCavernLevel()) {
+            fillUndergroundPearlwoodChest(chest, rnd, world);
+        } else {
+            fillCavernPearlwoodChest(chest, rnd, world);
+        }
         return;
     case Variant::reef:
     case Variant::water:

@@ -2,6 +2,7 @@
 
 #include "Random.h"
 #include "World.h"
+#include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/Statues.h"
@@ -58,7 +59,13 @@ Point selectCabinLocation(
     return {-1, -1};
 }
 
-int placeMushroomStruct(int x, int y, int mushroomId, Random &rnd, World &world)
+int placeMushroomStruct(
+    int x,
+    int y,
+    int mushroomId,
+    int paint,
+    Random &rnd,
+    World &world)
 {
     TileBuffer data = Data::getMushroom(mushroomId, world.getFramedTiles());
     bool mirror = rnd.getBool();
@@ -74,6 +81,8 @@ int placeMushroomStruct(int x, int y, int mushroomId, Random &rnd, World &world)
                 std::abs(rnd.getFineNoise(x + 3 * i, y + 3 * j)) > 0.3
                     ? TileID::slime
                     : TileID::mud;
+            tile.blockPaint =
+                tile.blockID == TileID::slime ? paint : Paint::none;
             tile.wallID = WallID::Unsafe::mushroom;
         }
     }
@@ -84,6 +93,7 @@ int placeMushroomStruct(int x, int y, int mushroomId, Random &rnd, World &world)
                 tile.guarded = true;
             } else if (tile.blockID == TileID::mud) {
                 tile.blockID = TileID::mushroomGrass;
+                tile.blockPaint = paint;
             }
         }
     }
@@ -185,8 +195,18 @@ void genMushroomCabin(Random &rnd, World &world)
                 }
             }
         }
+        bool isHallow =
+            !world.regionPasses(x, y, cabinWidth, 10, [](Tile &tile) {
+                return tile.blockPaint != Paint::pink;
+            });
         for (int i = -10; i < cabinWidth - 8; i += 2) {
-            i += placeMushroomStruct(x + i, y, *mushroomItr, rnd, world);
+            i += placeMushroomStruct(
+                x + i,
+                y,
+                *mushroomItr,
+                isHallow ? Paint::pink : Paint::none,
+                rnd,
+                world);
             ++mushroomItr;
             if (mushroomItr == structIds.end()) {
                 mushroomItr = structIds.begin();

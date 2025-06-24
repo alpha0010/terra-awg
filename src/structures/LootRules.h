@@ -11,6 +11,7 @@ void fillSurfaceAshWoodChest(Chest &chest, Random &rnd, World &world);
 void fillSurfaceFrozenChest(Chest &chest, Random &rnd, World &world);
 void fillSurfaceLivingWoodChest(Chest &chest, Random &rnd, World &world);
 void fillSurfacePalmWoodChest(Chest &chest, Random &rnd, World &world);
+void fillSurfacePearlwoodChest(Chest &chest, Random &rnd, World &world);
 void fillSurfaceRichMahoganyChest(Chest &chest, Random &rnd, World &world);
 void fillSurfaceWaterChest(Chest &chest, Random &rnd, World &world);
 
@@ -25,6 +26,7 @@ void fillUndergroundHoneyChest(Chest &chest, Random &rnd, World &world);
 void fillUndergroundIvyChest(Chest &chest, Random &rnd, World &world);
 void fillUndergroundMushroomChest(Chest &chest, Random &rnd, World &world);
 void fillUndergroundSandstoneChest(Chest &chest, Random &rnd, World &world);
+void fillUndergroundPearlwoodChest(Chest &chest, Random &rnd, World &world);
 void fillUndergroundRichMahoganyChest(Chest &chest, Random &rnd, World &world);
 void fillUndergroundWaterChest(Chest &chest, Random &rnd, World &world);
 
@@ -39,6 +41,7 @@ void fillCavernHoneyChest(Chest &chest, Random &rnd, World &world);
 void fillCavernIvyChest(Chest &chest, Random &rnd, World &world);
 void fillCavernMushroomChest(Chest &chest, Random &rnd, World &world);
 void fillCavernSandstoneChest(Chest &chest, Random &rnd, World &world);
+void fillCavernPearlwoodChest(Chest &chest, Random &rnd, World &world);
 void fillCavernRichMahoganyChest(Chest &chest, Random &rnd, World &world);
 void fillCavernWaterChest(Chest &chest, Random &rnd, World &world);
 

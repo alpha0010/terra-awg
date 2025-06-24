@@ -1,5 +1,6 @@
 #include "biomes/hardmode/Hallow.h"
 
+#include "Cleanup.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
@@ -145,21 +146,48 @@ void genHallow(Random &rnd, World &world)
           WallID::Unsafe::crimsonBlister}) {
         hallowWalls[wallId] = rnd.select(WallVariants::hallow);
     }
+    constexpr auto erodeBlocks = frozen::make_set<int>({
+        TileID::pearlstone,
+        TileID::hallowedIce,
+        TileID::pearlsandstone,
+    });
+    constexpr auto erodeSkipBlocks = frozen::make_set<int>({
+        TileID::livingWood,
+        TileID::livingMahogany,
+    });
     int scanDist = 0.07 * world.getWidth();
+    std::vector<std::pair<int, int>> erosion;
     for (int x = centerX - scanDist; x < centerX + scanDist; ++x) {
         for (int y = 0; y < world.getHeight(); ++y) {
             Tile &tile = world.getTile(x, y);
             auto blockItr = hallowBlocks.find(tile.blockID);
             if (blockItr != hallowBlocks.end()) {
                 tile.blockID = blockItr->second;
+                if (erodeBlocks.contains(tile.blockID) &&
+                    !erodeSkipBlocks.contains(blockItr->first) &&
+                    world.isExposed(x, y)) {
+                    erosion.emplace_back(x, y);
+                }
             }
             auto wallItr = hallowWalls.find(tile.wallID);
             if (wallItr != hallowWalls.end()) {
                 tile.wallID = wallItr->second;
             }
             if (paintedBlocks.contains(tile.blockID)) {
-                tile.blockPaint = Paint::pink;
+                tile.blockPaint = tile.blockID == TileID::jungleGrass
+                                      ? Paint::cyan
+                                      : Paint::pink;
             }
         }
+    }
+    for (auto [x, y] : erosion) {
+        Tile &tile = world.getTile(x, y);
+        if (tile.wallID != WallID::empty) {
+            std::tie(tile.wallID, tile.wallPaint) =
+                getAttachedOpenWall(world, x, y);
+        }
+    }
+    for (auto [x, y] : erosion) {
+        world.getTile(x, y).blockID = TileID::empty;
     }
 }

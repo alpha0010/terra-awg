@@ -463,6 +463,54 @@ void fillSurfacePalmWoodChest(Chest &chest, Random &rnd, World &world)
          {0.5, {ItemID::palmWood, Prefix::none, rnd.getInt(50, 99)}}});
 }
 
+void fillSurfacePearlwoodChest(Chest &chest, Random &rnd, World &world)
+{
+    fillLoot(
+        chest,
+        rnd,
+        {{1, getSurfacePrimaryLoot(rnd)},
+         getGlobalItemPrimary(world),
+         {1.0 / 6, {ItemID::bouncyGlowstick, Prefix::none, rnd.getInt(40, 75)}},
+         {1.0 / 6, {ItemID::throwingKnife, Prefix::none, rnd.getInt(150, 300)}},
+         {0.2,
+          {rnd.select({ItemID::herbBag, ItemID::canOfWorms}),
+           Prefix::none,
+           rnd.getInt(1, 4)}},
+         {1.0 / 3, {ItemID::happyGrenade, Prefix::none, rnd.getInt(3, 5)}},
+         {0.5,
+          {rnd.select(
+               {world.copperVariant == TileID::copperOre ? ItemID::copperBar
+                                                         : ItemID::tinBar,
+                world.ironVariant == TileID::ironOre ? ItemID::ironBar
+                                                     : ItemID::leadBar}),
+           Prefix::none,
+           rnd.getInt(3, 10)}},
+         {0.5, {ItemID::silkRope, Prefix::none, rnd.getInt(50, 100)}},
+         {2.0 / 3,
+          {rnd.select({ItemID::woodenArrow, ItemID::starAnise}),
+           Prefix::none,
+           rnd.getInt(25, 50)}},
+         getGlobalItemPotion(world),
+         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {2.0 / 3,
+          {rnd.select(
+               {ItemID::ironskinPotion,
+                ItemID::shinePotion,
+                ItemID::nightOwlPotion,
+                ItemID::swiftnessPotion,
+                ItemID::miningPotion,
+                ItemID::builderPotion}),
+           Prefix::none,
+           rnd.getInt(1, 2)}},
+         {0.5,
+          {rnd.select<int>({ItemID::hallowedTorch, ItemID::bottle}),
+           Prefix::none,
+           rnd.getInt(10, 20)}},
+         {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
+         {0.5, {ItemID::pearlwood, Prefix::none, rnd.getInt(50, 99)}}});
+}
+
 void fillSurfaceRichMahoganyChest(Chest &chest, Random &rnd, World &world)
 {
     fillLoot(
@@ -822,6 +870,54 @@ void fillUndergroundMushroomChest(Chest &chest, Random &rnd, World &world)
               Prefix::none,
               rnd.getInt(1, 2)}},
             {0.5, {ItemID::mushroomTorch, Prefix::none, rnd.getInt(10, 20)}},
+            {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
+            {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(50, 89)}},
+        });
+}
+
+void fillUndergroundPearlwoodChest(Chest &chest, Random &rnd, World &world)
+{
+    fillLoot(
+        chest,
+        rnd,
+        {
+            {1, getUndergroundPrimaryLoot(rnd)},
+            getGlobalItemPrimary(world),
+            {0.05, {ItemID::extractinator, Prefix::none, 1}},
+            {0.05, {ItemID::flareGun, Prefix::none, 1}},
+            {1.0 / 3, {ItemID::bomb, Prefix::none, rnd.getInt(10, 19)}},
+            {0.2, {ItemID::angelStatue, Prefix::none, 1}},
+            {1.0 / 3, {ItemID::silkRope, Prefix::none, rnd.getInt(50, 100)}},
+            {0.5,
+             {rnd.select(
+                  {world.ironVariant == TileID::ironOre ? ItemID::ironBar
+                                                        : ItemID::leadBar,
+                   world.silverVariant == TileID::silverOre
+                       ? ItemID::silverBar
+                       : ItemID::tungstenBar}),
+              Prefix::none,
+              rnd.getInt(5, 14)}},
+            {0.5,
+             {rnd.select({ItemID::jestersArrow, ItemID::starAnise}),
+              Prefix::none,
+              rnd.getInt(25, 49)}},
+            getGlobalItemPotion(world),
+            {0.5,
+             {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
+            {2.0 / 3,
+             {rnd.select(
+                  {ItemID::regenerationPotion,
+                   ItemID::shinePotion,
+                   ItemID::nightOwlPotion,
+                   ItemID::swiftnessPotion,
+                   ItemID::archeryPotion,
+                   ItemID::gillsPotion,
+                   ItemID::hunterPotion,
+                   ItemID::miningPotion,
+                   ItemID::dangersensePotion}),
+              Prefix::none,
+              rnd.getInt(1, 2)}},
+            {0.5, {ItemID::hallowedTorch, Prefix::none, rnd.getInt(10, 20)}},
             {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
             {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(50, 89)}},
         });
@@ -1310,6 +1406,67 @@ void fillCavernMushroomChest(Chest &chest, Random &rnd, World &world)
             {0.5, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
             {0.5,
              {rnd.select({ItemID::mushroomTorch, ItemID::glowstick}),
+              Prefix::none,
+              rnd.getInt(15, 29)}},
+            {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}},
+        });
+}
+
+void fillCavernPearlwoodChest(Chest &chest, Random &rnd, World &world)
+{
+    int lavaLevel =
+        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
+    fillLoot(
+        chest,
+        rnd,
+        {
+            {1, getCavernPrimaryLoot(rnd)},
+            getGlobalItemPrimary(world),
+            {chest.y < lavaLevel ? 0.05 : 0.15,
+             {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
+              Prefix::none,
+              1}},
+            {0.2, {ItemID::suspiciousLookingEye, Prefix::none, 1}},
+            {1.0 / 3, {ItemID::dynamite, Prefix::none, 1}},
+            {0.25, {ItemID::holyArrow, Prefix::none, rnd.getInt(25, 50)}},
+            {0.5,
+             {rnd.select(
+                  {world.silverVariant == TileID::silverOre
+                       ? ItemID::silverBar
+                       : ItemID::tungstenBar,
+                   world.goldVariant == TileID::goldOre ? ItemID::goldBar
+                                                        : ItemID::platinumBar}),
+              Prefix::none,
+              rnd.getInt(3, 10)}},
+            {0.5,
+             {rnd.select({ItemID::crystalBullet, ItemID::crystalDart}),
+              Prefix::none,
+              rnd.getInt(25, 50)}},
+            getGlobalItemPotion(world),
+            {0.5, {ItemID::healingPotion, Prefix::none, rnd.getInt(3, 5)}},
+            {2.0 / 3,
+             {rnd.select(
+                  {ItemID::spelunkerPotion,
+                   ItemID::featherfallPotion,
+                   ItemID::nightOwlPotion,
+                   ItemID::waterWalkingPotion,
+                   ItemID::archeryPotion,
+                   ItemID::gravitationPotion}),
+              Prefix::none,
+              rnd.getInt(1, 2)}},
+            {1.0 / 3,
+             {rnd.select(
+                  {ItemID::thornsPotion,
+                   ItemID::waterWalkingPotion,
+                   ItemID::invisibilityPotion,
+                   ItemID::hunterPotion,
+                   ItemID::dangersensePotion,
+                   ItemID::teleportationPotion}),
+              Prefix::none,
+              rnd.getInt(1, 2)}},
+            {0.5, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
+            {0.5,
+             {rnd.select<int>({ItemID::hallowedTorch, ItemID::bouncyGlowstick}),
               Prefix::none,
               rnd.getInt(15, 29)}},
             {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}},

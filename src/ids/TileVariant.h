@@ -47,6 +47,7 @@ enum class Variant {
     oilRagSconce,
     omega,
     palmWood,
+    pearlwood,
     pyramid,
     reef,
     richMahogany,

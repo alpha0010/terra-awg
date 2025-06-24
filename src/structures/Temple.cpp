@@ -490,6 +490,7 @@ void genTemple(Random &rnd, World &world)
     iterateTemple(center, world, [&world](int x, int y) {
         Tile &tile = world.getTile(x, y);
         tile.blockID = TileID::lihzahrdBrick;
+        tile.blockPaint = Paint::none;
         tile.wallID = WallID::Unsafe::lihzahrdBrick;
         return true;
     });

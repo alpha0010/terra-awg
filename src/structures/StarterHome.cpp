@@ -255,7 +255,7 @@ void genStarterHome(Random &rnd, World &world)
         theme = Data::Variant::mahogany;
     } else if (tileCounts[TileID::marble] > 2) {
         theme = Data::Variant::marble;
-    } else if (tileCounts[TileID::sand] > 2) {
+    } else if (tileCounts[TileID::sand] + tileCounts[TileID::pearlsand] > 2) {
         theme = Data::Variant::palm;
     } else if (
         tileCounts[TileID::leaf] > 2 ||

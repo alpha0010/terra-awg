@@ -307,6 +307,10 @@ void growTapRoot(double x, double y, int roomId, Random &rnd, World &world)
              TileID::hardenedSand,
              TileID::snow,
              TileID::ice,
+             TileID::hallowedGrass,
+             TileID::pearlstone,
+             TileID::pearlsand,
+             TileID::aetherium,
              TileID::copperOre,
              TileID::tinOre,
              TileID::ironOre,
@@ -324,6 +328,12 @@ void growTapRoot(double x, double y, int roomId, Random &rnd, World &world)
                 })) {
             return;
         }
+        bool isHallow = !world.regionPasses(
+            x,
+            anchorY,
+            room.getWidth(),
+            room.getHeight(),
+            [](Tile &tile) { return tile.blockID != TileID::pearlstone; });
         for (int hallX = std::min(x + doorI, anchorX);
              hallX < std::max(x + doorI, anchorX);
              ++hallX) {
@@ -339,6 +349,18 @@ void growTapRoot(double x, double y, int roomId, Random &rnd, World &world)
                 world.registerStorage(chestX, chestY),
                 rnd,
                 world);
+        }
+        if (isHallow) {
+            for (int i = 0; i < room.getWidth(); ++i) {
+                for (int j = 0; j < room.getHeight(); ++j) {
+                    Tile &tile = world.getTile(x + i, anchorY + j);
+                    if (tile.blockID == TileID::livingWood) {
+                        tile.blockID = TileID::pearlstone;
+                    } else if (tile.blockID == TileID::leaf) {
+                        tile.blockID = TileID::aetherium;
+                    }
+                }
+            }
         }
     });
 }

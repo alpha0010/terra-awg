@@ -349,6 +349,7 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
                 }
                 break;
             case TileID::stone:
+            case TileID::pearlstone:
                 if (y > world.getCavernLevel() &&
                     world.getTile(x, y - 1).liquid == Liquid::none &&
                     (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
@@ -797,9 +798,11 @@ void growGrass(int x, int y, Random &rnd, World &world)
             y - 1,
             rnd.getCoarseNoise(x, y) > 0 ? TileID::tallJunglePlant
                                          : TileID::junglePlant);
+        world.getTile(x, y - 1).blockPaint = world.getTile(x, y).blockPaint;
         break;
     case TileID::mushroomGrass:
         world.placeFramedTile(x, y - 1, TileID::mushroomPlant);
+        world.getTile(x, y - 1).blockPaint = world.getTile(x, y).blockPaint;
         break;
     }
 }

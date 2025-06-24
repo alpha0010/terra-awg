@@ -93,6 +93,7 @@ private:
                 Tile &tile = world.getTile(
                     topLeft.first + i + skewX * j,
                     topLeft.second + j + skewY * i);
+                tile.blockPaint = Paint::none;
                 if (i < wallThickness || j < wallThickness ||
                     width - i <= wallThickness || height - j <= wallThickness) {
                     if (tile.wallID != theme.brickWall) {
@@ -1042,6 +1043,7 @@ private:
                 if (tile.blockID != TileID::empty) {
                     constexpr auto grassMap = frozen::make_map<int, int>(
                         {{TileID::grass, TileID::dirt},
+                         {TileID::hallowedGrass, TileID::dirt},
                          {TileID::jungleGrass, TileID::mud}});
                     if (grassMap.contains(tile.blockID)) {
                         tile.blockID = grassMap.at(tile.blockID);
