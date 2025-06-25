@@ -7,7 +7,7 @@
 namespace Data
 {
 
-inline auto homes = std::views::iota(0, 5);
+inline auto homes = std::views::iota(0, 6);
 
 TileBuffer getHome(int homeId, const std::vector<bool> &framedTiles);
 

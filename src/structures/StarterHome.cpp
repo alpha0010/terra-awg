@@ -193,9 +193,10 @@ void placeHomeAt(
     constexpr auto grassToBlock = frozen::make_map<int, int>(
         {{TileID::ashGrass, TileID::ash},
          {TileID::grass, TileID::dirt},
+         {TileID::hallowedGrass, TileID::dirt},
          {TileID::jungleGrass, TileID::mud}});
     for (int i = 0; i < home.getWidth(); ++i) {
-        for (int j = home.getHeight() / 2; j < home.getHeight(); ++j) {
+        for (int j = 0; j < home.getHeight(); ++j) {
             Tile &homeTile = home.getTile(i, j);
             if (homeTile.blockID == TileID::cloud ||
                 (homeTile.blockID == TileID::empty &&
