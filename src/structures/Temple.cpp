@@ -14,8 +14,6 @@
 #include <iostream>
 #include <set>
 
-typedef std::pair<int, int> Point;
-
 template <typename Func> void iterateTemple(Point center, World &world, Func f)
 {
     int scanX = std::max<int>(0.029 * world.getWidth(), 128);

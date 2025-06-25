@@ -29,9 +29,11 @@ void growBamboo(int x, int y, Random &rnd, World &world)
         }
     }
     int bambooSize = rnd.getInt(3, 10);
+    int paint = world.getTile(x, y).blockPaint;
     for (int i = 0; i < bambooSize; ++i) {
         Tile &tile = world.getTile(x, y - i - 1);
         tile.blockID = TileID::bambooStalk;
+        tile.blockPaint = paint;
         if (i == 0) {
             tile.frameX = 18 * rnd.getInt(0, 4);
         } else if (i == bambooSize - 1) {

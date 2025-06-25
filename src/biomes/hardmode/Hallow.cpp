@@ -10,6 +10,23 @@
 #include "vendor/frozen/set.h"
 #include <iostream>
 
+template <typename Func>
+void iterateDiamond(int topHeight, int centerHeight, Func f)
+{
+    for (int i = 0; i < 2 * topHeight - 1; ++i) {
+        for (int j = std::abs(topHeight - i - 1); j < topHeight; ++j) {
+            f(i, j);
+        }
+        for (int j = 0; j < centerHeight; ++j) {
+            f(i, j + topHeight);
+        }
+        int maxJ = topHeight - 1 - std::abs(topHeight - i - 1);
+        for (int j = 0; j < maxJ; ++j) {
+            f(i, j + topHeight + centerHeight);
+        }
+    }
+}
+
 int selectHallowLocation(Random &rnd, World &world)
 {
     constexpr auto avoidTiles = frozen::make_set<int>({
@@ -62,6 +79,35 @@ int selectHallowLocation(Random &rnd, World &world)
             }
         }
         --scanDist;
+    }
+}
+
+void markForHallow(int centerX, Random &rnd, World &world)
+{
+    int scanDist = 0.07 * world.getWidth();
+    int numDiamonds = rnd.getInt(27, 31);
+    for (int iter = 0; iter < numDiamonds; ++iter) {
+        int topHeight = 25 + world.getWidth() * world.getHeight() /
+                                 rnd.getInt(76800, 230400);
+        int centerHeight = rnd.getInt(0.5 * topHeight, 1.5 * topHeight);
+        int x =
+            rnd.getInt(centerX - scanDist, centerX + scanDist - 2 * topHeight);
+        int y = rnd.getInt(
+            0.1 * world.getUndergroundLevel(),
+            world.getUnderworldLevel());
+        iterateDiamond(topHeight, centerHeight, [x, y, &world](int i, int j) {
+            world.getTile(x + i, y + j).wireRed = true;
+        });
+        x += 0.9 * topHeight;
+        y += 0.9 * topHeight + 0.45 * centerHeight;
+        if (y > world.getSurfaceLevel(x) - 50 && y < world.getHeight() - 100) {
+            iterateDiamond(
+                topHeight / 10,
+                centerHeight / 10,
+                [x, y, &world](int i, int j) {
+                    world.getTile(x + i, y + j).wireBlue = true;
+                });
+        }
     }
 }
 
@@ -157,9 +203,20 @@ void genHallow(Random &rnd, World &world)
     });
     int scanDist = 0.07 * world.getWidth();
     std::vector<std::pair<int, int>> erosion;
+    std::vector<std::pair<int, int>> hallowCores;
+    markForHallow(centerX, rnd, world);
     for (int x = centerX - scanDist; x < centerX + scanDist; ++x) {
         for (int y = 0; y < world.getHeight(); ++y) {
             Tile &tile = world.getTile(x, y);
+            if (!tile.wireRed) {
+                continue;
+            }
+            tile.wireRed = false;
+            if (tile.wireBlue) {
+                tile.wireBlue = false;
+                tile.blockID = TileID::crystalBlock;
+                hallowCores.emplace_back(x, y);
+            }
             auto blockItr = hallowBlocks.find(tile.blockID);
             if (blockItr != hallowBlocks.end()) {
                 tile.blockID = blockItr->second;
@@ -189,5 +246,17 @@ void genHallow(Random &rnd, World &world)
     }
     for (auto [x, y] : erosion) {
         world.getTile(x, y).blockID = TileID::empty;
+    }
+    erosion.clear();
+    for (auto [x, y] : hallowCores) {
+        if (std::abs(rnd.getFineNoise(2 * x, 2 * y)) > 0.09 &&
+            world.regionPasses(x - 1, y - 1, 3, 3, [](Tile &tile) {
+                return tile.blockID == TileID::crystalBlock;
+            })) {
+            erosion.emplace_back(x, y);
+        }
+    }
+    for (auto [x, y] : erosion) {
+        world.getTile(x, y).blockID = TileID::pearlstone;
     }
 }
