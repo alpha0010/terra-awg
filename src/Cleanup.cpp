@@ -71,6 +71,7 @@ Slope computeSlope(World &world, int x, int y)
         [[fallthrough]];
     case 0b00010110:
     case 0b00010111:
+    case 0b00110110:
         return Slope::topRight;
     case 0b11010100:
     case 0b11110100:
@@ -80,16 +81,19 @@ Slope computeSlope(World &world, int x, int y)
         [[fallthrough]];
     case 0b11010000:
     case 0b11110000:
+    case 0b11010001:
         return Slope::topLeft;
     case 0b00001011:
     case 0b00101011:
     case 0b00001111:
     case 0b00101111:
+    case 0b10001011:
         return Slope::bottomRight;
     case 0b01101000:
     case 0b11101000:
     case 0b01101001:
     case 0b11101001:
+    case 0b01101100:
         return Slope::bottomLeft;
     default:
         return Slope::none;

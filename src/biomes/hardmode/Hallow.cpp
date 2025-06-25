@@ -13,14 +13,14 @@
 template <typename Func>
 void iterateDiamond(int topHeight, int centerHeight, Func f)
 {
-    for (int i = 0; i < 2 * topHeight - 1; ++i) {
-        for (int j = std::abs(topHeight - i - 1); j < topHeight; ++j) {
+    for (int i = 0; i < 2 * topHeight; ++i) {
+        for (int j = std::abs(topHeight - i - 0.5); j < topHeight; ++j) {
             f(i, j);
         }
         for (int j = 0; j < centerHeight; ++j) {
             f(i, j + topHeight);
         }
-        int maxJ = topHeight - 1 - std::abs(topHeight - i - 1);
+        int maxJ = topHeight - std::abs(topHeight - i - 0.5);
         for (int j = 0; j < maxJ; ++j) {
             f(i, j + topHeight + centerHeight);
         }
