@@ -11,6 +11,7 @@
 #include "structures/LootRules.h"
 #include "structures/Traps.h"
 #include "structures/UndergroundCabin.h"
+#include "structures/data/Altars.h"
 #include "structures/data/JungleShrines.h"
 #include "vendor/frozen/map.h"
 #include "vendor/frozen/set.h"
@@ -291,6 +292,145 @@ void placeAltars(int maxBin, LocationBins &locations, Random &rnd, World &world)
             isPlacementCandidate(x - 1, y, world)) {
             world.placeFramedTile(x - 1, y - 2, TileID::altar, type);
             --altarCount;
+        }
+    }
+}
+
+Point selectPurityAltarLocation(
+    TileBuffer &altar,
+    int lavaLevel,
+    Random &rnd,
+    World &world)
+{
+    constexpr auto avoidTiles = frozen::make_set<int>(
+        {TileID::obsidianBrick,
+         TileID::hellstoneBrick,
+         TileID::ebonstoneBrick,
+         TileID::lesion,
+         TileID::crimstoneBrick,
+         TileID::flesh,
+         TileID::lamp,
+         TileID::blueBrick,
+         TileID::greenBrick,
+         TileID::pinkBrick});
+    int scanHeight = std::max<int>(1.5 * altar.getHeight(), 30);
+    int scanY = lavaLevel - scanHeight;
+    while (true) {
+        int x = rnd.getInt(150, world.getWidth() - 150 - altar.getWidth());
+        if (!world.regionPasses(
+                x,
+                scanY,
+                altar.getWidth(),
+                scanHeight,
+                [&avoidTiles](Tile &tile) {
+                    return !avoidTiles.contains(tile.blockID);
+                })) {
+            continue;
+        }
+        int y = lavaLevel;
+        for (int i : {1, 2, altar.getWidth() - 3, altar.getWidth() - 2}) {
+            y = std::min(
+                y,
+                scanWhileEmpty({x + i, scanY}, {0, 1}, world).second);
+        }
+        y += 2 - altar.getHeight();
+        return {x, y};
+    }
+}
+
+Point scanForAltarOffset(TileBuffer &altar)
+{
+    for (int i = 0; i < altar.getWidth(); ++i) {
+        for (int j = 0; j < altar.getHeight(); ++j) {
+            if (altar.getTile(i, j).blockID == TileID::altar) {
+                return {i, j};
+            }
+        }
+    }
+    return {-1, -1};
+}
+
+void placePurityAltars(Random &rnd, World &world)
+{
+    std::vector<int> altars;
+    if (world.conf.doubleTrouble) {
+        altars.insert(
+            altars.end(),
+            Data::corruptAltars.begin(),
+            Data::corruptAltars.end());
+        std::shuffle(altars.begin(), altars.end(), rnd.getPRNG());
+        altars.resize(4);
+        altars.insert(
+            altars.end(),
+            Data::crimsonAltars.begin(),
+            Data::crimsonAltars.end());
+        std::shuffle(altars.begin() + 4, altars.end(), rnd.getPRNG());
+        altars.resize(8);
+    } else {
+        if (world.isCrimson) {
+            altars.insert(
+                altars.end(),
+                Data::crimsonAltars.begin(),
+                Data::crimsonAltars.end());
+        } else {
+            altars.insert(
+                altars.end(),
+                Data::corruptAltars.begin(),
+                Data::corruptAltars.end());
+        }
+        std::shuffle(altars.begin(), altars.end(), rnd.getPRNG());
+        altars.resize(5);
+    }
+    int underworldHeight = world.getHeight() - world.getUnderworldLevel();
+    int lavaLevel = world.getUnderworldLevel() + 0.46 * underworldHeight;
+    for (size_t iter = 0; iter < altars.size(); ++iter) {
+        TileBuffer altar = Data::getAltar(altars[iter], world.getFramedTiles());
+        auto [x, y] = selectPurityAltarLocation(altar, lavaLevel, rnd, world);
+        world.placeBuffer(x, y, altar);
+        for (int i = 1; i < altar.getWidth() - 1; ++i) {
+            int fillTile =
+                world.getTile(x + i, y + altar.getHeight() - 2).blockID;
+            for (int j = 1; j < altar.getHeight() - 1; ++j) {
+                Tile &tile = world.getTile(x + i, y + j);
+                if ((tile.blockID == TileID::ebonstoneBrick ||
+                     tile.blockID == TileID::crimstoneBrick) &&
+                    fnv1a32pt(x + i, y + j) % 11 == 0) {
+                    tile.blockID = TileID::hellstoneBrick;
+                }
+            }
+            if (fillTile != TileID::ebonstoneBrick &&
+                fillTile != TileID::crimstoneBrick) {
+                continue;
+            }
+            int maxJ = altar.getHeight() + 30;
+            for (int j = altar.getHeight() - 1; j < maxJ; ++j) {
+                Tile &tile = world.getTile(x + i, y + j);
+                if (tile.blockID == TileID::empty) {
+                    tile.blockID = fnv1a32pt(x + i, y + j) % 7 == 0
+                                       ? TileID::hellstoneBrick
+                                       : fillTile;
+                    if (y + j == lavaLevel + 1) {
+                        maxJ = std::min<int>(
+                            maxJ,
+                            j + 6 + 5 * rnd.getFineNoise(x + i, lavaLevel));
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+        if (world.conf.hardmode && iter % 4 != 0) {
+            auto delta = scanForAltarOffset(altar);
+            x += delta.first;
+            y += delta.second;
+            int paint = world.getTile(x, y).frameX == 0 ? Paint::purple
+                                                        : Paint::deepRed;
+            world.placeFramedTile(x, y, TileID::largePileGroup2, Variant::ash);
+            for (int i = 0; i < 3; ++i) {
+                for (int j = 0; j < 2; ++j) {
+                    world.getTile(x + i, y + j).blockPaint = paint;
+                }
+            }
         }
     }
 }
@@ -1002,8 +1142,12 @@ LocationBins genTreasure(Random &rnd, World &world)
     placeJungleShrines(rnd, world);
     placeLifeCrystals(maxBin, flatLocations, rnd, world);
     placeFallenLogs(maxBin, flatLocations, rnd, world);
-    placeAltars(maxBin, flatLocations, rnd, world);
-    placeOrbHearts(maxBin, orbHeartLocations, rnd, world);
+    if (world.conf.purity) {
+        placePurityAltars(rnd, world);
+    } else {
+        placeAltars(maxBin, flatLocations, rnd, world);
+        placeOrbHearts(maxBin, orbHeartLocations, rnd, world);
+    }
     placeManaCrystals(maxBin, flatLocations, rnd, world);
     placeChests(maxBin, flatLocations, rnd, world);
     placePots(maxBin, flatLocations, rnd, world);

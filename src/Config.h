@@ -16,6 +16,7 @@ struct Config {
     bool home;
     int equipment;
     bool doubleTrouble;
+    bool purity;
     bool hardmode;
     bool patches;
     double patchesHumidity;

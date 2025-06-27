@@ -282,6 +282,15 @@ void doWorldGen(Random &rnd, World &world)
              Step::genSecondaryCrimson,
              Step::genSecondaryCorruption});
     }
+    if (world.conf.purity) {
+        world.surfaceEvilCenter = 0;
+        excludes.insert(
+            {Step::genCrimson,
+             Step::genCorruption,
+             Step::genSecondaryCrimson,
+             Step::genSecondaryCorruption,
+             Step::genHallow});
+    }
     if (!world.conf.hardmode) {
         excludes.insert({Step::genHardmodeOres, Step::genHallow});
     }

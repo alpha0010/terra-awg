@@ -44,7 +44,11 @@ home = false
 equipment = none
 
 # Include both evil biomes and all ore variants.
+# Activates "drunk world" secret seed.
 doubleTrouble = false
+
+# Only generate non-spreading biomes.
+purity = false
 
 # Start with hardmode activated.
 hardmode = false
@@ -476,6 +480,7 @@ Config readConfig(Random &rnd)
         false, // starterHome
         0,     // equipment
         false, // doubleTrouble
+        false, // purity
         false, // hardmode
         false, // patches
         0.0,   // patchesHumidity
@@ -510,6 +515,7 @@ Config readConfig(Random &rnd)
     conf.equipment =
         parseEquipment(reader.Get("variation", "equipment", "none"));
     READ_CONF_VALUE(variation, doubleTrouble, Boolean);
+    READ_CONF_VALUE(variation, purity, Boolean);
     READ_CONF_VALUE(variation, hardmode, Boolean);
     READ_CONF_VALUE(variation, patches, Boolean);
     READ_CONF_VALUE(variation, patchesHumidity, Real);
