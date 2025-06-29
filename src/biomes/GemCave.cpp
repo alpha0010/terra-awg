@@ -1,5 +1,6 @@
 #include "GemCave.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -65,7 +66,8 @@ void genGemCave(Random &rnd, World &world)
     int bandHeight =
         (world.getUnderworldLevel() - world.getUndergroundLevel()) /
         gemTypes.size();
-    int numCaves = world.getWidth() * world.getHeight() / 900000;
+    int numCaves =
+        world.conf.gems * world.getWidth() * world.getHeight() / 900000;
     for (size_t band = 0; band + 1 < gemTypes.size(); ++band) {
         for (int i = 0; i < numCaves; ++i) {
             auto [x, y] = findStoneCave(

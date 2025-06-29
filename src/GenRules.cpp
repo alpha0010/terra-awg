@@ -254,7 +254,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genHallow)
     case Step::initBiomeNoise:
         rnd.initBiomeNoise(
-            0.00097,
+            0.00097 / world.conf.patchesSize,
             world.conf.patchesHumidity,
             world.conf.patchesTemperature);
         break;

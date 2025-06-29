@@ -1,5 +1,6 @@
 #include "GraniteCave.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -9,7 +10,7 @@
 
 void fillGraniteCave(int centerX, int centerY, Random &rnd, World &world)
 {
-    double caveSize = rnd.getDouble(70, 150);
+    double caveSize = world.conf.graniteSize * rnd.getDouble(70, 150);
     int noiseShuffleX = rnd.getInt(0, world.getWidth());
     int noiseShuffleY = rnd.getInt(0, world.getHeight());
     constexpr auto bgOverrideExcl = frozen::make_set<int>(
@@ -96,7 +97,8 @@ void fillGraniteCave(int centerX, int centerY, Random &rnd, World &world)
 void genGraniteCave(Random &rnd, World &world)
 {
     std::cout << "Smoothing granite\n";
-    int numCaves = world.getWidth() * world.getHeight() / 2000000;
+    int numCaves =
+        world.conf.graniteFreq * world.getWidth() * world.getHeight() / 2000000;
     rnd.restoreShuffleState();
     for (int i = 0; i < numCaves; ++i) {
         auto [x, y] = findStoneCave(

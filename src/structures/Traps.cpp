@@ -150,8 +150,8 @@ void placeSandTraps(Random &rnd, World &world)
         maxX,
         world.getUnderworldLevel(),
         world.getUnderworldLevel());
-    int numSandTraps =
-        world.getWidth() * world.getHeight() / rnd.getInt(240000, 360000);
+    int numSandTraps = world.conf.traps * world.getWidth() * world.getHeight() /
+                       rnd.getInt(240000, 360000);
     constexpr auto validFloors = frozen::make_set<int>(
         {TileID::sand,
          TileID::hardenedSand,
@@ -225,7 +225,7 @@ bool isValidBoulderPlacement(int x, int y, World &world)
 
 Point selectBoulderLocation(Random &rnd, World &world)
 {
-    while (true) {
+    for (int tries = 0; tries < 50; ++tries) {
         int x = rnd.getInt(100, world.getWidth() - 100);
         int y = rnd.getInt(
             0.85 * world.getUndergroundLevel(),
@@ -237,15 +237,19 @@ Point selectBoulderLocation(Random &rnd, World &world)
             return {x + 2, y + 2};
         }
     }
+    return {-1, -1};
 }
 
 void placeBoulderTraps(Random &rnd, World &world)
 {
-    int numBoulders =
-        world.getWidth() * world.getHeight() / rnd.getInt(57600, 64000);
+    int numBoulders = world.conf.traps * world.getWidth() * world.getHeight() /
+                      rnd.getInt(57600, 64000);
     std::vector<Point> usedLocations;
-    while (numBoulders > 0) {
+    for (int tries = 5 * numBoulders; numBoulders > 0 && tries > 0; --tries) {
         auto [x, y] = selectBoulderLocation(rnd, world);
+        if (x == -1) {
+            continue;
+        }
         int trapFloor = y + 4;
         while (!world.regionPasses(x, trapFloor, 2, 3, [](Tile &tile) {
             return tile.blockID == TileID::empty;
@@ -317,8 +321,8 @@ void placeLavaTraps(Random &rnd, World &world)
         }
     }
     std::vector<Point> usedLocations;
-    double numLavaTraps =
-        world.getWidth() * world.getHeight() / rnd.getInt(164000, 230400);
+    double numLavaTraps = world.conf.traps * world.getWidth() *
+                          world.getHeight() / rnd.getInt(164000, 230400);
     while (numLavaTraps > 0) {
         auto [x, y] = rnd.select(locations);
         if (isLocationUsed(x, y, 15, usedLocations)) {
@@ -416,16 +420,17 @@ bool targetWithDartTraps(int x, int y, int maxTraps, Random &rnd, World &world)
 
 void placeDartTraps(Random &rnd, World &world)
 {
-    int numDartTraps =
-        world.getWidth() * world.getHeight() / rnd.getInt(209000, 256000);
+    int numDartTraps = world.conf.traps * world.getWidth() * world.getHeight() /
+                       rnd.getInt(209000, 256000);
     int scanDist = 0.12 * world.getWidth();
     while (numDartTraps > 0) {
         int bias = rnd.select({world.jungleCenter, world.snowCenter});
         int x = rnd.getInt(bias - scanDist, bias + scanDist);
         int y = rnd.getInt(
-            std::midpoint(
-                world.getSurfaceLevel(x),
-                world.getUndergroundLevel()),
+            world.conf.traps > 20 ? world.getSurfaceLevel(x) - 2
+                                  : std::midpoint(
+                                        world.getSurfaceLevel(x),
+                                        world.getUndergroundLevel()),
             world.getUnderworldLevel());
         y = scanWhileEmpty({x, y}, {0, 1}, world).second;
         if (y > world.getUnderworldLevel() ||

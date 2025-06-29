@@ -122,8 +122,8 @@ bool attachGemTo(Gem gem, int x, int y, Random &rnd, World &world)
 
 void placeGems(Random &rnd, World &world)
 {
-    int numGems =
-        world.getWidth() * world.getHeight() / rnd.getInt(65800, 76800);
+    int numGems = world.conf.gems * world.getWidth() * world.getHeight() /
+                  rnd.getInt(65800, 76800);
     int scanDist = 0.08 * world.getWidth();
     int minX = world.conf.patches ? 350 : world.desertCenter - scanDist;
     int maxX = world.conf.patches ? world.getWidth() - 350
@@ -217,7 +217,12 @@ void placeLifeCrystals(
                 continue;
             } else {
                 usedLocations.emplace_back(x, y);
-                world.placeFramedTile(x, y - 2, TileID::lifeCrystal);
+                double threshold = 0.0088 * world.conf.traps - 0.076;
+                world.placeFramedTile(
+                    x,
+                    y - 2,
+                    rnd.getDouble(0, 1) < threshold ? TileID::lifeCrystalBoulder
+                                                    : TileID::lifeCrystal);
             }
             --lifeCrystalCount;
         }
@@ -1017,16 +1022,23 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
             world.getTile(x, y).blockID == TileID::ash) {
             continue;
         } else if (
-            (type == Variant::gold || (type == Variant::richMahogany &&
-                                       y > std::midpoint(
-                                               world.getUndergroundLevel(),
-                                               world.getCavernLevel()))) &&
-            static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 37 < 9) {
-            origType = type;
-            type = Variant::deadMans;
+            type == Variant::gold || (type == Variant::richMahogany &&
+                                      y > std::midpoint(
+                                              world.getUndergroundLevel(),
+                                              world.getCavernLevel()))) {
+            int threshold = std::lerp(0, 220, world.conf.traps);
+            if (type == Variant::richMahogany) {
+                threshold = std::min(300, threshold);
+            }
+            if (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 907 <
+                threshold) {
+                origType = type;
+                type = Variant::deadMans;
+            }
         }
         usedLocations.emplace_back(x, y);
-        if (type == Variant::gold) {
+        if (type == Variant::gold ||
+            (origType == Variant::gold && world.conf.traps > 1.8)) {
             maybePlaceCabinForChest(x, y, rnd, world);
         }
         placeChest(x, y, type, origType, rnd, world);

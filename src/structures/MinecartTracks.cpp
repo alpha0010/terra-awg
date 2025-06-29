@@ -104,14 +104,20 @@ inline constexpr auto trackClearTiles = frozen::make_set<int>({
     TileID::chlorophyteOre,
 });
 
-std::vector<Point> planTrack(Random &rnd, World &world)
+std::vector<Point> planTrack(double lengthScale, Random &rnd, World &world)
 {
     Point pos{
         rnd.getInt(0, world.getWidth()),
         rnd.getInt(world.getUndergroundLevel(), world.getUnderworldLevel())};
     Point delta{rnd.select({-1, 1}), 0};
-    int maxLen = rnd.getInt(world.getWidth() / 26, world.getWidth() / 4.2);
-    size_t minLen = std::min(120 + world.getWidth() / 70, maxLen - 10);
+    int hardMaxLen = world.getWidth() / 4.2;
+    int maxLen = std::min(
+        std::max<int>(
+            lengthScale * rnd.getDouble(world.getWidth() / 26, hardMaxLen),
+            20),
+        hardMaxLen);
+    size_t minLen =
+        std::min<int>(lengthScale * (120 + world.getWidth() / 70), maxLen - 10);
     int minY = 0.8 * world.getUndergroundLevel();
     int maxY = 0.2 * world.getHeight() + 0.8 * world.getUnderworldLevel();
     std::vector<Point> track;
@@ -219,8 +225,17 @@ void genTracks(Random &rnd, World &world)
     rnd.shuffleNoise();
     int numTracks = world.conf.minecartTracks * world.getWidth() *
                     world.getHeight() / rnd.getInt(640000, 960000);
-    while (numTracks > 0) {
-        auto track = planTrack(rnd, world);
+    int maxTries = 5000 * numTracks;
+    for (int tries = 0; numTracks > 0 && tries < maxTries; ++tries) {
+        auto track = planTrack(
+            world.conf.minecartLength > 1.0
+                ? std::lerp(
+                      world.conf.minecartLength,
+                      1.0,
+                      static_cast<double>(tries) / maxTries)
+                : world.conf.minecartLength,
+            rnd,
+            world);
         if (track.empty()) {
             continue;
         }

@@ -1,5 +1,6 @@
 #include "biomes/patches/Hive.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -29,7 +30,9 @@ void genHivePatches(Random &rnd, World &world)
 {
     std::cout << "Importing bees\n";
     double numHives =
-        1 + rnd.getDouble(0, world.getWidth() * world.getHeight() / 5750000.0);
+        world.conf.hiveFreq *
+        (1 +
+         rnd.getDouble(0, world.getWidth() * world.getHeight() / 5750000.0));
     while (numHives > 0) {
         auto [x, y] = selectHiveLocation(rnd, world);
         if (x == -1) {

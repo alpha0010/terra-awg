@@ -61,6 +61,9 @@ patches = false
 patchesHumidity = 0.0
 patchesTemperature = 0.0
 
+# How rapidly to transition biomes for biome patches.
+patchesSize = 1.0
+
 # Placement frequency multipliers. 0.5 means half the
 # normal amount, 2.0 means double the normal amount.
 ore = 1.0
@@ -68,8 +71,19 @@ lifeCrystals = 1.0
 manaCrystals = 1.0
 pots = 1.0
 chests = 1.0
+gems = 1.0
+traps = 1.0
 clouds = 1.0
 minecartTracks = 1.0
+minecartLength = 1.0
+marbleFreq = 1.0
+marbleSize = 1.0
+graniteFreq = 1.0
+graniteSize = 1.0
+glowingMushroomFreq = 1.0
+glowingMushroomSize = 1.0
+hiveFreq = 1.0
+hiveSize = 1.0
 
 [extra]
 # Output a map preview image.
@@ -485,13 +499,25 @@ Config readConfig(Random &rnd)
         false, // patches
         0.0,   // patchesHumidity
         0.0,   // patchesTemperature
+        1.0,   // patchesSize
         1.0,   // ore
         1.0,   // lifeCrystals
         1.0,   // manaCrystals
         1.0,   // pots
         1.0,   // chests
+        1.0,   // gems
+        1.0,   // traps
         1.0,   // clouds
         1.0,   // minecartTracks
+        1.0,   // minecartLength
+        1.0,   // marbleFreq
+        1.0,   // marbleSize
+        1.0,   // graniteFreq
+        1.0,   // graniteSize
+        1.0,   // glowingMushroomFreq
+        1.0,   // glowingMushroomSize
+        1.0,   // hiveFreq
+        1.0,   // hiveSize
         true}; // map
     if (!std::filesystem::exists(confName)) {
         std::ofstream out(confName, std::ios::out);
@@ -520,13 +546,25 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, patches, Boolean);
     READ_CONF_VALUE(variation, patchesHumidity, Real);
     READ_CONF_VALUE(variation, patchesTemperature, Real);
+    READ_CONF_VALUE(variation, patchesSize, Real);
     READ_CONF_VALUE(variation, ore, Real);
     READ_CONF_VALUE(variation, lifeCrystals, Real);
     READ_CONF_VALUE(variation, manaCrystals, Real);
     READ_CONF_VALUE(variation, pots, Real);
     READ_CONF_VALUE(variation, chests, Real);
+    READ_CONF_VALUE(variation, gems, Real);
+    READ_CONF_VALUE(variation, traps, Real);
     READ_CONF_VALUE(variation, clouds, Real);
     READ_CONF_VALUE(variation, minecartTracks, Real);
+    READ_CONF_VALUE(variation, minecartLength, Real);
+    READ_CONF_VALUE(variation, marbleFreq, Real);
+    READ_CONF_VALUE(variation, marbleSize, Real);
+    READ_CONF_VALUE(variation, graniteFreq, Real);
+    READ_CONF_VALUE(variation, graniteSize, Real);
+    READ_CONF_VALUE(variation, glowingMushroomFreq, Real);
+    READ_CONF_VALUE(variation, glowingMushroomSize, Real);
+    READ_CONF_VALUE(variation, hiveFreq, Real);
+    READ_CONF_VALUE(variation, hiveSize, Real);
     READ_CONF_VALUE(extra, map, Boolean);
     return conf;
 }

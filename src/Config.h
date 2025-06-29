@@ -21,13 +21,25 @@ struct Config {
     bool patches;
     double patchesHumidity;
     double patchesTemperature;
+    double patchesSize;
     double ore;
     double lifeCrystals;
     double manaCrystals;
     double pots;
     double chests;
+    double gems;
+    double traps;
     double clouds;
     double minecartTracks;
+    double minecartLength;
+    double marbleFreq;
+    double marbleSize;
+    double graniteFreq;
+    double graniteSize;
+    double glowingMushroomFreq;
+    double glowingMushroomSize;
+    double hiveFreq;
+    double hiveSize;
     bool map;
 
     std::string getFilename() const;

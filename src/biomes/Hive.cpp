@@ -1,5 +1,6 @@
 #include "Hive.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -84,7 +85,8 @@ Point selectLarvaeLocation(
 void fillHive(int hiveX, int hiveY, Random &rnd, World &world)
 {
     rnd.shuffleNoise();
-    double size = 15 + world.getWidth() / rnd.getDouble(84, 166);
+    double size =
+        world.conf.hiveSize * (15 + world.getWidth() / rnd.getDouble(84, 166));
     for (int x = hiveX - size; x < hiveX + size; ++x) {
         for (int y = hiveY - size; y < hiveY + size; ++y) {
             auto [centroidX, centroidY] = getHexCentroid(x, y);
@@ -173,7 +175,8 @@ void genHive(Random &rnd, World &world)
 {
     std::cout << "Importing bees\n";
     int bonusHives = world.getWidth() * world.getHeight() / 5750000;
-    int numHives = bonusHives > 0 ? 2 + rnd.getInt(0, bonusHives) : 2;
+    int numHives = world.conf.hiveFreq *
+                   (bonusHives > 0 ? 2 + rnd.getDouble(0, bonusHives) : 2);
     for (int i = 0; i < numHives; ++i) {
         fillHive(
             rnd.getInt(

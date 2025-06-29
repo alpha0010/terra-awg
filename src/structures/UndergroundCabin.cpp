@@ -1,5 +1,6 @@
 #include "structures/UndergroundCabin.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
@@ -257,7 +258,7 @@ void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
         break;
     }
     addCabinDebris(locations, world);
-    if (trap.first != -1 && rnd.getDouble(0, 1) < 0.2) {
+    if (trap.first != -1 && rnd.getDouble(0, 1) < 0.2 * world.conf.traps) {
         world.queuedTraps.emplace_back(
             [chestX, chestY, trap](Random &, World &world) {
                 world.placeFramedTile(

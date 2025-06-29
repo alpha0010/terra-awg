@@ -345,7 +345,9 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
             case TileID::hardenedSand:
             case TileID::sandstone:
                 if (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
-                        11 ==
+                        std::max<int>(
+                            11 / std::max(world.conf.traps, 0.1),
+                            2) ==
                     0) {
                     growRollingCactus(x, y, world);
                 }
@@ -670,11 +672,14 @@ bool placeGeyser(int x, int y, World &world)
     int lavaLevel =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     if (y > lavaLevel && isRegionEmpty(x, y - 3, 2, 3, world) &&
-        world.regionPasses(x, y, 2, 1, [](Tile &tile) {
+        world.regionPasses(x, y, 2, 1, [&world](Tile &tile) {
             return tile.slope == Slope::none &&
                    (tile.blockID == TileID::ash ||
                     tile.blockID == TileID::jungleGrass ||
-                    tile.blockID == TileID::stone);
+                    tile.blockID == TileID::stone ||
+                    (tile.blockID == TileID::obsidianBrick &&
+                     tile.wallID != WallID::Unsafe::obsidianBrick &&
+                     world.conf.traps > 20));
         })) {
         world.placeFramedTile(x, y - 1, TileID::geyser);
         return true;
@@ -756,7 +761,9 @@ void growGrass(int x, int y, Random &rnd, World &world)
         placeLargePile(x, y, world)) {
         return;
     }
-    if (randInt % 131 == 0 && placeGeyser(x, y, world)) {
+    if (randInt % std::max<int>(131 / std::max(world.conf.traps, 0.1), 7) ==
+            0 &&
+        placeGeyser(x, y, world)) {
         return;
     }
     if (baseTile.blockID == TileID::grass && randInt % 3 == 0 &&

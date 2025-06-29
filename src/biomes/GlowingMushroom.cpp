@@ -55,6 +55,12 @@ void fillMushroomField(
                         tile.wallID = WallID::Unsafe::mushroom;
                     }
                     break;
+                case TileID::grass:
+                    tile.blockID = TileID::mushroomGrass;
+                    if (tile.wallID != WallID::empty) {
+                        tile.wallID = WallID::Unsafe::mushroom;
+                    }
+                    break;
                 case TileID::stone:
                 case TileID::clay:
                 case TileID::sand:
@@ -85,9 +91,19 @@ void fillMushroomField(
 void genGlowingMushroom(Random &rnd, World &world)
 {
     std::cout << "Fertilizing glowing mushrooms\n";
-    int numFields = std::max(world.getWidth() * world.getHeight() / 3388000, 2);
-    int buffer = 0.06 * world.getWidth();
-    while (numFields > 0) {
+    int numFields = std::max<int>(
+        world.conf.glowingMushroomFreq * world.getWidth() * world.getHeight() /
+            3388000,
+        2);
+    int maxTries = numFields * 2500;
+    for (int tries = 0; numFields > 0 && tries < maxTries; ++tries) {
+        int buffer = (world.conf.glowingMushroomSize > 1.0
+                          ? std::lerp(
+                                world.conf.glowingMushroomSize,
+                                1.0,
+                                static_cast<double>(tries) / maxTries)
+                          : world.conf.glowingMushroomSize) *
+                     0.06 * world.getWidth();
         int centerX = world.getWidth() * rnd.getDouble(0.05, 0.95);
         int fieldFloor =
             rnd.getInt(world.getCavernLevel(), world.getUnderworldLevel() - 50);

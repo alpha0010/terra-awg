@@ -24,6 +24,8 @@ uint64_t getBinaryTime()
 
 void saveWorldFile(Config &conf, Random &rnd, World &world)
 {
+    bool isNoTrapsSeed = !conf.doubleTrouble && conf.traps > 20;
+
     Writer w(conf.getFilename() + ".wld");
     w.putUint32(279); // File format version.
     w.write("relogic", 7);
@@ -59,7 +61,7 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     w.putBool(false);                              // The constant.
     w.putBool(false);                              // Not the bees.
     w.putBool(false);                              // Don't dig up.
-    w.putBool(false);                              // No traps.
+    w.putBool(isNoTrapsSeed);                      // No traps.
     w.putBool(false);                              // Get fixed boi.
     w.putUint64(getBinaryTime());                  // Creation time.
     w.putUint8(rnd.getInt(0, 8));                  // Moon type.

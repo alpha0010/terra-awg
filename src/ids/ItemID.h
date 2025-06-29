@@ -323,6 +323,7 @@ enum {
     loveIsInTheTrashSlot = 5255,
     seeTheWorldForWhatItIs = 5258,
     mushroomTorch = 5293,
+    gasTrap = 5346,
     aetherTorch = 5353,
     eyeOfTheSun = 5388,
 };

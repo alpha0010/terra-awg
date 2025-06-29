@@ -1,5 +1,6 @@
 #include "MarbleCave.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -8,8 +9,8 @@
 
 void fillMarbleCave(int x, int y, Random &rnd, World &world)
 {
-    double caveWidth = rnd.getDouble(70, 150);
-    double caveHeight = rnd.getDouble(40, 70);
+    double caveWidth = world.conf.marbleSize * rnd.getDouble(70, 150);
+    double caveHeight = world.conf.marbleSize * rnd.getDouble(40, 70);
     rnd.shuffleNoise();
     fillLargeWallGaps(
         {x - 0.7 * caveWidth, y - 0.7 * caveHeight},
@@ -63,7 +64,8 @@ void fillMarbleCave(int x, int y, Random &rnd, World &world)
 void genMarbleCave(Random &rnd, World &world)
 {
     std::cout << "Excavating marble\n";
-    int numCaves = world.getWidth() * world.getHeight() / 1200000;
+    int numCaves =
+        world.conf.marbleFreq * world.getWidth() * world.getHeight() / 1200000;
     for (int i = 0; i < numCaves; ++i) {
         auto [x, y] = findStoneCave(
             (world.getUndergroundLevel() + world.getCavernLevel()) / 2,
