@@ -76,7 +76,7 @@ void fillLoot(
 
 std::pair<double, Item> getGlobalItemPrimary(Random &rnd, World &world)
 {
-    if (world.conf.traps > 20) {
+    if (world.conf.traps > 14) {
         if (world.conf.doubleTrouble) {
             return {
                 0.117,

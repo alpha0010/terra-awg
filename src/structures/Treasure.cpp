@@ -217,7 +217,9 @@ void placeLifeCrystals(
                 continue;
             } else {
                 usedLocations.emplace_back(x, y);
-                double threshold = 0.0088 * world.conf.traps - 0.076;
+                double threshold = world.conf.traps > 14
+                                       ? 0.0076 * world.conf.traps + 0.036
+                                       : 0;
                 world.placeFramedTile(
                     x,
                     y - 2,
@@ -722,6 +724,7 @@ Variant getChestType(int x, int y, World &world)
          {TileID::crimsonIce, Variant::flesh},
          {TileID::crimsandstone, Variant::flesh},
          {TileID::hardenedCrimsand, Variant::flesh},
+         {TileID::flesh, Variant::flesh},
          {TileID::snow, Variant::frozen},
          {TileID::ice, Variant::frozen},
          {TileID::thinIce, Variant::frozen},

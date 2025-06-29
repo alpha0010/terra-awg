@@ -72,6 +72,7 @@ manaCrystals = 1.0
 pots = 1.0
 chests = 1.0
 gems = 1.0
+# Activates "no traps" secret seed when greater than 15.
 traps = 1.0
 clouds = 1.0
 minecartTracks = 1.0

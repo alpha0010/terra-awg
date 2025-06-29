@@ -4,6 +4,7 @@
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
+#include "ids/WallID.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
 #include <iostream>
@@ -120,7 +121,10 @@ void placeSandTraps(Random &rnd, World &world)
     LocationBins locations;
     for (int x = minX; x < maxX; ++x) {
         int fallingCount = 0;
-        for (int y = world.getUndergroundLevel();
+        for (int y = world.conf.traps > 14 ? std::midpoint(
+                                                 world.getSurfaceLevel(x),
+                                                 world.getUndergroundLevel())
+                                           : world.getUndergroundLevel();
              y < world.getUnderworldLevel();
              ++y) {
             Tile &tile = world.getTile(x, y);
@@ -167,6 +171,7 @@ void placeSandTraps(Random &rnd, World &world)
          TileID::pearlsandstone});
     constexpr auto looseBlocks = frozen::make_set<int>(
         {TileID::sand, TileID::ebonsand, TileID::crimsand, TileID::pearlsand});
+    std::vector<Point> usedLocations;
     for (int tries = 50 * numSandTraps; numSandTraps > 0 && tries > 0;
          --tries) {
         int binId = rnd.getInt(minBin, maxBin);
@@ -176,10 +181,12 @@ void placeSandTraps(Random &rnd, World &world)
         auto [x, y] = rnd.select(locations[binId]);
         int trapFloor = scanWhileEmpty({x, y}, {0, 1}, world).second;
         if (trapFloor - y < 4 ||
-            !validFloors.contains(world.getTile(x, trapFloor + 1).blockID)) {
+            !validFloors.contains(world.getTile(x, trapFloor + 1).blockID) ||
+            isLocationUsed(x, trapFloor, 3, usedLocations)) {
             continue;
         }
         placePressurePlate(x, trapFloor, true, world);
+        usedLocations.emplace_back(x, trapFloor);
         placeWire({x, trapFloor}, {x, y - 1}, Wire::red, world);
         Point prevActuator{-1, -1};
         for (int i = -5; i < 5; ++i) {
@@ -207,7 +214,7 @@ void placeSandTraps(Random &rnd, World &world)
     }
 }
 
-bool isValidBoulderPlacement(int x, int y, World &world)
+bool isValidBoulderPlacement(int x, int y, bool allowMud, World &world)
 {
     constexpr auto validTiles = frozen::make_set<int>(
         {TileID::crimstone,
@@ -216,8 +223,11 @@ bool isValidBoulderPlacement(int x, int y, World &world)
          TileID::sandstone,
          TileID::slime,
          TileID::stone});
-    return world.regionPasses(x, y, 6, 6, [&validTiles](Tile &tile) {
-        return !tile.guarded && validTiles.contains(tile.blockID);
+    return world.regionPasses(x, y, 6, 6, [allowMud, &validTiles](Tile &tile) {
+        return !tile.guarded &&
+               (validTiles.contains(tile.blockID) ||
+                (allowMud && (tile.blockID == TileID::mud ||
+                              tile.blockID == TileID::mushroomGrass)));
     }) && world.regionPasses(x + 2, y + 6, 2, 1, [](Tile &tile) {
         return tile.blockID != TileID::empty;
     });
@@ -225,13 +235,14 @@ bool isValidBoulderPlacement(int x, int y, World &world)
 
 Point selectBoulderLocation(Random &rnd, World &world)
 {
+    bool allowMud = rnd.getDouble(0, 1) < 0.0053 * world.conf.traps - 0.0265;
     for (int tries = 0; tries < 50; ++tries) {
         int x = rnd.getInt(100, world.getWidth() - 100);
         int y = rnd.getInt(
             0.85 * world.getUndergroundLevel(),
             world.getUnderworldLevel() - 100);
-        if (isValidBoulderPlacement(x, y, world)) {
-            while (isValidBoulderPlacement(x, y + 1, world)) {
+        if (isValidBoulderPlacement(x, y, allowMud, world)) {
+            while (isValidBoulderPlacement(x, y + 1, allowMud, world)) {
                 ++y;
             }
             return {x + 2, y + 2};
@@ -272,11 +283,14 @@ void placeBoulderTraps(Random &rnd, World &world)
         }
         usedLocations.emplace_back(x, y);
         int probeTileId = world.getTile(x, y).blockID;
+        int probeWallId = world.getTile(x, y).wallID;
         world.placeFramedTile(
             x,
             y,
             probeTileId == TileID::sandstone ? TileID::rollingCactus
-            : probeTileId == TileID::slime || probeTileId == TileID::pinkSlime
+            : probeTileId == TileID::slime ||
+                    probeTileId == TileID::pinkSlime ||
+                    probeWallId == WallID::Unsafe::mushroom
                 ? TileID::bouncyBoulder
                 : TileID::boulder);
         for (int i = -2; i < 4; ++i) {
@@ -427,7 +441,7 @@ void placeDartTraps(Random &rnd, World &world)
         int bias = rnd.select({world.jungleCenter, world.snowCenter});
         int x = rnd.getInt(bias - scanDist, bias + scanDist);
         int y = rnd.getInt(
-            world.conf.traps > 20 ? world.getSurfaceLevel(x) - 2
+            world.conf.traps > 14 ? world.getSurfaceLevel(x) - 2
                                   : std::midpoint(
                                         world.getSurfaceLevel(x),
                                         world.getUndergroundLevel()),

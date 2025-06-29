@@ -539,8 +539,10 @@ private:
 
     void addDartTraps(const std::vector<Point> &locations)
     {
-        int numTraps =
-            world.getWidth() * world.getHeight() / rnd.getInt(384000, 576000);
+        int numTraps = (world.conf.traps > 1 ? 1 + world.conf.traps / 25
+                                             : world.conf.traps) *
+                       world.getWidth() * world.getHeight() /
+                       rnd.getInt(384000, 576000);
         while (numTraps > 0) {
             auto [x, y] = rnd.select(locations);
             if (!isValidPlacementLocation(x, y, 1, 4, true)) {
@@ -577,6 +579,43 @@ private:
             tile.blockID = TileID::pressurePlate;
             tile.frameY = 36;
             --numTraps;
+        }
+    }
+
+    void addBoulderTraps(int dungeonCenter, int dungeonWidth)
+    {
+        int numBoulders =
+            world.conf.traps * world.getWidth() * world.getHeight() / 70560000;
+        if (numBoulders <= 0) {
+            return;
+        }
+        std::vector<Point> locations;
+        for (int x = dungeonCenter - dungeonWidth;
+             x < dungeonCenter + dungeonWidth + 2 * roomSize;
+             ++x) {
+            for (int y = world.getUndergroundLevel();
+                 y < world.getUnderworldLevel();
+                 ++y) {
+                if (world.regionPasses(x - 2, y, 6, 4, [this](Tile &tile) {
+                        return tile.blockID == theme.crackedBrick;
+                    })) {
+                    locations.emplace_back(x, y);
+                }
+            }
+        }
+        std::shuffle(locations.begin(), locations.end(), rnd.getPRNG());
+        for (auto [x, y] : locations) {
+            if (!world.regionPasses(x - 3, y - 4, 8, 10, [this](Tile &tile) {
+                    return tile.blockID == theme.crackedBrick ||
+                           tile.blockID == theme.brick;
+                })) {
+                continue;
+            }
+            world.placeFramedTile(x, y, TileID::bouncyBoulder);
+            --numBoulders;
+            if (numBoulders <= 0) {
+                break;
+            }
         }
     }
 
@@ -1009,6 +1048,7 @@ private:
                     std::abs(rnd.getFineNoise(x + 2 * i, y + 2 * j)) <
                         0.1 - 0.1 * j / entry.getHeight()) {
                     if (world.conf.doubleTrouble) {
+                        tile.wallID = WallID::Safe::mudstoneBrick;
                         tile.wallPaint = theme.paint;
                     } else {
                         tile.wallID = WallID::Unsafe::craggyStone;
@@ -1150,8 +1190,7 @@ private:
         }
         if (tile.wallID == theme.brickWall || tile.wallID == theme.slabWall ||
             tile.wallID == theme.tiledWall) {
-            tile.wallPaint =
-                tile.wallPaint == theme.paint ? Paint::none : theme.paint;
+            tile.wallPaint = theme.paint;
             if (tile.blockID == TileID::pressurePlate ||
                 tile.blockID == TileID::trap) {
                 tile.blockPaint = theme.paint;
@@ -1233,6 +1272,7 @@ public:
         addShelves(dungeonCenter, dungeonWidth);
         addFunctionalFurniture(dungeonCenter, dungeonWidth);
         addSpikes(zones);
+        addBoulderTraps(dungeonCenter, dungeonWidth);
         makeEntry();
         addPaintings(dungeonCenter, dungeonWidth);
         addFurniture(dungeonCenter, dungeonWidth);

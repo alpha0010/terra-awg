@@ -24,7 +24,7 @@ uint64_t getBinaryTime()
 
 void saveWorldFile(Config &conf, Random &rnd, World &world)
 {
-    bool isNoTrapsSeed = !conf.doubleTrouble && conf.traps > 20;
+    bool isNoTrapsSeed = !conf.doubleTrouble && conf.traps > 14;
 
     Writer w(conf.getFilename() + ".wld");
     w.putUint32(279); // File format version.

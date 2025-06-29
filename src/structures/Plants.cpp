@@ -679,7 +679,7 @@ bool placeGeyser(int x, int y, World &world)
                     tile.blockID == TileID::stone ||
                     (tile.blockID == TileID::obsidianBrick &&
                      tile.wallID != WallID::Unsafe::obsidianBrick &&
-                     world.conf.traps > 20));
+                     world.conf.traps > 14));
         })) {
         world.placeFramedTile(x, y - 1, TileID::geyser);
         return true;
