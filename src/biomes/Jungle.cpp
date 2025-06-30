@@ -1,5 +1,6 @@
 #include "Jungle.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
@@ -201,15 +202,18 @@ void genJungle(Random &rnd, World &world)
 {
     std::cout << "Generating jungle\n";
     rnd.shuffleNoise();
-    double center =
-        world.jungleCenter + rnd.getDouble(-0.05, 0.05) * world.getWidth();
-    double scanDist = rnd.getDouble(0.03, 0.035) * world.getWidth();
+    double islandScale = world.conf.jungleSize > 1
+                             ? std::sqrt(world.conf.jungleSize)
+                             : world.conf.jungleSize;
+    double center = world.jungleCenter +
+                    islandScale * rnd.getDouble(-0.05, 0.05) * world.getWidth();
+    double scanDist =
+        islandScale * rnd.getDouble(0.03, 0.035) * world.getWidth();
     levitateIslands(center - scanDist, center + scanDist, rnd, world);
 
     center = world.jungleCenter;
-    scanDist = 0.11 * world.getWidth();
-    std::map<int, int> surfaceJungleWalls{
-        {WallID::Safe::cloud, WallID::Safe::cloud}};
+    scanDist = world.conf.jungleSize * 0.11 * world.getWidth();
+    std::map<int, int> surfaceJungleWalls;
     for (int wallId : WallVariants::dirt) {
         surfaceJungleWalls[wallId] = rnd.select(
             {WallID::Unsafe::jungle,
@@ -222,14 +226,15 @@ void genJungle(Random &rnd, World &world)
     }
     parallelFor(
         std::views::iota(
-            static_cast<int>(center - scanDist),
-            static_cast<int>(center + scanDist)),
+            std::max<int>(center - scanDist, 0),
+            std::min<int>(center + scanDist, world.getWidth())),
         [center, &surfaceJungleWalls, &undergroundJungleWalls, &rnd, &world](
             int x) {
             int lastTileID = TileID::empty;
             for (int y = 0; y < world.getHeight(); ++y) {
                 double threshold =
-                    std::abs(x - center) / 100.0 - (world.getWidth() / 1050.0);
+                    std::abs(x - center) / 100.0 -
+                    (world.conf.jungleSize * world.getWidth() / 1050.0);
                 if (rnd.getCoarseNoise(x, y) < threshold) {
                     continue;
                 }
@@ -254,10 +259,17 @@ void genJungle(Random &rnd, World &world)
                     }
                 }
                 switch (tile.blockID) {
+                case TileID::ice:
+                case TileID::sandstone:
+                    if (rnd.getFineNoise(x, y) > -0.02) {
+                        break;
+                    }
+                    [[fallthrough]];
                 case TileID::dirt:
                 case TileID::stone:
-                    threshold = std::abs(x - center) / 260.0 -
-                                (world.getWidth() / 2700.0);
+                    threshold =
+                        std::abs(x - center) / 260.0 -
+                        (world.conf.jungleSize * world.getWidth() / 2700.0);
                     if (rnd.getFineNoise(x, y) > threshold) {
                         tile.blockID = world.isExposed(x, y)
                                            ? TileID::jungleGrass
@@ -279,6 +291,9 @@ void genJungle(Random &rnd, World &world)
                 case TileID::smoothMarble:
                     tile.blockID = TileID::silt;
                     break;
+                case TileID::snow:
+                    tile.blockID = TileID::slush;
+                    break;
                 case TileID::mud:
                     tile.blockID = TileID::stone;
                     break;
@@ -290,7 +305,10 @@ void genJungle(Random &rnd, World &world)
                 }
                 if (y < world.getUndergroundLevel()) {
                     if (tile.blockID == TileID::empty) {
-                        tile.wallID = surfaceJungleWalls[tile.wallID];
+                        auto itr = surfaceJungleWalls.find(tile.wallID);
+                        if (itr != surfaceJungleWalls.end()) {
+                            tile.wallID = itr->second;
+                        }
                     } else if (
                         tile.wallID != WallID::Unsafe::livingWood &&
                         tile.wallID != WallID::Safe::livingLeaf) {

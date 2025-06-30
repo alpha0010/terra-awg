@@ -1,5 +1,6 @@
 #include "Snow.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
@@ -12,7 +13,7 @@ void genSnow(Random &rnd, World &world)
     std::cout << "Freezing land\n";
     rnd.shuffleNoise();
     double center = world.snowCenter;
-    double scanDist = 0.08 * world.getWidth();
+    double scanDist = world.conf.snowSize * 0.08 * world.getWidth();
     double snowFloor =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     std::map<int, int> snowWalls{{WallID::Safe::cloud, WallID::Safe::cloud}};
@@ -26,12 +27,13 @@ void genSnow(Random &rnd, World &world)
     }
     parallelFor(
         std::views::iota(
-            static_cast<int>(center - scanDist),
-            static_cast<int>(center + scanDist)),
+            std::max<int>(center - scanDist, 0),
+            std::min<int>(center + scanDist, world.getWidth())),
         [center, snowFloor, &snowWalls, &rnd, &world](int x) {
             for (int y = 0; y < world.getUnderworldLevel(); ++y) {
                 double threshold = std::max(
-                    std::abs(x - center) / 100.0 - (world.getWidth() / 1700.0),
+                    std::abs(x - center) / 100.0 -
+                        (world.conf.snowSize * world.getWidth() / 1700.0),
                     15 * (y - snowFloor) / world.getHeight());
                 if (rnd.getCoarseNoise(x, y) < threshold) {
                     continue;

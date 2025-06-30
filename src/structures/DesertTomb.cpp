@@ -24,12 +24,15 @@ Point selectTombLocation(TileBuffer &tomb, Random &rnd, World &world)
         TileID::mythrilOre,  TileID::orichalcumOre, TileID::adamantiteOre,
         TileID::titaniumOre,
     });
-    int minX =
-        world.conf.patches ? 350 : world.desertCenter - 0.06 * world.getWidth();
-    int maxX =
-        world.conf.patches
-            ? world.getWidth() - 350
-            : world.desertCenter + 0.06 * world.getWidth() - tomb.getWidth();
+    int minX = world.conf.patches
+                   ? 350
+                   : world.desertCenter -
+                         world.conf.desertSize * 0.06 * world.getWidth();
+    int maxX = world.conf.patches
+                   ? world.getWidth() - 350
+                   : world.desertCenter +
+                         world.conf.desertSize * 0.06 * world.getWidth() -
+                         tomb.getWidth();
     int minY = world.getCavernLevel();
     int maxY = (world.getCavernLevel() + 4 * world.getUnderworldLevel()) / 5 -
                tomb.getHeight();

@@ -91,6 +91,10 @@ hiveFreq = 1.0
 hiveSize = 1.0
 glowingMossFreq = 1.0
 glowingMossSize = 1.0
+# Snow, desert, and jungle size are ignored for biome patches.
+snowSize = 1.0
+desertSize = 1.0
+jungleSize = 1.0
 
 [extra]
 # Output a map preview image.
@@ -535,6 +539,9 @@ Config readConfig(Random &rnd)
         1.0,   // hiveSize
         1.0,   // glowingMossFreq
         1.0,   // glowingMossSize
+        1.0,   // snowSize
+        1.0,   // desertSize
+        1.0,   // jungleSize
         true}; // map
     if (!std::filesystem::exists(confName)) {
         std::ofstream out(confName, std::ios::out);
@@ -588,6 +595,9 @@ Config readConfig(Random &rnd)
     READ_CONF_AREA_VALUE(variation, hiveSize);
     READ_CONF_VALUE(variation, glowingMossFreq, Real);
     READ_CONF_AREA_VALUE(variation, glowingMossSize);
+    READ_CONF_VALUE(variation, snowSize, Real);
+    READ_CONF_VALUE(variation, desertSize, Real);
+    READ_CONF_VALUE(variation, jungleSize, Real);
     READ_CONF_VALUE(extra, map, Boolean);
     return conf;
 }

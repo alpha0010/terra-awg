@@ -75,10 +75,16 @@ Point selectTempleCenter(Random &rnd, World &world)
 {
     int minX = world.conf.patches
                    ? 350
-                   : world.jungleCenter - 0.079 * world.getWidth();
+                   : std::max<int>(
+                         world.jungleCenter -
+                             world.conf.jungleSize * 0.079 * world.getWidth(),
+                         350);
     int maxX = world.conf.patches
                    ? world.getWidth() - 350
-                   : world.jungleCenter + 0.079 * world.getWidth();
+                   : std::min<int>(
+                         world.jungleCenter +
+                             world.conf.jungleSize * 0.079 * world.getWidth(),
+                         world.getWidth() - 350);
     int minY = (world.getUndergroundLevel() + world.getCavernLevel()) / 2;
     for (int numTries = 0; numTries < 1000; ++numTries) {
         int x = rnd.getInt(minX, maxX);

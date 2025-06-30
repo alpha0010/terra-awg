@@ -46,6 +46,9 @@ struct Config {
     double hiveSize;
     double glowingMossFreq;
     double glowingMossSize;
+    double snowSize;
+    double desertSize;
+    double jungleSize;
     bool map;
 
     std::string getFilename() const;

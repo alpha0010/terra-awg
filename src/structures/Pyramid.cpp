@@ -211,7 +211,8 @@ std::vector<int> getDesertSurfaceCols(int size, World &world)
             }
         }
     } else {
-        double scanDist = 0.061 * world.getWidth() - size;
+        double scanDist =
+            world.conf.desertSize * 0.061 * world.getWidth() - size;
         for (int x = world.desertCenter - scanDist;
              x < world.desertCenter + scanDist;
              ++x) {

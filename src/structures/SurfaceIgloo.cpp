@@ -131,7 +131,7 @@ void genIgloo(Random &rnd, World &world)
             }
         }
     } else {
-        int scanDist = 0.05 * world.getWidth();
+        int scanDist = world.conf.snowSize * 0.05 * world.getWidth();
         for (int x = world.snowCenter - scanDist;
              x < world.snowCenter + scanDist;
              ++x) {

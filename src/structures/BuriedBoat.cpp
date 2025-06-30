@@ -16,9 +16,12 @@ Point selectBoatLocation(int width, int height, Random &rnd, World &world)
 {
     int minX = world.conf.patches
                    ? 350
-                   : world.snowCenter - 0.06 * world.getWidth() - width;
-    int maxX = world.conf.patches ? world.getWidth() - width - 350
-                                  : world.snowCenter + 0.06 * world.getWidth();
+                   : world.snowCenter -
+                         world.conf.snowSize * 0.06 * world.getWidth() - width;
+    int maxX =
+        world.conf.patches
+            ? world.getWidth() - width - 350
+            : world.snowCenter + world.conf.snowSize * 0.06 * world.getWidth();
     int maxY =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3 - height;
     constexpr auto avoidBlocks = frozen::make_set<int>({
@@ -29,6 +32,7 @@ Point selectBoatLocation(int width, int height, Random &rnd, World &world)
         TileID::dirt,
         TileID::granite,
         TileID::greenBrick,
+        TileID::lihzahrdBrick,
         TileID::marble,
         TileID::mushroomGrass,
         TileID::pinkBrick,

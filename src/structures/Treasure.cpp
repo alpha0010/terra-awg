@@ -124,7 +124,7 @@ void placeGems(Random &rnd, World &world)
 {
     int numGems = world.conf.gems * world.getWidth() * world.getHeight() /
                   rnd.getInt(65800, 76800);
-    int scanDist = 0.08 * world.getWidth();
+    int scanDist = world.conf.desertSize * 0.08 * world.getWidth();
     int minX = world.conf.patches ? 350 : world.desertCenter - scanDist;
     int maxX = world.conf.patches ? world.getWidth() - 350
                                   : world.desertCenter + scanDist;
@@ -537,11 +537,14 @@ Point selectShrineLocation(
          TileID::cobaltOre,     TileID::palladiumOre,  TileID::mythrilOre,
          TileID::orichalcumOre, TileID::adamantiteOre, TileID::titaniumOre,
          TileID::chlorophyteOre});
-    int minX =
-        world.conf.patches ? 350 : world.jungleCenter - 0.09 * world.getWidth();
+    int minX = world.conf.patches
+                   ? 350
+                   : world.jungleCenter -
+                         world.conf.jungleSize * 0.09 * world.getWidth();
     int maxX = world.conf.patches
                    ? world.getWidth() - 350
-                   : world.jungleCenter + 0.09 * world.getWidth();
+                   : world.jungleCenter +
+                         world.conf.jungleSize * 0.09 * world.getWidth();
     for (int numTries = 0; numTries < 10000; ++numTries) {
         int x = rnd.getInt(minX, maxX);
         int y =

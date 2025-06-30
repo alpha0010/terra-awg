@@ -72,6 +72,7 @@ void placePressurePlate(int x, int y, bool isSingleUse, World &world)
         case TileID::ebonstone:
         case TileID::crimstone:
         case TileID::granite:
+        case TileID::silt:
             tile.blockPaint = Paint::gray;
             break;
         case TileID::jungleGrass:
@@ -114,7 +115,7 @@ void placePressurePlate(int x, int y, bool isSingleUse, World &world)
 
 void placeSandTraps(Random &rnd, World &world)
 {
-    double scanDist = 0.065 * world.getWidth();
+    double scanDist = world.conf.desertSize * 0.065 * world.getWidth();
     int minX = world.conf.patches ? 350 : world.desertCenter - scanDist;
     int maxX = world.conf.patches ? world.getWidth() - 350
                                   : world.desertCenter + scanDist;
@@ -133,6 +134,7 @@ void placeSandTraps(Random &rnd, World &world)
             case TileID::ebonsand:
             case TileID::crimsand:
             case TileID::pearlsand:
+            case TileID::silt:
                 ++fallingCount;
                 break;
             case TileID::empty:
@@ -168,9 +170,14 @@ void placeSandTraps(Random &rnd, World &world)
          TileID::crimsandstone,
          TileID::pearlsand,
          TileID::hardenedPearlsand,
-         TileID::pearlsandstone});
+         TileID::pearlsandstone,
+         TileID::silt});
     constexpr auto looseBlocks = frozen::make_set<int>(
-        {TileID::sand, TileID::ebonsand, TileID::crimsand, TileID::pearlsand});
+        {TileID::sand,
+         TileID::ebonsand,
+         TileID::crimsand,
+         TileID::pearlsand,
+         TileID::silt});
     std::vector<Point> usedLocations;
     for (int tries = 50 * numSandTraps; numSandTraps > 0 && tries > 0;
          --tries) {

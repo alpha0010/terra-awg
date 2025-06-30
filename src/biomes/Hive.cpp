@@ -175,14 +175,20 @@ void genHive(Random &rnd, World &world)
 {
     std::cout << "Importing bees\n";
     int numHives =
-        world.conf.hiveFreq *
+        world.conf.hiveFreq * std::max(0.4 * world.conf.jungleSize, 1.0) *
         (2 +
          rnd.getDouble(0, world.getWidth() * world.getHeight() / 5750000.0));
     for (int i = 0; i < numHives; ++i) {
         fillHive(
             rnd.getInt(
-                world.jungleCenter - 0.075 * world.getWidth(),
-                world.jungleCenter + 0.075 * world.getWidth()),
+                std::max<int>(
+                    world.jungleCenter -
+                        world.conf.jungleSize * 0.075 * world.getWidth(),
+                    100),
+                std::min<int>(
+                    world.jungleCenter +
+                        world.conf.jungleSize * 0.075 * world.getWidth(),
+                    world.getWidth() - 100)),
             rnd.getInt(
                 (world.getUndergroundLevel() + world.getCavernLevel()) / 2,
                 (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3),

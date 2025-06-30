@@ -707,7 +707,7 @@ bool World::isIsolated(int x, int y) const
 void World::planBiomes(Random &rnd)
 {
     std::cout << "Planning biomes\n";
-    while (true) {
+    for (int tries = 0; tries < 1000; ++tries) {
         desertCenter = rnd.getDouble(0.09, 0.91);
         jungleCenter = rnd.getDouble(0.12, 0.39);
         if (rnd.getBool()) {
@@ -715,9 +715,21 @@ void World::planBiomes(Random &rnd)
         }
         snowCenter = rnd.getDouble(0.12, 0.88);
 
-        if (std::abs(desertCenter - jungleCenter) > 0.15 &&
-            std::abs(desertCenter - snowCenter) > 0.15 &&
-            std::abs(snowCenter - jungleCenter) > 0.15) {
+        if (std::abs(desertCenter - jungleCenter) >
+                0.075 * std::lerp(
+                            conf.desertSize + conf.jungleSize,
+                            2.0,
+                            tries / 1000.0) &&
+            std::abs(desertCenter - snowCenter) >
+                0.075 * std::lerp(
+                            conf.desertSize + conf.snowSize,
+                            2.0,
+                            tries / 1000.0) &&
+            std::abs(snowCenter - jungleCenter) >
+                0.075 * std::lerp(
+                            conf.snowSize + conf.jungleSize,
+                            2.0,
+                            tries / 1000.0)) {
             break;
         }
     }

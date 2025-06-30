@@ -1,5 +1,6 @@
 #include "Desert.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
@@ -15,7 +16,7 @@ void genDesert(Random &rnd, World &world)
     int noiseShuffleX = rnd.getInt(0, world.getWidth());
     int noiseShuffleY = rnd.getInt(0, world.getHeight());
     double center = world.desertCenter;
-    double scanDist = 0.08 * world.getWidth();
+    double scanDist = world.conf.desertSize * 0.08 * world.getWidth();
     double desertFloor =
         (world.getCavernLevel() + 4 * world.getUnderworldLevel()) / 5;
     std::map<int, int> sandWalls{
@@ -32,8 +33,8 @@ void genDesert(Random &rnd, World &world)
         world);
     parallelFor(
         std::views::iota(
-            static_cast<int>(center - scanDist),
-            static_cast<int>(center + scanDist)),
+            std::max<int>(center - scanDist, 0),
+            std::min<int>(center + scanDist, world.getWidth())),
         [center,
          desertFloor,
          noiseShuffleX,
@@ -43,7 +44,8 @@ void genDesert(Random &rnd, World &world)
          &world](int x) {
             for (int y = 0; y < world.getUnderworldLevel(); ++y) {
                 double threshold = std::max(
-                    std::abs(x - center) / 100.0 - (world.getWidth() / 1700.0),
+                    std::abs(x - center) / 100.0 -
+                        (world.conf.desertSize * world.getWidth() / 1700.0),
                     15 * (y - desertFloor) / world.getHeight());
                 if (rnd.getCoarseNoise(x, y) < threshold) {
                     continue;
@@ -53,6 +55,11 @@ void genDesert(Random &rnd, World &world)
                 case TileID::dirt:
                     tile.blockID = TileID::sand;
                     break;
+                case TileID::ice:
+                    if (rnd.getFineNoise(x, y) > -0.02) {
+                        break;
+                    }
+                    [[fallthrough]];
                 case TileID::stone:
                 case TileID::smoothMarble:
                     tile.blockID = TileID::sandstone;
