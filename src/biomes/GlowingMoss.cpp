@@ -1,5 +1,6 @@
 #include "GlowingMoss.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -36,8 +37,8 @@ void fillGlowingMossCave(Random &rnd, World &world)
         world.getUnderworldLevel(),
         rnd,
         world);
-    double size =
-        world.getWidth() * world.getHeight() / rnd.getDouble(95000, 210000);
+    double size = world.conf.glowingMossSize * world.getWidth() *
+                  world.getHeight() / rnd.getDouble(95000, 210000);
     for (int x = centerX - size; x < centerX + size; ++x) {
         for (int y = centerY - size; y < centerY + size; ++y) {
             Tile &tile = world.getTile(x, y);
@@ -98,7 +99,7 @@ void fillGlowingMossCave(Random &rnd, World &world)
 void genGlowingMoss(Random &rnd, World &world)
 {
     std::cout << "Energizing moss\n";
-    int numCaves = rnd.getInt(2, 8);
+    int numCaves = world.conf.glowingMossFreq * rnd.getDouble(2, 9);
     for (int i = 0; i < numCaves; ++i) {
         fillGlowingMossCave(rnd, world);
     }

@@ -1,39 +1,47 @@
 #include "biomes/AsteroidField.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
 #include <iostream>
 
 std::pair<int, int>
-selectAsteroidFieldLocation(int width, int height, Random &rnd, World &world)
+selectAsteroidFieldLocation(int &width, int height, Random &rnd, World &world)
 {
     int y = 40;
+    double widthF = width;
+    double widthDelta = widthF / 2500;
     while (true) {
-        int x = rnd.getInt(40, 0.3 * world.getWidth() - width);
+        int x =
+            rnd.getInt(40, std::max<int>(0.3 * world.getWidth() - widthF, 45));
         if (rnd.getBool()) {
-            x = world.getWidth() - x - width;
+            x = world.getWidth() - x - widthF;
         }
         if (world.regionPasses(
-                x + 0.1 * width,
+                x + 0.1 * widthF,
                 y,
-                0.8 * width,
+                0.8 * widthF,
                 height,
                 [](Tile &tile) { return tile.blockID == TileID::empty; })) {
+            width = std::midpoint<int>(width, widthF);
             return {x, y};
         }
+        widthF -= widthDelta;
     }
 }
 
 void genAsteroidField(Random &rnd, World &world)
 {
     std::cout << "Suspending asteroids\n";
-    int width = rnd.getDouble(0.06, 0.07) * world.getWidth();
+    int width =
+        world.conf.asteroids * rnd.getDouble(0.06, 0.07) * world.getWidth();
     int height = rnd.getDouble(0.18, 0.21) * world.getUndergroundLevel();
     auto [fieldX, fieldY] =
         selectAsteroidFieldLocation(width, height, rnd, world);
     int numAsteroids = width * height / 220;
-    while (numAsteroids > 0) {
+    for (int tries = 10 * numAsteroids; numAsteroids > 0 && tries > 0;
+         --tries) {
         double radius = rnd.getDouble(2, 9);
         int x = rnd.getInt(fieldX + radius, fieldX + width - radius);
         int y = rnd.getInt(fieldY + radius, fieldY + height - radius);

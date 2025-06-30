@@ -29,9 +29,13 @@ struct Config {
     double chests;
     double gems;
     double traps;
+    double livingTrees;
     double clouds;
+    double asteroids;
     double minecartTracks;
     double minecartLength;
+    double aetherSize;
+    double templeSize;
     double marbleFreq;
     double marbleSize;
     double graniteFreq;
@@ -40,6 +44,8 @@ struct Config {
     double glowingMushroomSize;
     double hiveFreq;
     double hiveSize;
+    double glowingMossFreq;
+    double glowingMossSize;
     bool map;
 
     std::string getFilename() const;

@@ -1,5 +1,6 @@
 #include "Aether.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -50,8 +51,9 @@ void genAether(Random &rnd, World &world)
     int centerY = rnd.getInt(
         (world.getUndergroundLevel() + 2 * world.getCavernLevel()) / 3,
         (world.getCavernLevel() + 5 * world.getUnderworldLevel()) / 6);
-    double size = 25 + world.getWidth() * world.getHeight() /
-                           rnd.getDouble(274000, 384000);
+    double size =
+        world.conf.aetherSize * (25 + world.getWidth() * world.getHeight() /
+                                          rnd.getDouble(274000, 384000));
     applyAetherDistortion(centerX, centerY, size * 3.2, world);
     int maxBubblePos = centerY;
     int maxEditPos = centerY;

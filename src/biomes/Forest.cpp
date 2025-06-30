@@ -455,7 +455,7 @@ void growLivingTrees(Random &rnd, World &world)
     std::vector<int> rooms(Data::treeRooms.begin(), Data::treeRooms.end());
     std::shuffle(rooms.begin(), rooms.end(), rnd.getPRNG());
     for (int partition : partitions) {
-        int numTrees = rnd.getInt(3, 6);
+        int numTrees = world.conf.livingTrees * rnd.getDouble(3, 7);
         for (int x = partition - 25 * numTrees; numTrees > 0;
              x += rnd.getInt(45, 55), --numTrees) {
             if (std::abs(x - world.getWidth() / 2) < 25) {

@@ -74,9 +74,13 @@ chests = 1.0
 gems = 1.0
 # Activates "no traps" secret seed when greater than 15.
 traps = 1.0
+livingTrees = 1.0
 clouds = 1.0
+asteroids = 1.0
 minecartTracks = 1.0
 minecartLength = 1.0
+aetherSize = 1.0
+templeSize = 1.0
 marbleFreq = 1.0
 marbleSize = 1.0
 graniteFreq = 1.0
@@ -85,6 +89,8 @@ glowingMushroomFreq = 1.0
 glowingMushroomSize = 1.0
 hiveFreq = 1.0
 hiveSize = 1.0
+glowingMossFreq = 1.0
+glowingMossSize = 1.0
 
 [extra]
 # Output a map preview image.
@@ -484,6 +490,10 @@ std::string Config::getFilename() const
 #define READ_CONF_VALUE(SECTION, KEY, TYPE)                                    \
     conf.KEY = reader.Get##TYPE(#SECTION, #KEY, conf.KEY)
 
+#define READ_CONF_AREA_VALUE(SECTION, KEY)                                     \
+    conf.KEY =                                                                 \
+        std::sqrt(std::max(reader.GetReal(#SECTION, #KEY, conf.KEY), 0.0))
+
 Config readConfig(Random &rnd)
 {
     Config conf{
@@ -508,9 +518,13 @@ Config readConfig(Random &rnd)
         1.0,   // chests
         1.0,   // gems
         1.0,   // traps
+        1.0,   // livingTrees
         1.0,   // clouds
+        1.0,   // asteroids
         1.0,   // minecartTracks
         1.0,   // minecartLength
+        1.0,   // aetherSize
+        1.0,   // templeSize
         1.0,   // marbleFreq
         1.0,   // marbleSize
         1.0,   // graniteFreq
@@ -519,6 +533,8 @@ Config readConfig(Random &rnd)
         1.0,   // glowingMushroomSize
         1.0,   // hiveFreq
         1.0,   // hiveSize
+        1.0,   // glowingMossFreq
+        1.0,   // glowingMossSize
         true}; // map
     if (!std::filesystem::exists(confName)) {
         std::ofstream out(confName, std::ios::out);
@@ -547,7 +563,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, patches, Boolean);
     READ_CONF_VALUE(variation, patchesHumidity, Real);
     READ_CONF_VALUE(variation, patchesTemperature, Real);
-    READ_CONF_VALUE(variation, patchesSize, Real);
+    READ_CONF_AREA_VALUE(variation, patchesSize);
     READ_CONF_VALUE(variation, ore, Real);
     READ_CONF_VALUE(variation, lifeCrystals, Real);
     READ_CONF_VALUE(variation, manaCrystals, Real);
@@ -555,17 +571,23 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, chests, Real);
     READ_CONF_VALUE(variation, gems, Real);
     READ_CONF_VALUE(variation, traps, Real);
+    READ_CONF_VALUE(variation, livingTrees, Real);
     READ_CONF_VALUE(variation, clouds, Real);
+    READ_CONF_VALUE(variation, asteroids, Real);
     READ_CONF_VALUE(variation, minecartTracks, Real);
     READ_CONF_VALUE(variation, minecartLength, Real);
+    READ_CONF_AREA_VALUE(variation, aetherSize);
+    READ_CONF_AREA_VALUE(variation, templeSize);
     READ_CONF_VALUE(variation, marbleFreq, Real);
-    READ_CONF_VALUE(variation, marbleSize, Real);
+    READ_CONF_AREA_VALUE(variation, marbleSize);
     READ_CONF_VALUE(variation, graniteFreq, Real);
-    READ_CONF_VALUE(variation, graniteSize, Real);
+    READ_CONF_AREA_VALUE(variation, graniteSize);
     READ_CONF_VALUE(variation, glowingMushroomFreq, Real);
-    READ_CONF_VALUE(variation, glowingMushroomSize, Real);
+    READ_CONF_AREA_VALUE(variation, glowingMushroomSize);
     READ_CONF_VALUE(variation, hiveFreq, Real);
-    READ_CONF_VALUE(variation, hiveSize, Real);
+    READ_CONF_AREA_VALUE(variation, hiveSize);
+    READ_CONF_VALUE(variation, glowingMossFreq, Real);
+    READ_CONF_AREA_VALUE(variation, glowingMossSize);
     READ_CONF_VALUE(extra, map, Boolean);
     return conf;
 }

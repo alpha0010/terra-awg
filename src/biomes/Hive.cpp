@@ -174,9 +174,10 @@ void fillHive(int hiveX, int hiveY, Random &rnd, World &world)
 void genHive(Random &rnd, World &world)
 {
     std::cout << "Importing bees\n";
-    int bonusHives = world.getWidth() * world.getHeight() / 5750000;
-    int numHives = world.conf.hiveFreq *
-                   (bonusHives > 0 ? 2 + rnd.getDouble(0, bonusHives) : 2);
+    int numHives =
+        world.conf.hiveFreq *
+        (2 +
+         rnd.getDouble(0, world.getWidth() * world.getHeight() / 5750000.0));
     for (int i = 0; i < numHives; ++i) {
         fillHive(
             rnd.getInt(

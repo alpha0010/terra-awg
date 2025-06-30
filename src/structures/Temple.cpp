@@ -16,7 +16,8 @@
 
 template <typename Func> void iterateTemple(Point center, World &world, Func f)
 {
-    int scanX = std::max<int>(0.029 * world.getWidth(), 128);
+    int scanX =
+        std::max<int>(world.conf.templeSize * 0.029 * world.getWidth(), 128);
     int scanY = 0.45 * scanX;
     int startScanY = scanY;
     int stepCtrl = -1;
@@ -104,7 +105,8 @@ void clearTempleSurface(Point center, Random &rnd, World &world)
          TileID::goldOre,       TileID::platinumOre, TileID::cobaltOre,
          TileID::palladiumOre,  TileID::mythrilOre,  TileID::orichalcumOre,
          TileID::adamantiteOre, TileID::titaniumOre, TileID::chlorophyteOre});
-    int scanDist = std::max<int>(0.019 * world.getWidth(), 82);
+    int scanDist =
+        std::max<double>(world.conf.templeSize * 0.019 * world.getWidth(), 82);
     for (int x = center.first - scanDist; x < center.first + scanDist; ++x) {
         for (int y = center.second - scanDist; y < center.second + scanDist;
              ++y) {
