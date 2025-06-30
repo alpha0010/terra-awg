@@ -5,6 +5,7 @@
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
 #include "vendor/frozen/set.h"
+#include <algorithm>
 #include <iostream>
 
 void genAshenField(Random &rnd, World &world)
@@ -15,7 +16,11 @@ void genAshenField(Random &rnd, World &world)
     double width = 100 + world.getWidth() / rnd.getInt(64, 85);
     int minX = world.getWidth() / 2 - width;
     int maxX = world.getWidth() / 2 + width;
-    int minY = world.spawnY - 20;
+    int minY = std::min(
+                   {world.spawnY,
+                    world.getSurfaceLevel(minX),
+                    world.getSurfaceLevel(maxX)}) -
+               20;
     int maxY = std::midpoint<double>(minY + width, world.getUndergroundLevel());
     constexpr auto avoidTiles = frozen::make_set<int>({
         TileID::snow,
