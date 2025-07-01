@@ -15,6 +15,7 @@ inline constexpr auto attatchTiles = frozen::make_set<int>(
     {TileID::ice,
      TileID::stone,
      TileID::stoneSlab,
+     TileID::hive,
      TileID::pearlstone,
      TileID::ebonstone,
      TileID::crimstone,
@@ -68,6 +69,7 @@ ScanState scanTransition(Tile &tile, ScanState state)
 inline constexpr auto stalactiteTypes = frozen::make_map<int, int>(
     {{TileID::ice, 0},
      {TileID::stone, 54},
+     {TileID::hive, 162},
      {TileID::pearlstone, 216},
      {TileID::ebonstone, 270},
      {TileID::crimstone, 324},
@@ -102,6 +104,10 @@ void placeStalactite(int x, int y, World &world)
             return;
         }
         frameX += itr->second;
+        if (itr->first == TileID::hive) {
+            frameY = 72;
+            height = 1;
+        }
     }
     for (int j = 0; j < height; ++j) {
         Tile &tile = world.getTile(x, y + j + 1);
@@ -113,6 +119,7 @@ void placeStalactite(int x, int y, World &world)
 
 inline constexpr auto stalagmiteTypes = frozen::make_map<int, int>(
     {{TileID::stone, 54},
+     {TileID::hive, 162},
      {TileID::pearlstone, 216},
      {TileID::ebonstone, 270},
      {TileID::crimstone, 324},
@@ -132,6 +139,9 @@ void placeStalagmite(int x, int y, World &world)
     int height = 2;
     if (variation > 2) {
         frameX -= 54;
+        frameY = 90;
+        height = 1;
+    } else if (itr->first == TileID::hive) {
         frameY = 90;
         height = 1;
     }
@@ -212,7 +222,8 @@ void genVines(Random &rnd, World &world)
                 }
             } else if (
                 dropper != TileID::empty && tile.blockID == TileID::empty &&
-                tile.liquid == Liquid::none && randInt % 67 == 0) {
+                tile.liquid == Liquid::none &&
+                randInt % (dropper == TileID::honeyDrip ? 19 : 67) == 0) {
                 tile.blockID = dropper == TileID::waterDrip && y > lavaLevel &&
                                        randInt % 5 != 0
                                    ? TileID::lavaDrip
