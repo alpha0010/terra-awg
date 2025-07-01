@@ -67,7 +67,7 @@ public:
     Chest &placeChest(int x, int y, Variant type);
     Chest &registerStorage(int x, int y);
 
-    const std::vector<Chest> &getChests() const
+    std::vector<Chest> &getChests()
     {
         return chests;
     }

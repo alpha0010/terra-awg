@@ -52,6 +52,7 @@
 #include "structures/Traps.h"
 #include "structures/Treasure.h"
 #include "structures/Vines.h"
+#include "structures/hardmode/LootRules.h"
 #include <ranges>
 #include <set>
 
@@ -108,6 +109,8 @@ enum class Step {
     // Hardmode.
     genHardmodeOres,
     genHallow,
+    // Hardmode loot.
+    applyHardmodeLoot,
     // Patches.
     initBiomeNoise,
     genWorldBasePatches,
@@ -153,9 +156,10 @@ inline std::array baseStructureRules{
     Step::genDesertTomb,  Step::genBuriedBoat, Step::genSpiderHall,
     Step::genRuins,       Step::genTorchArena, Step::genLake,
     Step::genStarterHome, Step::genIgloo,      Step::genMushroomCabin,
-    Step::genOceanWreck,  Step::genTreasure,   Step::genPlants,
-    Step::genTraps,       Step::genTracks,     Step::smoothSurfaces,
-    Step::finalizeWalls,  Step::genVines,      Step::genGrasses,
+    Step::genOceanWreck,  Step::genTreasure,   Step::applyHardmodeLoot,
+    Step::genPlants,      Step::genTraps,      Step::genTracks,
+    Step::smoothSurfaces, Step::finalizeWalls, Step::genVines,
+    Step::genGrasses,
 };
 
 inline std::array patchesBiomeRules{
@@ -252,6 +256,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genSecondaryCorruption)
         GEN_STEP(genHardmodeOres)
         GEN_STEP(genHallow)
+        GEN_STEP_WORLD(applyHardmodeLoot)
     case Step::initBiomeNoise:
         rnd.initBiomeNoise(
             0.00097 / world.conf.patchesSize,
@@ -293,6 +298,9 @@ void doWorldGen(Random &rnd, World &world)
     }
     if (!world.conf.hardmode) {
         excludes.insert({Step::genHardmodeOres, Step::genHallow});
+    }
+    if (!world.conf.hardmodeLoot) {
+        excludes.insert(Step::applyHardmodeLoot);
     }
     LocationBins locations;
     std::vector<Step> steps;

@@ -53,6 +53,9 @@ purity = false
 # Start with hardmode activated.
 hardmode = false
 
+# Modify chest loot to be more applicable to a hardmode start.
+hardmodeLoot = false
+
 # Distribute biomes in patches (instead of columns).
 patches = false
 
@@ -511,6 +514,7 @@ Config readConfig(Random &rnd)
         false, // doubleTrouble
         false, // purity
         false, // hardmode
+        false, // hardmodeLoot
         false, // patches
         0.0,   // patchesHumidity
         0.0,   // patchesTemperature
@@ -567,6 +571,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, doubleTrouble, Boolean);
     READ_CONF_VALUE(variation, purity, Boolean);
     READ_CONF_VALUE(variation, hardmode, Boolean);
+    READ_CONF_VALUE(variation, hardmodeLoot, Boolean);
     READ_CONF_VALUE(variation, patches, Boolean);
     READ_CONF_VALUE(variation, patchesHumidity, Real);
     READ_CONF_VALUE(variation, patchesTemperature, Real);

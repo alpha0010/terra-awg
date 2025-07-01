@@ -18,6 +18,7 @@ struct Config {
     bool doubleTrouble;
     bool purity;
     bool hardmode;
+    bool hardmodeLoot;
     bool patches;
     double patchesHumidity;
     double patchesTemperature;
