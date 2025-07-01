@@ -104,11 +104,10 @@ inline constexpr auto trackClearTiles = frozen::make_set<int>({
     TileID::chlorophyteOre,
 });
 
-std::vector<Point> planTrack(double lengthScale, Random &rnd, World &world)
+std::vector<Point>
+planTrackAt(int x, int y, double lengthScale, Random &rnd, World &world)
 {
-    Point pos{
-        rnd.getInt(0, world.getWidth()),
-        rnd.getInt(world.getUndergroundLevel(), world.getUnderworldLevel())};
+    Point pos{x, y};
     Point delta{rnd.select({-1, 1}), 0};
     int hardMaxLen = world.getWidth() / 4.2;
     int maxLen = std::min(
@@ -159,9 +158,47 @@ std::vector<Point> planTrack(double lengthScale, Random &rnd, World &world)
     return track;
 }
 
-std::pair<int, int> findGrassInColumn(int x, int y, World &world)
+std::vector<Point> planTrack(double lengthScale, Random &rnd, World &world)
 {
-    constexpr auto grasses = frozen::make_set<int>(
+    return planTrackAt(
+        rnd.getInt(50, world.getWidth() - 50),
+        rnd.getInt(world.getUndergroundLevel(), world.getUnderworldLevel()),
+        lengthScale,
+        rnd,
+        world);
+}
+
+std::vector<Point> planSurfaceTrack(Random &rnd, World &world)
+{
+    std::vector<Point> locations;
+    int minY = 0.8 * world.getUndergroundLevel();
+    for (int x = 0.25 * world.getWidth(); x < 0.75 * world.getWidth(); ++x) {
+        if (x == world.getWidth() / 2 - 150) {
+            x = world.getWidth() / 2 + 150;
+        }
+        int y = world.getSurfaceLevel(x);
+        if (y > minY && world.getTile(x, y - 1).liquid == Liquid::none) {
+            locations.emplace_back(x, y);
+        }
+    }
+    std::shuffle(locations.begin(), locations.end(), rnd.getPRNG());
+    for (auto [x, y] : locations) {
+        auto track = planTrackAt(x, y, 1.0, rnd, world);
+        if (!track.empty()) {
+            return track;
+        }
+    }
+    return {};
+}
+
+std::pair<int, int> findGrassInColumn(int x, int y, bool isDirt, World &world)
+{
+    constexpr auto dirtGrasses = frozen::make_set<int>(
+        {TileID::grass,
+         TileID::hallowedGrass,
+         TileID::corruptGrass,
+         TileID::crimsonGrass});
+    constexpr auto mudGrasses = frozen::make_set<int>(
         {TileID::jungleGrass,
          TileID::mushroomGrass,
          TileID::corruptJungleGrass,
@@ -174,23 +211,27 @@ std::pair<int, int> findGrassInColumn(int x, int y, World &world)
         }
         for (int i = minI; i < 1 - minI; ++i) {
             Tile &tile = world.getTile(x + i, y + j);
-            if (grasses.contains(tile.blockID)) {
+            if (isDirt ? dirtGrasses.contains(tile.blockID)
+                       : mudGrasses.contains(tile.blockID)) {
                 return {tile.blockID, tile.blockPaint};
             }
         }
     }
-    return {TileID::mud, Paint::none};
+    return {isDirt ? TileID::dirt : TileID::mud, Paint::none};
 }
 
-void applyMudGrass(int x, int y, World &world)
+void applyTrackGrass(int x, int y, World &world)
 {
     for (int j = -10; j < 2; ++j) {
         Tile &tile = world.getTile(x, y + j);
-        if (tile.blockID != TileID::mud || !world.isExposed(x, y + j)) {
+        bool isDirt =
+            tile.blockID == TileID::dirt && y + j < world.getUndergroundLevel();
+        if ((!isDirt && tile.blockID != TileID::mud) ||
+            !world.isExposed(x, y + j)) {
             continue;
         }
         std::tie(tile.blockID, tile.blockPaint) =
-            findGrassInColumn(x, y + j, world);
+            findGrassInColumn(x, y + j, isDirt, world);
     }
 }
 
@@ -227,15 +268,17 @@ void genTracks(Random &rnd, World &world)
                     world.getHeight() / rnd.getInt(640000, 960000);
     int maxTries = 5000 * numTracks;
     for (int tries = 0; numTracks > 0 && tries < maxTries; ++tries) {
-        auto track = planTrack(
-            world.conf.minecartLength > 1.0
-                ? std::lerp(
-                      world.conf.minecartLength,
-                      1.0,
-                      static_cast<double>(tries) / maxTries)
-                : world.conf.minecartLength,
-            rnd,
-            world);
+        auto track = tries == 0
+                         ? planSurfaceTrack(rnd, world)
+                         : planTrack(
+                               world.conf.minecartLength > 1.0
+                                   ? std::lerp(
+                                         world.conf.minecartLength,
+                                         1.0,
+                                         static_cast<double>(tries) / maxTries)
+                                   : world.conf.minecartLength,
+                               rnd,
+                               world);
         if (track.empty()) {
             continue;
         }
@@ -258,7 +301,7 @@ void genTracks(Random &rnd, World &world)
             Tile &tile = world.getTile(x, y);
             if (isEndpoint) {
                 tile.blockID = TileID::empty;
-                applyMudGrass(x, y, world);
+                applyTrackGrass(x, y, world);
                 continue;
             }
             tile.blockID = TileID::minecartTrack;
@@ -292,7 +335,7 @@ void genTracks(Random &rnd, World &world)
             }
             tile.frameY = -1;
             prevMode = mode;
-            applyMudGrass(x, y, world);
+            applyTrackGrass(x, y, world);
             Tile &supportTile = world.getTile(x, y + 1);
             if (tile.frameX == Track::flat &&
                 supportTile.blockID == TileID::empty) {
