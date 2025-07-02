@@ -43,6 +43,7 @@ enum {
     borealWood = 149,
     palmWood = 151,
     palmWoodFence = 152,
+    amethystGemspark = 154,
     crimtaneBrick = 174,
     smoothMarble = 179,
     marble = 183,

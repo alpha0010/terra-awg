@@ -211,7 +211,8 @@ void genVines(Random &rnd, World &world)
             int randInt = 99999 * (1 + rnd.getFineNoise(x, y));
             if (vineLen > 0) {
                 if (tile.blockID == TileID::empty &&
-                    tile.liquid == Liquid::none) {
+                    (tile.liquid == Liquid::none ||
+                     tile.liquid == Liquid::water)) {
                     tile.blockID = vine;
                     tile.blockPaint = vinePaint;
                     state = ScanState::n;

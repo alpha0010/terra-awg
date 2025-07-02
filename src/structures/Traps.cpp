@@ -73,6 +73,10 @@ void placePressurePlate(int x, int y, bool isSingleUse, World &world)
         case TileID::crimstone:
         case TileID::granite:
         case TileID::silt:
+        case TileID::pearlstone:
+        case TileID::pearlsand:
+        case TileID::hardenedPearlsand:
+        case TileID::pearlsandstone:
             tile.blockPaint = Paint::gray;
             break;
         case TileID::jungleGrass:
@@ -227,6 +231,7 @@ bool isValidBoulderPlacement(int x, int y, bool allowMud, World &world)
         {TileID::crimstone,
          TileID::ebonstone,
          TileID::granite,
+         TileID::pearlstone,
          TileID::sandstone,
          TileID::slime,
          TileID::stone});

@@ -65,7 +65,8 @@ Slope computeSlope(World &world, int x, int y)
         return Slope::half;
     case 0b10010110:
     case 0b10010111:
-        if (world.getTile(x - 2, y).blockID == TileID::empty) {
+        if (world.getTile(x - 2, y).blockID == TileID::empty &&
+            world.getTile(x, y).blockID != TileID::crystalBlock) {
             return Slope::half;
         }
         [[fallthrough]];
@@ -75,7 +76,8 @@ Slope computeSlope(World &world, int x, int y)
         return Slope::topRight;
     case 0b11010100:
     case 0b11110100:
-        if (world.getTile(x + 2, y).blockID == TileID::empty) {
+        if (world.getTile(x + 2, y).blockID == TileID::empty &&
+            world.getTile(x, y).blockID != TileID::crystalBlock) {
             return Slope::half;
         }
         [[fallthrough]];

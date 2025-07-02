@@ -257,6 +257,8 @@ void genHallow(Random &rnd, World &world)
         }
     }
     for (auto [x, y] : erosion) {
-        world.getTile(x, y).blockID = TileID::pearlstone;
+        Tile &tile = world.getTile(x, y);
+        tile.blockID = TileID::pearlstone;
+        tile.wallID = WallID::Safe::amethystGemspark;
     }
 }
