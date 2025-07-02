@@ -111,7 +111,8 @@ void simulateRain(Random &rnd, World &world, int x)
                 world.conf.jungleSize * 0.08 * world.getWidth()
             ? 15
             : -4;
-    for (int y = world.spawnY - 45; y < world.getUnderworldLevel(); y += 3) {
+    for (int y = world.getSurfaceLevel(x) - 45; y < world.getUnderworldLevel();
+         y += 3) {
         if (!isLiquidPathable(world, x, y) ||
             (y < lavaLevel && dryWalls.contains(world.getTile(x, y).wallID))) {
             pendingWater = 2.1;

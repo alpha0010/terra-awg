@@ -47,6 +47,9 @@ equipment = none
 # Activates "drunk world" secret seed.
 doubleTrouble = false
 
+# Flood the majority of the world surface.
+sunken = false
+
 # Only generate non-spreading biomes.
 purity = false
 
@@ -512,6 +515,7 @@ Config readConfig(Random &rnd)
         false, // starterHome
         0,     // equipment
         false, // doubleTrouble
+        false, // sunken
         false, // purity
         false, // hardmode
         false, // hardmodeLoot
@@ -569,6 +573,7 @@ Config readConfig(Random &rnd)
     conf.equipment =
         parseEquipment(reader.Get("variation", "equipment", "none"));
     READ_CONF_VALUE(variation, doubleTrouble, Boolean);
+    READ_CONF_VALUE(variation, sunken, Boolean);
     READ_CONF_VALUE(variation, purity, Boolean);
     READ_CONF_VALUE(variation, hardmode, Boolean);
     READ_CONF_VALUE(variation, hardmodeLoot, Boolean);

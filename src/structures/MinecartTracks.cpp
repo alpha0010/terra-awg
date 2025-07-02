@@ -170,6 +170,9 @@ std::vector<Point> planTrack(double lengthScale, Random &rnd, World &world)
 
 std::vector<Point> planSurfaceTrack(Random &rnd, World &world)
 {
+    if (world.conf.sunken) {
+        return {};
+    }
     std::vector<Point> locations;
     int minY = 0.8 * world.getUndergroundLevel();
     for (int x = 0.25 * world.getWidth(); x < 0.75 * world.getWidth(); ++x) {

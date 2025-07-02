@@ -16,6 +16,15 @@ bool isRegionEmpty(int x, int y, int width, int height, World &world)
     });
 }
 
+bool isSunken(int x, int y, World &world)
+{
+    return world.conf.sunken && y < world.getUndergroundLevel() &&
+           y > std::max(
+                   world.getSurfaceLevel(world.getWidth() / 2 - 130),
+                   world.getSurfaceLevel(world.getWidth() / 2 + 130)) &&
+           std::hypot(world.dungeonX - x, world.dungeonY - y) > 78;
+}
+
 void growBamboo(int x, int y, Random &rnd, World &world)
 {
     if (rnd.getDouble(0, 1) > 0.21) {
@@ -124,6 +133,9 @@ void growPalmTree(int x, int y, Random &rnd, World &world)
 
 void growSandPlant(int x, int y, Random &rnd, World &world)
 {
+    if (isSunken(x, y, world)) {
+        return;
+    }
     Tile &probeTile = world.getTile(x, y - 1);
     if (probeTile.wallID != WallID::empty || probeTile.liquid != Liquid::none) {
         return;
@@ -191,6 +203,9 @@ void growTree(
     Random &rnd,
     World &world)
 {
+    if (isSunken(x, y, world)) {
+        return;
+    }
     for (int i = 0; i < 3; ++i) {
         if (world.getTile(x + i, y).blockID != groundTile) {
             return;

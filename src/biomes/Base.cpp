@@ -22,12 +22,18 @@ void computeSurfaceLevel(Random &rnd, World &world)
     int prevY = surfaceLevel;
     // Keep surface terrain mostly level near spawn and oceans.
     for (int x = 0; x < world.getWidth(); ++x) {
-        int curY =
-            surfaceLevel + std::min(
-                               {0.1 * std::abs(center - x) + 15,
-                                0.08 * std::min(x, world.getWidth() - x) + 5,
-                                50.0}) *
-                               rnd.getCoarseNoise(x, 0);
+        double drop =
+            world.conf.sunken
+                ? 120 * (1 / (1 + std::exp(0.057 * (180 + center - x))) +
+                         1 / (1 + std::exp(0.057 * (180 + x - center)))) -
+                      90
+                : 0;
+        int curY = surfaceLevel + drop +
+                   std::min(
+                       {0.1 * std::abs(center - x) + 15,
+                        0.08 * std::min(x, world.getWidth() - x) + 5,
+                        50.0}) *
+                       rnd.getCoarseNoise(x, 0);
         world.getSurfaceLevel(x) = curY;
         if (delta == curY - prevY) {
             ++deltaLen;

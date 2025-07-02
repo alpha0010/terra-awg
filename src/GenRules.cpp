@@ -53,6 +53,7 @@
 #include "structures/Treasure.h"
 #include "structures/Vines.h"
 #include "structures/hardmode/LootRules.h"
+#include "structures/sunken/Flood.h"
 #include <ranges>
 #include <set>
 
@@ -106,6 +107,8 @@ enum class Step {
     swapResources,
     genSecondaryCrimson,
     genSecondaryCorruption,
+    // Sunken.
+    genFlood,
     // Hardmode.
     genHardmodeOres,
     genHallow,
@@ -158,8 +161,8 @@ inline std::array baseStructureRules{
     Step::genStarterHome, Step::genIgloo,      Step::genMushroomCabin,
     Step::genOceanWreck,  Step::genTreasure,   Step::applyHardmodeLoot,
     Step::genPlants,      Step::genTraps,      Step::genTracks,
-    Step::smoothSurfaces, Step::finalizeWalls, Step::genVines,
-    Step::genGrasses,
+    Step::smoothSurfaces, Step::finalizeWalls, Step::genFlood,
+    Step::genVines,       Step::genGrasses,
 };
 
 inline std::array patchesBiomeRules{
@@ -254,6 +257,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(swapResources)
         GEN_STEP(genSecondaryCrimson)
         GEN_STEP(genSecondaryCorruption)
+        GEN_STEP_WORLD(genFlood)
         GEN_STEP(genHardmodeOres)
         GEN_STEP(genHallow)
         GEN_STEP_WORLD(applyHardmodeLoot)
@@ -286,6 +290,9 @@ void doWorldGen(Random &rnd, World &world)
             {Step::swapResources,
              Step::genSecondaryCrimson,
              Step::genSecondaryCorruption});
+    }
+    if (!world.conf.sunken) {
+        excludes.insert(Step::genFlood);
     }
     if (world.conf.purity) {
         world.surfaceEvilCenter = 0;
