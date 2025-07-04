@@ -1,5 +1,6 @@
 #include "AshenField.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
@@ -14,6 +15,9 @@ void genAshenField(Random &rnd, World &world)
         return;
     }
     double width = 100 + world.getWidth() / rnd.getInt(64, 85);
+    if (world.conf.shattered) {
+        width *= 0.82;
+    }
     int minX = world.getWidth() / 2 - width;
     int maxX = world.getWidth() / 2 + width;
     int minY = std::min(
@@ -51,11 +55,11 @@ void genAshenField(Random &rnd, World &world)
     }
     double height = maxY - world.spawnY;
     for (int x = minX; x < maxX; ++x) {
-        int surface = std::lerp(
+        int surface = scanWhileEmpty({x, minY}, {0, 1}, world).second;
+        surface = std::lerp(
             world.spawnY,
-            std::min(
-                scanWhileEmpty({x, minY}, {0, 1}, world).second,
-                world.getUndergroundLevel()),
+            surface < world.getUndergroundLevel() ? surface
+                                                  : world.getSurfaceLevel(x),
             std::abs(x - world.getWidth() / 2) / width);
         for (int y = minY; y < maxY; ++y) {
             double threshold = std::hypot(
