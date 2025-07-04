@@ -32,7 +32,15 @@ void floodFill(int startX, int startY, int minY, World &world)
         Tile &tile = world.getTile(x, y);
         if (!isSolidBlock(tile.blockID) && tile.blockID != TileID::bubble &&
             !skipWalls.contains(tile.wallID) && tile.liquid == Liquid::none) {
-            tile.liquid = Liquid::water;
+            if (y + 10 > world.getUnderworldLevel() &&
+                (tile.blockID == TileID::empty ||
+                 tile.blockID == TileID::minecartTrack)) {
+                tile.blockID = TileID::obsidian;
+                tile.frameX = 0;
+                tile.frameY = 0;
+            } else {
+                tile.liquid = Liquid::water;
+            }
             for (auto [i, j] : {std::pair{-1, 0}, {1, 0}, {0, -1}, {0, 1}}) {
                 locations.emplace_back(x + i, y + j);
             }

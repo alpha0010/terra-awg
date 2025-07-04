@@ -1071,7 +1071,9 @@ private:
                     tile.blockID = existingTileId;
                 }
             }
-            for (int j = entry.getHeight(); j < 100; ++j) {
+            int maxJ =
+                world.conf.shattered ? entry.getHeight() + roomSize : 100;
+            for (int j = entry.getHeight(); j < maxJ; ++j) {
                 Tile &tile = world.getTile(x + i, y + j);
                 if (tile.wallID == theme.brickWall) {
                     if (j < 50) {
@@ -1110,12 +1112,13 @@ private:
         int delta = isOnLeft ? 1 : -1;
         x += isOnLeft ? entry.getWidth() : -1;
         y += entry.getHeight() - 1;
+        int maxJ = world.conf.shattered ? roomSize + 1 : 100;
         for (int i = 0; std::abs(i) < 50; i += delta) {
             int minJ = 2 * std::abs(i);
             if (world.getTile(x + i, y + minJ).blockID != TileID::empty) {
                 break;
             }
-            for (int j = minJ; j < 100; ++j) {
+            for (int j = minJ; j < maxJ; ++j) {
                 Tile &tile = world.getTile(x + i, y + j);
                 if (tile.blockID != TileID::empty) {
                     if (tile.blockID == TileID::grass) {
@@ -1253,14 +1256,25 @@ public:
              x < dungeonCenter + dungeonWidth + roomSize;
              x += 4) {
             bool prevWasDungeon = false;
+            bool checkedForGround = false;
             for (int y = yMin; y < world.getUnderworldLevel(); ++y) {
                 Tile &tile = world.getTile(x, y);
                 if (prevWasDungeon && tile.blockID == TileID::empty &&
                     tile.wallID != theme.brickWall) {
-                    tile.blockID = theme.brick;
-                    tile.actuated = true;
+                    if (checkedForGround) {
+                        tile.blockID = theme.brick;
+                        tile.actuated = true;
+                    } else if (
+                        scanWhileEmpty({x, y}, {0, 1}, world).second - y < 35) {
+                        tile.blockID = theme.brick;
+                        tile.actuated = true;
+                        checkedForGround = true;
+                    } else {
+                        prevWasDungeon = false;
+                    }
                 } else if (tile.blockID == theme.brick) {
                     prevWasDungeon = true;
+                    checkedForGround = false;
                 } else {
                     prevWasDungeon = false;
                 }

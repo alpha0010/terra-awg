@@ -137,7 +137,7 @@ void placeCobwebs(
                 continue;
             }
             Tile &tile = world.getTile(centerX + i, centerY + j);
-            if (tile.blockID == TileID::empty) {
+            if (tile.blockID == TileID::empty && tile.wallID != WallID::empty) {
                 tile.blockID = TileID::cobweb;
             }
         }

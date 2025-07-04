@@ -42,15 +42,24 @@ Point selectBoatLocation(int width, int height, Random &rnd, World &world)
     for (int tries = 0; tries < 8000; ++tries) {
         int x = rnd.getInt(minX, maxX);
         int y = rnd.getInt(world.getCavernLevel(), maxY);
+        int maxEmpty = 0.7 * width * height;
         if ((!world.conf.patches || isInBiome(
                                         x + biomeScan,
                                         y + biomeScan,
                                         biomeScan,
                                         Biome::snow,
                                         world)) &&
-            world.regionPasses(x, y, width, height, [&avoidBlocks](Tile &tile) {
-                return !avoidBlocks.contains(tile.blockID);
-            })) {
+            world.regionPasses(
+                x,
+                y,
+                width,
+                height,
+                [&avoidBlocks, &maxEmpty](Tile &tile) {
+                    if (tile.blockID == TileID::empty) {
+                        --maxEmpty;
+                    }
+                    return !avoidBlocks.contains(tile.blockID) && maxEmpty > 0;
+                })) {
             return {x, y};
         }
     }

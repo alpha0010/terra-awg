@@ -254,7 +254,10 @@ void growTapRoot(double x, double y, int roomId, Random &rnd, World &world)
             Tile &tile =
                 world.getTile(x + i + 2.8 * rnd.getFineNoise(x, j), y + j);
             if (tile.blockID == TileID::livingWood ||
-                tile.blockID == TileID::empty) {
+                (tile.blockID == TileID::empty &&
+                 (tile.wallID != WallID::empty ||
+                  y + j - 3 + 3 * rnd.getFineNoise(x + i, y + j) >
+                      world.getUndergroundLevel()))) {
                 continue;
             }
             tile.wallID = WallID::Unsafe::livingWood;

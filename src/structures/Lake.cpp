@@ -122,6 +122,9 @@ void simulateRain(Random &rnd, World &world, int x)
                         : world.conf.patches && y < lavaLevel
                             ? 1.15 + rnd.getHumidity(x, y)
                             : 1.6;
+        if (pendingWater > 10) {
+            pendingWater *= 0.94;
+        }
         auto [minDropX, maxDropX, dropY] =
             followRainFrom(world, x, y, isLiquidPathable);
         if (maxDropX - minDropX < pendingWater) {
@@ -133,7 +136,9 @@ void simulateRain(Random &rnd, World &world, int x)
                 (y < world.getUndergroundLevel() &&
                  (surfaceDryBlocks.contains(probeTile.blockID) ||
                   probeTile.liquid == Liquid::lava)) ||
-                dropY > world.getUnderworldLevel() + 50) {
+                dropY > world.getUnderworldLevel() + 50 ||
+                (world.conf.shattered && dropY < lavaLevel &&
+                 dryWalls.contains(probeTile.wallID))) {
                 continue;
             }
             if (y < world.getUndergroundLevel() &&

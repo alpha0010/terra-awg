@@ -122,6 +122,35 @@ void growMahoganyVine(
     }
 }
 
+void growMahoganyVines(
+    int minX,
+    int maxX,
+    int minY,
+    int maxY,
+    Random &rnd,
+    World &world)
+{
+    int numVines = (maxY - minY) * (maxX - minX) / rnd.getInt(6910, 8640);
+    while (numVines > 0) {
+        int x = rnd.getInt(minX, maxX);
+        int y = rnd.getInt(minY, maxY);
+        if (!world.regionPasses(x - 4, y - 4, 8, 8, [](Tile &tile) {
+                return tile.blockID != TileID::empty &&
+                       tile.blockID != TileID::livingMahogany &&
+                       tile.blockID != TileID::mahoganyLeaf;
+            })) {
+            continue;
+        }
+        growMahoganyVine(
+            {x, y},
+            rnd.getDouble(2.1, 2.5),
+            rnd.getDouble(-std::numbers::pi, std::numbers::pi),
+            rnd,
+            world);
+        --numVines;
+    }
+}
+
 void connectSurfaceCaves(int xMin, int xMax, Random &rnd, World &world)
 {
     rnd.restoreShuffleState();
@@ -146,6 +175,16 @@ void connectSurfaceCaves(int xMin, int xMax, Random &rnd, World &world)
 
 void levitateIslands(int lb, int ub, Random &rnd, World &world)
 {
+    if (world.conf.shattered) {
+        growMahoganyVines(
+            lb,
+            ub,
+            0.7 * world.getUndergroundLevel(),
+            std::midpoint(world.getUndergroundLevel(), world.getCavernLevel()),
+            rnd,
+            world);
+        return;
+    }
     int minSurface = world.getUndergroundLevel();
     int xMin = lb;
     int xMax = lb;
@@ -159,25 +198,7 @@ void levitateIslands(int lb, int ub, Random &rnd, World &world)
     connectSurfaceCaves(xMin, xMax, rnd, world);
     int yMin = minSurface - 0.22 * world.getUndergroundLevel();
     int yMax = minSurface + 0.1 * world.getUndergroundLevel();
-    int numVines = (yMax - yMin) * (xMax - xMin) / rnd.getInt(6910, 8640);
-    while (numVines > 0) {
-        int x = rnd.getInt(xMin, xMax);
-        int y = rnd.getInt(yMin, yMax);
-        if (!world.regionPasses(x - 4, y - 4, 8, 8, [](Tile &tile) {
-                return tile.blockID != TileID::empty &&
-                       tile.blockID != TileID::livingMahogany &&
-                       tile.blockID != TileID::mahoganyLeaf;
-            })) {
-            continue;
-        }
-        growMahoganyVine(
-            {x, y},
-            rnd.getDouble(2.1, 2.5),
-            rnd.getDouble(-std::numbers::pi, std::numbers::pi),
-            rnd,
-            world);
-        --numVines;
-    }
+    growMahoganyVines(xMin, xMax, yMin, yMax, rnd, world);
     for (int x = xMin - 100; x < xMax + 100; ++x) {
         for (int y = yMin - 100; y < yMax + 100; ++y) {
             Tile &tile = world.getTile(x, y);

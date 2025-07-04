@@ -23,7 +23,7 @@ void computeSurfaceLevel(Random &rnd, World &world)
     // Keep surface terrain mostly level near spawn and oceans.
     for (int x = 0; x < world.getWidth(); ++x) {
         double drop =
-            world.conf.sunken
+            world.conf.sunken && !world.conf.shattered
                 ? 120 * (1 / (1 + std::exp(0.057 * (180 + center - x))) +
                          1 / (1 + std::exp(0.057 * (180 + x - center)))) -
                       90

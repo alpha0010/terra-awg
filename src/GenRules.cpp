@@ -34,6 +34,7 @@
 #include "biomes/patches/Cloud.h"
 #include "biomes/patches/Hive.h"
 #include "biomes/patches/Jungle.h"
+#include "biomes/shattered/ShatteredLand.h"
 #include "structures/BuriedBoat.h"
 #include "structures/DesertTomb.h"
 #include "structures/Dungeon.h"
@@ -107,6 +108,8 @@ enum class Step {
     swapResources,
     genSecondaryCrimson,
     genSecondaryCorruption,
+    // Shattered.
+    genShatteredLand,
     // Sunken.
     genFlood,
     // Hardmode.
@@ -131,6 +134,7 @@ inline std::array baseBiomeRules{
     Step::genMarbleCave,
     Step::genSnow,
     Step::genDesert,
+    Step::genShatteredLand,
     Step::genJungle,
     Step::genForest,
     Step::genAshenField,
@@ -166,19 +170,33 @@ inline std::array baseStructureRules{
 };
 
 inline std::array patchesBiomeRules{
-    Step::initNoise,           Step::initBiomeNoise,
-    Step::genWorldBasePatches, Step::genOceans,
-    Step::genCloudPatches,     Step::genMarbleCave,
-    Step::genJunglePatches,    Step::genForest,
-    Step::genAshenField,       Step::genUnderworld,
-    Step::genGlowingMushroom,  Step::genGraniteCave,
-    Step::genHivePatches,      Step::genAether,
-    Step::genCrimson,          Step::genCorruption,
-    Step::genSecondaryCrimson, Step::genSecondaryCorruption,
-    Step::applyQueuedEvil,     Step::genHardmodeOres,
-    Step::genHallow,           Step::swapResources,
-    Step::genAsteroidField,    Step::genGemCave,
-    Step::genSpiderNest,       Step::genGlowingMoss,
+    Step::initNoise,
+    Step::initBiomeNoise,
+    Step::genWorldBasePatches,
+    Step::genOceans,
+    Step::genShatteredLand,
+    Step::genCloudPatches,
+    Step::genMarbleCave,
+    Step::genJunglePatches,
+    Step::genForest,
+    Step::genAshenField,
+    Step::genUnderworld,
+    Step::genGlowingMushroom,
+    Step::genGraniteCave,
+    Step::genHivePatches,
+    Step::genAether,
+    Step::genCrimson,
+    Step::genCorruption,
+    Step::genSecondaryCrimson,
+    Step::genSecondaryCorruption,
+    Step::applyQueuedEvil,
+    Step::genHardmodeOres,
+    Step::genHallow,
+    Step::swapResources,
+    Step::genAsteroidField,
+    Step::genGemCave,
+    Step::genSpiderNest,
+    Step::genGlowingMoss,
     Step::genGemGrove,
 };
 
@@ -257,6 +275,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(swapResources)
         GEN_STEP(genSecondaryCrimson)
         GEN_STEP(genSecondaryCorruption)
+        GEN_STEP(genShatteredLand)
         GEN_STEP_WORLD(genFlood)
         GEN_STEP(genHardmodeOres)
         GEN_STEP(genHallow)
@@ -290,6 +309,9 @@ void doWorldGen(Random &rnd, World &world)
             {Step::swapResources,
              Step::genSecondaryCrimson,
              Step::genSecondaryCorruption});
+    }
+    if (!world.conf.shattered) {
+        excludes.insert(Step::genShatteredLand);
     }
     if (!world.conf.sunken) {
         excludes.insert(Step::genFlood);

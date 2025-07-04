@@ -53,7 +53,9 @@ void genAshenField(Random &rnd, World &world)
     for (int x = minX; x < maxX; ++x) {
         int surface = std::lerp(
             world.spawnY,
-            scanWhileEmpty({x, minY}, {0, 1}, world).second,
+            std::min(
+                scanWhileEmpty({x, minY}, {0, 1}, world).second,
+                world.getUndergroundLevel()),
             std::abs(x - world.getWidth() / 2) / width);
         for (int y = minY; y < maxY; ++y) {
             double threshold = std::hypot(

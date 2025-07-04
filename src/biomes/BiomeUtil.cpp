@@ -147,7 +147,8 @@ Point findStoneCave(int yMin, int yMax, Random &rnd, World &world, int minSize)
             ++caveFloor;
         }
         if (world.getTile(x, caveFloor).blockID != TileID::stone ||
-            caveFloor - caveRoof < minSize) {
+            caveFloor - caveRoof < minSize ||
+            caveFloor - caveRoof > minSize + 50) {
             continue;
         }
         // Scan left.
@@ -165,7 +166,7 @@ Point findStoneCave(int yMin, int yMax, Random &rnd, World &world, int minSize)
             ++right;
         }
         if (world.getTile(right, y).blockID != TileID::stone ||
-            right - left < minSize) {
+            right - left < minSize || right - left > minSize + 50) {
             continue;
         }
         // Success.

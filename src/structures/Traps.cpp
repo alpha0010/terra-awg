@@ -191,7 +191,7 @@ void placeSandTraps(Random &rnd, World &world)
         }
         auto [x, y] = rnd.select(locations[binId]);
         int trapFloor = scanWhileEmpty({x, y}, {0, 1}, world).second;
-        if (trapFloor - y < 4 ||
+        if (trapFloor - y < 4 || trapFloor - y > 30 ||
             !validFloors.contains(world.getTile(x, trapFloor + 1).blockID) ||
             isLocationUsed(x, trapFloor, 3, usedLocations)) {
             continue;
@@ -205,6 +205,9 @@ void placeSandTraps(Random &rnd, World &world)
                 scanWhileEmpty({x + i, (y + trapFloor) / 2}, {0, -1}, world)
                     .second -
                 1;
+            if (trapCeiling + 45 < trapFloor) {
+                continue;
+            }
             Tile &tile = world.getTile(x + i, trapCeiling);
             if (looseBlocks.contains(tile.blockID) ||
                 (validFloors.contains(tile.blockID) &&
@@ -371,6 +374,7 @@ void placeLavaTraps(Random &rnd, World &world)
             !world.regionPasses(x, y, 1, trapFloor - y, isTrappable)) {
             continue;
         }
+        trapFloor = std::min(y + gapJ + 30, trapFloor);
         std::vector<Point> plateLocs;
         for (int plateX = x - 4; plateX < x + 4; ++plateX) {
             for (int plateY = y + gapJ - 2; plateY < trapFloor + 4; ++plateY) {

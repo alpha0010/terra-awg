@@ -7,6 +7,7 @@ SRCS := $(wildcard src/*.cpp) $(wildcard src/biomes/*.cpp) \
     $(wildcard src/biomes/doubleTrouble/*.cpp) \
     $(wildcard src/biomes/hardmode/*.cpp) \
     $(wildcard src/biomes/patches/*.cpp) \
+    $(wildcard src/biomes/shattered/*.cpp) \
     $(wildcard src/map/*.cpp) $(wildcard src/structures/*.cpp) \
     $(wildcard src/structures/hardmode/*.cpp) \
     $(wildcard src/structures/sunken/*.cpp) \

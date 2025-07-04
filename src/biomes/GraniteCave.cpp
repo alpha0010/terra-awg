@@ -23,11 +23,13 @@ void fillGraniteCave(int centerX, int centerY, Random &rnd, World &world)
          TileID::mud,
          TileID::mushroomGrass,
          TileID::jungleGrass});
-    fillLargeWallGaps(
-        {centerX - 0.71 * caveSize, centerY - 0.71 * caveSize},
-        {centerX + 0.71 * caveSize, centerY + 0.71 * caveSize},
-        rnd,
-        world);
+    if (!world.conf.shattered) {
+        fillLargeWallGaps(
+            {centerX - 0.71 * caveSize, centerY - 0.71 * caveSize},
+            {centerX + 0.71 * caveSize, centerY + 0.71 * caveSize},
+            rnd,
+            world);
+    }
     for (int x = std::max(centerX - caveSize, 0.0); x < centerX + caveSize;
          ++x) {
         for (int y = std::max(centerY - caveSize, 0.0); y < centerY + caveSize;

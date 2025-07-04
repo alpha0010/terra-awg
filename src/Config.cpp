@@ -22,6 +22,9 @@ name = Terra AWG World
 # Use the value:
 #   RANDOM
 # for a randomly generated seed.
+#
+# Note that that vanilla secret seeds have no special meaning here. To
+# integrate with secret seeds, see the related settings below.
 seed = RANDOM
 
 # World size:
@@ -38,6 +41,14 @@ mode = classic
 # Add a starter home at the spawn point.
 home = false
 
+# For a balanced world keep all the following settings at defaults.
+#
+# Unless mentioned otherwise on a specific option, all settings can be
+# mixed together. Note that if an impossible condition is requested, for
+# example more clouds than can fit in the sky, Terra AWG will make a best
+# effort attempt anyway, but some features may fail to generate, and in
+# rare cases, Terra AWG may freeze or crash (please report this so I can
+# fix it).
 [variation]
 # Add starter equipment at the spawn point. Options:
 #   none/iron/platinum/hellstone/mythril
@@ -46,6 +57,9 @@ equipment = none
 # Include both evil biomes and all ore variants.
 # Activates "drunk world" secret seed.
 doubleTrouble = false
+
+# Break up the world into floating islands.
+shattered = false
 
 # Flood the majority of the world surface.
 sunken = false
@@ -515,6 +529,7 @@ Config readConfig(Random &rnd)
         false, // starterHome
         0,     // equipment
         false, // doubleTrouble
+        false, // shattered
         false, // sunken
         false, // purity
         false, // hardmode
@@ -573,6 +588,7 @@ Config readConfig(Random &rnd)
     conf.equipment =
         parseEquipment(reader.Get("variation", "equipment", "none"));
     READ_CONF_VALUE(variation, doubleTrouble, Boolean);
+    READ_CONF_VALUE(variation, shattered, Boolean);
     READ_CONF_VALUE(variation, sunken, Boolean);
     READ_CONF_VALUE(variation, purity, Boolean);
     READ_CONF_VALUE(variation, hardmode, Boolean);

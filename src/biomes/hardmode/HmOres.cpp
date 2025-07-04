@@ -68,16 +68,28 @@ void genHardmodeOres(Random &rnd, World &world)
     std::array<DepositDef, 3> depositNoise({
         {world.cobaltVariant,
          0,
-         std::lerp(world.getCavernLevel(), world.getUnderworldLevel(), 0.48),
+         static_cast<int>(std::lerp(
+             world.getCavernLevel(),
+             world.getUnderworldLevel(),
+             0.48)),
          rnd.getInt(0, world.getWidth()),
          rnd.getInt(0, world.getHeight())},
         {world.mythrilVariant,
-         std::lerp(world.getCavernLevel(), world.getUnderworldLevel(), 0.12),
-         std::lerp(world.getCavernLevel(), world.getUnderworldLevel(), 0.73),
+         static_cast<int>(std::lerp(
+             world.getCavernLevel(),
+             world.getUnderworldLevel(),
+             0.12)),
+         static_cast<int>(std::lerp(
+             world.getCavernLevel(),
+             world.getUnderworldLevel(),
+             0.73)),
          rnd.getInt(0, world.getWidth()),
          rnd.getInt(0, world.getHeight())},
         {world.adamantiteVariant,
-         std::lerp(world.getCavernLevel(), world.getUnderworldLevel(), 0.61),
+         static_cast<int>(std::lerp(
+             world.getCavernLevel(),
+             world.getUnderworldLevel(),
+             0.61)),
          world.getHeight(),
          rnd.getInt(0, world.getWidth()),
          rnd.getInt(0, world.getHeight())},

@@ -12,11 +12,13 @@ void fillMarbleCave(int x, int y, Random &rnd, World &world)
     double caveWidth = world.conf.marbleSize * rnd.getDouble(70, 150);
     double caveHeight = world.conf.marbleSize * rnd.getDouble(40, 70);
     rnd.shuffleNoise();
-    fillLargeWallGaps(
-        {x - 0.7 * caveWidth, y - 0.7 * caveHeight},
-        {x + 0.7 * caveWidth, y + 0.7 * caveHeight},
-        rnd,
-        world);
+    if (!world.conf.shattered) {
+        fillLargeWallGaps(
+            {x - 0.7 * caveWidth, y - 0.7 * caveHeight},
+            {x + 0.7 * caveWidth, y + 0.7 * caveHeight},
+            rnd,
+            world);
+    }
     for (int i = std::max<int>(-caveWidth, -x); i < caveWidth; ++i) {
         int stalactiteLen = 0;
         int stalacIter = 0;
