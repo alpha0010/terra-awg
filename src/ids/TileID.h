@@ -104,6 +104,8 @@ enum {
     snowBrick = 148,
     sandstoneBrick = 151,
     ebonstoneBrick = 152,
+    redStucco = 153,
+    grayStucco = 156,
     richMahogany = 158,
     ice = 161,
     thinIce = 162,
