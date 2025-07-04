@@ -7,6 +7,7 @@
 #include "structures/Traps.h"
 #include "structures/data/Trees.h"
 #include "vendor/frozen/set.h"
+#include <algorithm>
 #include <iostream>
 
 bool isRegionEmpty(int x, int y, int width, int height, World &world)
@@ -20,8 +21,9 @@ bool isSunken(int x, int y, World &world)
 {
     return world.conf.sunken && y < world.getUndergroundLevel() &&
            y > std::max(
-                   world.getSurfaceLevel(world.getWidth() / 2 - 130),
-                   world.getSurfaceLevel(world.getWidth() / 2 + 130)) &&
+                   {world.getSurfaceLevel(world.getWidth() / 2 - 130),
+                    world.getSurfaceLevel(world.getWidth() / 2),
+                    world.getSurfaceLevel(world.getWidth() / 2 + 130)}) &&
            std::hypot(world.dungeonX - x, world.dungeonY - y) > 78;
 }
 

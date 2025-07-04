@@ -1072,7 +1072,7 @@ private:
                 }
             }
             int maxJ =
-                world.conf.shattered ? entry.getHeight() + roomSize : 100;
+                world.conf.shattered ? entry.getHeight() + roomSize + 1 : 100;
             for (int j = entry.getHeight(); j < maxJ; ++j) {
                 Tile &tile = world.getTile(x + i, y + j);
                 if (tile.wallID == theme.brickWall) {
@@ -1112,7 +1112,7 @@ private:
         int delta = isOnLeft ? 1 : -1;
         x += isOnLeft ? entry.getWidth() : -1;
         y += entry.getHeight() - 1;
-        int maxJ = world.conf.shattered ? roomSize + 1 : 100;
+        int maxJ = world.conf.shattered ? roomSize + 2 : 100;
         for (int i = 0; std::abs(i) < 50; i += delta) {
             int minJ = 2 * std::abs(i);
             if (world.getTile(x + i, y + minJ).blockID != TileID::empty) {
