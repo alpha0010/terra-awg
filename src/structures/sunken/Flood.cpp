@@ -54,6 +54,12 @@ void floodFill(int startX, int startY, int minY, World &world)
                     locations.emplace_back(x + i, y + j);
                 }
             }
+        } else if (
+            tile.liquid == Liquid::lava &&
+            (tile.blockID == TileID::empty ||
+             tile.blockID == TileID::woodenBeam)) {
+            tile.blockID = TileID::obsidian;
+            tile.liquid = Liquid::none;
         }
     }
 }
