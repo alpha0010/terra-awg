@@ -84,6 +84,7 @@ int placeMushroomStruct(
             tile.blockPaint =
                 tile.blockID == TileID::slime ? paint : Paint::none;
             tile.wallID = WallID::Unsafe::mushroom;
+            tile.liquid = Liquid::none;
         }
     }
     for (int i = 0; i < data.getWidth(); ++i) {

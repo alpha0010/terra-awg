@@ -19,11 +19,13 @@ bool isRegionEmpty(int x, int y, int width, int height, World &world)
 
 bool isSunken(int x, int y, World &world)
 {
+    int delta = world.conf.shattered ? 120 : 130;
     return world.conf.sunken && y < world.getUndergroundLevel() &&
            y > std::max(
-                   {world.getSurfaceLevel(world.getWidth() / 2 - 130),
+                   {world.getSurfaceLevel(world.getWidth() / 2 - delta),
                     world.getSurfaceLevel(world.getWidth() / 2),
-                    world.getSurfaceLevel(world.getWidth() / 2 + 130)}) &&
+                    world.getSurfaceLevel(world.getWidth() / 2 + delta)}) +
+                   (world.conf.shattered ? 3 : 0) &&
            std::hypot(world.dungeonX - x, world.dungeonY - y) > 78;
 }
 

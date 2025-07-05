@@ -159,13 +159,13 @@ inline std::array baseBiomeRules{
 };
 
 inline std::array baseStructureRules{
-    Step::genDungeon,     Step::genTemple,     Step::genPyramid,
-    Step::genDesertTomb,  Step::genBuriedBoat, Step::genSpiderHall,
-    Step::genRuins,       Step::genTorchArena, Step::genLake,
-    Step::genStarterHome, Step::genIgloo,      Step::genMushroomCabin,
-    Step::genOceanWreck,  Step::genTreasure,   Step::applyHardmodeLoot,
-    Step::genPlants,      Step::genTraps,      Step::genTracks,
-    Step::smoothSurfaces, Step::finalizeWalls, Step::genFlood,
+    Step::genDungeon,     Step::genTemple,      Step::genPyramid,
+    Step::genDesertTomb,  Step::genBuriedBoat,  Step::genSpiderHall,
+    Step::genRuins,       Step::genTorchArena,  Step::genLake,
+    Step::genStarterHome, Step::genIgloo,       Step::genMushroomCabin,
+    Step::genOceanWreck,  Step::genTreasure,    Step::applyHardmodeLoot,
+    Step::genPlants,      Step::genTraps,       Step::genTracks,
+    Step::genFlood,       Step::smoothSurfaces, Step::finalizeWalls,
     Step::genVines,       Step::genGrasses,
 };
 

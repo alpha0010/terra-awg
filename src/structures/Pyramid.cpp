@@ -149,7 +149,7 @@ Point fillTreasureRoom(int x, int y, Random &rnd, World &world)
 void applyGravity(int x, int y, int width, int height, World &world)
 {
     constexpr auto unstableBlocks = frozen::make_set<int>(
-        {TileID::sand, TileID::ebonsand, TileID::crimsand});
+        {TileID::sand, TileID::ebonsand, TileID::crimsand, TileID::pearlsand});
     for (int i = 0; i < width; ++i) {
         int lastGap = -1;
         std::set<int> fallenTiles;
