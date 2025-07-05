@@ -215,6 +215,8 @@ void genHallow(Random &rnd, World &world)
             if (tile.wireBlue) {
                 tile.wireBlue = false;
                 tile.blockID = TileID::crystalBlock;
+                tile.slope = Slope::none;
+                tile.guarded = false;
                 hallowCores.emplace_back(x, y);
             }
             auto blockItr = hallowBlocks.find(tile.blockID);
