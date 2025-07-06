@@ -1,5 +1,6 @@
 #include "Crimson.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
@@ -34,7 +35,7 @@ void genCrimsonAt(int surfaceX, int undergroundX, Random &rnd, World &world)
     int surfaceY = rnd.getInt(
         0.95 * world.getUndergroundLevel(),
         (2 * world.getUndergroundLevel() + world.getCavernLevel()) / 3);
-    int scanDist = 0.08 * world.getWidth();
+    int scanDist = world.conf.evilSize * 0.08 * world.getWidth();
     // Conversion mappings.
     constexpr auto crimsonBlocks = frozen::make_map<int, int>(
         {{TileID::stone, TileID::crimstone},
@@ -92,7 +93,8 @@ void genCrimsonAt(int surfaceX, int undergroundX, Random &rnd, World &world)
          TileID::livingMahogany,
          TileID::mahoganyLeaf});
     int scaleFactor =
-        std::midpoint<int>(world.getWidth(), 3.5 * world.getHeight());
+        world.conf.evilSize *
+        std::midpoint<double>(world.getWidth(), 3.5 * world.getHeight());
     // Dig surface smooth tunnel network, edged with crimstone.
     for (int x = surfaceX - scanDist; x < surfaceX + scanDist; ++x) {
         for (int y = 0.45 * world.getUndergroundLevel();

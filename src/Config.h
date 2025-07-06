@@ -32,13 +32,16 @@ struct Config {
     double chests;
     double gems;
     double traps;
+    double trees;
     double livingTrees;
     double clouds;
     double asteroids;
     double minecartTracks;
     double minecartLength;
     double aetherSize;
+    double dungeonSize;
     double templeSize;
+    double evilSize;
     double marbleFreq;
     double marbleSize;
     double graniteFreq;

@@ -94,13 +94,16 @@ chests = 1.0
 gems = 1.0
 # Activates "no traps" secret seed when greater than 15.
 traps = 1.0
+trees = 1.0
 livingTrees = 1.0
 clouds = 1.0
 asteroids = 1.0
 minecartTracks = 1.0
 minecartLength = 1.0
 aetherSize = 1.0
+dungeonSize = 1.0
 templeSize = 1.0
+evilSize = 1.0
 marbleFreq = 1.0
 marbleSize = 1.0
 graniteFreq = 1.0
@@ -545,13 +548,16 @@ Config readConfig(Random &rnd)
         1.0,   // chests
         1.0,   // gems
         1.0,   // traps
+        1.0,   // trees
         1.0,   // livingTrees
         1.0,   // clouds
         1.0,   // asteroids
         1.0,   // minecartTracks
         1.0,   // minecartLength
         1.0,   // aetherSize
+        1.0,   // dungeonSize
         1.0,   // templeSize
+        1.0,   // evilSize
         1.0,   // marbleFreq
         1.0,   // marbleSize
         1.0,   // graniteFreq
@@ -604,13 +610,16 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, chests, Real);
     READ_CONF_VALUE(variation, gems, Real);
     READ_CONF_VALUE(variation, traps, Real);
+    READ_CONF_VALUE(variation, trees, Real);
     READ_CONF_VALUE(variation, livingTrees, Real);
     READ_CONF_VALUE(variation, clouds, Real);
     READ_CONF_VALUE(variation, asteroids, Real);
     READ_CONF_VALUE(variation, minecartTracks, Real);
     READ_CONF_VALUE(variation, minecartLength, Real);
     READ_CONF_AREA_VALUE(variation, aetherSize);
+    READ_CONF_VALUE(variation, dungeonSize, Real);
     READ_CONF_AREA_VALUE(variation, templeSize);
+    READ_CONF_AREA_VALUE(variation, evilSize);
     READ_CONF_VALUE(variation, marbleFreq, Real);
     READ_CONF_AREA_VALUE(variation, marbleSize);
     READ_CONF_VALUE(variation, graniteFreq, Real);

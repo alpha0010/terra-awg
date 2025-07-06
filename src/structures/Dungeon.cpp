@@ -79,6 +79,51 @@ private:
     DungeonTheme theme;
     std::vector<Point> requestedDoors;
 
+    Point selectSize(int dungeonCenter)
+    {
+        double dungeonSize = world.conf.dungeonSize;
+        double initialW = rnd.getDouble(0.029, 0.034) * world.getWidth();
+        double initialH = rnd.getDouble(0.35, 0.4) * world.getHeight();
+        double targetSize = dungeonSize * initialW * initialH;
+        int dungeonHeight = std::max(
+            std::min(
+                (dungeonSize < 1 ? std::lerp(
+                                       std::sqrt(dungeonSize),
+                                       dungeonSize,
+                                       dungeonSize)
+                                 : dungeonSize) *
+                    initialH,
+                0.4 * world.getHeight()),
+            2.5 * roomSize);
+        int maxWidth =
+            std::min(dungeonCenter, world.getWidth() - dungeonCenter) - 100;
+        return {
+            std::min<int>(targetSize / dungeonHeight, maxWidth),
+            dungeonHeight};
+    }
+
+    void sortInitialZones(
+        int dungeonCenter,
+        int dungeonWidth,
+        std::vector<Point> &zones)
+    {
+        int thresholdY = zones.front().second + roomSize;
+        auto endItr = zones.begin();
+        while (endItr != zones.end() && endItr->second <= thresholdY) {
+            ++endItr;
+        }
+        std::sort(zones.begin(), endItr);
+        int thresholdX = dungeonCenter - dungeonWidth / 5;
+        endItr = zones.begin();
+        while (endItr != zones.end() && endItr->first < thresholdX &&
+               endItr->second <= thresholdY) {
+            ++endItr;
+        }
+        if (endItr != zones.begin()) {
+            std::reverse(zones.begin(), endItr);
+        }
+    }
+
     void drawRect(
         Point topLeft,
         Point bottomRight,
@@ -338,7 +383,10 @@ private:
     void addPlatforms(const std::vector<Point> &zones)
     {
         std::set<int> usedRows;
-        int maxPlatforms = world.getHeight() / 40;
+        int maxPlatforms =
+            (world.conf.dungeonSize > 1 ? 0.8 * world.conf.dungeonSize + 0.2
+                                        : 1) *
+            world.getHeight() / 40;
         for (int i = 0; i < maxPlatforms; ++i) {
             auto [centerX, centerY] = selectPlatformLocation(zones);
             if (usedRows.contains(centerY / 7)) {
@@ -541,8 +589,7 @@ private:
     {
         int numTraps = (world.conf.traps > 1 ? 1 + world.conf.traps / 25
                                              : world.conf.traps) *
-                       world.getWidth() * world.getHeight() /
-                       rnd.getInt(384000, 576000);
+                       locations.size() / rnd.getDouble(124.68, 187.03);
         while (numTraps > 0) {
             auto [x, y] = rnd.select(locations);
             if (!isValidPlacementLocation(x, y, 1, 4, true)) {
@@ -585,8 +632,8 @@ private:
     void addBoulderTraps(int dungeonCenter, int dungeonWidth)
     {
         int numBoulders =
-            world.conf.traps * world.getWidth() * world.getHeight() / 70560000;
-        if (numBoulders <= 0) {
+            world.conf.traps * dungeonWidth * world.getHeight() / 2222640;
+        if (numBoulders <= 0 || world.conf.traps < 2) {
             return;
         }
         std::vector<Point> locations;
@@ -639,7 +686,7 @@ private:
               {TileID::bewitchingTable, Variant::oilRagSconce},
               {TileID::boneWelder, Variant::bone}}) {
             int numPlacements = std::round(
-                rnd.getDouble(0.5, 3.2) + world.getHeight() / 1600.0);
+                rnd.getDouble(0.5, 3.2) + locations.size() / 2737.56);
             while (numPlacements > 0) {
                 auto [x, y] = rnd.select(locations);
                 if (isValidPlacementLocation(x, y, 3, 3, true)) {
@@ -649,7 +696,7 @@ private:
                 }
             }
         }
-        int numChests = world.conf.chests * world.getHeight() / 150;
+        int numChests = world.conf.chests * locations.size() / 256.65;
         while (numChests > 0) {
             auto [x, y] = rnd.select(locations);
             if (isValidPlacementLocation(x, y, 2, 3, true)) {
@@ -715,7 +762,7 @@ private:
     void addPaintings(int dungeonCenter, int dungeonWidth)
     {
         int numPaintings =
-            world.getWidth() * world.getHeight() / rnd.getInt(640000, 960000);
+            dungeonWidth * world.getHeight() / rnd.getInt(20160, 30240);
         std::array dungeonPaintings{
             Painting::bloodMoonRising,
             Painting::boneWarp,
@@ -891,7 +938,7 @@ private:
     void addFurniture(int dungeonCenter, int dungeonWidth)
     {
         double numPlacements =
-            world.getWidth() * world.getHeight() / rnd.getInt(144000, 192000);
+            dungeonWidth * world.getHeight() / rnd.getInt(4536, 6048);
         std::vector<Point> usedLocations;
         while (numPlacements > 0) {
             TileBuffer data = getFurniture(
@@ -1214,8 +1261,7 @@ public:
     void gen(int dungeonCenter)
     {
         selectEntry(dungeonCenter);
-        int dungeonWidth = rnd.getDouble(0.029, 0.034) * world.getWidth();
-        int dungeonHeight = rnd.getDouble(0.35, 0.4) * world.getHeight();
+        auto [dungeonWidth, dungeonHeight] = selectSize(dungeonCenter);
         int yMin =
             (world.getUndergroundLevel() + 4 * world.getCavernLevel()) / 5;
         int shuffleX = rnd.getInt(0, world.getWidth());
@@ -1238,6 +1284,7 @@ public:
         makeMapRoom(zones);
         std::set<Point> connectedZones;
         std::set<Point> allZones{zones.begin(), zones.end()};
+        sortInitialZones(dungeonCenter, dungeonWidth, zones);
         for (auto [x, y] : zones) {
             if (connectedZones.empty()) {
                 findConnectedZones(x, y, connectedZones, allZones);
@@ -1333,6 +1380,9 @@ int computeDungeonCenter(World &world)
 
 void genDungeon(Random &rnd, World &world)
 {
+    if (world.conf.dungeonSize < 0.01) {
+        return;
+    }
     std::cout << "Employing the undead\n";
     rnd.shuffleNoise();
     Dungeon structure(rnd, world);

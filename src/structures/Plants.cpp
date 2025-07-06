@@ -100,7 +100,7 @@ void growCactus(int x, int y, Random &rnd, World &world)
 
 void growPalmTree(int x, int y, Random &rnd, World &world)
 {
-    if (rnd.getDouble(0, 1) > 0.3) {
+    if (rnd.getDouble(0, 1) > 0.3 * world.conf.trees) {
         return;
     }
     for (int i = 0; i < 3; ++i) {
@@ -276,7 +276,7 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
             switch (curTileID) {
             case TileID::ashGrass:
                 if (world.getTile(x, y - 1).liquid == Liquid::none &&
-                    rnd.getDouble(0, 1) < 0.18) {
+                    rnd.getDouble(0, 1) < 0.18 * world.conf.trees) {
                     growTree(
                         x,
                         y,
@@ -296,7 +296,7 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
                 if (y < world.getUndergroundLevel() &&
                     world.getTile(x, y - 1).liquid == Liquid::none &&
                     world.getTile(x, y - 1).wallID == WallID::empty &&
-                    rnd.getDouble(0, 1) < 0.21) {
+                    rnd.getDouble(0, 1) < 0.21 * world.conf.trees) {
                     growTree(
                         x,
                         y,
@@ -322,7 +322,7 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
                         }
                     } else if (
                         world.getTile(x, y - 1).wallID == WallID::empty &&
-                        rnd.getDouble(0, 1) < 0.2) {
+                        rnd.getDouble(0, 1) < 0.2 * world.conf.trees) {
                         growTree(
                             x,
                             y,
@@ -333,7 +333,7 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
                     }
                 } else if (
                     world.getTile(x, y - 1).liquid == Liquid::none &&
-                    rnd.getDouble(0, 1) < 0.09) {
+                    rnd.getDouble(0, 1) < 0.09 * world.conf.trees) {
                     growTree(
                         x,
                         y,
@@ -345,7 +345,7 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
                 break;
             case TileID::mushroomGrass:
                 if (world.getTile(x, y - 1).liquid == Liquid::none &&
-                    rnd.getDouble(0, 1) < 0.35) {
+                    rnd.getDouble(0, 1) < 0.35 * world.conf.trees) {
                     growTree(
                         x,
                         y,
@@ -376,9 +376,13 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
                 if (y > world.getCavernLevel() &&
                     world.getTile(x, y - 1).liquid == Liquid::none &&
                     (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
-                             100 ==
+                             std::max<int>(
+                                 100 / std::max(world.conf.trees, 0.1),
+                                 2) ==
                          0 ||
-                     (inGemGrove(x, y, world) && rnd.getDouble(0, 1) < 0.85))) {
+                     (inGemGrove(x, y, world) &&
+                      rnd.getDouble(0, 1) <
+                          0.85 * std::max(world.conf.trees, 0.95)))) {
                     growTree(
                         x,
                         y,
