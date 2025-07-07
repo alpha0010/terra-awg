@@ -12,28 +12,32 @@
  */
 void applyAetherDistortion(int centerX, int centerY, double size, World &world)
 {
-    for (int x = std::max(centerX - size, 0.0); x < centerX + size; ++x) {
-        int yMin = std::max(centerY - size, 0.0);
-        int yMax = centerY + size;
+    int maxX = std::min<int>(centerX + size, world.getWidth());
+    int minY = std::max<int>(centerY - size, 1);
+    int maxY = std::min<int>(centerY + size, world.getHeight() - 1);
+    for (int x = std::max<int>(centerX - size, 0); x < maxX; ++x) {
         double distortion = 23 * std::sin(0.11 * x);
         if (distortion > 0) {
-            for (int y = yMin; y < yMax; ++y) {
+            for (int y = minY; y < maxY; ++y) {
                 int delta = distortion *
                             std::min(
                                 1 - std::hypot(x - centerX, y - centerY) / size,
                                 0.5);
                 if (delta > 0) {
-                    world.getTile(x, y) = world.getTile(x, y + delta);
+                    world.getTile(x, y) = world.getTile(
+                        x,
+                        std::min(y + delta, world.getHeight() - 1));
                 }
             }
         } else {
-            for (int y = yMax; y > yMin; --y) {
+            for (int y = maxY - 1; y > minY; --y) {
                 int delta = distortion *
                             std::min(
                                 1 - std::hypot(x - centerX, y - centerY) / size,
                                 0.5);
                 if (delta < 0) {
-                    world.getTile(x, y) = world.getTile(x, y + delta);
+                    world.getTile(x, y) =
+                        world.getTile(x, std::max(y + delta, 0));
                 }
             }
         }
