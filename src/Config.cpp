@@ -84,6 +84,9 @@ patchesTemperature = 0.0
 # How rapidly to transition biomes for biome patches.
 patchesSize = 1.0
 
+# Activates "for the worthy" secret seed.
+forTheWorthy = false
+
 # Placement frequency multipliers. 0.5 means half the
 # normal amount, 2.0 means double the normal amount.
 ore = 1.0
@@ -112,6 +115,8 @@ glowingMushroomFreq = 1.0
 glowingMushroomSize = 1.0
 hiveFreq = 1.0
 hiveSize = 1.0
+spiderNestFreq = 1.0
+spiderNestSize = 1.0
 glowingMossFreq = 1.0
 glowingMossSize = 1.0
 # Snow, desert, and jungle size are ignored for biome patches.
@@ -541,6 +546,7 @@ Config readConfig(Random &rnd)
         0.0,   // patchesHumidity
         0.0,   // patchesTemperature
         1.0,   // patchesSize
+        false, // forTheWorthy
         1.0,   // ore
         1.0,   // lifeCrystals
         1.0,   // manaCrystals
@@ -566,6 +572,8 @@ Config readConfig(Random &rnd)
         1.0,   // glowingMushroomSize
         1.0,   // hiveFreq
         1.0,   // hiveSize
+        1.0,   // spiderNestFreq
+        1.0,   // spiderNestSize
         1.0,   // glowingMossFreq
         1.0,   // glowingMossSize
         1.0,   // snowSize
@@ -603,6 +611,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, patchesHumidity, Real);
     READ_CONF_VALUE(variation, patchesTemperature, Real);
     READ_CONF_AREA_VALUE(variation, patchesSize);
+    READ_CONF_VALUE(variation, forTheWorthy, Boolean);
     READ_CONF_VALUE(variation, ore, Real);
     READ_CONF_VALUE(variation, lifeCrystals, Real);
     READ_CONF_VALUE(variation, manaCrystals, Real);
@@ -628,6 +637,8 @@ Config readConfig(Random &rnd)
     READ_CONF_AREA_VALUE(variation, glowingMushroomSize);
     READ_CONF_VALUE(variation, hiveFreq, Real);
     READ_CONF_AREA_VALUE(variation, hiveSize);
+    READ_CONF_VALUE(variation, spiderNestFreq, Real);
+    READ_CONF_AREA_VALUE(variation, spiderNestSize);
     READ_CONF_VALUE(variation, glowingMossFreq, Real);
     READ_CONF_AREA_VALUE(variation, glowingMossSize);
     READ_CONF_VALUE(variation, snowSize, Real);

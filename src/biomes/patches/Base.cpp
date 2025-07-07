@@ -231,9 +231,17 @@ void genWorldBasePatches(Random &rnd, World &world)
     world.spawnY = world.getSurfaceLevel(world.getWidth() / 2) - 1;
     world.initBiomeData();
     double oreThreshold = computeOreThreshold(world.conf.ore);
+    double goldThreshold = world.conf.forTheWorthy
+                               ? computeOreThreshold(1.35 * world.conf.ore)
+                               : oreThreshold;
     parallelFor(
         std::views::iota(0, world.getWidth()),
-        [oreThreshold, &depositNoise, &wallVarNoise, &rnd, &world](int x) {
+        [oreThreshold,
+         goldThreshold,
+         &depositNoise,
+         &wallVarNoise,
+         &rnd,
+         &world](int x) {
             bool nearEdge = x < 350 || x > world.getWidth() - 350;
             for (int y = 0; y < world.getHeight(); ++y) {
                 BiomeData biome = computeBiomeData(x, y, rnd);
@@ -377,7 +385,9 @@ void genWorldBasePatches(Random &rnd, World &world)
                     if (y > oreRoof && y < oreFloor &&
                         rnd.getFineNoise(
                             x + depositNoise[idx].first,
-                            y + depositNoise[idx].second) < oreThreshold) {
+                            y + depositNoise[idx].second) <
+                            (ore == world.goldVariant ? goldThreshold
+                                                      : oreThreshold)) {
                         tile.blockID = ore;
                         break;
                     }

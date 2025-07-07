@@ -12,6 +12,49 @@
 #include <iostream>
 #include <map>
 
+void genCloudCrimson(Random &rnd, World &world)
+{
+    int maxY = 0.45 * world.getUndergroundLevel();
+    parallelFor(
+        std::views::iota(0, world.getWidth()),
+        [maxY, &rnd, &world](int x) {
+            for (int y = 0; y < maxY; ++y) {
+                Tile &tile = world.getTile(x, y);
+                int crimsonBlock = TileID::empty;
+                switch (tile.blockID) {
+                case TileID::grass:
+                    tile.blockID = TileID::crimsonGrass;
+                    break;
+                case TileID::jungleGrass:
+                    tile.blockID = TileID::crimsonJungleGrass;
+                    break;
+                case TileID::sand:
+                    tile.blockID = TileID::crimsand;
+                    break;
+                case TileID::cloud:
+                case TileID::rainCloud:
+                case TileID::snowCloud:
+                    crimsonBlock = TileID::flesh;
+                    break;
+                case TileID::snow:
+                    crimsonBlock = TileID::crimsonIce;
+                    break;
+                case TileID::goldOre:
+                case TileID::platinumOre:
+                    crimsonBlock = TileID::crimtane;
+                    break;
+                }
+                if (crimsonBlock != TileID::empty &&
+                    std::abs(rnd.getBlurNoise(3 * x, 3 * y)) < 0.1) {
+                    tile.blockID = crimsonBlock;
+                    if (tile.wallID != WallID::empty) {
+                        tile.wallID = WallID::Unsafe::crimsonBlister;
+                    }
+                }
+            }
+        });
+}
+
 void genCrimson(Random &rnd, World &world)
 {
     std::cout << "Infecting the world\n";
@@ -27,6 +70,9 @@ void genCrimson(Random &rnd, World &world)
         world.getWidth() * rnd.getDouble(0.08, 0.92),
         rnd,
         world);
+    if (world.conf.forTheWorthy) {
+        genCloudCrimson(rnd, world);
+    }
 }
 
 void genCrimsonAt(int surfaceX, int undergroundX, Random &rnd, World &world)

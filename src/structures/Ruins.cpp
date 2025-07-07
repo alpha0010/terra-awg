@@ -2,6 +2,7 @@
 
 #include "Config.h"
 #include "Random.h"
+#include "Util.h"
 #include "World.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
@@ -285,6 +286,31 @@ public:
     }
 };
 
+void igniteRuins(World &world)
+{
+    parallelFor(std::views::iota(0, world.getWidth()), [&world](int x) {
+        for (int y = world.getUnderworldLevel(); y < world.getHeight(); ++y) {
+            Tile &tile = world.getTile(x, y);
+            switch (tile.blockID) {
+            case TileID::hellstoneBrick:
+                tile.blockID = TileID::obsidianBrick;
+                break;
+            case TileID::obsidianBrick:
+                tile.blockID = TileID::hellstoneBrick;
+                break;
+            }
+            switch (tile.wallID) {
+            case WallID::Unsafe::hellstoneBrick:
+                tile.wallID = WallID::Unsafe::obsidianBrick;
+                break;
+            case WallID::Unsafe::obsidianBrick:
+                tile.wallID = WallID::Unsafe::hellstoneBrick;
+                break;
+            }
+        }
+    });
+}
+
 void genRuins(Random &rnd, World &world)
 {
     std::cout << "Abandoning cities\n";
@@ -508,5 +534,8 @@ void genRuins(Random &rnd, World &world)
         usedLocations.emplace_back(x, y);
         world.placeFramedTile(x, y, TileID::pot, Variant::underworld);
         --numPlacements;
+    }
+    if (world.conf.forTheWorthy) {
+        igniteRuins(world);
     }
 }

@@ -25,6 +25,7 @@ struct Config {
     double patchesHumidity;
     double patchesTemperature;
     double patchesSize;
+    bool forTheWorthy;
     double ore;
     double lifeCrystals;
     double manaCrystals;
@@ -50,6 +51,8 @@ struct Config {
     double glowingMushroomSize;
     double hiveFreq;
     double hiveSize;
+    double spiderNestFreq;
+    double spiderNestSize;
     double glowingMossFreq;
     double glowingMossSize;
     double snowSize;

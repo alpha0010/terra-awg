@@ -94,7 +94,9 @@ std::pair<double, Item> getGlobalItemPrimary(Random &rnd, World &world)
 std::pair<double, Item> getGlobalItemPotion(World &world)
 {
     return {
-        world.conf.doubleTrouble ? 1.0 / 30 : 0,
+        world.conf.forTheWorthy    ? 0.1
+        : world.conf.doubleTrouble ? 1.0 / 30
+                                   : 0,
         {ItemID::redPotion, Prefix::none, 1}};
 }
 

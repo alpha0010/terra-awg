@@ -48,7 +48,11 @@ void makeFishingCloud(
     embedWaterfalls(
         {startX, startY},
         {startX + width, startY + height},
-        {TileID::cloud, TileID::rainCloud, TileID::snowCloud},
+        {TileID::cloud,
+         TileID::rainCloud,
+         TileID::snowCloud,
+         TileID::lesion,
+         TileID::flesh},
         Liquid::water,
         14,
         rnd,
@@ -186,6 +190,7 @@ void addCloudStructure(
     world.queuedTreasures.emplace_back(
         [x, y, roomId](Random &rnd, World &world) {
             TileBuffer room = Data::getSkyBox(roomId, world.getFramedTiles());
+            std::vector<Point> chests;
             for (int i = 0; i < room.getWidth(); ++i) {
                 for (int j = 0; j < room.getHeight(); ++j) {
                     Tile &roomTile = room.getTile(i, j);
@@ -203,16 +208,21 @@ void addCloudStructure(
                     tile = roomTile;
                     if (tile.blockID == TileID::chest &&
                         tile.frameX % 36 == 0 && tile.frameY == 0) {
-                        fillSkywareChest(
-                            world.registerStorage(x + i, y + j),
-                            rnd,
-                            world);
+                        chests.emplace_back(x + i, y + j);
                     } else if (
                         tile.blockID == TileID::dresser &&
                         tile.frameX % 54 == 0 && tile.frameY == 0) {
                         fillDresser(world.registerStorage(x + i, y + j), rnd);
                     }
                 }
+            }
+            for (auto [chestX, chestY] : chests) {
+                fillSkywareChest(
+                    world.conf.forTheWorthy
+                        ? world.placeChest(chestX, chestY, Variant::goldLocked)
+                        : world.registerStorage(chestX, chestY),
+                    rnd,
+                    world);
             }
         });
 }

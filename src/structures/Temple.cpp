@@ -469,18 +469,18 @@ void addSpikes(Point center, Random &rnd, World &world)
     });
 }
 
-void paintTemple(Point center, World &world)
+void paintTemple(Point center, int paint, World &world)
 {
-    iterateTemple(center, world, [&world](int x, int y) {
+    iterateTemple(center, world, [paint, &world](int x, int y) {
         Tile &tile = world.getTile(x, y);
         if (tile.blockID == TileID::lihzahrdBrick ||
             tile.blockID == TileID::platform ||
             tile.blockID == TileID::pressurePlate ||
             tile.blockID == TileID::trap) {
-            tile.blockPaint = Paint::deepLime;
+            tile.blockPaint = paint;
         }
         if (tile.wallID == WallID::Unsafe::lihzahrdBrick) {
-            tile.wallPaint = Paint::deepLime;
+            tile.wallPaint = paint;
         }
         return true;
     });
@@ -488,6 +488,9 @@ void paintTemple(Point center, World &world)
 
 void genTemple(Random &rnd, World &world)
 {
+    if (world.conf.templeSize < 0.01) {
+        return;
+    }
     std::cout << "Training acolytes\n";
     Point center = selectTempleCenter(rnd, world);
     if (center.first < 100) {
@@ -603,7 +606,9 @@ void genTemple(Random &rnd, World &world)
     std::shuffle(flatLocations.begin(), flatLocations.end(), rnd.getPRNG());
     addTraps(flatLocations, rnd, world);
     addSpikes(center, rnd, world);
-    if (world.conf.doubleTrouble) {
-        paintTemple(center, world);
+    if (world.conf.forTheWorthy) {
+        paintTemple(center, Paint::deepGreen, world);
+    } else if (world.conf.doubleTrouble) {
+        paintTemple(center, Paint::deepLime, world);
     }
 }

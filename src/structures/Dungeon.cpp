@@ -1094,7 +1094,7 @@ private:
                 if (tile.wallID != WallID::empty &&
                     std::abs(rnd.getFineNoise(x + 2 * i, y + 2 * j)) <
                         0.1 - 0.1 * j / entry.getHeight()) {
-                    if (world.conf.doubleTrouble) {
+                    if (world.conf.doubleTrouble || world.conf.forTheWorthy) {
                         tile.wallID = WallID::Safe::mudstoneBrick;
                         tile.wallPaint = theme.paint;
                     } else {
@@ -1349,7 +1349,7 @@ public:
                            b.second + shuffleY);
             });
         applyWallVariety(zones);
-        if (world.conf.doubleTrouble) {
+        if (world.conf.doubleTrouble || world.conf.forTheWorthy) {
             applyPaint(dungeonCenter, dungeonWidth);
         }
     }

@@ -966,6 +966,13 @@ void placeChest(
         fillShadowChest(chest, rnd, world);
         return;
     case Variant::skyware:
+        if (world.conf.forTheWorthy) {
+            world.placeFramedTile(
+                chest.x,
+                chest.y,
+                TileID::chest,
+                Variant::goldLocked);
+        }
         fillSkywareChest(chest, rnd, world);
         return;
     default:

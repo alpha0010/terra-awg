@@ -333,7 +333,9 @@ void placeBoulderTraps(Random &rnd, World &world)
 void placeLavaTraps(Random &rnd, World &world)
 {
     int lavaLevel =
-        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
+        world.conf.forTheWorthy
+            ? world.getUndergroundLevel()
+            : (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     std::vector<Point> locations;
     for (int x = 100; x < world.getWidth() - 100; ++x) {
         int lavaCount = 0;

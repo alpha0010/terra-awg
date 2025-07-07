@@ -120,8 +120,8 @@ void simulateRain(Random &rnd, World &world, int x)
         }
         pendingWater += world.getTile(x, y).wallID == WallID::Unsafe::hive ? 2.4
                         : world.conf.patches && y < lavaLevel
-                            ? 1.15 + rnd.getHumidity(x, y)
-                            : 1.6;
+                            ? 1.2 + rnd.getHumidity(x, y)
+                            : 1.65;
         if (pendingWater > 10) {
             pendingWater *= 0.94;
         }
@@ -236,6 +236,48 @@ void fillLavaHotzones(Random &rnd, World &world, int x)
     }
 }
 
+void convertLiquid(int startX, int startY, Liquid from, Liquid to, World &world)
+{
+    std::vector<std::pair<int, int>> locations{{startX, startY}};
+    while (!locations.empty()) {
+        auto [x, y] = locations.back();
+        locations.pop_back();
+        Tile &tile = world.getTile(x, y);
+        if (tile.liquid == from) {
+            tile.liquid = to;
+            for (auto [i, j] : {std::pair{-1, 0}, {1, 0}, {0, -1}, {0, 1}}) {
+                locations.emplace_back(x + i, y + j);
+            }
+        }
+    }
+}
+
+void convertExtraLava(Random &rnd, World &world, int x)
+{
+    int lavaLevel =
+        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
+    if (x > 350 && x < world.getWidth() - 350) {
+        for (int y = 0; y < lavaLevel; ++y) {
+            if (world.getTile(x, y).liquid == Liquid::water &&
+                rnd.getCoarseNoise(x, y) > 0.13) {
+                convertLiquid(x, y, Liquid::water, Liquid::lava, world);
+            }
+        }
+    }
+    lavaLevel = std::midpoint(lavaLevel, world.getUnderworldLevel());
+    int lavaHeight = world.getHeight() - lavaLevel;
+    for (int y = lavaLevel; y < world.getHeight(); ++y) {
+        Tile &tile = world.getTile(x, y);
+        if (tile.blockID == TileID::ash &&
+            static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
+                    static_cast<int>(17.5 * lavaHeight / (y + 1 - lavaLevel)) ==
+                0) {
+            tile.blockID = TileID::empty;
+            tile.liquid = Liquid::lava;
+        }
+    }
+}
+
 void genLake(Random &rnd, World &world)
 {
     std::cout << "Raining\n";
@@ -250,5 +292,11 @@ void genLake(Random &rnd, World &world)
         parallelFor(
             std::views::iota(0, world.getWidth()),
             [&rnd, &world](int x) { fillLavaHotzones(rnd, world, x); });
+    }
+    if (world.conf.forTheWorthy) {
+        rnd.shuffleNoise();
+        parallelFor(
+            std::views::iota(0, world.getWidth()),
+            [&rnd, &world](int x) { convertExtraLava(rnd, world, x); });
     }
 }

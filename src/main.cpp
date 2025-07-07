@@ -22,9 +22,33 @@ uint64_t getBinaryTime()
     return ms * 10000 + 621355968000000000ull;
 }
 
+enum class Seed {
+    normal,
+    drunkWorld,
+    forTheWorthy,
+    celebrationmk10,
+    theConstant,
+    notTheBees,
+    dontDigUp,
+    noTraps,
+    getFixedBoi
+};
+
+Seed determineSeed(Config &conf)
+{
+    if (conf.forTheWorthy) {
+        return Seed::forTheWorthy;
+    } else if (conf.doubleTrouble) {
+        return Seed::drunkWorld;
+    } else if (conf.traps > 14) {
+        return Seed::noTraps;
+    }
+    return Seed::normal;
+}
+
 void saveWorldFile(Config &conf, Random &rnd, World &world)
 {
-    bool isNoTrapsSeed = !conf.doubleTrouble && conf.traps > 14;
+    Seed special = determineSeed(conf);
 
     Writer w(conf.getFilename() + ".wld");
     w.putUint32(279); // File format version.
@@ -55,14 +79,14 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     w.putUint32(world.getHeight());                // Vertical tiles.
     w.putUint32(world.getWidth());                 // Horizontal tiles.
     w.putUint32(static_cast<uint32_t>(conf.mode)); // Game mode.
-    w.putBool(conf.doubleTrouble);                 // Drunk world.
-    w.putBool(false);                              // For the worthy.
-    w.putBool(false);                              // Celebrationmk10.
-    w.putBool(false);                              // The constant.
-    w.putBool(false);                              // Not the bees.
-    w.putBool(false);                              // Don't dig up.
-    w.putBool(isNoTrapsSeed);                      // No traps.
-    w.putBool(false);                              // Get fixed boi.
+    w.putBool(special == Seed::drunkWorld);        // Drunk world.
+    w.putBool(special == Seed::forTheWorthy);      // For the worthy.
+    w.putBool(special == Seed::celebrationmk10);   // Celebrationmk10.
+    w.putBool(special == Seed::theConstant);       // The constant.
+    w.putBool(special == Seed::notTheBees);        // Not the bees.
+    w.putBool(special == Seed::dontDigUp);         // Don't dig up.
+    w.putBool(special == Seed::noTraps);           // No traps.
+    w.putBool(special == Seed::getFixedBoi);       // Get fixed boi.
     w.putUint64(getBinaryTime());                  // Creation time.
     w.putUint8(rnd.getInt(0, 8));                  // Moon type.
     for (auto part : rnd.partitionRange(4, world.getWidth())) {
@@ -338,7 +362,14 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
 
     w.putUint32(0);  // Number of shimmered NPCs.
     w.putBool(true); // Begin town NPC record.
-    if (conf.doubleTrouble) {
+    if (special == Seed::forTheWorthy) {
+        w.putUint32(38); // Demolitionist.
+        w.putString(rnd.select(
+            {"Bazdin", "Beldin",  "Boften",   "Darur",   "Dias",   "Dolbere",
+             "Dolgen", "Dolgrim", "Duerthen", "Durim",   "Fikod",  "Garval",
+             "Gimli",  "Gimut",   "Jarut",    "Morthal", "Norkas", "Norsun",
+             "Oten",   "Ovbere",  "Tordak",   "Urist"})); // NPC name.
+    } else if (special == Seed::drunkWorld) {
         w.putUint32(208); // Party Girl.
         w.putString(rnd.select(
             {"Amanda",
@@ -463,6 +494,16 @@ int main()
         world.cobaltVariant = TileID::empty;
         world.mythrilVariant = TileID::empty;
         world.adamantiteVariant = TileID::empty;
+    }
+    if (conf.forTheWorthy) {
+        conf.spiderNestFreq *= 2.5;
+        conf.graniteFreq *= 1.7;
+        conf.marbleFreq *= 1.85;
+        conf.glowingMushroomFreq *= 1.5;
+        conf.glowingMushroomSize *= 1.26;
+        conf.templeSize *= 1.4;
+        conf.glowingMossSize *= 1.225;
+        conf.evilSize *= 1.58;
     }
 
     doWorldGen(rnd, world);

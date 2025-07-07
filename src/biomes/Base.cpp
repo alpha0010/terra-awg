@@ -73,7 +73,9 @@ void scatterResource(Random &rnd, World &world, int resource)
 void genOreVeins(Random &rnd, World &world, int oreRoof, int oreFloor, int ore)
 {
     rnd.shuffleNoise();
-    double threshold = computeOreThreshold(world.conf.ore);
+    double threshold = computeOreThreshold(
+        world.conf.ore *
+        (world.conf.forTheWorthy && ore == world.goldVariant ? 1.35 : 1));
     parallelFor(
         std::views::iota(0, world.getWidth()),
         [oreRoof, oreFloor, ore, threshold, &rnd, &world](int x) {
