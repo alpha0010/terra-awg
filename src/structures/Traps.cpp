@@ -351,13 +351,15 @@ void placeLavaTraps(Random &rnd, World &world)
             }
         }
     }
+    if (locations.empty()) {
+        return;
+    }
     std::vector<Point> usedLocations;
     double numLavaTraps = world.conf.traps * world.getWidth() *
                           world.getHeight() / rnd.getInt(164000, 230400);
-    while (numLavaTraps > 0) {
+    for (; numLavaTraps > 0; numLavaTraps -= 0.1) {
         auto [x, y] = rnd.select(locations);
         if (isLocationUsed(x, y, 15, usedLocations)) {
-            numLavaTraps -= 0.1;
             continue;
         }
         int gapJ = 0;
@@ -409,7 +411,7 @@ void placeLavaTraps(Random &rnd, World &world)
         auto [plateX, plateY] = rnd.select(plateLocs);
         placePressurePlate(plateX, plateY, true, world);
         placeWire({x, y + gapJ}, {plateX, plateY}, Wire::red, world);
-        --numLavaTraps;
+        numLavaTraps -= 0.9;
     }
 }
 

@@ -202,11 +202,15 @@ Point selectGroveLocation(double &groveSize, Random &rnd, World &world)
     partialWalls.insert(
         WallVariants::underworld.begin(),
         WallVariants::underworld.end());
+    int safeMinY =
+        (2 * world.getCavernLevel() + world.getUnderworldLevel()) / 3;
+    int safeMaxY =
+        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     double shrink = groveSize / 10000.0;
     for (int numTries = 0; numTries < 5000; ++numTries, groveSize -= shrink) {
         auto [x, y] = findStoneCave(
-            world.getCavernLevel() + groveSize,
-            world.getUnderworldLevel() - groveSize,
+            std::min<int>(world.getCavernLevel() + groveSize, safeMinY),
+            std::max<int>(world.getUnderworldLevel() - groveSize, safeMaxY),
             rnd,
             world);
         if (x < 75 + groveSize || x > world.getWidth() - 75 - groveSize) {

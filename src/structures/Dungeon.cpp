@@ -154,6 +154,10 @@ private:
                     }
                 }
                 tile.wallID = theme.brickWall;
+                if (tile.liquid == Liquid::water ||
+                    tile.liquid == Liquid::lava) {
+                    tile.liquid = Liquid::none;
+                }
             }
         }
     }
@@ -396,13 +400,14 @@ private:
 
     Point selectPlatformLocation(const std::vector<Point> &zones)
     {
-        while (true) {
+        for (int tries = 0; tries < 100; ++tries) {
             auto [x, y] = rnd.select(zones);
             if (isValidPlacementLocation(x, y, 1, roomSize, false)) {
                 y -= rnd.getInt(4, roomSize - 4);
                 return {x, y};
             }
         }
+        return {-1, -1};
     }
 
     void addPlatforms(const std::vector<Point> &zones)
@@ -414,7 +419,7 @@ private:
             world.getHeight() / 40;
         for (int i = 0; i < maxPlatforms; ++i) {
             auto [centerX, centerY] = selectPlatformLocation(zones);
-            if (usedRows.contains(centerY / 7)) {
+            if (centerX == -1 || usedRows.contains(centerY / 7)) {
                 continue;
             }
             usedRows.insert(centerY / 7);
@@ -623,6 +628,9 @@ private:
                 7,
                 40,
                 usedLocations);
+            if (x == -1) {
+                continue;
+            }
             usedLocations.emplace_back(x, y);
             x += 3;
             y -= 5;
@@ -736,6 +744,9 @@ private:
                 }
             }
         }
+        if (locations.empty()) {
+            return;
+        }
         addDartTraps(locations);
         for (auto [furnitureTile, lanternStyle] :
              {std::pair{TileID::alchemyTable, Variant::alchemy},
@@ -743,7 +754,9 @@ private:
               {TileID::boneWelder, Variant::bone}}) {
             int numPlacements = std::round(
                 rnd.getDouble(0.5, 3.2) + locations.size() / 2737.56);
-            while (numPlacements > 0) {
+            for (int tries = 500 * numPlacements;
+                 numPlacements > 0 && tries > 0;
+                 --tries) {
                 auto [x, y] = rnd.select(locations);
                 if (isValidPlacementLocation(x, y, 3, 3, true)) {
                     world.placeFramedTile(x, y - 2, furnitureTile);
@@ -801,7 +814,7 @@ private:
         int radius,
         const std::vector<Point> &usedLocations)
     {
-        while (true) {
+        for (int tries = 0; tries < 500; ++tries) {
             int x = rnd.getInt(
                 dungeonCenter - dungeonWidth,
                 dungeonCenter + dungeonWidth + 2 * roomSize);
@@ -813,6 +826,7 @@ private:
                 return {x, y};
             }
         }
+        return {-1, -1};
     }
 
     void addPaintings(int dungeonCenter, int dungeonWidth)
@@ -860,8 +874,10 @@ private:
                 height,
                 40,
                 usedLocations);
-            usedLocations.emplace_back(x, y);
-            world.placePainting(x + 2, y - height - 1, curPainting);
+            if (x != -1) {
+                usedLocations.emplace_back(x, y);
+                world.placePainting(x + 2, y - height - 1, curPainting);
+            }
         }
         numPaintings *= 2;
         for (int i = 0; i < numPaintings; ++i) {
@@ -887,8 +903,10 @@ private:
                 height,
                 25,
                 usedLocations);
-            usedLocations.emplace_back(x, y);
-            world.placePainting(x + 2, y - height - 1, curPainting);
+            if (x != -1) {
+                usedLocations.emplace_back(x, y);
+                world.placePainting(x + 2, y - height - 1, curPainting);
+            }
         }
     }
 

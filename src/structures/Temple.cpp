@@ -85,6 +85,10 @@ Point selectTempleCenter(Random &rnd, World &world)
                          world.jungleCenter +
                              world.conf.jungleSize * 0.079 * world.getWidth(),
                          world.getWidth() - 350);
+    if (maxX < minX) {
+        minX = std::midpoint(minX, maxX);
+        maxX = minX + 1;
+    }
     int minY = (world.getUndergroundLevel() + world.getCavernLevel()) / 2;
     for (int numTries = 0; numTries < 1000; ++numTries) {
         int x = rnd.getInt(minX, maxX);

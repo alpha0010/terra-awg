@@ -453,7 +453,8 @@ void placeOrbHearts(
     if (world.conf.doubleTrouble) {
         orbHeartCount *= 2;
     }
-    while (orbHeartCount > 0) {
+    for (int tries = 500 * orbHeartCount; orbHeartCount > 0 && tries > 0;
+         --tries) {
         int binId = rnd.getInt(0, maxBin);
         if (locations[binId].empty()) {
             continue;
