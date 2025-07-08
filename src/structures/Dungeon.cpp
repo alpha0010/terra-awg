@@ -272,7 +272,7 @@ private:
             }
         }
         world.queuedDeco.emplace_back(
-            [x, y, mapWidth, mapHeight, scale](Random &, World &world) {
+            [x, y, mapWidth, mapHeight, scale](Random &rnd, World &world) {
                 parallelFor(
                     std::views::iota(0, mapWidth),
                     [x, y, mapHeight, scale, &world](int i) {
@@ -288,6 +288,31 @@ private:
                             }
                         }
                     });
+                if (world.conf.forTheWorthy) {
+                    std::vector<Tile> mapTiles;
+                    for (int j = 0; j < mapHeight; ++j) {
+                        for (int i = 0; i < mapWidth; ++i) {
+                            mapTiles.emplace_back(world.getTile(x + i, y + j));
+                        }
+                    }
+                    int chunk = rnd.getInt(mapWidth * 3, mapWidth * 5);
+                    for (size_t start = 0; start < mapTiles.size();
+                         start += chunk) {
+                        std::shuffle(
+                            mapTiles.begin() + start,
+                            mapTiles.begin() +
+                                std::min(start + chunk, mapTiles.size()),
+                            rnd.getPRNG());
+                    }
+                    for (int i = 0; i < mapWidth; ++i) {
+                        for (int j = 0; j < mapHeight; ++j) {
+                            if (rnd.getDouble(0, 1) < 0.15) {
+                                world.getTile(x + i, y + j) =
+                                    mapTiles[mapHeight + j * mapWidth];
+                            }
+                        }
+                    }
+                }
             });
     }
 
@@ -585,6 +610,34 @@ private:
         }
     }
 
+    void addFloatingSpikes(int dungeonCenter, int dungeonWidth)
+    {
+        int numSpikes =
+            dungeonWidth * world.getHeight() / rnd.getInt(10080, 15120);
+        std::vector<Point> usedLocations;
+        for (int iter = 0; iter < numSpikes; ++iter) {
+            auto [x, y] = selectPaintingLocation(
+                dungeonCenter,
+                dungeonWidth,
+                7,
+                7,
+                40,
+                usedLocations);
+            usedLocations.emplace_back(x, y);
+            x += 3;
+            y -= 5;
+            bool asCross = rnd.getBool();
+            for (int i = 0; i < 5; ++i) {
+                for (int j = 0; j < 5; ++j) {
+                    if (asCross ? i == 2 || j == 2
+                                : std::abs(i - 2) == std::abs(j - 2)) {
+                        world.getTile(x + i, y + j).blockID = TileID::spike;
+                    }
+                }
+            }
+        }
+    }
+
     void addDartTraps(const std::vector<Point> &locations)
     {
         int numTraps = (world.conf.traps > 1 ? 1 + world.conf.traps / 25
@@ -632,8 +685,11 @@ private:
     void addBoulderTraps(int dungeonCenter, int dungeonWidth)
     {
         int numBoulders =
-            world.conf.traps * dungeonWidth * world.getHeight() / 2222640;
-        if (numBoulders <= 0 || world.conf.traps < 2) {
+            (world.conf.forTheWorthy ? std::max(15.0, world.conf.traps)
+                                     : world.conf.traps) *
+            dungeonWidth * world.getHeight() / 2222640;
+        if (numBoulders <= 0 ||
+            (world.conf.traps < 2 && !world.conf.forTheWorthy)) {
             return;
         }
         std::vector<Point> locations;
@@ -1223,9 +1279,8 @@ private:
                 applyPaintAt(x, y);
             }
         }
-        for (int x = dungeonCenter - dungeonWidth;
-             x < dungeonCenter + dungeonWidth + roomSize;
-             ++x) {
+        maxX = dungeonCenter + dungeonWidth + 2 * roomSize;
+        for (int x = dungeonCenter - dungeonWidth; x < maxX; ++x) {
             for (int y = yDivide; y < world.getHeight(); ++y) {
                 applyPaintAt(x, y);
             }
@@ -1337,6 +1392,9 @@ public:
         makeEntry();
         addPaintings(dungeonCenter, dungeonWidth);
         addFurniture(dungeonCenter, dungeonWidth);
+        if (world.conf.forTheWorthy) {
+            addFloatingSpikes(dungeonCenter, dungeonWidth);
+        }
         std::sort(
             zones.begin(),
             zones.end(),
