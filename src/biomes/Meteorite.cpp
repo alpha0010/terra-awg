@@ -19,7 +19,7 @@ inline constexpr auto emptyBlocks = frozen::make_set<int>(
 
 void placeMeteorite(int x, int y, Random &rnd, World &world)
 {
-    int size = rnd.getInt(26, 30);
+    int size = world.conf.meteoriteSize * rnd.getDouble(26, 30);
     int wallID = rnd.select(WallVariants::underworld);
     for (int i = -size; i < size; ++i) {
         for (int j = -size; j < size; ++j) {

@@ -1,5 +1,6 @@
 #include "Ocean.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -76,13 +77,21 @@ void addOceanCave(int waterTable, Random &rnd, World &world)
         : centerOpt2 < world.jungleCenter + 0.11 * world.getWidth() + 220
             ? centerOpt1
             : rnd.select({centerOpt1, centerOpt2});
-    int maxY = (5 * world.getCavernLevel() + world.getUnderworldLevel()) / 6;
     int shuffleX = rnd.getInt(0, world.getWidth());
     int shuffleY = rnd.getInt(0, world.getHeight());
     std::vector<Point> locations;
     world.oceanCaveCenter = centerX;
+    int oceanFloor =
+        scanWhileEmpty({centerX - 90, waterTable}, {0, 1}, world).second;
+    int minY = scanWhileEmpty({centerX + 90, waterTable}, {0, 1}, world).second;
+    if (minY > oceanFloor) {
+        std::swap(minY, oceanFloor);
+    }
+    int maxY = std::min<int>(
+        oceanFloor + world.conf.oceanCaveSize * 0.2262 * world.getHeight(),
+        world.getUnderworldLevel() - 10);
     for (int x = centerX - 100; x < centerX + 100; ++x) {
-        for (int y = waterTable + 20; y < maxY; ++y) {
+        for (int y = minY; y < maxY; ++y) {
             double threshold =
                 std::max(std::abs(x - centerX), y + 100 - maxY) / 25.0 - 3;
             if (rnd.getFineNoise(x, y) < threshold - 0.5 ||
@@ -112,7 +121,7 @@ void addOceanCave(int waterTable, Random &rnd, World &world)
                 tile.blockID = TileID::empty;
                 tile.wallID = WallID::empty;
                 tile.liquid = Liquid::water;
-                if (y > world.getUndergroundLevel()) {
+                if (y > oceanFloor) {
                     locations.emplace_back(x, y);
                 }
             }
@@ -160,7 +169,8 @@ void genOceans(Random &rnd, World &world)
                          world.getSurfaceLevel(world.getWidth() - 300)) +
                      rnd.getInt(4, 12);
     for (int x = 0; x < 390; ++x) {
-        double drop = 90 * (1 - 1 / (1 + std::exp(0.041 * (200 - x))));
+        double drop = world.conf.oceanSize * 90 *
+                      (1 - 1 / (1 + std::exp(0.041 * (200 - x))));
         double sandDepth = (40 + 9 * rnd.getCoarseNoise(x, 0)) *
                            std::min(1.0, (400.0 - x) / 160);
         auto fillColumn = [&](int effectiveX) {

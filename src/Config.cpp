@@ -95,6 +95,7 @@ forTheWorthy = false
 
 # Number of meteorites to place.
 meteorites = 0
+meteoriteSize = 1.0
 
 # Placement frequency multipliers. 0.5 means half the
 # normal amount, 2.0 means double the normal amount.
@@ -116,6 +117,8 @@ aetherSize = 1.0
 dungeonSize = 1.0
 templeSize = 1.0
 evilSize = 1.0
+oceanSize = 1.0
+oceanCaveSize = 1.0
 marbleFreq = 1.0
 marbleSize = 1.0
 graniteFreq = 1.0
@@ -572,6 +575,7 @@ Config readConfig(Random &rnd)
         1.0,   // patchesSize
         false, // forTheWorthy
         0,     // meteorites
+        1.0,   // meteoriteSize
         1.0,   // ore
         1.0,   // lifeCrystals
         1.0,   // manaCrystals
@@ -589,6 +593,8 @@ Config readConfig(Random &rnd)
         1.0,   // dungeonSize
         1.0,   // templeSize
         1.0,   // evilSize
+        1.0,   // oceanSize
+        1.0,   // oceanCaveSize
         1.0,   // marbleFreq
         1.0,   // marbleSize
         1.0,   // graniteFreq
@@ -640,6 +646,7 @@ Config readConfig(Random &rnd)
     READ_CONF_AREA_VALUE(variation, patchesSize);
     READ_CONF_VALUE(variation, forTheWorthy, Boolean);
     READ_CONF_VALUE(variation, meteorites, Integer);
+    READ_CONF_AREA_VALUE(variation, meteoriteSize);
     READ_CONF_VALUE(variation, ore, Real);
     READ_CONF_VALUE(variation, lifeCrystals, Real);
     READ_CONF_VALUE(variation, manaCrystals, Real);
@@ -657,6 +664,8 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, dungeonSize, Real);
     READ_CONF_AREA_VALUE(variation, templeSize);
     READ_CONF_AREA_VALUE(variation, evilSize);
+    READ_CONF_VALUE(variation, oceanSize, Real);
+    READ_CONF_VALUE(variation, oceanCaveSize, Real);
     READ_CONF_VALUE(variation, marbleFreq, Real);
     READ_CONF_AREA_VALUE(variation, marbleSize);
     READ_CONF_VALUE(variation, graniteFreq, Real);

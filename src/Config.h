@@ -30,6 +30,7 @@ struct Config {
     double patchesSize;
     bool forTheWorthy;
     int meteorites;
+    double meteoriteSize;
     double ore;
     double lifeCrystals;
     double manaCrystals;
@@ -47,6 +48,8 @@ struct Config {
     double dungeonSize;
     double templeSize;
     double evilSize;
+    double oceanSize;
+    double oceanCaveSize;
     double marbleFreq;
     double marbleSize;
     double graniteFreq;
