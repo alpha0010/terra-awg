@@ -233,7 +233,10 @@ void genPyramid(Random &rnd, World &world)
         return;
     }
     constexpr auto avoidTiles = frozen::make_set<int>(
-        {TileID::blueBrick, TileID::greenBrick, TileID::pinkBrick});
+        {TileID::blueBrick,
+         TileID::greenBrick,
+         TileID::pinkBrick,
+         TileID::meteorite});
     while (std::abs(x - world.surfaceEvilCenter) < 1.5 * size ||
            std::abs(x - world.getWidth() / 2) < 2 * size ||
            !world.regionPasses(

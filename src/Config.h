@@ -26,6 +26,7 @@ struct Config {
     double patchesTemperature;
     double patchesSize;
     bool forTheWorthy;
+    int meteorites;
     double ore;
     double lifeCrystals;
     double manaCrystals;

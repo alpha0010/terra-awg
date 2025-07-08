@@ -62,6 +62,9 @@ doubleTrouble = false
 shattered = false
 
 # Flood the majority of the world surface.
+#
+# Note that this may prevent meteorites. Also, Terraria's liquid engine
+# has poor performance when settling large bodies of water.
 sunken = false
 
 # Only generate non-spreading biomes.
@@ -86,6 +89,9 @@ patchesSize = 1.0
 
 # Activates "for the worthy" secret seed.
 forTheWorthy = false
+
+# Number of meteorites to place.
+meteorites = 0
 
 # Placement frequency multipliers. 0.5 means half the
 # normal amount, 2.0 means double the normal amount.
@@ -547,6 +553,7 @@ Config readConfig(Random &rnd)
         0.0,   // patchesTemperature
         1.0,   // patchesSize
         false, // forTheWorthy
+        0,     // meteorites
         1.0,   // ore
         1.0,   // lifeCrystals
         1.0,   // manaCrystals
@@ -612,6 +619,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, patchesTemperature, Real);
     READ_CONF_AREA_VALUE(variation, patchesSize);
     READ_CONF_VALUE(variation, forTheWorthy, Boolean);
+    READ_CONF_VALUE(variation, meteorites, Integer);
     READ_CONF_VALUE(variation, ore, Real);
     READ_CONF_VALUE(variation, lifeCrystals, Real);
     READ_CONF_VALUE(variation, manaCrystals, Real);

@@ -21,6 +21,7 @@
 #include "biomes/Hive.h"
 #include "biomes/Jungle.h"
 #include "biomes/MarbleCave.h"
+#include "biomes/Meteorite.h"
 #include "biomes/Ocean.h"
 #include "biomes/Snow.h"
 #include "biomes/SpiderNest.h"
@@ -78,6 +79,7 @@ enum class Step {
     genCrimson,
     genCorruption,
     applyQueuedEvil,
+    genMeteorite,
     genAsteroidField,
     genGemCave,
     genSpiderNest,
@@ -148,6 +150,7 @@ inline std::array baseBiomeRules{
     Step::genSecondaryCrimson,
     Step::genSecondaryCorruption,
     Step::applyQueuedEvil,
+    Step::genMeteorite,
     Step::genHardmodeOres,
     Step::genHallow,
     Step::swapResources,
@@ -190,6 +193,7 @@ inline std::array patchesBiomeRules{
     Step::genSecondaryCrimson,
     Step::genSecondaryCorruption,
     Step::applyQueuedEvil,
+    Step::genMeteorite,
     Step::genHardmodeOres,
     Step::genHallow,
     Step::swapResources,
@@ -240,6 +244,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
             applyQueuedEvil(rnd, world);
         }
         break;
+        GEN_STEP(genMeteorite)
         GEN_STEP(genAsteroidField)
         GEN_STEP(genGemCave)
         GEN_STEP(genSpiderNest)

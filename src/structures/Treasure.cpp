@@ -41,6 +41,7 @@ inline constexpr auto placementAvoidTiles = frozen::make_set<int>({
     TileID::thinIce,
     TileID::spike,
     TileID::woodenSpike,
+    TileID::meteorite,
 });
 
 bool isPlacementCandidate(int x, int y, World &world)
