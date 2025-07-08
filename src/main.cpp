@@ -478,7 +478,9 @@ int main()
     rnd.setSeed(conf.seed);
     World world{conf};
 
-    world.isCrimson = rnd.getBool();
+    world.isCrimson = conf.evil == EvilBiome::random
+                          ? rnd.getBool()
+                          : conf.evil == EvilBiome::crimson;
     world.copperVariant = rnd.select({TileID::copperOre, TileID::tinOre});
     world.ironVariant = rnd.select({TileID::ironOre, TileID::leadOre});
     world.silverVariant = rnd.select({TileID::silverOre, TileID::tungstenOre});

@@ -43,7 +43,7 @@ bool markIslandAt(int x, int y, int size, Random &rnd, World &world)
             [](Tile &tile) { return !tile.wireRed; })) {
         return false;
     }
-    double surfaceScale = rnd.getDouble(28, 35);
+    double surfaceScale = world.conf.surfaceAmplitude * rnd.getDouble(28, 35);
     double dropScale =
         size < 99 ? rnd.getDouble(18, 26) : rnd.getDouble(30, 42);
     for (int i = 0; i < size; ++i) {

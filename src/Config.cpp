@@ -38,6 +38,9 @@ height = 1800
 # Difficulty: journey/classic/expert/master
 mode = classic
 
+# Evil biome: RANDOM/corruption/crimson
+evil = RANDOM
+
 # Add a starter home at the spawn point.
 home = false
 
@@ -129,6 +132,8 @@ glowingMossSize = 1.0
 snowSize = 1.0
 desertSize = 1.0
 jungleSize = 1.0
+# Controls how flat/mountainous to generate surface terrain.
+surfaceAmplitude = 1.0
 
 [extra]
 # Output a map preview image.
@@ -454,6 +459,18 @@ GameMode parseGameMode(const std::string &mode)
     return GameMode::classic;
 }
 
+EvilBiome parseEvilBiome(const std::string &evil)
+{
+    if (evil == "corruption") {
+        return EvilBiome::corruption;
+    } else if (evil == "crimson") {
+        return EvilBiome::crimson;
+    } else if (evil != "RANDOM") {
+        std::cout << "Unknown evil '" << evil << "'\n";
+    }
+    return EvilBiome::random;
+}
+
 int parseEquipment(const std::string &equipment)
 {
     if (equipment == "iron") {
@@ -540,6 +557,7 @@ Config readConfig(Random &rnd)
         6400,
         1800,
         GameMode::classic,
+        EvilBiome::random,
         false, // starterHome
         0,     // equipment
         false, // doubleTrouble
@@ -586,6 +604,7 @@ Config readConfig(Random &rnd)
         1.0,   // snowSize
         1.0,   // desertSize
         1.0,   // jungleSize
+        1.0,   // surfaceAmplitude
         true}; // map
     if (!std::filesystem::exists(confName)) {
         std::ofstream out(confName, std::ios::out);
@@ -605,6 +624,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(world, width, Integer);
     READ_CONF_VALUE(world, height, Integer);
     conf.mode = parseGameMode(reader.Get("world", "mode", "classic"));
+    conf.evil = parseEvilBiome(reader.Get("world", "evil", "RANDOM"));
     READ_CONF_VALUE(world, home, Boolean);
     conf.equipment =
         parseEquipment(reader.Get("variation", "equipment", "none"));
@@ -652,6 +672,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, snowSize, Real);
     READ_CONF_VALUE(variation, desertSize, Real);
     READ_CONF_VALUE(variation, jungleSize, Real);
+    READ_CONF_VALUE(variation, surfaceAmplitude, Real);
     READ_CONF_VALUE(extra, map, Boolean);
     return conf;
 }

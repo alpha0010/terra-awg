@@ -7,12 +7,15 @@ class Random;
 
 enum class GameMode { journey = 3, classic = 0, expert = 1, master = 2 };
 
+enum class EvilBiome { random, corruption, crimson };
+
 struct Config {
     std::string name;
     std::string seed;
     int width;
     int height;
     GameMode mode;
+    EvilBiome evil;
     bool home;
     int equipment;
     bool doubleTrouble;
@@ -59,6 +62,7 @@ struct Config {
     double snowSize;
     double desertSize;
     double jungleSize;
+    double surfaceAmplitude;
     bool map;
 
     std::string getFilename() const;

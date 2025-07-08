@@ -32,7 +32,7 @@ void computeSurfaceLevel(Random &rnd, World &world)
                    std::min(
                        {0.1 * std::abs(center - x) + 15,
                         0.08 * std::min(x, world.getWidth() - x) + 5,
-                        50.0}) *
+                        world.conf.surfaceAmplitude * 50.0}) *
                        rnd.getCoarseNoise(x, 0);
         world.getSurfaceLevel(x) = curY;
         if (delta == curY - prevY) {
