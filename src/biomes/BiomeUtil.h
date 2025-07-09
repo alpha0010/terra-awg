@@ -37,6 +37,8 @@ Point findStoneCave(
     World &world,
     int minSize = 6);
 
+Point getHexCentroid(int x, int y, int scale);
+
 void growMossOn(int x, int y, World &world);
 
 bool isInBiome(int x, int y, int scanDist, Biome biome, World &world);

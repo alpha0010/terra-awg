@@ -174,6 +174,31 @@ Point findStoneCave(int yMin, int yMax, Random &rnd, World &world, int minSize)
     }
 }
 
+Point getHexCentroid(int x, int y, int scale)
+{
+    int targetX = x;
+    int targetY = y;
+    int minDist = std::numeric_limits<int>::max();
+    double centralDist = scale * 2 / std::sqrt(3);
+    double startRow = std::floor(y / centralDist);
+    for (int col : {x / scale, x / scale + 1}) {
+        for (double row : {startRow, startRow + 1}) {
+            if (col % 2 == 0) {
+                row += 0.5;
+            }
+            int testX = col * scale;
+            int testY = row * centralDist;
+            int testDist = std::pow(x - testX, 2) + std::pow(y - testY, 2);
+            if (testDist < minDist) {
+                targetX = testX;
+                targetY = testY;
+                minDist = testDist;
+            }
+        }
+    }
+    return {targetX, targetY};
+}
+
 inline constexpr auto mossFrameX = frozen::make_map<int, int>(
     {{TileID::greenMossStone, 0},
      {TileID::brownMossStone, 22},

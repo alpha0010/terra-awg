@@ -31,6 +31,7 @@
 #include "biomes/doubleTrouble/ResourceSwap.h"
 #include "biomes/hardmode/Hallow.h"
 #include "biomes/hardmode/HmOres.h"
+#include "biomes/hiveQueen/Base.h"
 #include "biomes/patches/Base.h"
 #include "biomes/patches/Cloud.h"
 #include "biomes/patches/Hive.h"
@@ -125,6 +126,8 @@ enum class Step {
     genCloudPatches,
     genJunglePatches,
     genHivePatches,
+    // Hive queen.
+    genWorldBaseHiveQueen,
 };
 
 inline std::array baseBiomeRules{
@@ -202,6 +205,17 @@ inline std::array patchesBiomeRules{
     Step::genSpiderNest,
     Step::genGlowingMoss,
     Step::genGemGrove,
+};
+
+inline std::array hiveQueenBiomeRules{
+    Step::planBiomes,
+    Step::initNoise,
+    Step::genWorldBaseHiveQueen,
+    Step::genOceans,
+    Step::genShatteredLand,
+    Step::genCloudPatches,
+    Step::smoothSurfaces,
+    Step::finalizeWalls,
 };
 
 #define GEN_STEP(step)                                                         \
@@ -295,6 +309,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genCloudPatches)
         GEN_STEP(genJunglePatches)
         GEN_STEP(genHivePatches)
+        GEN_STEP(genWorldBaseHiveQueen)
     }
 }
 
@@ -338,7 +353,12 @@ void doWorldGen(Random &rnd, World &world)
     }
     LocationBins locations;
     std::vector<Step> steps;
-    if (world.conf.patches) {
+    if (world.conf.hiveQueen) {
+        steps.insert(
+            steps.end(),
+            hiveQueenBiomeRules.begin(),
+            hiveQueenBiomeRules.end());
+    } else if (world.conf.patches) {
         steps.insert(
             steps.end(),
             patchesBiomeRules.begin(),
@@ -346,10 +366,12 @@ void doWorldGen(Random &rnd, World &world)
     } else {
         steps.insert(steps.end(), baseBiomeRules.begin(), baseBiomeRules.end());
     }
-    steps.insert(
-        steps.end(),
-        baseStructureRules.begin(),
-        baseStructureRules.end());
+    if (!world.conf.hiveQueen) {
+        steps.insert(
+            steps.end(),
+            baseStructureRules.begin(),
+            baseStructureRules.end());
+    }
     for (Step step : steps | std::views::filter([&excludes](Step s) {
                          return !excludes.contains(s);
                      })) {

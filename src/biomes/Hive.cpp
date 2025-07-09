@@ -9,32 +9,6 @@
 #include "structures/StructureUtil.h"
 #include <iostream>
 
-std::pair<int, int> getHexCentroid(int x, int y)
-{
-    int scale = 10;
-    int targetX = x;
-    int targetY = y;
-    double minDist = 2 * scale;
-    double centralDist = scale * 2 / std::sqrt(3);
-    double startRow = std::floor(y / centralDist);
-    for (int col : {x / scale, x / scale + 1}) {
-        for (double row : {startRow, startRow + 1}) {
-            if (col % 2 == 0) {
-                row += 0.5;
-            }
-            int testX = col * scale;
-            int testY = row * centralDist;
-            double testDist = std::hypot(x - testX, y - testY);
-            if (testDist < minDist) {
-                targetX = testX;
-                targetY = testY;
-                minDist = testDist;
-            }
-        }
-    }
-    return {targetX, targetY};
-}
-
 bool isHiveEdge(int x, int y, World &world)
 {
     if (world.getTile(x, y).wallID != WallID::Unsafe::hive) {
@@ -89,7 +63,7 @@ void fillHive(int hiveX, int hiveY, Random &rnd, World &world)
         world.conf.hiveSize * (15 + world.getWidth() / rnd.getDouble(84, 166));
     for (int x = hiveX - size; x < hiveX + size; ++x) {
         for (int y = hiveY - size; y < hiveY + size; ++y) {
-            auto [centroidX, centroidY] = getHexCentroid(x, y);
+            auto [centroidX, centroidY] = getHexCentroid(x, y, 10);
             double threshold =
                 3 * std::hypot(hiveX - centroidX, hiveY - centroidY) / size - 2;
             Tile &tile = world.getTile(x, y);
