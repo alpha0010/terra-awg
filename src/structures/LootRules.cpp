@@ -100,8 +100,16 @@ std::pair<double, Item> getGlobalItemPotion(World &world)
         {ItemID::redPotion, Prefix::none, 1}};
 }
 
-Item getSurfacePrimaryLoot(Random &rnd)
+bool skipPrimaryLoot(Random &rnd, World &world)
 {
+    return world.conf.forTheWorthy && rnd.getDouble(0, 1) < 0.06;
+}
+
+Item getSurfacePrimaryLoot(Random &rnd, World &world)
+{
+    if (skipPrimaryLoot(rnd, world)) {
+        return {ItemID::angelStatue, Prefix::none, 1};
+    }
     return rnd.pool<Item>({
         {ItemID::spear, rnd.select(PrefixSet::universal), 1},
         {ItemID::blowpipe, rnd.select(PrefixSet::ranged), 1},
@@ -116,8 +124,11 @@ Item getSurfacePrimaryLoot(Random &rnd)
     });
 }
 
-Item getUndergroundPrimaryLoot(Random &rnd)
+Item getUndergroundPrimaryLoot(Random &rnd, World &world)
 {
+    if (skipPrimaryLoot(rnd, world)) {
+        return {ItemID::angelStatue, Prefix::none, 1};
+    }
     return rnd.pool<Item>({
         {ItemID::bandOfRegeneration, rnd.select(PrefixSet::accessory), 1},
         {ItemID::magicMirror, Prefix::none, 1},
@@ -128,8 +139,11 @@ Item getUndergroundPrimaryLoot(Random &rnd)
     });
 }
 
-Item getCavernPrimaryLoot(Random &rnd)
+Item getCavernPrimaryLoot(Random &rnd, World &world)
 {
+    if (skipPrimaryLoot(rnd, world)) {
+        return {ItemID::angelStatue, Prefix::none, 1};
+    }
     return rnd.pool<Item>({
         {ItemID::bandOfRegeneration, rnd.select(PrefixSet::accessory), 1},
         {ItemID::magicMirror, Prefix::none, 1},
@@ -140,8 +154,11 @@ Item getCavernPrimaryLoot(Random &rnd)
     });
 }
 
-Item getFrozenPrimaryLoot(Random &rnd)
+Item getFrozenPrimaryLoot(Random &rnd, World &world)
 {
+    if (skipPrimaryLoot(rnd, world)) {
+        return {ItemID::angelStatue, Prefix::none, 1};
+    }
     return rnd.pool<Item>({
         {ItemID::iceBoomerang, rnd.select(PrefixSet::universal), 1},
         {ItemID::iceBlade, rnd.select(PrefixSet::melee), 1},
@@ -164,8 +181,11 @@ Item getHoneyPrimaryLoot(Random &rnd)
         1};
 }
 
-Item getIvyPrimaryLoot(Random &rnd)
+Item getIvyPrimaryLoot(Random &rnd, World &world)
 {
+    if (skipPrimaryLoot(rnd, world)) {
+        return {ItemID::angelStatue, Prefix::none, 1};
+    }
     return rnd.pool<Item>({
         {ItemID::feralClaws, rnd.select(PrefixSet::accessory), 1},
         {ItemID::ankletOfTheWind, rnd.select(PrefixSet::accessory), 1},
@@ -177,8 +197,11 @@ Item getIvyPrimaryLoot(Random &rnd)
     });
 }
 
-Item getMushroomPrimaryLoot(Random &rnd)
+Item getMushroomPrimaryLoot(Random &rnd, World &world)
 {
+    if (skipPrimaryLoot(rnd, world)) {
+        return {ItemID::angelStatue, Prefix::none, 1};
+    }
     return rnd.pool<Item>({
         {ItemID::bandOfRegeneration, rnd.select(PrefixSet::accessory), 1},
         {ItemID::magicMirror, Prefix::none, 1},
@@ -188,8 +211,11 @@ Item getMushroomPrimaryLoot(Random &rnd)
     });
 }
 
-Item getWaterPrimaryLoot(Random &rnd)
+Item getWaterPrimaryLoot(Random &rnd, World &world)
 {
+    if (skipPrimaryLoot(rnd, world)) {
+        return {ItemID::angelStatue, Prefix::none, 1};
+    }
     return rnd.pool<Item>({
         {ItemID::breathingReed, rnd.select(PrefixSet::melee), 1},
         {ItemID::flipper, rnd.select(PrefixSet::accessory), 1},
@@ -205,7 +231,7 @@ void fillSurfaceChest(Chest &chest, int torchID, Random &rnd, World &world)
     fillLoot(
         chest,
         rnd,
-        {{1, getSurfacePrimaryLoot(rnd)},
+        {{1, getSurfacePrimaryLoot(rnd, world)},
          getGlobalItemPrimary(rnd, world),
          {1.0 / 6, {ItemID::glowstick, Prefix::none, rnd.getInt(40, 75)}},
          {1.0 / 6, {ItemID::throwingKnife, Prefix::none, rnd.getInt(150, 300)}},
@@ -253,7 +279,7 @@ void fillSurfaceAshWoodChest(Chest &chest, Random &rnd, World &world)
     fillLoot(
         chest,
         rnd,
-        {{1, getSurfacePrimaryLoot(rnd)},
+        {{1, getSurfacePrimaryLoot(rnd, world)},
          getGlobalItemPrimary(rnd, world),
          {1.0 / 6, {ItemID::glowstick, Prefix::none, rnd.getInt(40, 75)}},
          {1.0 / 6, {ItemID::throwingKnife, Prefix::none, rnd.getInt(150, 300)}},
@@ -301,7 +327,7 @@ void fillSurfaceFrozenChest(Chest &chest, Random &rnd, World &world)
     fillLoot(
         chest,
         rnd,
-        {{1, getFrozenPrimaryLoot(rnd)},
+        {{1, getFrozenPrimaryLoot(rnd, world)},
          getGlobalItemPrimary(rnd, world),
          {0.05, {ItemID::extractinator, Prefix::none, 1}},
          {0.02, {ItemID::fish, Prefix::none, 1}},
@@ -356,18 +382,28 @@ void fillSurfaceLivingWoodChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {{1,
-          rnd.pool<Item>({
-              {ItemID::livingWoodWand, Prefix::none, 1},
-              rnd.select<Item>({
-                  {ItemID::bugNet, Prefix::none, 1},
-                  {ItemID::greenString, rnd.select(PrefixSet::accessory), 1},
-                  {ItemID::brownAndSilverDye, Prefix::none, rnd.getInt(3, 6)},
-                  {ItemID::greenAndBlackDye, Prefix::none, rnd.getInt(3, 6)},
-                  {ItemID::wandOfSparking, rnd.select(PrefixSet::magic), 1},
-              }),
-              {ItemID::livingWoodWand, Prefix::none, 1},
-              {ItemID::finchStaff, rnd.select(PrefixSet::magic), 1},
-          })},
+          skipPrimaryLoot(rnd, world)
+              ? Item{ItemID::angelStatue, Prefix::none, 1}
+              : rnd.pool<Item>({
+                    {ItemID::livingWoodWand, Prefix::none, 1},
+                    rnd.select<Item>({
+                        {ItemID::bugNet, Prefix::none, 1},
+                        {ItemID::greenString,
+                         rnd.select(PrefixSet::accessory),
+                         1},
+                        {ItemID::brownAndSilverDye,
+                         Prefix::none,
+                         rnd.getInt(3, 6)},
+                        {ItemID::greenAndBlackDye,
+                         Prefix::none,
+                         rnd.getInt(3, 6)},
+                        {ItemID::wandOfSparking,
+                         rnd.select(PrefixSet::magic),
+                         1},
+                    }),
+                    {ItemID::livingWoodWand, Prefix::none, 1},
+                    {ItemID::finchStaff, rnd.select(PrefixSet::magic), 1},
+                })},
          getGlobalItemPrimary(rnd, world),
          {0.1,
           {rnd.select({ItemID::sunflowerMinecart, ItemID::ladybugMinecart}),
@@ -420,17 +456,23 @@ void fillSurfacePalmWoodChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {{1,
-          rnd.pool<Item>({
-              {ItemID::spear, rnd.select(PrefixSet::universal), 1},
-              {ItemID::blowpipe, rnd.select(PrefixSet::ranged), 1},
-              {ItemID::woodenBoomerang, rnd.select(PrefixSet::universal), 1},
-              {ItemID::aglet, rnd.select(PrefixSet::accessory), 1},
-              {ItemID::climbingClaws, rnd.select(PrefixSet::accessory), 1},
-              {ItemID::umbrella, rnd.select(PrefixSet::melee), 1},
-              {ItemID::wandOfSparking, rnd.select(PrefixSet::magic), 1},
-              {ItemID::radar, rnd.select(PrefixSet::accessory), 1},
-              {ItemID::stepStool, rnd.select(PrefixSet::accessory), 1},
-          })},
+          skipPrimaryLoot(rnd, world)
+              ? Item{ItemID::angelStatue, Prefix::none, 1}
+              : rnd.pool<Item>({
+                    {ItemID::spear, rnd.select(PrefixSet::universal), 1},
+                    {ItemID::blowpipe, rnd.select(PrefixSet::ranged), 1},
+                    {ItemID::woodenBoomerang,
+                     rnd.select(PrefixSet::universal),
+                     1},
+                    {ItemID::aglet, rnd.select(PrefixSet::accessory), 1},
+                    {ItemID::climbingClaws,
+                     rnd.select(PrefixSet::accessory),
+                     1},
+                    {ItemID::umbrella, rnd.select(PrefixSet::melee), 1},
+                    {ItemID::wandOfSparking, rnd.select(PrefixSet::magic), 1},
+                    {ItemID::radar, rnd.select(PrefixSet::accessory), 1},
+                    {ItemID::stepStool, rnd.select(PrefixSet::accessory), 1},
+                })},
          getGlobalItemPrimary(rnd, world),
          {0.05, {ItemID::whitePearl, Prefix::none, 1}},
          {1.0 / 6, {ItemID::glowstick, Prefix::none, rnd.getInt(40, 75)}},
@@ -480,7 +522,7 @@ void fillSurfacePearlwoodChest(Chest &chest, Random &rnd, World &world)
     fillLoot(
         chest,
         rnd,
-        {{1, getSurfacePrimaryLoot(rnd)},
+        {{1, getSurfacePrimaryLoot(rnd, world)},
          getGlobalItemPrimary(rnd, world),
          {1.0 / 6, {ItemID::bouncyGlowstick, Prefix::none, rnd.getInt(40, 75)}},
          {1.0 / 6, {ItemID::throwingKnife, Prefix::none, rnd.getInt(150, 300)}},
@@ -528,7 +570,7 @@ void fillSurfaceRichMahoganyChest(Chest &chest, Random &rnd, World &world)
     fillLoot(
         chest,
         rnd,
-        {{1, getSurfacePrimaryLoot(rnd)},
+        {{1, getSurfacePrimaryLoot(rnd, world)},
          getGlobalItemPrimary(rnd, world),
          {1.0 / 6, {ItemID::glowstick, Prefix::none, rnd.getInt(40, 75)}},
          {1.0 / 6, {ItemID::poisonedKnife, Prefix::none, rnd.getInt(150, 300)}},
@@ -578,7 +620,7 @@ void fillSurfaceWaterChest(Chest &chest, Random &rnd, World &world)
     fillLoot(
         chest,
         rnd,
-        {{1, getWaterPrimaryLoot(rnd)},
+        {{1, getWaterPrimaryLoot(rnd, world)},
          getGlobalItemPrimary(rnd, world),
          {nearEdge ? 0.05 : 0, {ItemID::whitePearl, Prefix::none, 1}},
          {0.5, {ItemID::sandcastleBucket, Prefix::none, 1}},
@@ -638,7 +680,7 @@ void fillUndergroundChest(
         chest,
         rnd,
         {
-            {1, getUndergroundPrimaryLoot(rnd)},
+            {1, getUndergroundPrimaryLoot(rnd, world)},
             getGlobalItemPrimary(rnd, world),
             {isTrapped ? 1.0 / 3 : 0,
              {ItemID::deadMansSweater, Prefix::none, 1}},
@@ -688,7 +730,7 @@ void fillUndergroundFrozenChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1, getFrozenPrimaryLoot(rnd)},
+            {1, getFrozenPrimaryLoot(rnd, world)},
             getGlobalItemPrimary(rnd, world),
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
             {0.02, {ItemID::fish, Prefix::none, 1}},
@@ -789,7 +831,7 @@ void fillUndergroundIvyChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1, getIvyPrimaryLoot(rnd)},
+            {1, getIvyPrimaryLoot(rnd, world)},
             getGlobalItemPrimary(rnd, world),
             {1.0 / 6, {ItemID::livingMahoganyWand, Prefix::none, 1}},
             {0.1, {ItemID::beeMinecart, Prefix::none, 1}},
@@ -841,7 +883,7 @@ void fillUndergroundMushroomChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1, getMushroomPrimaryLoot(rnd)},
+            {1, getMushroomPrimaryLoot(rnd, world)},
             {1,
              {rnd.pool({ItemID::shroomMinecart, ItemID::mushroomHat}),
               Prefix::none,
@@ -893,7 +935,7 @@ void fillUndergroundPearlwoodChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1, getUndergroundPrimaryLoot(rnd)},
+            {1, getUndergroundPrimaryLoot(rnd, world)},
             getGlobalItemPrimary(rnd, world),
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
             {0.05, {ItemID::flareGun, Prefix::none, 1}},
@@ -942,12 +984,18 @@ void fillUndergroundSandstoneChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1,
-             rnd.pool<Item>({
-                 {ItemID::magicConch, Prefix::none, 1},
-                 {ItemID::snakeCharmersFlute, Prefix::none, 1},
-                 {ItemID::ancientChisel, rnd.select(PrefixSet::accessory), 1},
-                 {ItemID::duneriderBoots, rnd.select(PrefixSet::accessory), 1},
-             })},
+             skipPrimaryLoot(rnd, world)
+                 ? Item{ItemID::angelStatue, Prefix::none, 1}
+                 : rnd.pool<Item>({
+                       {ItemID::magicConch, Prefix::none, 1},
+                       {ItemID::snakeCharmersFlute, Prefix::none, 1},
+                       {ItemID::ancientChisel,
+                        rnd.select(PrefixSet::accessory),
+                        1},
+                       {ItemID::duneriderBoots,
+                        rnd.select(PrefixSet::accessory),
+                        1},
+                   })},
             getGlobalItemPrimary(rnd, world),
             {0.05,
              {rnd.select({ItemID::whitePearl, ItemID::blackPearl}),
@@ -1001,7 +1049,7 @@ void fillUndergroundRichMahoganyChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1, getUndergroundPrimaryLoot(rnd)},
+            {1, getUndergroundPrimaryLoot(rnd, world)},
             getGlobalItemPrimary(rnd, world),
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
             {0.05, {ItemID::flareGun, Prefix::none, 1}},
@@ -1051,7 +1099,7 @@ void fillUndergroundWaterChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1, getWaterPrimaryLoot(rnd)},
+            {1, getWaterPrimaryLoot(rnd, world)},
             getGlobalItemPrimary(rnd, world),
             {nearEdge ? 0.6 : 0,
              {rnd.select({ItemID::whitePearl, ItemID::blackPearl}),
@@ -1115,7 +1163,7 @@ void fillCavernChest(
         chest,
         rnd,
         {
-            {1, getCavernPrimaryLoot(rnd)},
+            {1, getCavernPrimaryLoot(rnd, world)},
             getGlobalItemPrimary(rnd, world),
             {isTrapped ? 1.0 / 3 : 0,
              {ItemID::deadMansSweater, Prefix::none, 1}},
@@ -1176,7 +1224,7 @@ void fillCavernFrozenChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1, getFrozenPrimaryLoot(rnd)},
+            {1, getFrozenPrimaryLoot(rnd, world)},
             getGlobalItemPrimary(rnd, world),
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
             {0.02, {ItemID::fish, Prefix::none, 1}},
@@ -1301,7 +1349,7 @@ void fillCavernIvyChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1, getIvyPrimaryLoot(rnd)},
+            {1, getIvyPrimaryLoot(rnd, world)},
             getGlobalItemPrimary(rnd, world),
             {1.0 / 6, {ItemID::livingMahoganyWand, Prefix::none, 1}},
             {0.1, {ItemID::beeMinecart, Prefix::none, 1}},
@@ -1367,7 +1415,7 @@ void fillCavernMushroomChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1, getMushroomPrimaryLoot(rnd)},
+            {1, getMushroomPrimaryLoot(rnd, world)},
             {1,
              {rnd.pool({ItemID::shroomMinecart, ItemID::mushroomHat}),
               Prefix::none,
@@ -1432,7 +1480,7 @@ void fillCavernPearlwoodChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1, getCavernPrimaryLoot(rnd)},
+            {1, getCavernPrimaryLoot(rnd, world)},
             getGlobalItemPrimary(rnd, world),
             {chest.y < lavaLevel ? 0.05 : 0.15,
              {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
@@ -1494,11 +1542,15 @@ void fillCavernSandstoneChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1,
-             rnd.pool<Item>({
-                 {ItemID::stormSpear, rnd.select(PrefixSet::universal), 1},
-                 {ItemID::thunderZapper, rnd.select(PrefixSet::magic), 1},
-                 {ItemID::bastStatue, Prefix::none, 1},
-             })},
+             skipPrimaryLoot(rnd, world)
+                 ? Item{ItemID::angelStatue, Prefix::none, 1}
+                 : rnd.pool<Item>({
+                       {ItemID::stormSpear,
+                        rnd.select(PrefixSet::universal),
+                        1},
+                       {ItemID::thunderZapper, rnd.select(PrefixSet::magic), 1},
+                       {ItemID::bastStatue, Prefix::none, 1},
+                   })},
             getGlobalItemPrimary(rnd, world),
             {0.05,
              {rnd.select({ItemID::blackPearl, ItemID::pinkPearl}),
@@ -1565,7 +1617,7 @@ void fillCavernRichMahoganyChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1, getCavernPrimaryLoot(rnd)},
+            {1, getCavernPrimaryLoot(rnd, world)},
             getGlobalItemPrimary(rnd, world),
             {chest.y < lavaLevel ? 0.05 : 0.15,
              {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
@@ -1629,7 +1681,7 @@ void fillCavernWaterChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1, getWaterPrimaryLoot(rnd)},
+            {1, getWaterPrimaryLoot(rnd, world)},
             getGlobalItemPrimary(rnd, world),
             {nearEdge ? 0.7 : 0,
              {rnd.select({ItemID::whitePearl, ItemID::blackPearl}),
@@ -1694,12 +1746,20 @@ void fillSkywareChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {{1,
-          rnd.pool<Item>({
-              {ItemID::shinyRedBalloon, rnd.select(PrefixSet::accessory), 1},
-              {ItemID::starfury, rnd.select(PrefixSet::melee), 1},
-              {ItemID::luckyHorseshoe, rnd.select(PrefixSet::accessory), 1},
-              {ItemID::celestialMagnet, rnd.select(PrefixSet::accessory), 1},
-          })},
+          skipPrimaryLoot(rnd, world)
+              ? Item{ItemID::angelStatue, Prefix::none, 1}
+              : rnd.pool<Item>({
+                    {ItemID::shinyRedBalloon,
+                     rnd.select(PrefixSet::accessory),
+                     1},
+                    {ItemID::starfury, rnd.select(PrefixSet::melee), 1},
+                    {ItemID::luckyHorseshoe,
+                     rnd.select(PrefixSet::accessory),
+                     1},
+                    {ItemID::celestialMagnet,
+                     rnd.select(PrefixSet::accessory),
+                     1},
+                })},
          getGlobalItemPrimary(rnd, world),
          {1.0 / 3, {ItemID::skyMill, Prefix::none, 1}},
          {0.025, {ItemID::fledglingWings, rnd.select(PrefixSet::accessory), 1}},
@@ -1754,13 +1814,15 @@ void fillShadowChest(Chest &chest, Random &rnd, World &world)
         rnd,
         {
             {1,
-             rnd.pool<Item>({
-                 {ItemID::sunfury, rnd.select(PrefixSet::universal), 1},
-                 {ItemID::flowerOfFire, rnd.select(PrefixSet::magic), 1},
-                 {ItemID::flamelash, rnd.select(PrefixSet::magic), 1},
-                 {ItemID::darkLance, rnd.select(PrefixSet::universal), 1},
-                 {ItemID::hellwingBow, rnd.select(PrefixSet::ranged), 1},
-             })},
+             skipPrimaryLoot(rnd, world)
+                 ? Item{ItemID::angelStatue, Prefix::none, 1}
+                 : rnd.pool<Item>({
+                       {ItemID::sunfury, rnd.select(PrefixSet::universal), 1},
+                       {ItemID::flowerOfFire, rnd.select(PrefixSet::magic), 1},
+                       {ItemID::flamelash, rnd.select(PrefixSet::magic), 1},
+                       {ItemID::darkLance, rnd.select(PrefixSet::universal), 1},
+                       {ItemID::hellwingBow, rnd.select(PrefixSet::ranged), 1},
+                   })},
             getGlobalItemPrimary(rnd, world),
             {0.1, {ItemID::demonicHellcart, Prefix::none, 1}},
             {0.1, {ItemID::ornateShadowKey, Prefix::none, 1}},
@@ -1881,7 +1943,11 @@ void fillWebCoveredChest(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1, {ItemID::webSlinger, Prefix::none, 1}},
+            {1,
+             {skipPrimaryLoot(rnd, world) ? ItemID::angelStatue
+                                          : ItemID::webSlinger,
+              Prefix::none,
+              1}},
             getGlobalItemPrimary(rnd, world),
             {1, {ItemID::cobweb, Prefix::none, rnd.getInt(10, 29)}},
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
@@ -2267,6 +2333,36 @@ void fillStarterChestMythril(Chest &chest, Random &rnd, World &world)
     }
 }
 
+void fillStarterChestDebug(Chest &chest, Random &rnd, World &world)
+{
+    fillLoot(
+        chest,
+        rnd,
+        {
+            {1, {ItemID::zenith, Prefix::legendary, 1}},
+            {1, {ItemID::zenith, Prefix::legendary, 1}},
+            {1, {ItemID::picksaw, Prefix::legendary, 1}},
+            {1, {ItemID::picksaw, Prefix::legendary, 1}},
+            {1, {ItemID::valhallaKnightsHelm, Prefix::none, 1}},
+            {1, {ItemID::valhallaKnightsBreastplate, Prefix::none, 1}},
+            {1, {ItemID::valhallaKnightsGreaves, Prefix::none, 1}},
+            {1, {ItemID::valhallaKnightsHelm, Prefix::none, 1}},
+            {1, {ItemID::valhallaKnightsBreastplate, Prefix::none, 1}},
+            {1, {ItemID::valhallaKnightsGreaves, Prefix::none, 1}},
+            {1, {ItemID::witchsBroom, Prefix::none, 1}},
+            {1, {ItemID::witchsBroom, Prefix::none, 1}},
+            {1, {ItemID::theGrandDesign, Prefix::none, 1}},
+            {1, {ItemID::theGrandDesign, Prefix::none, 1}},
+            {1,
+             {world.ironVariant == TileID::ironOre ? ItemID::ironBar
+                                                   : ItemID::leadBar,
+              Prefix::none,
+              9999}},
+            {1, {ItemID::shinePotion, Prefix::none, 9999}},
+            {1, {ItemID::wormholePotion, Prefix::none, 9999}},
+        });
+}
+
 void fillStarterChest(int level, Chest &chest, Random &rnd, World &world)
 {
     switch (level) {
@@ -2281,6 +2377,9 @@ void fillStarterChest(int level, Chest &chest, Random &rnd, World &world)
         break;
     case ItemID::mythrilBar:
         fillStarterChestMythril(chest, rnd, world);
+        break;
+    case ItemID::zenith:
+        fillStarterChestDebug(chest, rnd, world);
         break;
     }
 }

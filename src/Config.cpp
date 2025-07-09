@@ -484,6 +484,8 @@ int parseEquipment(const std::string &equipment)
         return ItemID::hellstoneBar;
     } else if (equipment == "mythril") {
         return ItemID::mythrilBar;
+    } else if (equipment == "debug") {
+        return ItemID::zenith;
     } else if (equipment != "none") {
         std::cout << "Unknown equipment '" << equipment << "'\n";
     }
