@@ -237,6 +237,7 @@ void genCloud(Random &rnd, World &world)
     std::shuffle(rooms.begin(), rooms.end(), rnd.getPRNG());
     auto roomItr = rooms.begin();
     double cloudScale = std::min(0.1 + world.getHeight() / 1400.0, 1.0);
+    int spacingBuffer = world.conf.hiveQueen ? -10 : 50;
     for (int tries = 500 * numClouds; numClouds > 0 && tries > 0; --tries) {
         int width = cloudScale * rnd.getInt(90, 160);
         int height = cloudScale * rnd.getInt(35, 50);
@@ -252,21 +253,26 @@ void genCloud(Random &rnd, World &world)
                 maxY - 1),
             maxY);
         if (!world.regionPasses(
-                x - 25,
-                y - 25,
-                width + 50,
-                height + 50,
+                x - spacingBuffer / 2,
+                y - spacingBuffer / 2,
+                width + spacingBuffer,
+                height + spacingBuffer,
                 [](Tile &tile) { return tile.blockID == TileID::empty; })) {
             continue;
         }
         for (int i = 0; i < width; ++i) {
+            int hI = i;
             for (int j = 0; j < height; ++j) {
+                int hJ = j;
+                if (world.conf.hiveQueen) {
+                    std::tie(hI, hJ) = getHexCentroid(i, j, 8);
+                }
                 double threshold =
                     8 * std::hypot(
-                            static_cast<double>(i) / width - 0.5,
-                            static_cast<double>(j) / height - 0.5) -
+                            static_cast<double>(hI) / width - 0.5,
+                            static_cast<double>(hJ) / height - 0.5) -
                     3;
-                if (rnd.getFineNoise(x + i, y + j) < threshold) {
+                if (rnd.getFineNoise(x + hI, y + hJ) < threshold) {
                     continue;
                 }
                 Tile &tile = world.getTile(x + i, y + j);

@@ -709,9 +709,13 @@ void World::planBiomes(Random &rnd)
     std::cout << "Planning biomes\n";
     for (int tries = 0; tries < 1000; ++tries) {
         desertCenter = rnd.getDouble(0.09, 0.91);
-        jungleCenter = rnd.getDouble(0.12, 0.39);
-        if (rnd.getBool()) {
-            jungleCenter = 1 - jungleCenter;
+        if (conf.hiveQueen) {
+            jungleCenter = rnd.getDouble(0.39, 0.61);
+        } else {
+            jungleCenter = rnd.getDouble(0.12, 0.39);
+            if (rnd.getBool()) {
+                jungleCenter = 1 - jungleCenter;
+            }
         }
         snowCenter = rnd.getDouble(0.12, 0.88);
 

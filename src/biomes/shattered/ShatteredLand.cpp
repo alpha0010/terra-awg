@@ -139,11 +139,13 @@ void genShatteredLand(Random &rnd, World &world)
                             world.getSurfaceLevel(x - 1));
                     }
                 }
-            } else {
+            } else if (
+                foundSurface || tile.blockID != TileID::hive ||
+                y >= world.getUndergroundLevel()) {
                 tile = {};
             }
         }
-        if (world.conf.patches && x != 0) {
+        if ((world.conf.patches || world.conf.hiveQueen) && x != 0) {
             for (int y = 0.5 * world.getUndergroundLevel();
                  y < world.getUnderworldLevel();
                  ++y) {

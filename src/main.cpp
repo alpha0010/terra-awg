@@ -38,6 +38,8 @@ Seed determineSeed(Config &conf)
 {
     if (conf.forTheWorthy) {
         return Seed::forTheWorthy;
+    } else if (conf.hiveQueen) {
+        return Seed::notTheBees;
     } else if (conf.doubleTrouble) {
         return Seed::drunkWorld;
     } else if (conf.traps > 14) {
@@ -496,6 +498,9 @@ int main()
         world.cobaltVariant = TileID::empty;
         world.mythrilVariant = TileID::empty;
         world.adamantiteVariant = TileID::empty;
+    }
+    if (conf.hiveQueen) {
+        conf.jungleSize *= 2;
     }
     if (conf.forTheWorthy) {
         conf.spiderNestFreq *= 2.5;

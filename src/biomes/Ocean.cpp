@@ -174,10 +174,12 @@ void genOceans(Random &rnd, World &world)
         double sandDepth = (40 + 9 * rnd.getCoarseNoise(x, 0)) *
                            std::min(1.0, (400.0 - x) / 160);
         auto fillColumn = [&](int effectiveX) {
-            for (int y = 0.3 * world.getUndergroundLevel();
+            for (int y = world.getSurfaceLevel(effectiveX) - 10;
                  y < world.getUndergroundLevel();
                  ++y) {
-                if (world.getTile(effectiveX, y).blockID != TileID::empty) {
+                if (world.getTile(effectiveX, y).blockID != TileID::empty &&
+                    (y > waterTable ||
+                     world.getTile(effectiveX, y).blockID != TileID::hive)) {
                     for (int i = 0; i < drop; ++i) {
                         Tile &tile = world.getTile(effectiveX, y + i);
                         tile.wallID = WallID::empty;

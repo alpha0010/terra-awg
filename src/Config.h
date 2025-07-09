@@ -28,6 +28,7 @@ struct Config {
     double patchesHumidity;
     double patchesTemperature;
     double patchesSize;
+    bool hiveQueen;
     bool forTheWorthy;
     int meteorites;
     double meteoriteSize;
