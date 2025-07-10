@@ -207,9 +207,12 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
     double goldThreshold = world.conf.forTheWorthy
                                ? computeOreThreshold(1.35 * world.conf.ore)
                                : oreThreshold;
+    int lavaLevel =
+        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     parallelFor(
         std::views::iota(0, world.getWidth()),
-        [oreThreshold,
+        [lavaLevel,
+         oreThreshold,
          goldThreshold,
          &depositNoise,
          &wallVarNoise,
@@ -280,7 +283,8 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                                       : WallID::Unsafe::hardenedSand;
                     break;
                 case Biome::jungle:
-                    tile.blockID = jungleTiles[tileType];
+                    tile.blockID = jungleTiles
+                        [y > lavaLevel && tileType == 0 ? 3 : tileType];
                     if (y < world.getUndergroundLevel()) {
                         tile.wallID = WallID::Unsafe::mud;
                     } else {

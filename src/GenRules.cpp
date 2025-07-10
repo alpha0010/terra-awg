@@ -32,6 +32,9 @@
 #include "biomes/hardmode/Hallow.h"
 #include "biomes/hardmode/HmOres.h"
 #include "biomes/hiveQueen/Base.h"
+#include "biomes/hiveQueen/GlowingMushroom.h"
+#include "biomes/hiveQueen/GraniteCave.h"
+#include "biomes/hiveQueen/Hive.h"
 #include "biomes/hiveQueen/MarbleCave.h"
 #include "biomes/patches/Base.h"
 #include "biomes/patches/Cloud.h"
@@ -130,6 +133,9 @@ enum class Step {
     // Hive queen.
     genWorldBaseHiveQueen,
     genMarbleCaveHiveQueen,
+    genGlowingMushroomHiveQueen,
+    genGraniteCaveHiveQueen,
+    genHiveHiveQueen,
 };
 
 inline std::array baseBiomeRules{
@@ -220,6 +226,9 @@ inline std::array hiveQueenBiomeRules{
     Step::genJunglePatches,
     Step::genForest,
     Step::genUnderworld,
+    Step::genGlowingMushroomHiveQueen,
+    Step::genGraniteCaveHiveQueen,
+    Step::genHiveHiveQueen,
     Step::smoothSurfaces,
     Step::finalizeWalls,
 };
@@ -317,6 +326,9 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genHivePatches)
         GEN_STEP(genWorldBaseHiveQueen)
         GEN_STEP(genMarbleCaveHiveQueen)
+        GEN_STEP(genGlowingMushroomHiveQueen)
+        GEN_STEP(genGraniteCaveHiveQueen)
+        GEN_STEP(genHiveHiveQueen)
     }
 }
 
