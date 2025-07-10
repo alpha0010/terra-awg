@@ -1,0 +1,70 @@
+#include "biomes/hiveQueen/GraniteCave.h"
+
+#include "Config.h"
+#include "Random.h"
+#include "World.h"
+#include "biomes/BiomeUtil.h"
+#include "ids/WallID.h"
+#include <iostream>
+#include <set>
+
+void fillGraniteCaveHex(int x, int y, World &world)
+{
+    std::set<Point> clearCenters;
+    iterateZone(
+        {x, y},
+        world,
+        [&world](Point pt) { return world.getTile(pt).flag != 1; },
+        [&clearCenters, &world](Point pt) {
+            Point centroid = getHexCentroid(pt.first, pt.second, 12);
+            if (world.getTile(pt).blockID == TileID::empty ||
+                world.getTile(centroid).blockID == TileID::empty) {
+                clearCenters.insert(centroid);
+            }
+        });
+    iterateZone(
+        {x, y},
+        world,
+        [&world](Point pt) { return world.getTile(pt).flag != 1; },
+        [&clearCenters, &world](Point pt) {
+            Tile &tile = world.getTile(pt);
+            switch (tile.blockID) {
+            case TileID::dirt:
+            case TileID::stone:
+            case TileID::mud:
+                tile.blockID = clearCenters.contains(
+                                   getHexCentroid(pt.first, pt.second, 12))
+                                   ? TileID::empty
+                                   : TileID::granite;
+                break;
+            case TileID::sand:
+            case TileID::clay:
+                tile.blockID = clearCenters.contains(
+                                   getHexCentroid(pt.first, pt.second, 12))
+                                   ? TileID::empty
+                                   : TileID::smoothGranite;
+                break;
+            }
+            if (!world.conf.shattered || tile.wallID != WallID::empty) {
+                tile.wallID = WallID::Unsafe::granite;
+            }
+        });
+}
+
+void genGraniteCaveHiveQueen(Random &rnd, World &world)
+{
+    std::cout << "Smoothing granite\n";
+    int numCaves =
+        world.conf.graniteFreq * world.getWidth() * world.getHeight() / 2000000;
+    for (int i = 0; i < numCaves; ++i) {
+        auto [x, y] = findStoneCave(
+            std::midpoint(world.getUndergroundLevel(), world.getCavernLevel()),
+            world.getUnderworldLevel(),
+            rnd,
+            world,
+            30);
+        if (world.getTile(x, y).flag != 1) {
+            fillGraniteCaveHex(x, y, world);
+        }
+    }
+}

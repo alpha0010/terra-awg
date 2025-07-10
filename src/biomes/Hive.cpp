@@ -58,9 +58,17 @@ Point selectLarvaeLocation(
 
 void fillHive(int hiveX, int hiveY, Random &rnd, World &world)
 {
+    fillHive(
+        hiveX,
+        hiveY,
+        world.conf.hiveSize * (15 + world.getWidth() / rnd.getDouble(84, 166)),
+        rnd,
+        world);
+}
+
+void fillHive(int hiveX, int hiveY, double size, Random &rnd, World &world)
+{
     rnd.shuffleNoise();
-    double size =
-        world.conf.hiveSize * (15 + world.getWidth() / rnd.getDouble(84, 166));
     for (int x = hiveX - size; x < hiveX + size; ++x) {
         for (int y = hiveY - size; y < hiveY + size; ++y) {
             auto [centroidX, centroidY] = getHexCentroid(x, y, 10);
