@@ -142,7 +142,9 @@ void genShatteredLand(Random &rnd, World &world)
             } else if (
                 foundSurface || tile.blockID != TileID::hive ||
                 y >= world.getUndergroundLevel()) {
+                short int flag = tile.flag;
                 tile = {};
+                tile.flag = flag;
             }
         }
         if ((world.conf.patches || world.conf.hiveQueen) && x != 0) {

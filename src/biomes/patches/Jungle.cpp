@@ -1,5 +1,6 @@
 #include "biomes/patches/Jungle.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/Jungle.h"
@@ -10,14 +11,21 @@ void genJunglePatches(Random &rnd, World &world)
     std::cout << "Generating jungle\n";
     rnd.shuffleNoise();
     int scanDist = rnd.getDouble(0.03, 0.035) * world.getWidth();
-    int minX = world.jungleCenter;
-    while (minX > 350 && minX > world.jungleCenter - scanDist &&
+    int jungleCenter = world.jungleCenter;
+    if (world.conf.hiveQueen) {
+        if (jungleCenter > world.getWidth() / 2) {
+            jungleCenter += 0.015 * world.getWidth();
+        } else {
+            jungleCenter -= 0.015 * world.getWidth();
+        }
+    }
+    int minX = jungleCenter;
+    while (minX > 350 && minX > jungleCenter - scanDist &&
            world.getBiome(minX, world.getSurfaceLevel(minX)).jungle > 0.8) {
         --minX;
     }
-    int maxX = world.jungleCenter;
-    while (maxX < world.getWidth() - 350 &&
-           maxX < world.jungleCenter + scanDist &&
+    int maxX = jungleCenter;
+    while (maxX < world.getWidth() - 350 && maxX < jungleCenter + scanDist &&
            world.getBiome(maxX + 25, world.getSurfaceLevel(maxX + 25)).jungle >
                0.8) {
         ++maxX;

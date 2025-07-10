@@ -35,6 +35,7 @@ public:
      * changes.
      */
     bool guarded : 1;
+    short int flag;
 
     bool operator==(const Tile &) const = default;
 };

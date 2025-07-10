@@ -110,9 +110,10 @@ std::vector<Point> planHiveQueenBiomes(Random &rnd, World &world)
     world.initBiomeData();
     std::mutex ptMtx;
     std::vector<Point> borders;
+    Point hexShift{rnd.getInt(0, 99999), rnd.getInt(0, 99999)};
     parallelFor(
         std::views::iota(0, world.getWidth()),
-        [&ptMtx, &borders, &rnd, &world](int x) {
+        [hexShift, &ptMtx, &borders, &rnd, &world](int x) {
             auto valueLess = [](const std::pair<Biome, int> &a,
                                 const std::pair<Biome, int> &b) {
                 return a.second < b.second;
@@ -125,9 +126,10 @@ std::vector<Point> planHiveQueenBiomes(Random &rnd, World &world)
                 std::vector<Point> locations;
                 std::map<Biome, int> biomes;
                 std::vector<Point> hexBorder = iterateHex(
-                    {x, y},
+                    addPts({x, y}, hexShift),
                     131,
-                    [&locations, &biomes, &rnd, &world](Point pt) {
+                    [hexShift, &locations, &biomes, &rnd, &world](Point pt) {
+                        pt = subPts(pt, hexShift);
                         if (pt.first < 0 || pt.second < 0 ||
                             pt.first >= world.getWidth() ||
                             pt.second >= world.getHeight()) {
@@ -137,10 +139,9 @@ std::vector<Point> planHiveQueenBiomes(Random &rnd, World &world)
                         biomes[getBiomeAt(pt.first, pt.second, rnd, world)] +=
                             1;
                     });
-                queuedBorders.insert(
-                    queuedBorders.end(),
-                    hexBorder.begin(),
-                    hexBorder.end());
+                for (Point pt : hexBorder) {
+                    queuedBorders.push_back(subPts(pt, hexShift));
+                }
                 auto targBiome =
                     std::max_element(biomes.begin(), biomes.end(), valueLess);
                 for (auto [ptX, ptY] : locations) {
@@ -157,6 +158,29 @@ std::vector<Point> planHiveQueenBiomes(Random &rnd, World &world)
                     queuedBorders.end());
             }
         });
+    parallelFor(std::views::iota(0, world.getWidth()), [&world](int x) {
+        for (int y = 0; y < world.getHeight(); ++y) {
+            BiomeData &biome = world.getBiome(x, y);
+            biome.forest = 0;
+            switch (biome.active) {
+            case Biome::forest:
+                biome.forest = 1;
+                break;
+            case Biome::snow:
+                biome.snow = 1;
+                break;
+            case Biome::desert:
+                biome.desert = 1;
+                break;
+            case Biome::jungle:
+                biome.jungle = 1;
+                break;
+            case Biome::underworld:
+                biome.underworld = 1;
+                break;
+            }
+        }
+    });
     return borders;
 }
 
@@ -463,6 +487,10 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                     tiles[tile.wireRed ? TileID::empty : tile.blockID] += 1;
                     walls[tile.wallID] += 1;
                 });
+            tiles[TileID::empty] *= 1.3;
+            if (y < world.getUndergroundLevel()) {
+                walls[WallID::empty] *= 1.3;
+            }
             auto targTile =
                 std::max_element(tiles.begin(), tiles.end(), valueLess);
             auto targWall =
@@ -494,11 +522,16 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
     });
 
     parallelFor(std::views::iota(0, world.getWidth()), [&rnd, &world](int x) {
-        world.getSurfaceLevel(x) =
+        int surfaceLevel =
             scanWhileEmpty({x, world.getSurfaceLevel(x) - 10}, {0, 1}, world)
-                .second;
+                .second +
+            1;
+        world.getSurfaceLevel(x) = surfaceLevel;
         for (int y = 0; y < world.getHeight(); ++y) {
             Tile &tile = world.getTile(x, y);
+            if (y <= surfaceLevel) {
+                tile.wallID = WallID::empty;
+            }
             BiomeData &biome = world.getBiome(x, y);
             tile.wireBlue = false;
             if (!world.isExposed(x, y)) {
@@ -545,6 +578,7 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                 Tile &tile = world.getTile(pt.first + i, pt.second + j);
                 tile.blockID = TileID::hive;
                 tile.wallID = WallID::Unsafe::hive;
+                tile.flag = 1;
             }
         }
     });

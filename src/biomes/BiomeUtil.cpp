@@ -262,3 +262,34 @@ bool isInBiome(int x, int y, int scanDist, Biome biome, World &world)
     }
     return true;
 }
+
+void iterateZone(
+    Point start,
+    World &world,
+    std::function<bool(Point)> isValid,
+    std::function<void(Point)> f)
+{
+    std::set<Point> border;
+    std::set<Point> visited;
+    std::vector<Point> locations{start};
+    while (!locations.empty()) {
+        Point loc = locations.back();
+        locations.pop_back();
+        if (loc.first < 0 || loc.second < 0 || loc.first >= world.getWidth() ||
+            loc.second >= world.getWidth() || visited.contains(loc) ||
+            border.contains(loc)) {
+            continue;
+        }
+        if (isValid(loc)) {
+            visited.insert(loc);
+            for (auto delta : {std::pair{-1, 0}, {1, 0}, {0, -1}, {0, 1}}) {
+                locations.push_back(addPts(loc, delta));
+            }
+        } else {
+            border.insert(loc);
+        }
+    }
+    for (Point loc : visited) {
+        f(loc);
+    }
+}
