@@ -1,5 +1,6 @@
 #include "Underworld.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
@@ -78,7 +79,8 @@ void addBridges(int centerLevel, int lavaLevel, Random &rnd, World &world)
                 }
                 if (j < bridge.getHeight() - 1) {
                     Tile &tile = world.getTile(x + i, bridgeLevel + j);
-                    if (tile.blockID == TileID::empty &&
+                    if ((tile.blockID == TileID::empty ||
+                         (world.conf.hiveQueen && tile.flag == 1)) &&
                         shouldIncludePt(x + i, bridgeLevel + j)) {
                         bridgeData[{x + i, bridgeLevel + j}] = {{i, j}, -1};
                     }
@@ -176,6 +178,12 @@ void genUnderworld(Random &rnd, World &world)
                                        ? (centerLevel - y) / upperDist
                                        : (y - centerLevel) / lowerDist);
                 Tile &tile = world.getTile(x, y);
+                if (tile.blockID == TileID::hive &&
+                    static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
+                            7 ==
+                        0) {
+                    tile.blockID = TileID::crispyHoney;
+                }
                 if (std::abs(rnd.getCoarseNoise(2 * x, y + aspectRatio * x)) <
                     threshold) {
                     for (auto [i, j] : {std::pair{-1, -1}, {-1, 0}, {0, -1}}) {

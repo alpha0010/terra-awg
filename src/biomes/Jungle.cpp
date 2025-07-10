@@ -28,8 +28,28 @@ int levitateIsland(int center, int width, Random &rnd, World &world)
     for (int x = xMin; x < xMax; ++x) {
         int yMax = yMin - 1.9 * (x - xMin) * (x - xMax) / width +
                    37 * rnd.getFineNoise(x, 0);
-        for (int y = yMin; y < yMax; ++y) {
-            std::swap(world.getTile(x, y), world.getTile(x, y + floatHeight));
+        if (world.conf.hiveQueen) {
+            for (int y = yMin; y < yMax; ++y) {
+                Tile &a = world.getTile(x, y);
+                Tile &b = world.getTile(x, y + floatHeight);
+                if (a.flag == 1) {
+                    if (b.flag != 1) {
+                        b = {};
+                    }
+                } else if (b.flag == 1) {
+                    if (y + floatHeight > world.getSurfaceLevel(x)) {
+                        a.blockID = TileID::mud;
+                    }
+                } else {
+                    std::swap(a, b);
+                }
+            }
+        } else {
+            for (int y = yMin; y < yMax; ++y) {
+                std::swap(
+                    world.getTile(x, y),
+                    world.getTile(x, y + floatHeight));
+            }
         }
     }
     return minSurface;
@@ -166,7 +186,10 @@ void connectSurfaceCaves(int xMin, int xMax, Random &rnd, World &world)
                 t);
             if (std::abs(rnd.getCoarseNoise(x, 2 * y) + 0.1) < 0.15 &&
                 rnd.getFineNoise(x, y) > threshold) {
-                world.getTile(x, y).blockID = TileID::empty;
+                Tile &tile = world.getTile(x, y);
+                if (tile.blockID != TileID::hive) {
+                    tile.blockID = TileID::empty;
+                }
             }
         }
     }

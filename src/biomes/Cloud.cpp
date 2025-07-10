@@ -13,6 +13,13 @@
 #include <iostream>
 #include <numbers>
 
+bool isRowZoneEmpty(int x, int y, World &world)
+{
+    return world.regionPasses(x - 2, y, 5, 1, [](Tile &tile) {
+        return tile.blockID == TileID::empty;
+    });
+}
+
 void makeFishingCloud(
     int startX,
     int startY,
@@ -24,10 +31,11 @@ void makeFishingCloud(
     int minX = startX + 0.2 * width;
     int maxX = startX + 0.8 * width;
     int waterLevel = startY;
-    while (world.getTile(minX, waterLevel).blockID == TileID::empty ||
-           world.getTile(maxX, waterLevel).blockID == TileID::empty) {
+    while (isRowZoneEmpty(minX, waterLevel, world) ||
+           isRowZoneEmpty(maxX, waterLevel, world)) {
         ++waterLevel;
     }
+    ++waterLevel;
     for (int x = minX; x < maxX; ++x) {
         int depth = 0.45 * height *
                     std::sin(std::numbers::pi * (x - minX) / (0.6 * width));
