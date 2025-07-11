@@ -30,6 +30,7 @@ void fillGraniteCaveHex(int x, int y, World &world)
             Tile &tile = world.getTile(pt);
             switch (tile.blockID) {
             case TileID::dirt:
+            case TileID::grass:
             case TileID::stone:
             case TileID::mud:
                 tile.blockID = clearCenters.contains(
@@ -45,7 +46,9 @@ void fillGraniteCaveHex(int x, int y, World &world)
                                    : TileID::smoothGranite;
                 break;
             }
-            if (!world.conf.shattered || tile.wallID != WallID::empty) {
+            if ((!world.conf.shattered &&
+                 pt.second < world.getUnderworldLevel()) ||
+                tile.wallID != WallID::empty) {
                 tile.wallID = WallID::Unsafe::granite;
             }
         });
@@ -56,7 +59,8 @@ void genGraniteCaveHiveQueen(Random &rnd, World &world)
     std::cout << "Smoothing granite\n";
     int numCaves =
         world.conf.graniteFreq * world.getWidth() * world.getHeight() / 2000000;
-    for (int i = 0; i < numCaves; ++i) {
+    int scanDist = world.conf.graniteSize * 90;
+    for (int iter = 0; iter < numCaves; ++iter) {
         auto [x, y] = findStoneCave(
             std::midpoint(world.getUndergroundLevel(), world.getCavernLevel()),
             world.getUnderworldLevel(),
@@ -65,6 +69,15 @@ void genGraniteCaveHiveQueen(Random &rnd, World &world)
             30);
         if (world.getTile(x, y).flag != 1) {
             fillGraniteCaveHex(x, y, world);
+            for (int probes = world.conf.graniteSize * 20; probes > 0;
+                 --probes) {
+                int i = rnd.getInt(-scanDist, scanDist);
+                int j = rnd.getInt(-scanDist, scanDist);
+                if (world.getBiome(x + i, y + j).active == Biome::forest &&
+                    world.getTile(x + i, y + j).blockID == TileID::stone) {
+                    fillGraniteCaveHex(x + i, y + j, world);
+                }
+            }
         }
     }
 }

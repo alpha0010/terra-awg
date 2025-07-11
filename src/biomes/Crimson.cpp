@@ -97,6 +97,7 @@ void genCrimsonAt(int surfaceX, int undergroundX, Random &rnd, World &world)
          {TileID::sand, TileID::crimsand},
          {TileID::jungleGrass, TileID::crimsonJungleGrass},
          {TileID::mushroomGrass, TileID::crimsonJungleGrass},
+         {TileID::hive, TileID::crimstone},
          {TileID::silt, TileID::crimstone},
          {TileID::slime, TileID::crimstone},
          {TileID::ice, TileID::crimsonIce},

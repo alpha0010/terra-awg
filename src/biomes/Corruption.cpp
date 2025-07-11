@@ -97,6 +97,7 @@ void genCorruptionAt(int surfaceX, int undergroundX, Random &rnd, World &world)
          {TileID::sand, TileID::ebonsand},
          {TileID::jungleGrass, TileID::corruptJungleGrass},
          {TileID::mushroomGrass, TileID::corruptJungleGrass},
+         {TileID::hive, TileID::ebonstone},
          {TileID::silt, TileID::ebonstone},
          {TileID::slime, TileID::ebonstone},
          {TileID::ice, TileID::corruptIce},

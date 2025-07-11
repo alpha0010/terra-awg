@@ -31,7 +31,10 @@
 #include "biomes/doubleTrouble/ResourceSwap.h"
 #include "biomes/hardmode/Hallow.h"
 #include "biomes/hardmode/HmOres.h"
+#include "biomes/hiveQueen/Aether.h"
+#include "biomes/hiveQueen/AsteroidField.h"
 #include "biomes/hiveQueen/Base.h"
+#include "biomes/hiveQueen/GlowingMoss.h"
 #include "biomes/hiveQueen/GlowingMushroom.h"
 #include "biomes/hiveQueen/GraniteCave.h"
 #include "biomes/hiveQueen/Hive.h"
@@ -136,6 +139,9 @@ enum class Step {
     genGlowingMushroomHiveQueen,
     genGraniteCaveHiveQueen,
     genHiveHiveQueen,
+    genAetherHiveQueen,
+    genAsteroidFieldHiveQueen,
+    genGlowingMossHiveQueen,
 };
 
 inline std::array baseBiomeRules{
@@ -229,6 +235,20 @@ inline std::array hiveQueenBiomeRules{
     Step::genGlowingMushroomHiveQueen,
     Step::genGraniteCaveHiveQueen,
     Step::genHiveHiveQueen,
+    Step::genAetherHiveQueen,
+    Step::genCrimson,
+    Step::genCorruption,
+    Step::genSecondaryCrimson,
+    Step::genSecondaryCorruption,
+    Step::applyQueuedEvil,
+    Step::genMeteorite,
+    Step::genHardmodeOres,
+    Step::genHallow,
+    Step::swapResources,
+    Step::genAsteroidFieldHiveQueen,
+    Step::genGemCave,
+    Step::genSpiderNest,
+    Step::genGlowingMossHiveQueen,
     Step::smoothSurfaces,
     Step::finalizeWalls,
 };
@@ -329,6 +349,9 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genGlowingMushroomHiveQueen)
         GEN_STEP(genGraniteCaveHiveQueen)
         GEN_STEP(genHiveHiveQueen)
+        GEN_STEP(genAetherHiveQueen)
+        GEN_STEP(genAsteroidFieldHiveQueen)
+        GEN_STEP(genGlowingMossHiveQueen)
     }
 }
 

@@ -480,6 +480,12 @@ void buryEnchantedSwords(Random &rnd, World &world)
 {
     double numSwords = world.getWidth() / rnd.getInt(1800, 3800);
     std::vector<Point> usedLocations;
+    constexpr auto avoidTiles = frozen::make_set<int>(
+        {TileID::empty,
+         TileID::snow,
+         TileID::sand,
+         TileID::jungleGrass,
+         TileID::hive});
     while (numSwords > 0) {
         int x = rnd.getInt(400, 0.36 * world.getWidth());
         if (rnd.getBool()) {
@@ -491,11 +497,8 @@ void buryEnchantedSwords(Random &rnd, World &world)
                 y,
                 32,
                 20,
-                [](Tile &tile) {
-                    return tile.blockID != TileID::empty &&
-                           tile.blockID != TileID::snow &&
-                           tile.blockID != TileID::sand &&
-                           tile.blockID != TileID::jungleGrass;
+                [&avoidTiles](Tile &tile) {
+                    return !avoidTiles.contains(tile.blockID);
                 }) ||
             isLocationUsed(x, y, 100, usedLocations)) {
             numSwords -= 0.002;
