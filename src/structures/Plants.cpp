@@ -321,6 +321,7 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
                             growBamboo(x + 1, y, rnd, world);
                         }
                     } else if (
+                        world.getTile(x, y - 1).liquid == Liquid::none &&
                         world.getTile(x, y - 1).wallID == WallID::empty &&
                         rnd.getDouble(0, 1) < 0.2 * world.conf.trees) {
                         growTree(

@@ -236,9 +236,31 @@ int realSurfaceAt(int x, World &world, int prevY = -1)
     return scanWhileEmpty({x, minY}, {0, 1}, world).second + 1;
 }
 
+void clearSpawnHive(World &world)
+{
+    int x = world.getWidth() / 2;
+    int y = world.getSurfaceLevel(x);
+    int radius = 30;
+    for (int i = -radius; i < radius; ++i) {
+        for (int j = -radius; j < radius; ++j) {
+            if (y + j >= world.getSurfaceLevel(x + i)) {
+                break;
+            }
+            Tile &tile = world.getTile(x + i, y + j);
+            if (tile.flag == 1 && tile.blockID == TileID::hive &&
+                std::hypot(i, j) < radius) {
+                tile.blockID = TileID::empty;
+            }
+        }
+    }
+}
+
 void genStarterHome(Random &rnd, World &world)
 {
     std::cout << "Purchasing property\n";
+    if (world.conf.hiveQueen) {
+        clearSpawnHive(world);
+    }
     std::map<int, int> tileCounts;
     int x = world.getWidth() / 2;
     int y = realSurfaceAt(x, world);

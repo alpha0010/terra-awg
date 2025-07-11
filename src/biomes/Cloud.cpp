@@ -245,7 +245,7 @@ void genCloud(Random &rnd, World &world)
     std::shuffle(rooms.begin(), rooms.end(), rnd.getPRNG());
     auto roomItr = rooms.begin();
     double cloudScale = std::min(0.1 + world.getHeight() / 1400.0, 1.0);
-    int spacingBuffer = world.conf.hiveQueen ? -10 : 50;
+    int hSpacingBuffer = world.conf.hiveQueen ? -10 : 50;
     for (int tries = 500 * numClouds; numClouds > 0 && tries > 0; --tries) {
         int width = cloudScale * rnd.getInt(90, 160);
         int height = cloudScale * rnd.getInt(35, 50);
@@ -261,10 +261,10 @@ void genCloud(Random &rnd, World &world)
                 maxY - 1),
             maxY);
         if (!world.regionPasses(
-                x - spacingBuffer / 2,
-                y - spacingBuffer / 2,
-                width + spacingBuffer,
-                height + spacingBuffer,
+                x - hSpacingBuffer / 2,
+                y - 25,
+                width + hSpacingBuffer,
+                height + 50,
                 [](Tile &tile) { return tile.blockID == TileID::empty; })) {
             continue;
         }

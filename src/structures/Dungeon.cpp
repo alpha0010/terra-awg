@@ -1168,7 +1168,8 @@ private:
                 if (tile.wallID != WallID::empty &&
                     std::abs(rnd.getFineNoise(x + 2 * i, y + 2 * j)) <
                         0.1 - 0.1 * j / entry.getHeight()) {
-                    if (world.conf.doubleTrouble || world.conf.forTheWorthy) {
+                    if (world.conf.doubleTrouble || world.conf.hiveQueen ||
+                        world.conf.forTheWorthy) {
                         tile.wallID = WallID::Safe::mudstoneBrick;
                         tile.wallPaint = theme.paint;
                     } else {
@@ -1329,6 +1330,13 @@ public:
             rnd.select(
                 {TileID::blueBrick, TileID::greenBrick, TileID::pinkBrick}),
             rnd);
+        if (world.conf.hiveQueen) {
+            theme.paint = rnd.select(
+                {Paint::yellow,
+                 Paint::orange,
+                 Paint::deepYellow,
+                 Paint::deepOrange});
+        }
     }
 
     void gen(int dungeonCenter)
@@ -1425,7 +1433,8 @@ public:
                            b.second + shuffleY);
             });
         applyWallVariety(zones);
-        if (world.conf.doubleTrouble || world.conf.forTheWorthy) {
+        if (world.conf.doubleTrouble || world.conf.hiveQueen ||
+            world.conf.forTheWorthy) {
             applyPaint(dungeonCenter, dungeonWidth);
         }
     }

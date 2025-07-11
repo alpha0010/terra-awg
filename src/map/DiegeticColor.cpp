@@ -1,5 +1,6 @@
 #include "map/DiegeticColor.h"
 
+#include "Config.h"
 #include "World.h"
 #include "ids/WallID.h"
 #include "vendor/frozen/map.h"
@@ -346,7 +347,7 @@ int getSectorColor(int i, int j, int scale, World &world)
           {TileID::borealWood, 0.07},
           {TileID::sandstoneBrick, 0.08},
           {TileID::emeraldStone, 0.032},
-          {TileID::honey, 0.08},
+          {TileID::honey, world.conf.hiveQueen ? 1.0 : 0.08},
           {TileID::slime, 0.08},
           {TileID::blueBrick, 0.08},
           {TileID::greenBrick, 0.08},

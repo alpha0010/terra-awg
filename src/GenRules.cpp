@@ -179,14 +179,14 @@ inline std::array baseBiomeRules{
 };
 
 inline std::array baseStructureRules{
-    Step::genDungeon,     Step::genTemple,      Step::genPyramid,
-    Step::genDesertTomb,  Step::genBuriedBoat,  Step::genSpiderHall,
-    Step::genRuins,       Step::genTorchArena,  Step::genLake,
-    Step::genStarterHome, Step::genIgloo,       Step::genMushroomCabin,
-    Step::genOceanWreck,  Step::genTreasure,    Step::applyHardmodeLoot,
-    Step::genPlants,      Step::genTraps,       Step::genTracks,
-    Step::genFlood,       Step::smoothSurfaces, Step::finalizeWalls,
-    Step::genVines,       Step::genGrasses,
+    Step::genDungeon,       Step::genTemple,      Step::genPyramid,
+    Step::genDesertTomb,    Step::genBuriedBoat,  Step::genSpiderHall,
+    Step::genRuins,         Step::genTorchArena,  Step::genOceanWreck,
+    Step::genLake,          Step::genStarterHome, Step::genIgloo,
+    Step::genMushroomCabin, Step::genTreasure,    Step::applyHardmodeLoot,
+    Step::genPlants,        Step::genTraps,       Step::genTracks,
+    Step::genFlood,         Step::smoothSurfaces, Step::finalizeWalls,
+    Step::genVines,         Step::genGrasses,
 };
 
 inline std::array patchesBiomeRules{
@@ -249,8 +249,6 @@ inline std::array hiveQueenBiomeRules{
     Step::genGemCave,
     Step::genSpiderNest,
     Step::genGlowingMossHiveQueen,
-    Step::smoothSurfaces,
-    Step::finalizeWalls,
 };
 
 #define GEN_STEP(step)                                                         \
@@ -408,12 +406,10 @@ void doWorldGen(Random &rnd, World &world)
     } else {
         steps.insert(steps.end(), baseBiomeRules.begin(), baseBiomeRules.end());
     }
-    if (!world.conf.hiveQueen) {
-        steps.insert(
-            steps.end(),
-            baseStructureRules.begin(),
-            baseStructureRules.end());
-    }
+    steps.insert(
+        steps.end(),
+        baseStructureRules.begin(),
+        baseStructureRules.end());
     for (Step step : steps | std::views::filter([&excludes](Step s) {
                          return !excludes.contains(s);
                      })) {

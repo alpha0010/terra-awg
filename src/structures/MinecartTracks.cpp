@@ -104,6 +104,12 @@ inline constexpr auto trackClearTiles = frozen::make_set<int>({
     TileID::chlorophyteOre,
 });
 
+bool canTrackClearTile(Tile &tile)
+{
+    return trackClearTiles.contains(tile.blockID) ||
+           (tile.flag == 1 && tile.blockID == TileID::hive);
+}
+
 std::vector<Point>
 planTrackAt(int x, int y, double lengthScale, Random &rnd, World &world)
 {
@@ -134,7 +140,7 @@ planTrackAt(int x, int y, double lengthScale, Random &rnd, World &world)
                 [](Tile &tile) {
                     return !tile.guarded &&
                            (!tile.actuator || tile.blockID != TileID::sand) &&
-                           trackClearTiles.contains(tile.blockID);
+                           canTrackClearTile(tile);
                 }) ||
             !world.regionPasses(
                 pos.first,
@@ -254,7 +260,7 @@ void applyTrackSupport(int x, int y, World &world)
     int supFloor = scanWhileEmpty({x, y + 1}, {0, 1}, world).second;
     ++supFloor;
     if (supFloor - y < 4 || supFloor - y > 24 ||
-        !trackClearTiles.contains(world.getTile(x, supFloor).blockID)) {
+        !canTrackClearTile(world.getTile(x, supFloor))) {
         return;
     }
     tile.blockPaint = Paint::none;
