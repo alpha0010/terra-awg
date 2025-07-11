@@ -203,9 +203,9 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
     }
     computeSurfaceLevel(rnd, world);
     std::vector<Point> hexBorders = planHiveQueenBiomes(rnd, world);
-    double oreThreshold = computeOreThreshold(world.conf.ore);
+    double oreThreshold = computeOreThreshold(1.35 * world.conf.ore);
     double goldThreshold = world.conf.forTheWorthy
-                               ? computeOreThreshold(1.35 * world.conf.ore)
+                               ? computeOreThreshold(1.82 * world.conf.ore)
                                : oreThreshold;
     int lavaLevel =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
@@ -502,6 +502,25 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
             int threshold = std::max<int>(0.6 * locations.size(), 2);
             if (targTile->second < threshold) {
                 targTile->second = -1;
+            } else {
+                int oreCount = 0;
+                for (auto ore :
+                     {TileID::copperOre,
+                      TileID::tinOre,
+                      TileID::ironOre,
+                      TileID::leadOre,
+                      TileID::silverOre,
+                      TileID::tungstenOre,
+                      TileID::goldOre,
+                      TileID::platinumOre,
+                      TileID::hellstone,
+                      TileID::desertFossil}) {
+                    oreCount += tiles[ore];
+                }
+                if (oreCount < threshold &&
+                    oreCount > std::max(threshold / 4, 5)) {
+                    targTile->second = -1;
+                }
             }
             if (targWall->second < threshold) {
                 targWall->second = -1;

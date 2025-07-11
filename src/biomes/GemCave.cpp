@@ -32,14 +32,18 @@ void fillGemCave(
                 5;
             if (rnd.getFineNoise(x + i, y + j) > threshold) {
                 if (dispersal > 1 && tile.blockID == TileID::stone) {
-                    tile.blockID = blockA;
+                    tile.blockID = world.conf.hiveQueen && dispersal < 4
+                                       ? TileID::crispyHoney
+                                       : blockA;
                 }
                 if (tile.wallID != WallID::empty) {
                     tile.wallID = wallA;
                 }
             } else if (rnd.getFineNoise(x + i, y + j) < -threshold) {
                 if (dispersal > 1 && tile.blockID == TileID::stone) {
-                    tile.blockID = blockB;
+                    tile.blockID = world.conf.hiveQueen && dispersal < 4
+                                       ? TileID::crispyHoney
+                                       : blockB;
                 }
                 if (tile.wallID != WallID::empty) {
                     tile.wallID = wallB;

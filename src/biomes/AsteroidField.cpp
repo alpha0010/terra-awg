@@ -23,7 +23,9 @@ selectAsteroidFieldLocation(int &width, int height, Random &rnd, World &world)
                 y,
                 0.8 * widthF,
                 height,
-                [](Tile &tile) { return tile.blockID == TileID::empty; })) {
+                [](Tile &tile) {
+                    return tile.blockID == TileID::empty || tile.flag == 1;
+                })) {
             width = std::midpoint<int>(width, widthF);
             return {x, y};
         }
@@ -32,6 +34,27 @@ selectAsteroidFieldLocation(int &width, int height, Random &rnd, World &world)
 }
 
 void genAsteroidField(Random &rnd, World &world)
+{
+    doGenAsteroidField(
+        [&rnd](int x, int y, double radius, std::function<void(int, int)> f) {
+            for (int i = -radius; i < radius; ++i) {
+                for (int j = -radius; j < radius; ++j) {
+                    if (std::hypot(i, j) / radius <
+                        0.6 + 0.6 * rnd.getFineNoise(x + i, y + j)) {
+                        f(i, j);
+                    }
+                }
+            }
+        },
+        rnd,
+        world);
+}
+
+void doGenAsteroidField(
+    std::function<void(int, int, double, std::function<void(int, int)>)>
+        iterateAsteroid,
+    Random &rnd,
+    World &world)
 {
     std::cout << "Suspending asteroids\n";
     int width =
@@ -58,22 +81,20 @@ void genAsteroidField(Random &rnd, World &world)
             continue;
         }
         int paint = rnd.select({Paint::brown, Paint::black});
-        for (int i = -radius; i < radius; ++i) {
-            for (int j = -radius; j < radius; ++j) {
-                if (std::hypot(i, j) / radius <
-                    0.6 + 0.6 * rnd.getFineNoise(x + i, y + j)) {
-                    Tile &tile = world.getTile(x + i, y + j);
-                    tile.blockID =
-                        std::min(
-                            std::abs(rnd.getFineNoise(x + i, j + radius)),
-                            std::abs(rnd.getFineNoise(i + radius, y + j))) <
-                                0.03
-                            ? TileID::meteorite
-                            : TileID::stone;
-                    tile.blockPaint = paint;
-                }
-            }
-        }
+        iterateAsteroid(
+            x,
+            y,
+            radius,
+            [x, y, radius, paint, &rnd, &world](int i, int j) {
+                Tile &tile = world.getTile(x + i, y + j);
+                tile.blockID =
+                    std::min(
+                        std::abs(rnd.getFineNoise(x + i, j + radius)),
+                        std::abs(rnd.getFineNoise(i + radius, y + j))) < 0.03
+                        ? TileID::meteorite
+                        : TileID::stone;
+                tile.blockPaint = paint;
+            });
         --numAsteroids;
     }
     for (int i = 0; i < width; ++i) {

@@ -96,6 +96,25 @@ void genAether(Random &rnd, World &world)
             growMossOn(x, y, world);
         }
     });
+    fillAetherShimmer(
+        centerX,
+        centerY,
+        size,
+        maxBubblePos,
+        maxEditPos,
+        rnd,
+        world);
+}
+
+void fillAetherShimmer(
+    int centerX,
+    int centerY,
+    double size,
+    int maxBubblePos,
+    int maxEditPos,
+    Random &rnd,
+    World &world)
+{
     for (int x = centerX - size; x < centerX + size; ++x) {
         for (int y = centerY - size; y < centerY + size; ++y) {
             Tile &tile = world.getTile(x, y);

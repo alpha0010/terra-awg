@@ -121,6 +121,7 @@ void genHallow(Random &rnd, World &world)
         TileID::snowCloud,
         TileID::jungleGrass,
         TileID::mushroomGrass,
+        TileID::hive,
     });
     constexpr auto hallowBlocks = frozen::make_map<int, int>({
         {TileID::grass, TileID::hallowedGrass},

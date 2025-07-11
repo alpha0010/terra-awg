@@ -102,12 +102,18 @@ void genMeteorite(Random &rnd, World &world)
                 rnd.getInt(-1, 5);
         int numEmpty = 0;
         if (y < world.getUndergroundLevel() &&
-            world.regionPasses(x - 15, y - 8, 30, 23, [&numEmpty](Tile &tile) {
-                if (emptyBlocks.contains(tile.blockID)) {
-                    ++numEmpty;
-                }
-                return numEmpty < 90;
-            })) {
+            world.regionPasses(
+                x - 15,
+                y - 8,
+                30,
+                23,
+                [&numEmpty, &world](Tile &tile) {
+                    if (emptyBlocks.contains(tile.blockID) ||
+                        (world.conf.hiveQueen && tile.flag == 1)) {
+                        ++numEmpty;
+                    }
+                    return numEmpty < 90;
+                })) {
             placeMeteorite(x, y, rnd, world);
             ++placed;
         }
