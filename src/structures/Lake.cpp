@@ -293,6 +293,28 @@ void genLake(Random &rnd, World &world)
             std::views::iota(0, world.getWidth()),
             [&rnd, &world](int x) { fillLavaHotzones(rnd, world, x); });
     }
+    if (world.conf.hiveQueen) {
+        rnd.shuffleNoise();
+        parallelFor(
+            std::views::iota(0, world.getWidth()),
+            [&rnd, &world](int x) {
+                if (world.oceanCaveCenter < world.getWidth() / 2
+                        ? x > 350
+                        : x < world.getWidth() - 350) {
+                    for (int y = 0; y < world.getUnderworldLevel(); ++y) {
+                        if (world.getTile(x, y).liquid == Liquid::water &&
+                            rnd.getCoarseNoise(x, y) > 0.13) {
+                            convertLiquid(
+                                x,
+                                y,
+                                Liquid::water,
+                                Liquid::honey,
+                                world);
+                        }
+                    }
+                }
+            });
+    }
     if (world.conf.forTheWorthy) {
         rnd.shuffleNoise();
         parallelFor(

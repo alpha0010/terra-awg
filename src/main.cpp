@@ -371,6 +371,14 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
              "Dolgen", "Dolgrim", "Duerthen", "Durim",   "Fikod",  "Garval",
              "Gimli",  "Gimut",   "Jarut",    "Morthal", "Norkas", "Norsun",
              "Oten",   "Ovbere",  "Tordak",   "Urist"})); // NPC name.
+    } else if (special == Seed::notTheBees) {
+        w.putUint32(17); // Merchant.
+        w.putString(
+            rnd.select({"Alfred",   "Barney", "Calvin",    "Edmund",   "Edwin",
+                        "Eugene",   "Frank",  "Frederick", "Gilbert",  "Gus",
+                        "Harold",   "Howard", "Humphrey",  "Isaac",    "Joseph",
+                        "Kristian", "Louis",  "Milton",    "Mortimer", "Ralph",
+                        "Seymour",  "Walter", "Wilbur"})); // NPC name.
     } else if (special == Seed::drunkWorld) {
         w.putUint32(208); // Party Girl.
         w.putString(rnd.select(

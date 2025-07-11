@@ -50,7 +50,7 @@ bool isPlacementCandidate(int x, int y, World &world)
         return isSolidBlock(tile.blockID) && tile.slope == Slope::none &&
                !tile.actuated && !placementAvoidTiles.contains(tile.blockID) &&
                ((tile.blockID != TileID::aetherium &&
-                 tile.blockID != TileID::pearlstone) ||
+                 tile.blockID != TileID::pearlstone && tile.flag != 1) ||
                 y > world.getSurfaceLevel(x));
     };
     return isFloorTile(world.getTile(x, y)) &&
