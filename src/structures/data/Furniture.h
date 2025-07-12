@@ -17,6 +17,7 @@ enum class Variant {
     ashWood,
     boreal,
     forest,
+    honey,
     livingWood,
     mahogany,
     marble,

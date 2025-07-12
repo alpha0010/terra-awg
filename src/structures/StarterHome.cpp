@@ -52,6 +52,25 @@ void placeHomeAt(
             {{WallID::Safe::stone,
               rnd.select({WallID::Safe::mudstoneBrick, WallID::Safe::stone})}});
         break;
+    case Data::Variant::honey:
+        themeTiles.insert(
+            {{TileID::wood, TileID::honey},
+             {TileID::woodenBeam, TileID::richMahoganyBeam},
+             {TileID::grayBrick,
+              rnd.select({TileID::hive, TileID::richMahogany})},
+             {TileID::dirt, TileID::mud}});
+        themeWalls.insert(
+            {{WallID::Safe::wood, WallID::Safe::hay},
+             {WallID::Safe::planked,
+              rnd.select(
+                  {WallID::Safe::honeyfall, WallID::Safe::iridescentBrick})},
+             {WallID::Safe::stone,
+              rnd.select(
+                  {WallID::Safe::bamboo,
+                   WallID::Safe::largeBamboo,
+                   WallID::Safe::lichenStone,
+                   WallID::Safe::leafyJungle})}});
+        break;
     case Data::Variant::livingWood:
         themeTiles.insert(
             {{TileID::wood, TileID::livingWood}, {TileID::dirt, TileID::leaf}});
@@ -121,11 +140,13 @@ void placeHomeAt(
     }
     constexpr auto brickToWall = frozen::make_map<int, int>({
         {TileID::grayBrick, WallID::Safe::grayBrick},
+        {TileID::hive, WallID::Safe::hive},
         {TileID::iceBrick, WallID::Safe::iceBrick},
         {TileID::iridescentBrick, WallID::Safe::iridescentBrick},
         {TileID::mudstoneBrick, WallID::Safe::mudstoneBrick},
         {TileID::pearlstoneBrick, WallID::Safe::pearlstoneBrick},
         {TileID::redBrick, WallID::Safe::redBrick},
+        {TileID::richMahogany, WallID::Safe::richMahogany},
         {TileID::sandstoneBrick, WallID::Safe::sandstoneBrick},
         {TileID::snowBrick, WallID::Safe::snowBrick},
         {TileID::tinBrick, WallID::Safe::tinBrick},
@@ -286,6 +307,13 @@ void genStarterHome(Random &rnd, World &world)
             return tile.blockID != TileID::livingWood;
         })) {
         theme = Data::Variant::livingWood;
+    }
+    if ((theme == Data::Variant::forest || theme == Data::Variant::mahogany) &&
+        !world.regionPasses(x - 20, y - 2, 40, 8, [](Tile &tile) {
+            return tile.wallID != WallID::Unsafe::hive &&
+                   tile.liquid != Liquid::honey;
+        })) {
+        theme = Data::Variant::honey;
     }
     TileBuffer home =
         Data::getHome(rnd.select(Data::homes), world.getFramedTiles());
