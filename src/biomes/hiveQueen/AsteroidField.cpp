@@ -13,8 +13,7 @@ void genAsteroidFieldHiveQueen(Random &rnd, World &world)
                 {x, y},
                 world,
                 [centroid, scale](Point pt) {
-                    return getHexCentroid(pt.first, pt.second, scale) ==
-                           centroid;
+                    return getHexCentroid(pt, scale) == centroid;
                 },
                 [centroid, &f](Point pt) {
                     f(pt.first - centroid.first, pt.second - centroid.second);

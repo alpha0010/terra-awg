@@ -174,6 +174,11 @@ Point findStoneCave(int yMin, int yMax, Random &rnd, World &world, int minSize)
     }
 }
 
+Point getHexCentroid(Point pt, int scale)
+{
+    return getHexCentroid(pt.first, pt.second, scale);
+}
+
 Point getHexCentroid(int x, int y, int scale)
 {
     int targetX = x;
