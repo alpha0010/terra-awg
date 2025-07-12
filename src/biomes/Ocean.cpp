@@ -67,20 +67,24 @@ void addGlowRocks(std::vector<Point> &locations, Random &rnd, World &world)
     }
 }
 
-void addOceanCave(int waterTable, Random &rnd, World &world)
+void selectOceanCave(Random &rnd, World &world)
 {
     int centerOpt1 = 105;
     int centerOpt2 = world.getWidth() - 105;
-    int centerX =
+    world.oceanCaveCenter =
         centerOpt1 > world.jungleCenter - 0.11 * world.getWidth() - 220
             ? centerOpt2
         : centerOpt2 < world.jungleCenter + 0.11 * world.getWidth() + 220
             ? centerOpt1
             : rnd.select({centerOpt1, centerOpt2});
+}
+
+void addOceanCave(int waterTable, Random &rnd, World &world)
+{
     int shuffleX = rnd.getInt(0, world.getWidth());
     int shuffleY = rnd.getInt(0, world.getHeight());
     std::vector<Point> locations;
-    world.oceanCaveCenter = centerX;
+    int centerX = world.oceanCaveCenter;
     int oceanFloor =
         scanWhileEmpty({centerX - 90, waterTable}, {0, 1}, world).second;
     int minY = scanWhileEmpty({centerX + 90, waterTable}, {0, 1}, world).second;
@@ -168,12 +172,22 @@ void genOceans(Random &rnd, World &world)
                          world.getSurfaceLevel(300),
                          world.getSurfaceLevel(world.getWidth() - 300)) +
                      rnd.getInt(4, 12);
+    selectOceanCave(rnd, world);
     for (int x = 0; x < 390; ++x) {
         double drop = world.conf.oceanSize * 90 *
                       (1 - 1 / (1 + std::exp(0.041 * (200 - x))));
         double sandDepth = (40 + 9 * rnd.getCoarseNoise(x, 0)) *
                            std::min(1.0, (400.0 - x) / 160);
         auto fillColumn = [&](int effectiveX) {
+            int sandTile = TileID::sand;
+            int shellPileTile = TileID::shellPile;
+            int siltTile = TileID::silt;
+            if (world.conf.hiveQueen &&
+                ((world.oceanCaveCenter < 400) != (effectiveX < 400))) {
+                sandTile = TileID::honey;
+                shellPileTile = TileID::hive;
+                siltTile = TileID::honey;
+            }
             for (int y = world.getSurfaceLevel(effectiveX) - 10;
                  y < world.getUndergroundLevel();
                  ++y) {
@@ -197,23 +211,23 @@ void genOceans(Random &rnd, World &world)
                         }
                         if (tile.blockID == TileID::mud ||
                             tile.blockID == TileID::jungleGrass) {
-                            tile.blockID = TileID::silt;
+                            tile.blockID = siltTile;
                         } else if (y + i > waterTable + 20) {
                             if (tile.blockID == TileID::stone ||
                                 tile.blockID == TileID::sandstone ||
                                 tile.blockID == TileID::ice) {
                                 tile.blockID = TileID::coralstone;
                             } else {
-                                tile.blockID = TileID::sand;
+                                tile.blockID = sandTile;
                             }
                         } else if (
                             tile.blockID != TileID::dirt &&
                             tile.blockID != TileID::grass &&
                             tile.blockID != TileID::sand &&
                             tile.blockID != TileID::snow) {
-                            tile.blockID = TileID::shellPile;
+                            tile.blockID = shellPileTile;
                         } else {
-                            tile.blockID = TileID::sand;
+                            tile.blockID = sandTile;
                         }
                     }
                     break;
