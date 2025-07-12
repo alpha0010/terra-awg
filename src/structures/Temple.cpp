@@ -71,7 +71,10 @@ bool testTempleSelection(Point center, World &world)
     return isValid;
 }
 
-Point selectTempleCenter(Random &rnd, World &world)
+Point selectTempleCenter(
+    std::function<bool(Point, World &)> isValid,
+    Random &rnd,
+    World &world)
 {
     int minX = world.conf.patches
                    ? 350
@@ -95,7 +98,7 @@ Point selectTempleCenter(Random &rnd, World &world)
         int y = rnd.getInt(minY, world.getUnderworldLevel());
         if ((!world.conf.patches ||
              isInBiome(x, y, 200 - 0.19 * numTries, Biome::jungle, world)) &&
-            testTempleSelection({x, y}, world)) {
+            isValid({x, y}, world)) {
             return {x, y};
         }
     }
@@ -295,6 +298,16 @@ addTempleTreasures(Point center, int numRooms, Random &rnd, World &world)
         }
         return true;
     });
+    addTempleTreasures(locations, numRooms, rnd, world);
+    return locations;
+}
+
+void addTempleTreasures(
+    std::vector<Point> &locations,
+    int numRooms,
+    Random &rnd,
+    World &world)
+{
     int numChests = world.conf.chests * numRooms / 17.5;
     std::vector<Point> usedLocations;
     while (numChests > 0) {
@@ -327,7 +340,6 @@ addTempleTreasures(Point center, int numRooms, Random &rnd, World &world)
         world.placeFramedTile(x, y - 3, TileID::statue, Variant::lihzahrd);
         --numStatues;
     }
-    return locations;
 }
 
 void addWallTrap(
@@ -397,10 +409,15 @@ void addCeilingTrap(Point pos, Variant trapType, World &world)
     world.placeFramedTile(x, y, TileID::pressurePlate, Variant::lihzahrd);
 }
 
-void addTraps(std::vector<Point> locations, Random &rnd, World &world)
+void addTempleTraps(
+    std::vector<Point> &locations,
+    int freqCtrl,
+    Random &rnd,
+    World &world)
 {
     for (auto [x, y] : locations) {
-        switch (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 75) {
+        switch (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
+                freqCtrl) {
         case 0:
             if (canPlaceTempleTreasureAt(x, y, world)) {
                 world.placeFramedTile(x, y - 2, TileID::TNTBarrel);
@@ -436,7 +453,7 @@ void addTraps(std::vector<Point> locations, Random &rnd, World &world)
     }
 }
 
-void addSpikesAt(Point pos, Random &rnd, World &world)
+void addTempleSpikesAt(Point pos, Random &rnd, World &world)
 {
     if (static_cast<int>(
             99999 * (1 + rnd.getFineNoise(pos.first, pos.second))) %
@@ -474,7 +491,7 @@ void addSpikes(Point center, Random &rnd, World &world)
         if (world.regionPasses(x - 1, y - 1, 3, 3, [](Tile &tile) {
                 return tile.blockID == TileID::empty;
             })) {
-            addSpikesAt({x, y}, rnd, world);
+            addTempleSpikesAt({x, y}, rnd, world);
         }
         return true;
     });
@@ -503,7 +520,7 @@ void genTemple(Random &rnd, World &world)
         return;
     }
     std::cout << "Training acolytes\n";
-    Point center = selectTempleCenter(rnd, world);
+    Point center = selectTempleCenter(testTempleSelection, rnd, world);
     if (center.first < 100) {
         return;
     }
@@ -615,7 +632,7 @@ void genTemple(Random &rnd, World &world)
         return world.getTile(pt).blockID == TileID::platform;
     });
     std::shuffle(flatLocations.begin(), flatLocations.end(), rnd.getPRNG());
-    addTraps(flatLocations, rnd, world);
+    addTempleTraps(flatLocations, 75, rnd, world);
     addSpikes(center, rnd, world);
     if (world.conf.forTheWorthy) {
         paintTemple(center, Paint::deepGreen, world);
