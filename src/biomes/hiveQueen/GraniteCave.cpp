@@ -16,7 +16,7 @@ void fillGraniteCaveHex(int x, int y, World &world)
         world,
         [&world](Point pt) { return world.getTile(pt).flag != 1; },
         [&clearCenters, &world](Point pt) {
-            Point centroid = getHexCentroid(pt.first, pt.second, 12);
+            Point centroid = getHexCentroid(pt, 12);
             if (world.getTile(pt).blockID == TileID::empty ||
                 world.getTile(centroid).blockID == TileID::empty) {
                 clearCenters.insert(centroid);
@@ -33,15 +33,13 @@ void fillGraniteCaveHex(int x, int y, World &world)
             case TileID::grass:
             case TileID::stone:
             case TileID::mud:
-                tile.blockID = clearCenters.contains(
-                                   getHexCentroid(pt.first, pt.second, 12))
+                tile.blockID = clearCenters.contains(getHexCentroid(pt, 12))
                                    ? TileID::empty
                                    : TileID::granite;
                 break;
             case TileID::sand:
             case TileID::clay:
-                tile.blockID = clearCenters.contains(
-                                   getHexCentroid(pt.first, pt.second, 12))
+                tile.blockID = clearCenters.contains(getHexCentroid(pt, 12))
                                    ? TileID::empty
                                    : TileID::smoothGranite;
                 break;

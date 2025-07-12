@@ -45,7 +45,7 @@ void fillGlowingMossHex(
             visited.insert(pt);
             Tile &tile = world.getTile(pt);
             if (tile.blockID == TileID::dirt || tile.blockID == TileID::stone) {
-                Point centroid = getHexCentroid(pt.first, pt.second, 6);
+                Point centroid = getHexCentroid(pt, 6);
                 if (std::max(
                         std::abs(rnd.getBlurNoise(
                             5 * centroid.first,

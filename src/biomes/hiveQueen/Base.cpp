@@ -56,7 +56,7 @@ iterateHex(Point start, int scale, std::function<void(Point)> f)
         scale * scale,
         hashPoint);
     std::vector<Point> locations{start};
-    Point centroid = getHexCentroid(start.first, start.second, scale);
+    Point centroid = getHexCentroid(start, scale);
     std::vector<Point> border;
     while (!locations.empty()) {
         Point loc = locations.back();
@@ -65,7 +65,7 @@ iterateHex(Point start, int scale, std::function<void(Point)> f)
             continue;
         }
         visited.insert(loc);
-        if (centroid == getHexCentroid(loc.first, loc.second, scale)) {
+        if (centroid == getHexCentroid(loc, scale)) {
             f(loc);
             for (auto delta : {std::pair{-1, 0}, {1, 0}, {0, -1}, {0, 1}}) {
                 locations.push_back(addPts(loc, delta));

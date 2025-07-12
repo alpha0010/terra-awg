@@ -38,6 +38,7 @@ Point findStoneCave(
     World &world,
     int minSize = 6);
 
+Point getHexCentroid(Point pt, int scale);
 Point getHexCentroid(int x, int y, int scale);
 
 void growMossOn(int x, int y, World &world);
