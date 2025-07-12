@@ -19,7 +19,7 @@ bool tryPlaceWreck(int x, int y, TileBuffer &wreck, World &world)
             .second +
         1;
     constexpr auto clearableTiles = frozen::make_set<int>(
-        {TileID::empty, TileID::sand, TileID::coralstone});
+        {TileID::empty, TileID::sand, TileID::coralstone, TileID::honey});
     for (y += 1 - wreck.getHeight(); y <= surfaceLeft; ++y) {
         int jLeft = surfaceLeft - y;
         int jRight = surfaceRight - y;

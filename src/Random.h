@@ -44,7 +44,8 @@ public:
     void initBiomeNoise(
         double scale,
         double humidityOffset,
-        double temperatureOffset);
+        double temperatureOffset,
+        bool hiveQueen);
     /**
      * Shift cached noise samples, effectively producing new noise samples,
      * cheaply.

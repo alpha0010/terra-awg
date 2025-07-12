@@ -226,6 +226,7 @@ inline std::array patchesBiomeRules{
 inline std::array hiveQueenBiomeRules{
     Step::planBiomes,
     Step::initNoise,
+    Step::initBiomeNoise,
     Step::genWorldBaseHiveQueen,
     Step::genOceans,
     Step::genShatteredLand,
@@ -338,7 +339,8 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         rnd.initBiomeNoise(
             0.00097 / world.conf.patchesSize,
             world.conf.patchesHumidity,
-            world.conf.patchesTemperature);
+            world.conf.patchesTemperature,
+            world.conf.hiveQueen);
         break;
         GEN_STEP(genWorldBasePatches)
         GEN_STEP(genCloudPatches)
@@ -403,6 +405,9 @@ void doWorldGen(Random &rnd, World &world)
             steps.end(),
             hiveQueenBiomeRules.begin(),
             hiveQueenBiomeRules.end());
+        if (!world.conf.patches) {
+            excludes.insert(Step::initBiomeNoise);
+        }
     } else if (world.conf.patches) {
         steps.insert(
             steps.end(),

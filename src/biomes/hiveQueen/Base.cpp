@@ -6,6 +6,7 @@
 #include "World.h"
 #include "biomes/Base.h"
 #include "biomes/BiomeUtil.h"
+#include "biomes/patches/Base.h"
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
 #include <algorithm>
@@ -85,6 +86,9 @@ int getWallVarIndex(
 
 Biome getBiomeAt(int x, int y, Random &rnd, World &world)
 {
+    if (world.conf.patches) {
+        return computeBiomeData(x, y, rnd).active;
+    }
     if (y >= world.getUnderworldLevel() + 20 * rnd.getCoarseNoise(x, 0)) {
         return Biome::underworld;
     } else if (
@@ -181,6 +185,9 @@ std::vector<Point> planHiveQueenBiomes(Random &rnd, World &world)
             }
         }
     });
+    if (world.conf.patches) {
+        identifySurfaceBiomes(world);
+    }
     return borders;
 }
 

@@ -3,7 +3,6 @@
 #include "Config.h"
 #include "Random.h"
 #include "Util.h"
-#include "World.h"
 #include "biomes/Base.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"

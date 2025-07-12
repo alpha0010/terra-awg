@@ -2,6 +2,7 @@
 
 #include "Util.h"
 #include "vendor/OpenSimplexNoise.hpp"
+#include <algorithm>
 #include <iostream>
 #include <numbers>
 
@@ -98,7 +99,8 @@ void Random::computeBlurNoise()
 void Random::initBiomeNoise(
     double scale,
     double humidityOffset,
-    double temperatureOffset)
+    double temperatureOffset,
+    bool hiveQueen)
 {
     std::cout << "Measuring weather\n";
     humidity.resize(noiseWidth * noiseHeight);
@@ -109,21 +111,33 @@ void Random::initBiomeNoise(
     OpenSimplexNoise noise{dist(rnd)};
     parallelFor(
         std::views::iota(0, noiseWidth),
-        [scale, humidityOffset, temperatureOffset, &noise, this](int x) {
+        [scale, humidityOffset, temperatureOffset, hiveQueen, &noise, this](
+            int x) {
             double offset = scale * (noiseWidth + noiseHeight);
             double xS = 1.4 * scale * x;
             for (int y = 0; y < noiseHeight; ++y) {
                 double yS = scale * y;
-                humidity[x * noiseHeight + y] =
-                    noise.Evaluate(xS, yS) +
-                    0.5 * noise.Evaluate(2 * xS, 2 * yS) +
-                    0.25 * noise.Evaluate(4 * xS, 4 * yS) + humidityOffset;
-                temperature[x * noiseHeight + y] =
+                int index = x * noiseHeight + y;
+                humidity[index] = noise.Evaluate(xS, yS) +
+                                  0.5 * noise.Evaluate(2 * xS, 2 * yS) +
+                                  0.25 * noise.Evaluate(4 * xS, 4 * yS) +
+                                  humidityOffset;
+                temperature[index] =
                     noise.Evaluate(offset + xS, offset + yS) +
                     0.5 * noise.Evaluate(offset + 2 * xS, offset + 2 * yS) +
                     0.25 * noise.Evaluate(offset + 4 * xS, offset + 4 * yS) +
                     std::max(0.01 * (y + 355 - noiseHeight), 0.0) +
                     temperatureOffset;
+                if (hiveQueen) {
+                    double jungleBoost = std::clamp(
+                        0.7 - 2.4 * std::abs(x - 0.5 * noiseWidth) / noiseWidth,
+                        0.0,
+                        0.5);
+                    humidity[index] =
+                        std::lerp(humidity[index], 0.82, jungleBoost);
+                    temperature[index] =
+                        std::lerp(temperature[index], 0.82, jungleBoost);
+                }
             }
         });
 }
