@@ -8,6 +8,7 @@
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
 #include "structures/Temple.h"
+#include "vendor/frozen/set.h"
 #include <iostream>
 #include <map>
 #include <set>
@@ -188,6 +189,7 @@ private:
             }
         }
         world.placeFramedTile(x + 2, y - 1, TileID::door, Variant::lihzahrd);
+        world.placeFramedTile(x + 4, y, TileID::pot, Variant::lihzahrd);
 
         x = 2 * center.first - x;
         while (world.getTile(x, y).blockID != TileID::lihzahrdBrick) {
@@ -210,6 +212,7 @@ private:
             }
         }
         world.placeFramedTile(x - 2, y - 1, TileID::door, Variant::lihzahrd);
+        world.placeFramedTile(x - 5, y, TileID::pot, Variant::lihzahrd);
     }
 
     void placeAltar(Point center)
@@ -226,6 +229,51 @@ private:
             TileID::lihzahrdAltar);
     }
 
+    std::vector<Point> placeTreasures(Point center)
+    {
+        std::vector<Point> locations;
+        for (int x = center.first - size; x < center.first + size; ++x) {
+            for (int y = center.second - size; y < center.second + size; ++y) {
+                if (canPlaceTempleTreasureAt(x, y, world)) {
+                    locations.emplace_back(x, y);
+                }
+            }
+        }
+        addTempleTreasures(locations, size * size / 127.7 + 20, rnd, world);
+        return locations;
+    }
+
+    void addSpikes(Point center)
+    {
+        for (int x = center.first - size; x < center.first + size; ++x) {
+            for (int y = center.second - size; y < center.second + size; ++y) {
+                if (world.regionPasses(x - 1, y - 1, 3, 3, [](Tile &tile) {
+                        return tile.blockID == TileID::empty &&
+                               tile.wallID == WallID::Unsafe::lihzahrdBrick;
+                    })) {
+                    addTempleSpikesAt({x, y}, rnd, world);
+                }
+            }
+        }
+    }
+
+    void applyPaint(Point center, int paint)
+    {
+        for (int x = center.first - size; x < center.first + size; ++x) {
+            for (int y = center.second - size; y < center.second + size; ++y) {
+                Tile &tile = world.getTile(x, y);
+                if (tile.wallID == WallID::Unsafe::lihzahrdBrick) {
+                    if (tile.blockID == TileID::lihzahrdBrick ||
+                        tile.blockID == TileID::pressurePlate ||
+                        tile.blockID == TileID::trap) {
+                        tile.blockPaint = paint;
+                    }
+                    tile.wallPaint = paint;
+                }
+            }
+        }
+    }
+
 public:
     HiveTemple(double s, Random &r, World &w)
         : rnd(r), world(w), size(s), roomSize(20)
@@ -238,6 +286,17 @@ public:
         genMaze(center);
         addEntries(center);
         placeAltar(center);
+        std::vector<Point> flatLocations = placeTreasures(center);
+        std::shuffle(flatLocations.begin(), flatLocations.end(), rnd.getPRNG());
+        addTempleTraps(flatLocations, 45, rnd, world);
+        addSpikes(center);
+        applyPaint(
+            center,
+            rnd.select(
+                {Paint::yellow,
+                 Paint::orange,
+                 Paint::deepYellow,
+                 Paint::deepOrange}));
     }
 };
 
@@ -252,6 +311,36 @@ void genTempleHiveQueen(Random &rnd, World &world)
         world.conf.templeSize * 0.022 *
             std::midpoint<double>(world.getWidth(), 3.55 * world.getHeight()),
         95.0);
+    Point center = selectTempleCenter(
+        [scanDist = 0.95 * size](Point center, World &world) {
+            constexpr auto avoidBlocks = frozen::make_set<int>({
+                TileID::aetherium,
+                TileID::ash,
+                TileID::blueBrick,
+                TileID::corruptJungleGrass,
+                TileID::crimsonJungleGrass,
+                TileID::granite,
+                TileID::greenBrick,
+                TileID::hive,
+                TileID::marble,
+                TileID::mushroomGrass,
+                TileID::pinkBrick,
+            });
+            return world.regionPasses(
+                center.first - scanDist,
+                center.second - scanDist,
+                2 * scanDist,
+                2 * scanDist,
+                [&avoidBlocks](Tile &tile) {
+                    return !avoidBlocks.contains(tile.blockID) ||
+                           (tile.blockID == TileID::hive && tile.flag == 1);
+                });
+        },
+        rnd,
+        world);
+    if (center.first < 100) {
+        return;
+    }
     HiveTemple structure(size, rnd, world);
-    structure.gen({world.getWidth() / 2, world.getHeight() / 2});
+    structure.gen(center);
 }

@@ -63,6 +63,7 @@
 #include "structures/Treasure.h"
 #include "structures/Vines.h"
 #include "structures/hardmode/LootRules.h"
+#include "structures/hiveQueen/Temple.h"
 #include "structures/sunken/Flood.h"
 #include <ranges>
 #include <set>
@@ -142,6 +143,7 @@ enum class Step {
     genAetherHiveQueen,
     genAsteroidFieldHiveQueen,
     genGlowingMossHiveQueen,
+    genTempleHiveQueen,
 };
 
 inline std::array baseBiomeRules{
@@ -179,14 +181,14 @@ inline std::array baseBiomeRules{
 };
 
 inline std::array baseStructureRules{
-    Step::genDungeon,       Step::genTemple,      Step::genPyramid,
-    Step::genDesertTomb,    Step::genBuriedBoat,  Step::genSpiderHall,
-    Step::genRuins,         Step::genTorchArena,  Step::genOceanWreck,
-    Step::genLake,          Step::genStarterHome, Step::genIgloo,
-    Step::genMushroomCabin, Step::genTreasure,    Step::applyHardmodeLoot,
-    Step::genPlants,        Step::genTraps,       Step::genTracks,
-    Step::genFlood,         Step::smoothSurfaces, Step::finalizeWalls,
-    Step::genVines,         Step::genGrasses,
+    Step::genDungeon,        Step::genTemple,        Step::genTempleHiveQueen,
+    Step::genPyramid,        Step::genDesertTomb,    Step::genBuriedBoat,
+    Step::genSpiderHall,     Step::genRuins,         Step::genTorchArena,
+    Step::genOceanWreck,     Step::genLake,          Step::genStarterHome,
+    Step::genIgloo,          Step::genMushroomCabin, Step::genTreasure,
+    Step::applyHardmodeLoot, Step::genPlants,        Step::genTraps,
+    Step::genTracks,         Step::genFlood,         Step::smoothSurfaces,
+    Step::finalizeWalls,     Step::genVines,         Step::genGrasses,
 };
 
 inline std::array patchesBiomeRules{
@@ -350,6 +352,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genAetherHiveQueen)
         GEN_STEP(genAsteroidFieldHiveQueen)
         GEN_STEP(genGlowingMossHiveQueen)
+        GEN_STEP(genTempleHiveQueen)
     }
 }
 
@@ -391,6 +394,8 @@ void doWorldGen(Random &rnd, World &world)
     if (!world.conf.hardmodeLoot) {
         excludes.insert(Step::applyHardmodeLoot);
     }
+    excludes.insert(
+        world.conf.hiveQueen ? Step::genTemple : Step::genTempleHiveQueen);
     LocationBins locations;
     std::vector<Step> steps;
     if (world.conf.hiveQueen) {
