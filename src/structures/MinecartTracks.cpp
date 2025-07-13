@@ -3,6 +3,7 @@
 #include "Config.h"
 #include "Random.h"
 #include "World.h"
+#include "biomes/BiomeUtil.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/Platforms.h"
@@ -10,6 +11,7 @@
 #include "vendor/frozen/set.h"
 #include <algorithm>
 #include <iostream>
+#include <set>
 
 namespace Track
 {
@@ -269,6 +271,31 @@ void applyTrackSupport(int x, int y, World &world)
     }
 }
 
+void clearTrackHex(Point centroid, World &world)
+{
+    iterateZone(
+        centroid,
+        world,
+        [centroid](Point pt) { return getHexCentroid(pt, 10) == centroid; },
+        [&world](Point pt) {
+            Tile &prevTile = world.getTile(pt.first, pt.second - 1);
+            if (!canTrackClearTile(prevTile) &&
+                prevTile.blockID != TileID::minecartTrack &&
+                prevTile.blockID != TileID::platform) {
+                return;
+            }
+            Tile &tile = world.getTile(pt);
+            if (!tile.guarded && canTrackClearTile(tile)) {
+                tile.blockID = TileID::empty;
+                tile.actuator = false;
+            }
+        });
+    for (int i = -10; i < 10; ++i) {
+        applyTrackGrass(centroid.first + i, centroid.second, world);
+        applyTrackGrass(centroid.first + i, centroid.second + 10, world);
+    }
+}
+
 void genTracks(Random &rnd, World &world)
 {
     std::cout << "Installing tracks\n";
@@ -293,6 +320,7 @@ void genTracks(Random &rnd, World &world)
         }
         Mode prevMode = Mode::none;
         int noiseRow = track.front().second;
+        std::set<Point> clearedHexes;
         for (size_t idx = 0; idx < track.size(); ++idx) {
             auto [x, y] = track[idx];
             int height = 7 + 2.9 * rnd.getFineNoise(2 * x, noiseRow);
@@ -301,6 +329,14 @@ void genTracks(Random &rnd, World &world)
                 height *= 0.3;
             } else if (idx == 1 || idx == track.size() - 2) {
                 height *= 0.8;
+            }
+            if (world.conf.hiveQueen) {
+                Point centroid = getHexCentroid(x, y - height, 10);
+                if (!clearedHexes.contains(centroid) &&
+                    centroid.second + 4 < y) {
+                    clearTrackHex(centroid, world);
+                    clearedHexes.insert(centroid);
+                }
             }
             for (int j = -height; j < 0; ++j) {
                 Tile &tile = world.getTile(x, y + j);

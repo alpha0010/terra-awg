@@ -110,7 +110,8 @@ void addOceanCave(int waterTable, Random &rnd, World &world)
                 tile.blockID = fnv1a32pt(x, y) % 7 == 0 ? TileID::sand
                                                         : TileID::coralstone;
             } else if (
-                tile.blockID == TileID::dirt || tile.blockID == TileID::mud ||
+                tile.blockID == TileID::dirt || tile.blockID == TileID::grass ||
+                tile.blockID == TileID::mud ||
                 tile.blockID == TileID::jungleGrass ||
                 (tile.blockID == TileID::empty &&
                  tile.liquid == Liquid::none)) {
