@@ -75,6 +75,7 @@ inline constexpr auto trackClearTiles = frozen::make_set<int>({
     TileID::crimtane,
     TileID::slush,
     TileID::crimsand,
+    TileID::crispyHoney,
     TileID::smoothMarble,
     TileID::marble,
     TileID::granite,
@@ -109,7 +110,7 @@ inline constexpr auto trackClearTiles = frozen::make_set<int>({
 bool canTrackClearTile(Tile &tile)
 {
     return trackClearTiles.contains(tile.blockID) ||
-           (tile.flag == 1 && tile.blockID == TileID::hive);
+           (tile.blockID == TileID::hive && tile.flag != Flag::none);
 }
 
 std::vector<Point>

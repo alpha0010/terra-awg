@@ -15,7 +15,7 @@ void fillMarbleCaveHex(int x, int y, Random &rnd, World &world)
     iterateZone(
         {x, y},
         world,
-        [&world](Point pt) { return world.getTile(pt).flag != 1; },
+        [&world](Point pt) { return world.getTile(pt).flag != Flag::border; },
         [&](Point pt) {
             if (pt.first != lastX) {
                 lastX = pt.first;
@@ -66,7 +66,7 @@ void genMarbleCaveHiveQueen(Random &rnd, World &world)
             rnd,
             world,
             30);
-        if (world.getTile(x, y).flag != 1) {
+        if (world.getTile(x, y).flag != Flag::border) {
             fillMarbleCaveHex(x, y, rnd, world);
         }
     }

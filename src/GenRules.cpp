@@ -63,6 +63,7 @@
 #include "structures/Treasure.h"
 #include "structures/Vines.h"
 #include "structures/hardmode/LootRules.h"
+#include "structures/hiveQueen/GlobalHive.h"
 #include "structures/hiveQueen/Temple.h"
 #include "structures/sunken/Flood.h"
 #include <ranges>
@@ -144,6 +145,7 @@ enum class Step {
     genAsteroidFieldHiveQueen,
     genGlowingMossHiveQueen,
     genTempleHiveQueen,
+    genGlobalHive,
 };
 
 inline std::array baseBiomeRules{
@@ -186,9 +188,10 @@ inline std::array baseStructureRules{
     Step::genSpiderHall,     Step::genRuins,         Step::genTorchArena,
     Step::genOceanWreck,     Step::genLake,          Step::genStarterHome,
     Step::genIgloo,          Step::genMushroomCabin, Step::genTreasure,
-    Step::applyHardmodeLoot, Step::genPlants,        Step::genTraps,
-    Step::genTracks,         Step::genFlood,         Step::smoothSurfaces,
-    Step::finalizeWalls,     Step::genVines,         Step::genGrasses,
+    Step::applyHardmodeLoot, Step::genGlobalHive,    Step::genPlants,
+    Step::genTraps,          Step::genTracks,        Step::genFlood,
+    Step::smoothSurfaces,    Step::finalizeWalls,    Step::genVines,
+    Step::genGrasses,
 };
 
 inline std::array patchesBiomeRules{
@@ -355,6 +358,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genAsteroidFieldHiveQueen)
         GEN_STEP(genGlowingMossHiveQueen)
         GEN_STEP(genTempleHiveQueen)
+        GEN_STEP_WORLD(genGlobalHive)
     }
 }
 
@@ -396,8 +400,11 @@ void doWorldGen(Random &rnd, World &world)
     if (!world.conf.hardmodeLoot) {
         excludes.insert(Step::applyHardmodeLoot);
     }
-    excludes.insert(
-        world.conf.hiveQueen ? Step::genTemple : Step::genTempleHiveQueen);
+    if (world.conf.hiveQueen) {
+        excludes.insert(Step::genTemple);
+    } else {
+        excludes.insert({Step::genTempleHiveQueen, Step::genGlobalHive});
+    }
     LocationBins locations;
     std::vector<Step> steps;
     if (world.conf.hiveQueen) {

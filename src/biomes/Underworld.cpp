@@ -80,7 +80,7 @@ void addBridges(int centerLevel, int lavaLevel, Random &rnd, World &world)
                 if (j < bridge.getHeight() - 1) {
                     Tile &tile = world.getTile(x + i, bridgeLevel + j);
                     if ((tile.blockID == TileID::empty ||
-                         (world.conf.hiveQueen && tile.flag == 1)) &&
+                         (world.conf.hiveQueen && tile.flag == Flag::border)) &&
                         shouldIncludePt(x + i, bridgeLevel + j)) {
                         bridgeData[{x + i, bridgeLevel + j}] = {{i, j}, -1};
                     }

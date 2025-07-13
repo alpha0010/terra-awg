@@ -142,7 +142,7 @@ void genShatteredLand(Random &rnd, World &world)
             } else if (
                 foundSurface || tile.blockID != TileID::hive ||
                 y >= world.getUndergroundLevel()) {
-                short int flag = tile.flag;
+                Flag flag = tile.flag;
                 tile = {};
                 tile.flag = flag;
             }

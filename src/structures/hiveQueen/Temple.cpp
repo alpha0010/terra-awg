@@ -334,7 +334,8 @@ void genTempleHiveQueen(Random &rnd, World &world)
                 2 * scanDist,
                 [&avoidBlocks](Tile &tile) {
                     return !avoidBlocks.contains(tile.blockID) ||
-                           (tile.blockID == TileID::hive && tile.flag == 1);
+                           (tile.blockID == TileID::hive &&
+                            tile.flag == Flag::border);
                 });
         },
         rnd,

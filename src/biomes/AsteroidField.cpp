@@ -24,7 +24,8 @@ selectAsteroidFieldLocation(int &width, int height, Random &rnd, World &world)
                 0.8 * widthF,
                 height,
                 [](Tile &tile) {
-                    return tile.blockID == TileID::empty || tile.flag == 1;
+                    return tile.blockID == TileID::empty ||
+                           tile.flag == Flag::border;
                 })) {
             width = std::midpoint<int>(width, widthF);
             return {x, y};

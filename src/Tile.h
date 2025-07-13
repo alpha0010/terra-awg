@@ -9,6 +9,8 @@ enum class Liquid { none, water, lava, honey, shimmer };
 // space.
 enum class Slope { none = 0, half, topRight, topLeft, bottomRight, bottomLeft };
 
+enum class Flag { none, border, hive, crispyHoney, yellow, orange };
+
 class Tile
 {
 public:
@@ -35,7 +37,7 @@ public:
      * changes.
      */
     bool guarded : 1;
-    short int flag;
+    Flag flag;
 
     bool operator==(const Tile &) const = default;
 };

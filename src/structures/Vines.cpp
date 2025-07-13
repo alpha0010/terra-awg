@@ -105,6 +105,9 @@ void placeStalactite(int x, int y, World &world)
         }
         frameX += itr->second;
         if (itr->first == TileID::hive) {
+            if (probeTile.flag == Flag::border) {
+                return;
+            }
             frameY = 72;
             height = 1;
         }
@@ -129,8 +132,10 @@ inline constexpr auto stalagmiteTypes = frozen::make_map<int, int>(
 
 void placeStalagmite(int x, int y, World &world)
 {
-    auto itr = stalagmiteTypes.find(world.getTile(x, y).blockID);
-    if (itr == stalagmiteTypes.end()) {
+    Tile &probeTile = world.getTile(x, y);
+    auto itr = stalagmiteTypes.find(probeTile.blockID);
+    if (itr == stalagmiteTypes.end() ||
+        (itr->first == TileID::hive && probeTile.flag == Flag::border)) {
         return;
     }
     int variation = fnv1a32pt(x, y) % 6;

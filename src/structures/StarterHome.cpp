@@ -268,7 +268,7 @@ void clearSpawnHive(World &world)
                 break;
             }
             Tile &tile = world.getTile(x + i, y + j);
-            if (tile.flag == 1 && tile.blockID == TileID::hive &&
+            if (tile.flag == Flag::border && tile.blockID == TileID::hive &&
                 std::hypot(i, j) < radius) {
                 tile.blockID = TileID::empty;
             }

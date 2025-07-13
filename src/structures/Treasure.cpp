@@ -50,7 +50,8 @@ bool isPlacementCandidate(int x, int y, World &world)
         return isSolidBlock(tile.blockID) && tile.slope == Slope::none &&
                !tile.actuated && !placementAvoidTiles.contains(tile.blockID) &&
                ((tile.blockID != TileID::aetherium &&
-                 tile.blockID != TileID::pearlstone && tile.flag != 1) ||
+                 tile.blockID != TileID::pearlstone &&
+                 tile.flag != Flag::border) ||
                 y > world.getSurfaceLevel(x));
     };
     return isFloorTile(world.getTile(x, y)) &&
@@ -491,7 +492,7 @@ void placeOrbHearts(
 void placeLarvae(int maxBin, LocationBins &locations, Random &rnd, World &world)
 {
     int larvaCount =
-        world.getWidth() * world.getHeight() / rnd.getInt(90000, 110000);
+        world.getWidth() * world.getHeight() / rnd.getInt(31000, 34000);
     constexpr auto avoidWalls = frozen::make_set<int>(
         {WallID::Unsafe::blueBrick,
          WallID::Unsafe::greenBrick,
@@ -512,7 +513,8 @@ void placeLarvae(int maxBin, LocationBins &locations, Random &rnd, World &world)
         }
         auto [x, y] = rnd.select(locations[binId]);
         Tile &tile = world.getTile(x, y - 1);
-        if (!avoidWalls.contains(tile.wallID) && tile.liquid == Liquid::none &&
+        if ((!avoidWalls.contains(tile.wallID) || fnv1a32pt(x, y) % 31 < 15) &&
+            tile.liquid == Liquid::none &&
             isPlacementCandidate(x - 1, y, world) &&
             isPlacementCandidate(x + 2, y, world) &&
             !isLocationUsed(x, y, 35, usedLocations)) {

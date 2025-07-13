@@ -14,7 +14,7 @@ void fillGraniteCaveHex(int x, int y, World &world)
     iterateZone(
         {x, y},
         world,
-        [&world](Point pt) { return world.getTile(pt).flag != 1; },
+        [&world](Point pt) { return world.getTile(pt).flag != Flag::border; },
         [&clearCenters, &world](Point pt) {
             Point centroid = getHexCentroid(pt, 12);
             if (world.getTile(pt).blockID == TileID::empty ||
@@ -25,7 +25,7 @@ void fillGraniteCaveHex(int x, int y, World &world)
     iterateZone(
         {x, y},
         world,
-        [&world](Point pt) { return world.getTile(pt).flag != 1; },
+        [&world](Point pt) { return world.getTile(pt).flag != Flag::border; },
         [&clearCenters, &world](Point pt) {
             Tile &tile = world.getTile(pt);
             switch (tile.blockID) {
@@ -65,7 +65,7 @@ void genGraniteCaveHiveQueen(Random &rnd, World &world)
             rnd,
             world,
             30);
-        if (world.getTile(x, y).flag != 1) {
+        if (world.getTile(x, y).flag != Flag::border) {
             fillGraniteCaveHex(x, y, world);
             for (int probes = world.conf.graniteSize * 20; probes > 0;
                  --probes) {

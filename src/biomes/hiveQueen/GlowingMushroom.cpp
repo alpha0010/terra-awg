@@ -21,7 +21,7 @@ void fillMushroomFieldHex(
     iterateZone(
         {centerX, fieldFloor},
         world,
-        [&world](Point pt) { return world.getTile(pt).flag != 1; },
+        [&world](Point pt) { return world.getTile(pt).flag != Flag::border; },
         [&](Point pt) {
             auto coarseHexNoise = [&rnd](int x, int y) {
                 Point centroid = getHexCentroid(x, y, 10);
@@ -94,7 +94,8 @@ void genGlowingMushroomHiveQueen(Random &rnd, World &world)
                 50,
                 60,
                 [](Tile &tile) {
-                    return tile.blockID != TileID::marble && tile.flag != 1;
+                    return tile.blockID != TileID::marble &&
+                           tile.flag != Flag::border;
                 })) {
             continue;
         }
@@ -114,17 +115,21 @@ void genGlowingMushroomHiveQueen(Random &rnd, World &world)
                 iterateZone(
                     {x, y},
                     world,
-                    [&world](Point pt) { return world.getTile(pt).flag != 1; },
+                    [&world](Point pt) {
+                        return world.getTile(pt).flag != Flag::border;
+                    },
                     [&](Point pt) {
                         Tile &tile = world.getTile(pt);
                         switch (tile.blockID) {
                         case TileID::jungleGrass:
-                            tile.blockID = TileID::mushroomGrass;
-                            break;
                         case TileID::mud:
-                            tile.blockID = rnd.getInt(0, 35) == 0
-                                               ? TileID::mushroomGrass
-                                               : TileID::mud;
+                            tile.blockID =
+                                tile.flag == Flag::crispyHoney
+                                    ? TileID::crispyHoney
+                                : tile.blockID == TileID::jungleGrass ||
+                                        rnd.getInt(0, 35) == 0
+                                    ? TileID::mushroomGrass
+                                    : TileID::mud;
                             break;
                         case TileID::silt:
                             tile.blockID = TileID::slime;

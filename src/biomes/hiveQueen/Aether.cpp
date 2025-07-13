@@ -18,7 +18,7 @@ Point selectAetherLocation(Random &rnd, World &world)
             (world.getUndergroundLevel() + 2 * world.getCavernLevel()) / 3,
             (world.getCavernLevel() + 5 * world.getUnderworldLevel()) / 6);
         if (world.regionPasses(x - 50, y - 50, 100, 100, [](Tile &tile) {
-                return tile.flag != 1;
+                return tile.flag != Flag::border;
             })) {
             return {x, y};
         }
@@ -36,7 +36,7 @@ void genAetherHiveQueen(Random &rnd, World &world)
     iterateZone(
         {x, y},
         world,
-        [&world](Point pt) { return world.getTile(pt).flag != 1; },
+        [&world](Point pt) { return world.getTile(pt).flag != Flag::border; },
         [x, y, &maxBubblePos, &maxEditPos, &mossLocations, &rnd, &world](
             Point pt) {
             double centralPropo = std::hypot(pt.first - x, pt.second - y) / 75;
@@ -52,6 +52,9 @@ void genAetherHiveQueen(Random &rnd, World &world)
                     std::abs(blurHexNoise(pt.first + x, pt.second + y))) *
                 std::min(1.0, 3 * (1 - centralPropo));
             Tile &tile = world.getTile(pt);
+            if (tile.flag == Flag::yellow || tile.flag == Flag::orange) {
+                tile.flag = Flag::none;
+            }
             if (noiseVal > 0.45) {
                 tile.blockID = TileID::bubble;
                 maxBubblePos = std::max(maxBubblePos, pt.second);

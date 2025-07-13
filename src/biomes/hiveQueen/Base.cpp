@@ -7,7 +7,6 @@
 #include "biomes/Base.h"
 #include "biomes/BiomeUtil.h"
 #include "biomes/patches/Base.h"
-#include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
 #include <algorithm>
@@ -536,16 +535,16 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                     targWall->second = -1;
                 }
                 Point centroid = getHexCentroid(x, y, 10);
-                int hexFlag =
+                int rndFlag =
                     static_cast<int>(
                         99999 *
                         (1 +
                          rnd.getFineNoise(centroid.first, centroid.second))) %
                     13;
-                hexFlag = hexFlag > 5                   ? 5
-                          : hexFlag > 1                 ? 4
-                          : centroid.second > lavaLevel ? 3
-                                                        : 2;
+                Flag hexFlag = rndFlag > 5                   ? Flag::orange
+                               : rndFlag > 1                 ? Flag::yellow
+                               : centroid.second > lavaLevel ? Flag::crispyHoney
+                                                             : Flag::hive;
                 for (auto pt : locations) {
                     Tile &tile = world.getTile(pt);
                     tile.wireRed = false;
@@ -618,36 +617,8 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                 Tile &tile = world.getTile(pt.first + i, pt.second + j);
                 tile.blockID = TileID::hive;
                 tile.wallID = WallID::Unsafe::hive;
-                tile.flag = 1;
+                tile.flag = Flag::border;
             }
         }
-    });
-    world.queuedDeco.emplace_back([](Random &, World &world) {
-        parallelFor(std::views::iota(0, world.getWidth()), [&world](int x) {
-            for (int y = 0; y < world.getHeight(); ++y) {
-                Tile &tile = world.getTile(x, y);
-                if (tile.blockID == TileID::stone && !tile.actuated &&
-                    tile.blockPaint == Paint::none) {
-                    switch (tile.flag) {
-                    case 2:
-                    case 3:
-                        tile.blockID =
-                            tile.flag == 2 ? TileID::hive : TileID::crispyHoney;
-                        if (tile.wallID != WallID::empty &&
-                            tile.wallPaint == Paint::none &&
-                            !world.isExposed(x, y)) {
-                            tile.wallID = WallID::Unsafe::hive;
-                        }
-                        break;
-                    case 4:
-                        tile.blockPaint = Paint::deepYellow;
-                        break;
-                    case 5:
-                        tile.blockPaint = Paint::deepOrange;
-                        break;
-                    }
-                }
-            }
-        });
     });
 }

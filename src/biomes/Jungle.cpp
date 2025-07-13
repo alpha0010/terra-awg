@@ -32,11 +32,11 @@ int levitateIsland(int center, int width, Random &rnd, World &world)
             for (int y = yMin; y < yMax; ++y) {
                 Tile &a = world.getTile(x, y);
                 Tile &b = world.getTile(x, y + floatHeight);
-                if (a.flag == 1) {
-                    if (b.flag != 1) {
+                if (a.flag == Flag::border) {
+                    if (b.flag != Flag::border) {
                         b = {};
                     }
-                } else if (b.flag == 1) {
+                } else if (b.flag == Flag::border) {
                     if (y + floatHeight > world.getSurfaceLevel(x)) {
                         a.blockID = TileID::mud;
                     }

@@ -82,6 +82,9 @@ void fillHive(int hiveX, int hiveY, double size, Random &rnd, World &world)
                                    ? TileID::hive
                                    : TileID::empty;
                 tile.wallID = WallID::Unsafe::hive;
+                if (tile.flag != Flag::border) {
+                    tile.flag = Flag::none;
+                }
             } else if (
                 rnd.getFineNoise(x + hiveX, y + hiveY) >
                     std::max(0.5, threshold) &&

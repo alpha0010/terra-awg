@@ -109,7 +109,7 @@ void genMeteorite(Random &rnd, World &world)
                 23,
                 [&numEmpty, &world](Tile &tile) {
                     if (emptyBlocks.contains(tile.blockID) ||
-                        (world.conf.hiveQueen && tile.flag == 1)) {
+                        (world.conf.hiveQueen && tile.flag == Flag::none)) {
                         ++numEmpty;
                     }
                     return numEmpty < 90;

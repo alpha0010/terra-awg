@@ -30,6 +30,7 @@ inline constexpr auto trappableTiles = frozen::make_set<int>({
     TileID::crimsonGrass,
     TileID::crimsonIce,
     TileID::crimstone,
+    TileID::crispyHoney,
     TileID::smoothMarble,
     TileID::marble,
     TileID::granite,
@@ -54,7 +55,9 @@ inline constexpr auto trappableTiles = frozen::make_set<int>({
 
 bool isTrappable(Tile &tile)
 {
-    return !tile.guarded && trappableTiles.contains(tile.blockID);
+    return !tile.guarded &&
+           (trappableTiles.contains(tile.blockID) ||
+            (tile.blockID == TileID::hive && tile.flag != Flag::none));
 }
 
 void placePressurePlate(int x, int y, bool isSingleUse, World &world)

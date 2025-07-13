@@ -40,7 +40,7 @@ void fillGlowingMossHex(
     iterateZone(
         {x, y},
         world,
-        [&world](Point pt) { return world.getTile(pt).flag != 1; },
+        [&world](Point pt) { return world.getTile(pt).flag != Flag::border; },
         [&visited, &rnd, &world](Point pt) {
             visited.insert(pt);
             Tile &tile = world.getTile(pt);
@@ -67,15 +67,16 @@ void fillGlowingMossHex(
     iterateZone(
         {x, y},
         world,
-        [&world](Point pt) { return world.getTile(pt).flag != 1; },
+        [&world](Point pt) { return world.getTile(pt).flag != Flag::border; },
         [mossType, &wallRepl, &mossLocations, &world](Point pt) {
             Tile &tile = world.getTile(pt);
             auto itr = wallRepl.find(tile.wallID);
             if (itr != wallRepl.end()) {
                 tile.wallID = itr->second;
             }
-            if (tile.blockID == TileID::stone && tile.flag != 2 &&
-                tile.flag != 3 && world.isExposed(pt.first, pt.second)) {
+            if (tile.blockID == TileID::stone && tile.flag != Flag::hive &&
+                tile.flag != Flag::crispyHoney &&
+                world.isExposed(pt.first, pt.second)) {
                 tile.blockID = mossType;
                 mossLocations.push_back(pt);
             }
