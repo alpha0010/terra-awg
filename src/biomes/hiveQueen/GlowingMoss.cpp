@@ -74,8 +74,8 @@ void fillGlowingMossHex(
             if (itr != wallRepl.end()) {
                 tile.wallID = itr->second;
             }
-            if (tile.blockID == TileID::stone &&
-                world.isExposed(pt.first, pt.second)) {
+            if (tile.blockID == TileID::stone && tile.flag != 2 &&
+                tile.flag != 3 && world.isExposed(pt.first, pt.second)) {
                 tile.blockID = mossType;
                 mossLocations.push_back(pt);
             }

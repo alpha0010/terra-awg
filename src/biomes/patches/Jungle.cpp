@@ -14,9 +14,9 @@ void genJunglePatches(Random &rnd, World &world)
     int jungleCenter = world.jungleCenter;
     if (world.conf.hiveQueen) {
         if (jungleCenter > world.getWidth() / 2) {
-            jungleCenter += 0.015 * world.getWidth();
+            jungleCenter += 0.018 * world.getWidth();
         } else {
-            jungleCenter -= 0.015 * world.getWidth();
+            jungleCenter -= 0.018 * world.getWidth();
         }
     }
     int minX = jungleCenter;

@@ -474,88 +474,92 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
         });
 
     std::cout << "Generating honeycomb\n";
-    parallelFor(std::views::iota(0, world.getWidth()), [&rnd, &world](int x) {
-        auto valueLess = [](const Point &a, const Point &b) {
-            return a.second < b.second;
-        };
-        for (int y = 0; y < world.getHeight(); ++y) {
-            if (world.getTile(x, y).wireBlue) {
-                continue;
-            }
-            std::vector<Point> locations;
-            std::map<int, int> tiles;
-            std::map<int, int> walls;
-            iterateHex(
-                {x, y},
-                10,
-                [&locations, &tiles, &walls, &world](Point pt) {
-                    if (pt.first < 0 || pt.second < 0 ||
-                        pt.first >= world.getWidth() ||
-                        pt.second >= world.getHeight()) {
-                        return;
-                    }
-                    locations.push_back(pt);
-                    Tile &tile = world.getTile(pt);
-                    tiles[tile.wireRed ? TileID::empty : tile.blockID] += 1;
-                    walls[tile.wallID] += 1;
-                });
-            tiles[TileID::empty] *= 1.3;
-            if (y < world.getUndergroundLevel()) {
-                walls[WallID::empty] *= 1.3;
-            }
-            auto targTile =
-                std::max_element(tiles.begin(), tiles.end(), valueLess);
-            auto targWall =
-                std::max_element(walls.begin(), walls.end(), valueLess);
-            int threshold = std::max<int>(0.6 * locations.size(), 2);
-            if (targTile->second < threshold) {
-                targTile->second = -1;
-            } else {
-                int oreCount = 0;
-                for (auto ore :
-                     {TileID::copperOre,
-                      TileID::tinOre,
-                      TileID::ironOre,
-                      TileID::leadOre,
-                      TileID::silverOre,
-                      TileID::tungstenOre,
-                      TileID::goldOre,
-                      TileID::platinumOre,
-                      TileID::hellstone,
-                      TileID::desertFossil}) {
-                    oreCount += tiles[ore];
+    parallelFor(
+        std::views::iota(0, world.getWidth()),
+        [lavaLevel, &rnd, &world](int x) {
+            auto valueLess = [](const Point &a, const Point &b) {
+                return a.second < b.second;
+            };
+            for (int y = 0; y < world.getHeight(); ++y) {
+                if (world.getTile(x, y).wireBlue) {
+                    continue;
                 }
-                if (oreCount < threshold &&
-                    oreCount > std::max(threshold / 4, 5)) {
+                std::vector<Point> locations;
+                std::map<int, int> tiles;
+                std::map<int, int> walls;
+                iterateHex(
+                    {x, y},
+                    10,
+                    [&locations, &tiles, &walls, &world](Point pt) {
+                        if (pt.first < 0 || pt.second < 0 ||
+                            pt.first >= world.getWidth() ||
+                            pt.second >= world.getHeight()) {
+                            return;
+                        }
+                        locations.push_back(pt);
+                        Tile &tile = world.getTile(pt);
+                        tiles[tile.wireRed ? TileID::empty : tile.blockID] += 1;
+                        walls[tile.wallID] += 1;
+                    });
+                tiles[TileID::empty] *= 1.3;
+                if (y < world.getUndergroundLevel()) {
+                    walls[WallID::empty] *= 1.3;
+                }
+                auto targTile =
+                    std::max_element(tiles.begin(), tiles.end(), valueLess);
+                auto targWall =
+                    std::max_element(walls.begin(), walls.end(), valueLess);
+                int threshold = std::max<int>(0.6 * locations.size(), 2);
+                if (targTile->second < threshold) {
                     targTile->second = -1;
+                } else {
+                    int oreCount = 0;
+                    for (auto ore :
+                         {TileID::copperOre,
+                          TileID::tinOre,
+                          TileID::ironOre,
+                          TileID::leadOre,
+                          TileID::silverOre,
+                          TileID::tungstenOre,
+                          TileID::goldOre,
+                          TileID::platinumOre,
+                          TileID::hellstone,
+                          TileID::desertFossil}) {
+                        oreCount += tiles[ore];
+                    }
+                    if (oreCount < threshold &&
+                        oreCount > std::max(threshold / 4, 5)) {
+                        targTile->second = -1;
+                    }
+                }
+                if (targWall->second < threshold) {
+                    targWall->second = -1;
+                }
+                Point centroid = getHexCentroid(x, y, 10);
+                int hexFlag =
+                    static_cast<int>(
+                        99999 *
+                        (1 +
+                         rnd.getFineNoise(centroid.first, centroid.second))) %
+                    13;
+                hexFlag = hexFlag > 5                   ? 5
+                          : hexFlag > 1                 ? 4
+                          : centroid.second > lavaLevel ? 3
+                                                        : 2;
+                for (auto pt : locations) {
+                    Tile &tile = world.getTile(pt);
+                    tile.wireRed = false;
+                    tile.wireBlue = true;
+                    if (targTile->second > 0) {
+                        tile.blockID = targTile->first;
+                    }
+                    if (targWall->second > 0) {
+                        tile.wallID = targWall->first;
+                    }
+                    tile.flag = hexFlag;
                 }
             }
-            if (targWall->second < threshold) {
-                targWall->second = -1;
-            }
-            Point centroid = getHexCentroid(x, y, 10);
-            int hexFlag =
-                static_cast<int>(
-                    99999 *
-                    (1 + rnd.getFineNoise(centroid.first, centroid.second))) %
-                            11 <
-                        4
-                    ? 2
-                    : 3;
-            for (auto pt : locations) {
-                Tile &tile = world.getTile(pt);
-                tile.wireRed = false;
-                tile.wireBlue = true;
-                if (targTile->second > 0) {
-                    tile.blockID = targTile->first;
-                }
-                if (targWall->second > 0) {
-                    tile.wallID = targWall->first;
-                }
-                tile.flag = hexFlag;
-            }
-        }
-    });
+        });
 
     parallelFor(std::views::iota(0, world.getWidth()), [&rnd, &world](int x) {
         int surfaceLevel =
@@ -624,10 +628,23 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                 Tile &tile = world.getTile(x, y);
                 if (tile.blockID == TileID::stone && !tile.actuated &&
                     tile.blockPaint == Paint::none) {
-                    if (tile.flag == 2) {
+                    switch (tile.flag) {
+                    case 2:
+                    case 3:
+                        tile.blockID =
+                            tile.flag == 2 ? TileID::hive : TileID::crispyHoney;
+                        if (tile.wallID != WallID::empty &&
+                            tile.wallPaint == Paint::none &&
+                            !world.isExposed(x, y)) {
+                            tile.wallID = WallID::Unsafe::hive;
+                        }
+                        break;
+                    case 4:
                         tile.blockPaint = Paint::deepYellow;
-                    } else if (tile.flag == 3) {
+                        break;
+                    case 5:
                         tile.blockPaint = Paint::deepOrange;
+                        break;
                     }
                 }
             }

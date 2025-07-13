@@ -488,6 +488,41 @@ void placeOrbHearts(
     }
 }
 
+void placeLarvae(int maxBin, LocationBins &locations, Random &rnd, World &world)
+{
+    int larvaCount =
+        world.getWidth() * world.getHeight() / rnd.getInt(90000, 110000);
+    constexpr auto avoidWalls = frozen::make_set<int>(
+        {WallID::Unsafe::blueBrick,
+         WallID::Unsafe::greenBrick,
+         WallID::Unsafe::pinkBrick,
+         WallID::Unsafe::blueSlab,
+         WallID::Unsafe::greenSlab,
+         WallID::Unsafe::pinkSlab,
+         WallID::Unsafe::blueTiled,
+         WallID::Unsafe::greenTiled,
+         WallID::Unsafe::pinkTiled,
+         WallID::Unsafe::lihzahrdBrick,
+         WallID::Unsafe::hive});
+    std::vector<Point> usedLocations;
+    while (larvaCount > 0) {
+        int binId = rnd.getInt(0, maxBin);
+        if (locations[binId].empty()) {
+            continue;
+        }
+        auto [x, y] = rnd.select(locations[binId]);
+        Tile &tile = world.getTile(x, y - 1);
+        if (!avoidWalls.contains(tile.wallID) && tile.liquid == Liquid::none &&
+            isPlacementCandidate(x - 1, y, world) &&
+            isPlacementCandidate(x + 2, y, world) &&
+            !isLocationUsed(x, y, 35, usedLocations)) {
+            world.placeFramedTile(x, y - 3, TileID::larva);
+            usedLocations.emplace_back(x, y);
+            --larvaCount;
+        }
+    }
+}
+
 void placeManaCrystals(
     int maxBin,
     LocationBins &locations,
@@ -1167,6 +1202,9 @@ LocationBins genTreasure(Random &rnd, World &world)
     int maxBin =
         binLocation(world.getWidth(), world.getHeight(), world.getHeight());
     placeJungleShrines(rnd, world);
+    if (world.conf.hiveQueen) {
+        placeLarvae(maxBin, flatLocations, rnd, world);
+    }
     placeLifeCrystals(maxBin, flatLocations, rnd, world);
     placeFallenLogs(maxBin, flatLocations, rnd, world);
     if (world.conf.purity) {

@@ -1354,6 +1354,7 @@ public:
                  Paint::orange,
                  Paint::deepYellow,
                  Paint::deepOrange});
+            theme.altPaint = theme.paint;
             while (theme.paint == theme.altPaint) {
                 theme.altPaint = rnd.select(
                     {Paint::yellow,

@@ -9,6 +9,7 @@
 #include "structures/StructureUtil.h"
 #include "structures/Temple.h"
 #include "vendor/frozen/set.h"
+#include <algorithm>
 #include <iostream>
 #include <map>
 #include <set>
