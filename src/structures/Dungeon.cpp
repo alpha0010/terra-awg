@@ -4,6 +4,7 @@
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
+#include "biomes/BiomeUtil.h"
 #include "ids/ItemID.h"
 #include "ids/Paint.h"
 #include "ids/Prefix.h"
@@ -26,6 +27,7 @@ struct DungeonTheme {
     int slabWall;
     int tiledWall;
     int paint;
+    int altPaint;
     Data::Variant furniture;
 
     void apply(int themeBrick, Random &rnd)
@@ -65,6 +67,7 @@ struct DungeonTheme {
                  Paint::deepViolet});
             furniture = Data::Variant::pinkDungeon;
         }
+        altPaint = paint;
     }
 };
 
@@ -1314,12 +1317,27 @@ private:
         }
         if (tile.wallID == theme.brickWall || tile.wallID == theme.slabWall ||
             tile.wallID == theme.tiledWall) {
-            tile.wallPaint = theme.paint;
+            tile.wallPaint = selectWallPaintAt(x, y);
             if (tile.blockID == TileID::pressurePlate ||
                 tile.blockID == TileID::trap) {
                 tile.blockPaint = theme.paint;
             }
         }
+    }
+
+    int selectWallPaintAt(int x, int y)
+    {
+        if (world.conf.hiveQueen) {
+            Point centroid = getHexCentroid(x, y, 8);
+            if (static_cast<int>(
+                    99999 *
+                    (1 + rnd.getFineNoise(centroid.first, centroid.second))) %
+                    11 <
+                4) {
+                return theme.altPaint;
+            }
+        }
+        return theme.paint;
     }
 
 public:
@@ -1336,6 +1354,13 @@ public:
                  Paint::orange,
                  Paint::deepYellow,
                  Paint::deepOrange});
+            while (theme.paint == theme.altPaint) {
+                theme.altPaint = rnd.select(
+                    {Paint::yellow,
+                     Paint::orange,
+                     Paint::deepYellow,
+                     Paint::deepOrange});
+            }
         }
     }
 

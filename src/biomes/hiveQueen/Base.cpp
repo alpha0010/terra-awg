@@ -7,6 +7,7 @@
 #include "biomes/Base.h"
 #include "biomes/BiomeUtil.h"
 #include "biomes/patches/Base.h"
+#include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
 #include <algorithm>
@@ -473,7 +474,7 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
         });
 
     std::cout << "Generating honeycomb\n";
-    parallelFor(std::views::iota(0, world.getWidth()), [&world](int x) {
+    parallelFor(std::views::iota(0, world.getWidth()), [&rnd, &world](int x) {
         auto valueLess = [](const Point &a, const Point &b) {
             return a.second < b.second;
         };
@@ -532,12 +533,16 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
             if (targWall->second < threshold) {
                 targWall->second = -1;
             }
+            Point centroid = getHexCentroid(x, y, 10);
+            int hexFlag =
+                static_cast<int>(
+                    99999 *
+                    (1 + rnd.getFineNoise(centroid.first, centroid.second))) %
+                            11 <
+                        4
+                    ? 2
+                    : 3;
             for (auto pt : locations) {
-                if (pt.first < 0 || pt.second < 0 ||
-                    pt.first >= world.getWidth() ||
-                    pt.second >= world.getHeight()) {
-                    return;
-                }
                 Tile &tile = world.getTile(pt);
                 tile.wireRed = false;
                 tile.wireBlue = true;
@@ -547,6 +552,7 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                 if (targWall->second > 0) {
                     tile.wallID = targWall->first;
                 }
+                tile.flag = hexFlag;
             }
         }
     });
@@ -611,5 +617,20 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                 tile.flag = 1;
             }
         }
+    });
+    world.queuedDeco.emplace_back([](Random &, World &world) {
+        parallelFor(std::views::iota(0, world.getWidth()), [&world](int x) {
+            for (int y = 0; y < world.getHeight(); ++y) {
+                Tile &tile = world.getTile(x, y);
+                if (tile.blockID == TileID::stone && !tile.actuated &&
+                    tile.blockPaint == Paint::none) {
+                    if (tile.flag == 2) {
+                        tile.blockPaint = Paint::deepYellow;
+                    } else if (tile.flag == 3) {
+                        tile.blockPaint = Paint::deepOrange;
+                    }
+                }
+            }
+        });
     });
 }
