@@ -72,7 +72,7 @@ TileBuffer getDecoGem(Random &rnd, World &world)
     return gem;
 }
 
-void placeDecoGems(Random &rnd, World &world)
+void placeGroveDecoGems(Random &rnd, World &world)
 {
     int groveSize = world.gemGroveSize;
     std::vector<Point> rawLocations;
@@ -149,7 +149,7 @@ void placeGemChest(Random &rnd, World &world)
     }
 }
 
-Point selectGroveLocation(double &groveSize, Random &rnd, World &world)
+Point selectGemGroveLocation(double &groveSize, Random &rnd, World &world)
 {
     constexpr auto allowedTiles = frozen::make_set<int>(
         {TileID::empty,
@@ -174,6 +174,9 @@ Point selectGroveLocation(double &groveSize, Random &rnd, World &world)
         WallVariants::dirt.begin(),
         WallVariants::dirt.end()};
     allowedWalls.insert(WallID::empty);
+    if (world.conf.hiveQueen) {
+        allowedWalls.insert(WallID::Unsafe::hive);
+    }
     constexpr auto partialTiles = frozen::make_set<int>(
         {TileID::snow,
          TileID::ice,
@@ -234,7 +237,9 @@ Point selectGroveLocation(double &groveSize, Random &rnd, World &world)
                         --threshold;
                         return threshold > 0;
                     }
-                    return allowedTiles.contains(tile.blockID) &&
+                    return (allowedTiles.contains(tile.blockID) ||
+                            (tile.flag == Flag::border &&
+                             tile.blockID == TileID::hive)) &&
                            allowedWalls.contains(tile.wallID);
                 })) {
             return {x, y};
@@ -251,7 +256,7 @@ void genGemGrove(Random &rnd, World &world)
     int noiseShuffleY = rnd.getInt(0, world.getHeight());
     double groveSize =
         world.getWidth() * world.getHeight() / 329000 + rnd.getInt(60, 75);
-    auto [x, y] = selectGroveLocation(groveSize, rnd, world);
+    auto [x, y] = selectGemGroveLocation(groveSize, rnd, world);
     if (x == -1) {
         return;
     }
@@ -277,6 +282,6 @@ void genGemGrove(Random &rnd, World &world)
     world.gemGroveX = x;
     world.gemGroveY = y;
     world.gemGroveSize = groveSize;
-    world.queuedDeco.emplace_back(placeDecoGems);
+    world.queuedDeco.emplace_back(placeGroveDecoGems);
     world.queuedTreasures.emplace_back(placeGemChest);
 }

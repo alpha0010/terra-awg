@@ -235,6 +235,7 @@ bool isValidBoulderPlacement(int x, int y, bool allowMud, World &world)
 {
     constexpr auto validTiles = frozen::make_set<int>(
         {TileID::crimstone,
+         TileID::crispyHoney,
          TileID::ebonstone,
          TileID::granite,
          TileID::pearlstone,
@@ -245,7 +246,8 @@ bool isValidBoulderPlacement(int x, int y, bool allowMud, World &world)
         return !tile.guarded &&
                (validTiles.contains(tile.blockID) ||
                 (allowMud && (tile.blockID == TileID::mud ||
-                              tile.blockID == TileID::mushroomGrass)));
+                              tile.blockID == TileID::mushroomGrass)) ||
+                (tile.flag == Flag::hive && tile.blockID == TileID::hive));
     }) && world.regionPasses(x + 2, y + 6, 2, 1, [](Tile &tile) {
         return tile.blockID != TileID::empty;
     });

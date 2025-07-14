@@ -34,6 +34,7 @@
 #include "biomes/hiveQueen/Aether.h"
 #include "biomes/hiveQueen/AsteroidField.h"
 #include "biomes/hiveQueen/Base.h"
+#include "biomes/hiveQueen/GemGrove.h"
 #include "biomes/hiveQueen/GlowingMoss.h"
 #include "biomes/hiveQueen/GlowingMushroom.h"
 #include "biomes/hiveQueen/GraniteCave.h"
@@ -144,6 +145,7 @@ enum class Step {
     genAetherHiveQueen,
     genAsteroidFieldHiveQueen,
     genGlowingMossHiveQueen,
+    genGemGroveHiveQueen,
     genTempleHiveQueen,
     genGlobalHive,
 };
@@ -255,6 +257,7 @@ inline std::array hiveQueenBiomeRules{
     Step::genGemCave,
     Step::genSpiderNest,
     Step::genGlowingMossHiveQueen,
+    Step::genGemGroveHiveQueen,
 };
 
 #define GEN_STEP(step)                                                         \
@@ -357,6 +360,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genAetherHiveQueen)
         GEN_STEP(genAsteroidFieldHiveQueen)
         GEN_STEP(genGlowingMossHiveQueen)
+        GEN_STEP(genGemGroveHiveQueen)
         GEN_STEP(genTempleHiveQueen)
         GEN_STEP_WORLD(genGlobalHive)
     }
