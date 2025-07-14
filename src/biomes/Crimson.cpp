@@ -65,11 +65,16 @@ void genCrimson(Random &rnd, World &world)
     }
     // Register location for use in other generators.
     world.surfaceEvilCenter = surfaceX;
-    genCrimsonAt(
-        surfaceX,
-        world.getWidth() * rnd.getDouble(0.08, 0.92),
-        rnd,
-        world);
+    int undergroundX;
+    if (world.conf.hiveQueen) {
+        undergroundX = world.getWidth() * rnd.getDouble(0.08, 0.42);
+        if (rnd.getBool()) {
+            undergroundX = world.getWidth() - undergroundX;
+        }
+    } else {
+        undergroundX = world.getWidth() * rnd.getDouble(0.08, 0.92);
+    }
+    genCrimsonAt(surfaceX, undergroundX, rnd, world);
     if (world.conf.forTheWorthy) {
         genCloudCrimson(rnd, world);
     }

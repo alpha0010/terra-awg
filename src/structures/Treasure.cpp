@@ -917,8 +917,11 @@ void placeChest(
     int torchID = ItemID::torch;
     switch (type) {
     case Variant::ashWood:
-        fillSurfaceAshWoodChest(chest, rnd, world);
-        return;
+        if (fuzzyIsSurfaceChest(x, y, world)) {
+            fillSurfaceAshWoodChest(chest, rnd, world);
+            return;
+        }
+        break;
     case Variant::flesh:
         torchID = ItemID::crimsonTorch;
         break;

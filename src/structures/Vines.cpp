@@ -92,12 +92,14 @@ void placeStalactite(int x, int y, World &world)
         height = 1;
     }
     Tile &probeTile = world.getTile(x, y);
+    int paint = probeTile.blockPaint;
     if (probeTile.wallID == WallID::Unsafe::spider &&
         (probeTile.blockID == TileID::stone ||
          probeTile.blockID == TileID::stoneSlab)) {
         frameX += 108;
         frameY = 0;
         height = 2;
+        paint = Paint::none;
     } else {
         auto itr = stalactiteTypes.find(probeTile.blockID);
         if (itr == stalactiteTypes.end()) {
@@ -117,6 +119,7 @@ void placeStalactite(int x, int y, World &world)
         tile.blockID = TileID::stalactite;
         tile.frameX = frameX;
         tile.frameY = 18 * j + frameY;
+        tile.blockPaint = paint;
     }
 }
 
@@ -155,6 +158,7 @@ void placeStalagmite(int x, int y, World &world)
         tile.blockID = TileID::stalactite;
         tile.frameX = frameX;
         tile.frameY = 18 * j + frameY;
+        tile.blockPaint = probeTile.blockPaint;
     }
 }
 

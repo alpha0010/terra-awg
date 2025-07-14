@@ -14,12 +14,20 @@ std::pair<int, int> selectHiveLocation(Random &rnd, World &world)
         int y = rnd.getInt(
             (world.getUndergroundLevel() + world.getCavernLevel()) / 2,
             (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3);
+        int borderScan = 90 - numTries / 2;
         if (isInBiome(
                 x,
                 y,
                 15 + world.getWidth() / 120,
                 Biome::jungle,
-                world)) {
+                world) &&
+            (!world.conf.hiveQueen ||
+             world.regionPasses(
+                 x - borderScan / 2,
+                 y - borderScan / 2,
+                 borderScan,
+                 borderScan,
+                 [](Tile &tile) { return tile.flag != Flag::border; }))) {
             return {x, y};
         }
     }

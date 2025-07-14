@@ -3,6 +3,7 @@
 #include "Config.h"
 #include "Random.h"
 #include "World.h"
+#include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/Traps.h"
 #include "structures/data/Trees.h"
@@ -240,7 +241,17 @@ void growTree(
             world.getTile(x + i, y).wallID = WallID::empty;
         }
     }
-    int paint = world.getTile(x + 1, y).blockPaint;
+    constexpr auto gemTrees = frozen::make_set<int>(
+        {TileID::amethystTree,
+         TileID::topazTree,
+         TileID::sapphireTree,
+         TileID::emeraldTree,
+         TileID::rubyTree,
+         TileID::amberTree,
+         TileID::diamondTree});
+    int paint = gemTrees.contains(treeTile)
+                    ? Paint::none
+                    : world.getTile(x + 1, y).blockPaint;
     for (int j = 0; j < height; ++j) {
         TileBuffer tree =
             Data::getTree(rnd.select(Data::trees), world.getFramedTiles());

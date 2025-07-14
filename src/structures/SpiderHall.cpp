@@ -199,7 +199,9 @@ Point selectSpiderHallLocation(
                 hall.getHeight() + 40,
                 [&clearableTiles](Tile &tile) {
                     return !tile.guarded && tile.liquid != Liquid::shimmer &&
-                           clearableTiles.contains(tile.blockID);
+                           (clearableTiles.contains(tile.blockID) ||
+                            (tile.flag == Flag::border &&
+                             tile.blockID == TileID::hive));
                 }) &&
             world.regionPasses(
                 x,

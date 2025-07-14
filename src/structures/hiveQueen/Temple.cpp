@@ -223,10 +223,17 @@ private:
                             {0, 1},
                             world)
                             .second;
-        int altarCenter = scanWhileEmpty(center, {0, 1}, world).second;
+        int altarRight = scanWhileEmpty(
+                             {center.first + roomSize, center.second},
+                             {0, 1},
+                             world)
+                             .second;
         world.placeFramedTile(
-            center.first - 1 - (altarLeft < altarCenter ? roomSize : 0),
-            std::min(altarLeft, altarCenter) - 1,
+            center.first - 1 -
+                (altarLeft < altarRight   ? roomSize
+                 : altarLeft > altarRight ? -roomSize
+                                          : rnd.select({-roomSize, roomSize})),
+            std::min(altarLeft, altarRight) - 1,
             TileID::lihzahrdAltar);
     }
 
