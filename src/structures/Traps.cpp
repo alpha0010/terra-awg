@@ -548,7 +548,12 @@ bool addChestBoulderTraps(int x, int y, Random &rnd, World &world)
                 }
             }
         }
-        world.placeFramedTile(trap.first, trap.second, TileID::boulder);
+        world.placeFramedTile(
+            trap.first,
+            trap.second,
+            world.getTile(trap).blockID == TileID::sandstone
+                ? TileID::rollingCactus
+                : TileID::boulder);
     }
     return true;
 }
@@ -668,6 +673,34 @@ void addChestTraps(int x, int y, Random &rnd, World &world)
             }
         }
     }
+}
+
+void maybeAddChestPressureTraps(int x, int y, Random &rnd, World &world)
+{
+    double threshold = world.conf.forTheWorthy
+                           ? 0.0091 * world.conf.traps + 0.0909
+                           : 0.0106 * world.conf.traps - 0.059;
+    if (rnd.getDouble(0, 1) > threshold) {
+        return;
+    }
+    std::vector<Point> locations;
+    for (int i = -2; i < 4; ++i) {
+        for (int j = -1; j < 3; ++j) {
+            Tile &baseTile = world.getTile(x + i, y + j + 1);
+            if (baseTile.blockID != TileID::empty && isTrappable(baseTile) &&
+                world.regionPasses(x + i, y + j - 2, 1, 3, [](Tile &tile) {
+                    return tile.blockID == TileID::empty;
+                })) {
+                locations.emplace_back(x + i, y + j);
+            }
+        }
+    }
+    if (locations.empty()) {
+        return;
+    }
+    Point loc = rnd.select(locations);
+    placePressurePlate(loc.first, loc.second, true, world);
+    addChestTraps(loc.first, loc.second, rnd, world);
 }
 
 Point selectDetonatorLocation(int x, int y, World &world)

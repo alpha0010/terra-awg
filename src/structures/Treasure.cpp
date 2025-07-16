@@ -927,6 +927,15 @@ void placeChest(
     World &world)
 {
     Chest &chest = world.placeChest(x, y - 2, type);
+    bool isTrapped = type == Variant::deadMans;
+    world.queuedTraps.emplace_back(
+        [x, y, isTrapped](Random &rnd, World &world) {
+            if (isTrapped) {
+                addChestTraps(x, y - 2, rnd, world);
+            } else {
+                maybeAddChestPressureTraps(x, y - 2, rnd, world);
+            }
+        });
     int torchID = ItemID::torch;
     switch (type) {
     case Variant::ashWood:
@@ -1033,7 +1042,6 @@ void placeChest(
     default:
         break;
     }
-    bool isTrapped = type == Variant::deadMans;
     if (isTrapped && origType == Variant::richMahogany) {
         torchID = ItemID::jungleTorch;
     }
@@ -1043,11 +1051,6 @@ void placeChest(
         fillUndergroundChest(chest, torchID, isTrapped, rnd, world);
     } else {
         fillCavernChest(chest, torchID, isTrapped, rnd, world);
-    }
-    if (isTrapped) {
-        world.queuedTraps.emplace_back([x, y](Random &rnd, World &world) {
-            addChestTraps(x, y - 2, rnd, world);
-        });
     }
 }
 
