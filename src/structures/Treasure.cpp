@@ -491,8 +491,10 @@ void placeOrbHearts(
 
 void placeLarvae(int maxBin, LocationBins &locations, Random &rnd, World &world)
 {
-    int larvaCount =
-        world.getWidth() * world.getHeight() / rnd.getInt(31000, 34000);
+    int larvaCount = (1 + (world.conf.forTheWorthy ? 0.5 : 0) +
+                      (world.conf.traps > 14 ? 0.5 : 0)) *
+                     world.getWidth() * world.getHeight() /
+                     rnd.getInt(62000, 65000);
     constexpr auto avoidWalls = frozen::make_set<int>(
         {WallID::Unsafe::blueBrick,
          WallID::Unsafe::greenBrick,
@@ -503,7 +505,6 @@ void placeLarvae(int maxBin, LocationBins &locations, Random &rnd, World &world)
          WallID::Unsafe::blueTiled,
          WallID::Unsafe::greenTiled,
          WallID::Unsafe::pinkTiled,
-         WallID::Unsafe::lihzahrdBrick,
          WallID::Unsafe::hive});
     std::vector<Point> usedLocations;
     while (larvaCount > 0) {
@@ -531,16 +532,28 @@ void placeManaCrystals(
     Random &rnd,
     World &world)
 {
-    int manaCrystalCount =
-        world.conf.manaCrystals * world.getWidth() * world.getHeight() / 310000;
+    int manaCrystalCount = world.conf.manaCrystals *
+                           (world.conf.hiveQueen ? 2 : 1) * world.getWidth() *
+                           world.getHeight() / 310000;
+    std::vector<Point> usedLocations;
+    for (auto &chest : world.getChests()) {
+        usedLocations.emplace_back(chest.x, chest.y);
+    }
     while (manaCrystalCount > 0) {
         int binId = rnd.getInt(0, maxBin);
         if (locations[binId].empty()) {
             continue;
         }
         auto [x, y] = rnd.select(locations[binId]);
+        if (isLocationUsed(x, y, 8, usedLocations)) {
+            continue;
+        }
+        usedLocations.emplace_back(x, y);
         int probeWall = world.getTile(x, y - 2).wallID;
-        if (y > world.getUndergroundLevel() && y < world.getUnderworldLevel() &&
+        if ((y > world.getUndergroundLevel() ||
+             (world.conf.hiveQueen &&
+              std::abs(y - world.getSurfaceLevel(x)) > 15)) &&
+            y < world.getUnderworldLevel() &&
             isPlacementCandidate(x, y, world) &&
             !listContains(WallVariants::dungeon, probeWall) &&
             probeWall != WallID::Unsafe::lihzahrdBrick) {

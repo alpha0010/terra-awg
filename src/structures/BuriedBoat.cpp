@@ -32,6 +32,7 @@ Point selectBoatLocation(int width, int height, Random &rnd, World &world)
         TileID::dirt,
         TileID::granite,
         TileID::greenBrick,
+        TileID::hive,
         TileID::lihzahrdBrick,
         TileID::marble,
         TileID::mushroomGrass,
