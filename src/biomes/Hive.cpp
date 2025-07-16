@@ -11,11 +11,13 @@
 
 bool isHiveEdge(int x, int y, World &world)
 {
-    if (world.getTile(x, y).wallID != WallID::Unsafe::hive) {
+    Tile &centerTile = world.getTile(x, y);
+    if (centerTile.wallID != WallID::Unsafe::hive ||
+        centerTile.flag == Flag::border) {
         return false;
     }
     return !world.regionPasses(x - 1, y - 1, 3, 3, [](Tile &tile) {
-        return tile.wallID == WallID::Unsafe::hive;
+        return tile.wallID == WallID::Unsafe::hive && tile.flag != Flag::border;
     });
 }
 
@@ -82,9 +84,7 @@ void fillHive(int hiveX, int hiveY, double size, Random &rnd, World &world)
                                    ? TileID::hive
                                    : TileID::empty;
                 tile.wallID = WallID::Unsafe::hive;
-                if (tile.flag != Flag::border) {
-                    tile.flag = Flag::none;
-                }
+                tile.flag = Flag::none;
             } else if (
                 rnd.getFineNoise(x + hiveX, y + hiveY) >
                     std::max(0.5, threshold) &&
@@ -96,15 +96,32 @@ void fillHive(int hiveX, int hiveY, double size, Random &rnd, World &world)
             }
         }
     }
+    std::vector<Point> hiveEdges;
     for (int x = hiveX - size; x < hiveX + size; ++x) {
         for (int y = hiveY - size; y < hiveY + size; ++y) {
-            if (isHiveEdge(x, y, world)) {
-                for (int i = -2; i < 3; ++i) {
-                    for (int j = -2; j < 3; ++j) {
-                        Tile &tile = world.getTile(x + i, y + j);
-                        if (tile.wallID == WallID::Unsafe::hive) {
-                            tile.blockID = TileID::hive;
-                        }
+            if (isHiveEdge(x, y, world) &&
+                std::hypot(x - hiveX, y - hiveY) < size) {
+                hiveEdges.emplace_back(x, y);
+            }
+        }
+    }
+    if (size > 200) {
+        for (auto [x, y] : hiveEdges) {
+            for (int i = -2; i < 3; ++i) {
+                for (int j = -2; j < 3; ++j) {
+                    Tile &tile = world.getTile(x + i, y + j);
+                    tile.blockID = TileID::hive;
+                    tile.wallID = WallID::Unsafe::hive;
+                }
+            }
+        }
+    } else {
+        for (auto [x, y] : hiveEdges) {
+            for (int i = -2; i < 3; ++i) {
+                for (int j = -2; j < 3; ++j) {
+                    Tile &tile = world.getTile(x + i, y + j);
+                    if (tile.wallID == WallID::Unsafe::hive) {
+                        tile.blockID = TileID::hive;
                     }
                 }
             }
