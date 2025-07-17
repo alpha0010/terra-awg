@@ -52,6 +52,20 @@ void placeHomeAt(
             {{WallID::Safe::stone,
               rnd.select({WallID::Safe::mudstoneBrick, WallID::Safe::stone})}});
         break;
+    case Data::Variant::granite:
+        themeTiles.insert(
+            {{TileID::wood, TileID::smoothGranite},
+             {TileID::woodenBeam, TileID::graniteColumn},
+             {TileID::grayBrick,
+              rnd.select({TileID::ironBrick, TileID::titanstone})},
+             {TileID::dirt, TileID::granite}});
+        themeWalls.insert(
+            {{WallID::Safe::wood, WallID::Safe::smoothGranite},
+             {WallID::Safe::planked,
+              rnd.select({WallID::Safe::shadewood, WallID::Safe::spookyWood})},
+             {WallID::Safe::stone,
+              rnd.select({WallID::Safe::granite, WallID::Safe::obsidian})}});
+        break;
     case Data::Variant::honey:
         themeTiles.insert(
             {{TileID::wood, TileID::honey},
@@ -143,6 +157,7 @@ void placeHomeAt(
         {TileID::hive, WallID::Safe::hive},
         {TileID::iceBrick, WallID::Safe::iceBrick},
         {TileID::iridescentBrick, WallID::Safe::iridescentBrick},
+        {TileID::ironBrick, WallID::Safe::ironBrick},
         {TileID::mudstoneBrick, WallID::Safe::mudstoneBrick},
         {TileID::pearlstoneBrick, WallID::Safe::pearlstoneBrick},
         {TileID::redBrick, WallID::Safe::redBrick},
@@ -150,12 +165,14 @@ void placeHomeAt(
         {TileID::sandstoneBrick, WallID::Safe::sandstoneBrick},
         {TileID::snowBrick, WallID::Safe::snowBrick},
         {TileID::tinBrick, WallID::Safe::tinBrick},
+        {TileID::titanstone, WallID::Safe::titanstone},
     });
     themeWalls[WallID::Safe::grayBrick] =
         brickToWall.at(themeTiles[TileID::grayBrick]);
     constexpr auto unguardedBlocks = frozen::make_set<int>(
         {TileID::ash,
          TileID::dirt,
+         TileID::granite,
          TileID::leaf,
          TileID::mud,
          TileID::marble,
@@ -293,6 +310,8 @@ void genStarterHome(Random &rnd, World &world)
         theme = Data::Variant::ashWood;
     } else if (tileCounts[TileID::snow] > 2) {
         theme = Data::Variant::boreal;
+    } else if (tileCounts[TileID::granite] > 2) {
+        theme = Data::Variant::granite;
     } else if (
         (tileCounts[TileID::jungleGrass] > 0 && tileCounts[TileID::mud] > 1) ||
         tileCounts[TileID::livingMahogany] > 2) {
