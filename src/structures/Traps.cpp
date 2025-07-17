@@ -273,7 +273,8 @@ Point selectBoulderLocation(Random &rnd, World &world)
 
 void placeBoulderTraps(Random &rnd, World &world)
 {
-    int numBoulders = world.conf.traps * world.getWidth() * world.getHeight() /
+    int numBoulders = world.conf.traps * (world.conf.hiveQueen ? 0.65 : 1) *
+                      world.getWidth() * world.getHeight() /
                       rnd.getInt(57600, 64000);
     std::vector<Point> usedLocations;
     for (int tries = 5 * numBoulders; numBoulders > 0 && tries > 0; --tries) {

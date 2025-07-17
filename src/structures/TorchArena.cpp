@@ -1,5 +1,6 @@
 #include "structures/TorchArena.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
@@ -41,15 +42,25 @@ Point selectArenaLocation(
         arenaHeight;
     int maxY = world.getUnderworldLevel() - arenaHeight;
     int maxFoundationEmpty = 0.4 * arenaWidth;
+    int padding = world.conf.hiveQueen ? 6 : 20;
     for (int tries = 0; tries < 8000; ++tries) {
         int x = rnd.getInt(minX, maxX);
         int y = rnd.getInt(minY, maxY);
+        if (world.conf.hiveQueen) {
+            while (world.getBiome(x, y).active == Biome::jungle) {
+                x = rnd.getInt(minX, maxX);
+                y = rnd.getInt(minY, maxY);
+            }
+        }
         if (std::hypot(x - world.gemGroveX, y - world.gemGroveY) < 150) {
             continue;
         }
         int numEmpty = 0;
         int numFilled = 0;
         int maxEntryFilled = tries / 250;
+        if (world.conf.hiveQueen) {
+            maxEntryFilled += 5;
+        }
         if (world.regionPasses(
                 x - 3,
                 y + arenaHeight - 9,
@@ -73,10 +84,10 @@ Point selectArenaLocation(
                     return numFilled < maxEntryFilled;
                 }) &&
             world.regionPasses(
-                x - 10,
-                y - 10,
-                arenaWidth + 20,
-                arenaHeight + 20,
+                x - padding / 2,
+                y - padding / 2,
+                arenaWidth + padding,
+                arenaHeight + padding,
                 [&clearableTiles](Tile &tile) {
                     return !tile.guarded && tile.liquid != Liquid::shimmer &&
                            clearableTiles.contains(tile.blockID);
