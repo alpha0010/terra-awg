@@ -79,7 +79,7 @@ void genMeteorite(Random &rnd, World &world)
     std::cout << "Bombarding surface\n";
     rnd.shuffleNoise();
     std::array avoidPoints{
-        world.getWidth() / 2,
+        world.spawn.first,
         world.surfaceEvilCenter,
         computeDungeonCenter(world),
     };

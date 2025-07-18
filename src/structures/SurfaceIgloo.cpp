@@ -122,10 +122,9 @@ void genIgloo(Random &rnd, World &world)
 {
     std::cout << "Piling snow\n";
     std::vector<int> locations;
-    int spawnX = world.getWidth() / 2;
     if (world.conf.patches) {
         for (int x = 350; x < world.getWidth() - 350; ++x) {
-            if (std::abs(x - spawnX) > 100 &&
+            if (std::abs(x - world.spawn.first) > 100 &&
                 world.getBiome(x, world.getSurfaceLevel(x)).snow > 0.99) {
                 locations.push_back(x);
             }
@@ -135,7 +134,7 @@ void genIgloo(Random &rnd, World &world)
         for (int x = world.snowCenter - scanDist;
              x < world.snowCenter + scanDist;
              ++x) {
-            if (std::abs(x - spawnX) > 100) {
+            if (std::abs(x - world.spawn.first) > 100) {
                 locations.push_back(x);
             }
         }

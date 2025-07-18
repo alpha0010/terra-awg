@@ -609,7 +609,9 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
             }
         }
     });
-    world.spawnY = world.getSurfaceLevel(world.getWidth() / 2) - 1;
+    world.spawn = {
+        world.getWidth() / 2,
+        world.getSurfaceLevel(world.getWidth() / 2) - 1};
 
     parallelFor(hexBorders, [&world](Point pt) {
         for (int i = -3; i < 3; ++i) {

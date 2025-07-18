@@ -5,6 +5,7 @@
 #include "biomes/Aether.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
+#include "structures/StructureUtil.h"
 #include <iostream>
 
 Point selectAetherLocation(Random &rnd, World &world)
@@ -39,7 +40,7 @@ void genAetherHiveQueen(Random &rnd, World &world)
         [&world](Point pt) { return world.getTile(pt).flag != Flag::border; },
         [x, y, &maxBubblePos, &maxEditPos, &mossLocations, &rnd, &world](
             Point pt) {
-            double centralPropo = std::hypot(pt.first - x, pt.second - y) / 75;
+            double centralPropo = hypotPts(pt, {x, y}) / 75;
             auto blurHexNoise = [&rnd](int a, int b) {
                 Point centroid = getHexCentroid(a, b, 10);
                 return rnd.getBlurNoise(

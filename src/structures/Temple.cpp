@@ -130,9 +130,7 @@ void clearTempleSurface(Point center, int scanDist, Random &rnd, World &world)
     for (int x = center.first - scanDist; x < center.first + scanDist; ++x) {
         for (int y = center.second - scanDist; y < center.second + scanDist;
              ++y) {
-            double threshold =
-                3 * std::hypot(x - center.first, y - center.second) / scanDist -
-                2;
+            double threshold = 3 * hypotPts(center, {x, y}) / scanDist - 2;
             Tile &tile = world.getTile(x, y);
             if (rnd.getFineNoise(x, y) > threshold) {
                 if (tile.blockID == TileID::lihzahrdBrick) {
@@ -358,7 +356,7 @@ void addWallTrap(
     for (int j = 0; j < 4; ++j) {
         for (int dir : {-1, 1}) {
             Point trap = scanWhileNotSolid({x, y - j}, {dir, 0}, world);
-            double dist = std::hypot(x - trap.first, y - trap.second);
+            double dist = hypotPts(trap, {x, y});
             if (dist > 1.5 && dist < 20 &&
                 world.getTile(trap.first + dir, trap.second).blockID ==
                     TileID::lihzahrdBrick) {

@@ -227,7 +227,9 @@ void genWorldBasePatches(Random &rnd, World &world)
             rnd.getInt(0, world.getHeight()));
     }
     computeSurfaceLevel(rnd, world);
-    world.spawnY = world.getSurfaceLevel(world.getWidth() / 2) - 1;
+    world.spawn = {
+        world.getWidth() / 2,
+        world.getSurfaceLevel(world.getWidth() / 2) - 1};
     world.initBiomeData();
     double oreThreshold = computeOreThreshold(world.conf.ore);
     double goldThreshold = world.conf.forTheWorthy

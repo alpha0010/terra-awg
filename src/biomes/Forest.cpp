@@ -85,9 +85,7 @@ void growLeaves(
     int maxY = std::ceil(std::max(from.second, to.second) + leafSpan);
     for (int x = minX; x < maxX; ++x) {
         for (int y = minY; y < maxY; ++y) {
-            if (std::hypot(x - from.first, y - from.second) +
-                    std::hypot(x - to.first, y - to.second) <
-                2 * leafSpan) {
+            if (hypotPts(from, {x, y}) + hypotPts(to, {x, y}) < 2 * leafSpan) {
                 Tile &tile = world.getTile(x, y);
                 if (tile.blockID == TileID::empty) {
                     tile.blockID = TileID::leaf;
@@ -461,7 +459,7 @@ void growLivingTrees(Random &rnd, World &world)
         int numTrees = world.conf.livingTrees * rnd.getDouble(3, 7);
         for (int x = partition - 25 * numTrees; numTrees > 0;
              x += rnd.getInt(45, 55), --numTrees) {
-            if (std::abs(x - world.getWidth() / 2) < 25) {
+            if (std::abs(x - world.spawn.first) < 25) {
                 continue;
             }
             int y = world.getSurfaceLevel(x);

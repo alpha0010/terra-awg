@@ -238,7 +238,7 @@ void genPyramid(Random &rnd, World &world)
          TileID::pinkBrick,
          TileID::meteorite});
     while (std::abs(x - world.surfaceEvilCenter) < 1.5 * size ||
-           std::abs(x - world.getWidth() / 2) < 2 * size ||
+           std::abs(x - world.spawn.first) < 2 * size ||
            !world.regionPasses(
                x - size,
                world.getSurfaceLevel(x),

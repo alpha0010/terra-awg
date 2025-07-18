@@ -189,12 +189,12 @@ private:
     Point getClosestPoint(int x, int y, const std::set<Point> &points)
     {
         Point closest = *points.begin();
-        double minDist = std::hypot(x - closest.first, y - closest.second);
-        for (auto [px, py] : points) {
-            double curDist = std::hypot(x - px, y - py);
+        double minDist = hypotPts(closest, {x, y});
+        for (Point pt : points) {
+            double curDist = hypotPts(pt, {x, y});
             if (curDist < minDist) {
                 minDist = curDist;
-                closest = {px, py};
+                closest = pt;
             }
         }
         return closest;
@@ -663,7 +663,7 @@ private:
             for (int j = 0; j < 4; ++j) {
                 for (int dir : {-1, 1}) {
                     Point trap = scanWhileEmpty({x, y - j}, {dir, 0}, world);
-                    double dist = std::hypot(x - trap.first, y - trap.second);
+                    double dist = hypotPts(trap, {x, y});
                     if (dist > 3 && dist < 40 &&
                         (world.getTile(trap.first, trap.second + 1).blockID ==
                              theme.brick ||
@@ -1043,9 +1043,8 @@ private:
     void selectEntry(int dungeonCenter)
     {
         int scanDist = 0.1 * world.getWidth();
-        world.dungeonX = dungeonCenter;
-        world.dungeonY = world.getSurfaceLevel(world.dungeonX);
-        int offset = world.dungeonX < world.getWidth() / 2 ? 23 : -23;
+        world.dungeon = {dungeonCenter, world.getSurfaceLevel(dungeonCenter)};
+        int offset = world.dungeon.first < world.getWidth() / 2 ? 23 : -23;
         for (int swapI = 0; swapI < scanDist; ++swapI) {
             int i = swapI / 2;
             if (swapI % 2 == 0) {
@@ -1065,17 +1064,17 @@ private:
                                tile.blockID != TileID::aetherium &&
                                tile.wallID != WallID::Unsafe::livingWood;
                     })) {
-                world.dungeonX = dungeonCenter + i;
+                world.dungeon.first = dungeonCenter + i;
                 break;
             }
         }
         std::vector<int> surface;
         for (int i = -30; i < 30; ++i) {
             surface.push_back(
-                world.getSurfaceLevel(world.dungeonX + i + offset));
+                world.getSurfaceLevel(world.dungeon.first + i + offset));
         }
         std::sort(surface.begin(), surface.end());
-        world.dungeonY = surface[0.15 * surface.size()];
+        world.dungeon.second = surface[0.15 * surface.size()];
     }
 
     void makeEntryHallway(Point entry, Point room)
@@ -1098,13 +1097,13 @@ private:
 
     void makeEntry()
     {
-        bool isOnLeft = world.dungeonX < world.getWidth() / 2;
+        bool isOnLeft = world.dungeon.first < world.getWidth() / 2;
         TileBuffer entry = Data::getDungeonRoom(
             isOnLeft ? Data::Room::entranceRight : Data::Room::entranceLeft,
             theme.furniture,
             world.getFramedTiles());
-        int x = world.dungeonX;
-        int y = world.dungeonY;
+        int x = world.dungeon.first;
+        int y = world.dungeon.second;
         int minX = world.getWidth();
         int maxX = 0;
         for (int i = -20; i < 20; ++i) {
@@ -1134,8 +1133,8 @@ private:
                 Tile &tile = world.getTile(x + i, y + j);
                 if (entryTile.blockID == TileID::cloud) {
                     if (entryTile.blockPaint == Paint::red) {
-                        world.dungeonX = x + i;
-                        world.dungeonY = y + j;
+                        world.dungeon.first = x + i;
+                        world.dungeon.second = y + j;
                     }
                     if (entryTile.blockPaint == Paint::none) {
                         entryTile.blockID = tile.blockID;
@@ -1288,16 +1287,17 @@ private:
     void applyPaint(int dungeonCenter, int dungeonWidth)
     {
         int maxX = std::max(
-            world.dungeonX + 80,
+            world.dungeon.first + 80,
             dungeonCenter + dungeonWidth + roomSize);
         int yDivide =
             wallThickness +
             (world.getUndergroundLevel() + 4 * world.getCavernLevel()) / 5;
-        for (int x =
-                 std::min(world.dungeonX - 80, dungeonCenter - dungeonWidth);
+        for (int x = std::min(
+                 world.dungeon.first - 80,
+                 dungeonCenter - dungeonWidth);
              x < maxX;
              ++x) {
-            for (int y = world.dungeonY - 40; y < yDivide; ++y) {
+            for (int y = world.dungeon.second - 40; y < yDivide; ++y) {
                 applyPaintAt(x, y);
             }
         }
@@ -1396,7 +1396,7 @@ public:
             if (connectedZones.empty()) {
                 findConnectedZones(x, y, connectedZones, allZones);
                 makeEntryHallway(
-                    {world.dungeonX, world.dungeonY + hallSize - 3},
+                    {world.dungeon.first, world.dungeon.second + hallSize - 3},
                     {x, y});
                 continue;
             } else if (connectedZones.contains({x, y})) {
@@ -1470,7 +1470,7 @@ int computeDungeonCenter(World &world)
 {
     std::vector avoidPoints{
         0,
-        world.getWidth() / 2,
+        world.spawn.first,
         world.getWidth(),
         world.surfaceEvilCenter,
         static_cast<int>(world.desertCenter),

@@ -52,7 +52,7 @@ Point selectArenaLocation(
                 y = rnd.getInt(minY, maxY);
             }
         }
-        if (std::hypot(x - world.gemGroveX, y - world.gemGroveY) < 150) {
+        if (hypotPts(world.gemGrove, {x, y}) < 150) {
             continue;
         }
         int numEmpty = 0;

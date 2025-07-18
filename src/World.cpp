@@ -44,7 +44,7 @@ constexpr std::vector<bool> genFramedTileLookup()
     return table;
 }
 
-std::pair<int, int> framedTileToDims(int tileID)
+Point framedTileToDims(int tileID)
 {
     switch (tileID) {
     case TileID::painting2x3:
@@ -131,10 +131,10 @@ BiomeData &World::getBiome(int x, int y)
     return biomeMap[y + x * height];
 }
 
-std::vector<std::pair<int, int>>
+std::vector<Point>
 World::placeBuffer(int x, int y, const TileBuffer &data, Blend blendMode)
 {
-    std::vector<std::pair<int, int>> storageLocations;
+    std::vector<Point> storageLocations;
     for (int i = 0; i < data.getWidth(); ++i) {
         for (int j = 0; j < data.getHeight(); ++j) {
             const Tile &dataTile = data.getTile(i, j);
@@ -650,7 +650,7 @@ void World::placePainting(int x, int y, Painting painting)
     }
 }
 
-std::pair<int, int> World::getPaintingDims(Painting painting)
+Point World::getPaintingDims(Painting painting)
 {
     auto itr = paintingData.find(painting);
     if (itr == paintingData.end()) {

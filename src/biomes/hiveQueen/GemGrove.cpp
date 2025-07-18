@@ -43,8 +43,7 @@ void genGemGroveHiveQueen(Random &rnd, World &world)
             }
         }
     }
-    world.gemGroveX = x;
-    world.gemGroveY = y;
+    world.gemGrove = {x, y};
     world.gemGroveSize = groveSize;
     world.queuedDeco.emplace_back(placeGroveDecoGems);
     world.queuedTreasures.emplace_back(placeGemChest);

@@ -7,6 +7,7 @@
 #include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
+#include "structures/StructureUtil.h"
 #include "structures/data/DecoGems.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
@@ -78,12 +79,10 @@ void placeGroveDecoGems(Random &rnd, World &world)
     std::vector<Point> rawLocations;
     for (int i = -groveSize; i < groveSize; ++i) {
         for (int j = -groveSize; j < groveSize; ++j) {
-            if (world.getTile(world.gemGroveX + i, world.gemGroveY + j)
-                        .blockID == TileID::empty &&
+            if (world.getTile(addPts(world.gemGrove, {i, j})).blockID ==
+                    TileID::empty &&
                 std::hypot(i, j) < groveSize) {
-                rawLocations.emplace_back(
-                    world.gemGroveX + i,
-                    world.gemGroveY + j);
+                rawLocations.push_back(addPts(world.gemGrove, {i, j}));
             }
         }
     }
@@ -124,8 +123,8 @@ void placeGemChest(Random &rnd, World &world)
                 j = -j;
             }
             if (world.regionPasses(
-                    world.gemGroveX + i,
-                    world.gemGroveY + j - 1,
+                    world.gemGrove.first + i,
+                    world.gemGrove.second + j - 1,
                     2,
                     3,
                     [](Tile &tile) {
@@ -133,14 +132,14 @@ void placeGemChest(Random &rnd, World &world)
                                tile.liquid == Liquid::none;
                     }) &&
                 world.regionPasses(
-                    world.gemGroveX + i,
-                    world.gemGroveY + j + 2,
+                    world.gemGrove.first + i,
+                    world.gemGrove.second + j + 2,
                     2,
                     1,
                     [](Tile &tile) { return tile.blockID == TileID::stone; })) {
                 Chest &chest = world.placeChest(
-                    world.gemGroveX + i,
-                    world.gemGroveY + j,
+                    world.gemGrove.first + i,
+                    world.gemGrove.second + j,
                     Variant::crystal);
                 fillCrystalChest(chest, rnd, world);
                 return;
@@ -279,8 +278,7 @@ void genGemGrove(Random &rnd, World &world)
             }
         }
     }
-    world.gemGroveX = x;
-    world.gemGroveY = y;
+    world.gemGrove = {x, y};
     world.gemGroveSize = groveSize;
     world.queuedDeco.emplace_back(placeGroveDecoGems);
     world.queuedTreasures.emplace_back(placeGemChest);

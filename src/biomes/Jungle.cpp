@@ -129,8 +129,7 @@ void growMahoganyVine(
         for (int x = from.first - 6; x < from.first + 6; ++x) {
             for (int y = from.second - 6; y < from.second + 6; ++y) {
                 Tile &tile = world.getTile(x, y);
-                double threshold =
-                    std::hypot(x - from.first, y - from.second) / 3 - 1;
+                double threshold = hypotPts(from, {x, y}) / 3 - 1;
                 if (tile.blockID == TileID::empty &&
                     rnd.getFineNoise(x, y) > threshold) {
                     tile.blockID = TileID::mahoganyLeaf;

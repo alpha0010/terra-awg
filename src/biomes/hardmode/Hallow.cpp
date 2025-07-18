@@ -49,7 +49,7 @@ int selectHallowLocation(Random &rnd, World &world)
     std::array avoidPoints{
         100,
         world.getWidth() - 100,
-        world.getWidth() / 2,
+        world.spawn.first,
         static_cast<int>(world.desertCenter),
         static_cast<int>(world.jungleCenter),
         static_cast<int>(world.snowCenter),

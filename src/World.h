@@ -13,6 +13,8 @@ struct Config;
 class Random;
 class TileBuffer;
 
+typedef std::pair<int, int> Point;
+
 enum class Blend { normal, blockOnly };
 
 uint32_t fnv1a32pt(uint32_t x, uint32_t y);
@@ -50,12 +52,12 @@ public:
     int getCavernLevel() const;
     int getUnderworldLevel() const;
     Tile &getTile(int x, int y);
-    Tile &getTile(std::pair<int, int> pt)
+    Tile &getTile(Point pt)
     {
         return getTile(pt.first, pt.second);
     }
     BiomeData &getBiome(int x, int y);
-    std::vector<std::pair<int, int>> placeBuffer(
+    std::vector<Point> placeBuffer(
         int x,
         int y,
         const TileBuffer &data,
@@ -63,7 +65,7 @@ public:
     void
     placeFramedTile(int x, int y, int blockID, Variant type = Variant::none);
     void placePainting(int x, int y, Painting painting);
-    std::pair<int, int> getPaintingDims(Painting painting);
+    Point getPaintingDims(Painting painting);
     Chest &placeChest(int x, int y, Variant type);
     Chest &registerStorage(int x, int y);
 
@@ -117,19 +119,17 @@ public:
     int mythrilVariant;
     int adamantiteVariant;
 
-    int spawnY;
+    Point spawn;
 
     double desertCenter;
     double jungleCenter;
     double snowCenter;
     int surfaceEvilCenter;
-    int dungeonX;
-    int dungeonY;
     int oceanCaveCenter;
-    int gemGroveX;
-    int gemGroveY;
+    Point dungeon;
+    Point gemGrove;
     int gemGroveSize;
-    std::vector<std::pair<int, int>> mushroomCenter;
+    std::vector<Point> mushroomCenter;
 
     std::vector<std::function<void(Random &, World &)>> queuedEvil;
     std::vector<std::function<void(Random &, World &)>> queuedDeco;

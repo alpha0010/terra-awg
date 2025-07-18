@@ -115,9 +115,7 @@ private:
         while (true) {
             std::vector<Point> choices;
             for (Point candidate : neighborCentroids(agent)) {
-                if (std::hypot(
-                        candidate.first - center.first,
-                        candidate.second - center.second) < threshold &&
+                if (hypotPts(candidate, center) < threshold &&
                     !core.contains(candidate) &&
                     (!connectedRooms.contains(candidate) ||
                      hasHallway(agent, candidate))) {

@@ -903,7 +903,7 @@ Variant getChestType(int x, int y, World &world)
 
 void placeStarterChest(Random &rnd, World &world)
 {
-    int centerX = world.getWidth() / 2;
+    int centerX = world.spawn.first;
     for (int iSwap = 0; iSwap < 20; ++iSwap) {
         int x = iSwap % 2 == 0 ? centerX - iSwap / 2 : centerX + iSwap / 2;
         int surfaceLevel = world.getSurfaceLevel(x);

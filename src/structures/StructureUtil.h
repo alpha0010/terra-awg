@@ -22,6 +22,8 @@ bool isLocationUsed(
 
 bool isSolidBlock(int tileId);
 
+double hypotPts(Point a, Point b);
+
 Point addPts(Point a, Point b);
 
 Point subPts(Point a, Point b);

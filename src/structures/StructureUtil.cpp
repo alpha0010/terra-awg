@@ -157,6 +157,11 @@ bool isSolidBlock(int tileId)
     return !nonSolidTiles.contains(tileId);
 }
 
+double hypotPts(Point a, Point b)
+{
+    return std::hypot(a.first - b.first, a.second - b.second);
+}
+
 Point addPts(Point a, Point b)
 {
     return {a.first + b.first, a.second + b.second};

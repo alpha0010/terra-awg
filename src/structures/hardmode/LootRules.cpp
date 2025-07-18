@@ -3,6 +3,7 @@
 #include "Config.h"
 #include "World.h"
 #include "ids/ItemID.h"
+#include "structures/StructureUtil.h"
 #include <cmath>
 #include <iostream>
 #include <map>
@@ -83,14 +84,14 @@ void applyHardmodeLoot(World &world)
     int skipY = -1;
     if (world.conf.equipment != 0) {
         double minDist = 9999;
-        int spawnX = world.getWidth() / 2;
-        for (int x = spawnX - 80; x < spawnX + 80; ++x) {
-            for (int y = world.spawnY - 40; y < world.spawnY + 40; ++y) {
+        for (int x = world.spawn.first - 80; x < world.spawn.first + 80; ++x) {
+            for (int y = world.spawn.second - 40; y < world.spawn.second + 40;
+                 ++y) {
                 Tile &tile = world.getTile(x, y);
                 if ((tile.blockID == TileID::chest ||
                      tile.blockID == TileID::chestGroup2) &&
                     tile.frameX % 36 == 0 && tile.frameY == 0) {
-                    double dist = std::hypot(x - spawnX, y - world.spawnY);
+                    double dist = hypotPts(world.spawn, {x, y});
                     if (dist < minDist) {
                         minDist = dist;
                         skipX = x;

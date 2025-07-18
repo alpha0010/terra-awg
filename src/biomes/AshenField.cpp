@@ -18,10 +18,10 @@ void genAshenField(Random &rnd, World &world)
     if (world.conf.shattered) {
         width *= 0.82;
     }
-    int minX = world.getWidth() / 2 - width;
-    int maxX = world.getWidth() / 2 + width;
+    int minX = world.spawn.first - width;
+    int maxX = world.spawn.first + width;
     int minY = std::min(
-                   {world.spawnY,
+                   {world.spawn.second,
                     world.getSurfaceLevel(minX),
                     world.getSurfaceLevel(maxX)}) -
                20;
@@ -29,6 +29,7 @@ void genAshenField(Random &rnd, World &world)
     constexpr auto avoidTiles = frozen::make_set<int>({
         TileID::snow,
         TileID::sandstone,
+        TileID::granite,
         TileID::marble,
         TileID::jungleGrass,
         TileID::livingWood,
@@ -53,18 +54,18 @@ void genAshenField(Random &rnd, World &world)
     for (int wallId : WallVariants::dirt) {
         stoneWalls[wallId] = rnd.select(WallVariants::stone);
     }
-    double height = maxY - world.spawnY;
+    double height = maxY - world.spawn.second;
     for (int x = minX; x < maxX; ++x) {
         int surface = scanWhileEmpty({x, minY}, {0, 1}, world).second;
         surface = std::lerp(
-            world.spawnY,
+            world.spawn.second,
             surface < world.getUndergroundLevel() ? surface
                                                   : world.getSurfaceLevel(x),
-            std::abs(x - world.getWidth() / 2) / width);
+            std::abs(x - world.spawn.first) / width);
         for (int y = minY; y < maxY; ++y) {
             double threshold = std::hypot(
-                (x - world.getWidth() / 2) / width,
-                (y - world.spawnY) / height);
+                (x - world.spawn.first) / width,
+                (y - world.spawn.second) / height);
             if (rnd.getFineNoise(x, y) < 9 * threshold - 8) {
                 continue;
             }
@@ -95,8 +96,8 @@ void genAshenField(Random &rnd, World &world)
             case TileID::mud:
             case TileID::sand:
             case TileID::clay:
-                tile.blockID =
-                    y > world.spawnY + 10 ? TileID::obsidian : TileID::ash;
+                tile.blockID = y > world.spawn.second + 10 ? TileID::obsidian
+                                                           : TileID::ash;
                 break;
             default:
                 break;

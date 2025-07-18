@@ -101,7 +101,9 @@ void genWorldBase(Random &rnd, World &world)
             wallId);
     }
     computeSurfaceLevel(rnd, world);
-    world.spawnY = world.getSurfaceLevel(world.getWidth() / 2) - 1;
+    world.spawn = {
+        world.getWidth() / 2,
+        world.getSurfaceLevel(world.getWidth() / 2) - 1};
     // Fill the world with dirt and stone; mostly dirt near the surface,
     // transitioning to mostly stone deeper down.
     parallelFor(

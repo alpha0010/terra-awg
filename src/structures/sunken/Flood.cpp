@@ -105,12 +105,11 @@ void genFlood(World &world)
              world.getSurfaceLevel(world.getWidth() / 2),
              world.getSurfaceLevel(world.getWidth() / 2 + probeDelta)}) +
         (world.conf.shattered ? 3 : 0);
-    if (floodLevel < world.dungeonY + 4) {
+    if (floodLevel < world.dungeon.second + 4) {
         for (int i = -85; i < 85; ++i) {
             for (int j = -85; j < 85; ++j) {
                 if (std::hypot(i, j) < 85) {
-                    Tile &tile =
-                        world.getTile(world.dungeonX + i, world.dungeonY + j);
+                    Tile &tile = world.getTile(addPts(world.dungeon, {i, j}));
                     if (tile.blockID == TileID::empty &&
                         !skipWalls.contains(tile.wallID)) {
                         tile.blockID = TileID::bubble;
@@ -124,12 +123,11 @@ void genFlood(World &world)
             floodFill(x, y, floodLevel, world);
         }
     }
-    if (floodLevel < world.dungeonY + 4) {
+    if (floodLevel < world.dungeon.second + 4) {
         for (int i = -82; i < 82; ++i) {
             for (int j = -82; j < 82; ++j) {
                 if (std::hypot(i, j) < 82) {
-                    Tile &tile =
-                        world.getTile(world.dungeonX + i, world.dungeonY + j);
+                    Tile &tile = world.getTile(addPts(world.dungeon, {i, j}));
                     tile.liquid = Liquid::none;
                     if (tile.blockID == TileID::bubble) {
                         tile.blockID = TileID::empty;
