@@ -33,7 +33,7 @@ Point selectLarvaeLocation(
         int x = rnd.getInt(hiveX - size, hiveX + size);
         int y = rnd.getInt(hiveY - size, hiveY + size);
         if (world.getTile(x, y).blockID == TileID::empty) {
-            y = scanWhileEmpty({x, y}, {0, 1}, world).second;
+            y = scanWhileEmpty({x, y}, {0, 1}, world).y;
         }
         if (world.getTile(x + 1, y).wallID == WallID::Unsafe::hive &&
             world.regionPasses(

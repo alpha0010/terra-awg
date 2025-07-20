@@ -1,13 +1,12 @@
 #ifndef TEMPLE_H
 #define TEMPLE_H
 
+#include "Point.h"
 #include <functional>
 #include <vector>
 
 class World;
 class Random;
-
-typedef std::pair<int, int> Point;
 
 void genTemple(Random &rnd, World &world);
 Point selectTempleCenter(

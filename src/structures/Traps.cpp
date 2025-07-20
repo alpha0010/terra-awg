@@ -193,7 +193,7 @@ void placeSandTraps(Random &rnd, World &world)
             continue;
         }
         auto [x, y] = rnd.select(locations[binId]);
-        int trapFloor = scanWhileEmpty({x, y}, {0, 1}, world).second;
+        int trapFloor = scanWhileEmpty({x, y}, {0, 1}, world).y;
         if (trapFloor - y < 4 || trapFloor - y > 30 ||
             !validFloors.contains(world.getTile(x, trapFloor + 1).blockID) ||
             isLocationUsed(x, trapFloor, 3, usedLocations)) {
@@ -205,8 +205,7 @@ void placeSandTraps(Random &rnd, World &world)
         Point prevActuator{-1, -1};
         for (int i = -5; i < 5; ++i) {
             int trapCeiling =
-                scanWhileEmpty({x + i, (y + trapFloor) / 2}, {0, -1}, world)
-                    .second -
+                scanWhileEmpty({x + i, (y + trapFloor) / 2}, {0, -1}, world).y -
                 1;
             if (trapCeiling + 45 < trapFloor) {
                 continue;
@@ -217,7 +216,7 @@ void placeSandTraps(Random &rnd, World &world)
                  looseBlocks.contains(
                      world.getTile(x + i, trapCeiling - 1).blockID))) {
                 tile.actuator = true;
-                if (prevActuator.first != -1) {
+                if (prevActuator.x != -1) {
                     placeWire(
                         prevActuator,
                         {x + i, trapCeiling},
@@ -289,7 +288,7 @@ void placeBoulderTraps(Random &rnd, World &world)
             ++trapFloor;
         }
         int trapX = rnd.select({x, x + 1});
-        trapFloor = scanWhileEmpty({trapX, trapFloor}, {0, 1}, world).second;
+        trapFloor = scanWhileEmpty({trapX, trapFloor}, {0, 1}, world).y;
         if (trapFloor > world.getUnderworldLevel() || trapFloor - y > 25 ||
             !world.regionPasses(
                 x,
@@ -379,7 +378,7 @@ void placeLavaTraps(Random &rnd, World &world)
         if (gapJ == 50) {
             continue;
         }
-        int trapFloor = scanWhileEmpty({x, y + gapJ}, {0, 1}, world).second;
+        int trapFloor = scanWhileEmpty({x, y + gapJ}, {0, 1}, world).y;
         if (trapFloor > world.getUnderworldLevel() ||
             !world.regionPasses(x, y, 1, trapFloor - y, isTrappable)) {
             continue;
@@ -427,15 +426,15 @@ bool targetWithDartTraps(int x, int y, int maxTraps, Random &rnd, World &world)
     for (auto delta : {Point{-1, 0}, {1, 0}}) {
         for (int j = -4; j < 2; ++j) {
             Point pos = scanWhileNotSolid({x, y + j}, delta, world);
-            int dist = std::abs(pos.first - x);
+            int dist = std::abs(pos.x - x);
             if (dist < 5 || dist > 30) {
                 continue;
             }
             if (!isTrappable(world.getTile(pos)) ||
-                !isSolidBlock(world.getTile(addPts(pos, {0, 1})).blockID)) {
-                pos = addPts(pos, delta);
+                !isSolidBlock(world.getTile(pos + Point{0, 1}).blockID)) {
+                pos += delta;
                 if (!isTrappable(world.getTile(pos)) ||
-                    !isSolidBlock(world.getTile(addPts(pos, {0, 1})).blockID)) {
+                    !isSolidBlock(world.getTile(pos + Point{0, 1}).blockID)) {
                     continue;
                 }
             }
@@ -450,10 +449,10 @@ bool targetWithDartTraps(int x, int y, int maxTraps, Random &rnd, World &world)
     for (auto trap : traps) {
         placeWire(trap, {x, y}, Wire::red, world);
         world.placeFramedTile(
-            trap.first,
-            trap.second,
+            trap.x,
+            trap.y,
             TileID::trap,
-            trap.first > x ? Variant::dartLeft : Variant::dartRight);
+            trap.x > x ? Variant::dartLeft : Variant::dartRight);
     }
     return true;
 }
@@ -472,7 +471,7 @@ void placeDartTraps(Random &rnd, World &world)
                                         world.getSurfaceLevel(x),
                                         world.getUndergroundLevel()),
             world.getUnderworldLevel());
-        y = scanWhileEmpty({x, y}, {0, 1}, world).second;
+        y = scanWhileEmpty({x, y}, {0, 1}, world).y;
         if (y > world.getUnderworldLevel() ||
             !world.regionPasses(x - 1, y - 2, 3, 4, isTrappable) ||
             !world.regionPasses(
@@ -509,25 +508,20 @@ bool addChestBoulderTraps(int x, int y, Random &rnd, World &world)
     std::vector<Point> traps;
     for (int i = rnd.getInt(-10, -7); i < 10; i += 4) {
         Point pos = scanWhileNotSolid({x + i, y}, {0, -1}, world);
-        int dist = y - pos.second;
+        int dist = y - pos.y;
         if (dist < 5 || dist > 30) {
             continue;
         }
-        pos = addPts(pos, {0, -5});
+        pos.y -= 5;
         if (world.regionPasses(
-                pos.first - 2,
-                pos.second - 2,
+                pos.x - 2,
+                pos.y - 2,
                 6,
                 6,
                 [](Tile &tile) {
                     return tile.blockID != TileID::empty && isTrappable(tile);
                 }) &&
-            world.regionPasses(
-                pos.first,
-                pos.second,
-                2,
-                pos.second - y - 3,
-                isTrappable)) {
+            world.regionPasses(pos.x, pos.y, 2, pos.y - y - 3, isTrappable)) {
             traps.push_back(pos);
         }
     }
@@ -535,23 +529,23 @@ bool addChestBoulderTraps(int x, int y, Random &rnd, World &world)
         return false;
     }
     for (auto trap : traps) {
-        placeWire({trap.first, trap.second + 2}, {x, y}, Wire::red, world);
+        placeWire({trap.x, trap.y + 2}, {x, y}, Wire::red, world);
         for (int i = 0; i < 2; ++i) {
-            for (int wireY = trap.second + 2; wireY < y; ++wireY) {
-                Tile &tile = world.getTile(trap.first + i, wireY);
+            for (int wireY = trap.y + 2; wireY < y; ++wireY) {
+                Tile &tile = world.getTile(trap.x + i, wireY);
                 if (isSolidBlock(tile.blockID)) {
                     tile.actuator = true;
                     placeWire(
-                        {trap.first, trap.second + 2},
-                        {trap.first + i, wireY},
+                        {trap.x, trap.y + 2},
+                        {trap.x + i, wireY},
                         Wire::red,
                         world);
                 }
             }
         }
         world.placeFramedTile(
-            trap.first,
-            trap.second,
+            trap.x,
+            trap.y,
             world.getTile(trap).blockID == TileID::sandstone
                 ? TileID::rollingCactus
                 : TileID::boulder);
@@ -591,11 +585,11 @@ bool addChestLavaTrap(int x, int y, Random &rnd, World &world)
         return false;
     }
     Point pos = scanWhileNotSolid({x, y}, {0, -1}, world);
-    int dist = y - pos.second;
+    int dist = y - pos.y;
     if (dist < 5 || dist > 30) {
         return false;
     }
-    pos = addPts(pos, {0, -5});
+    pos.y -= 5;
     constexpr auto oreTiles = frozen::make_set<int>(
         {TileID::ironOre,
          TileID::copperOre,
@@ -614,8 +608,8 @@ bool addChestLavaTrap(int x, int y, Random &rnd, World &world)
          TileID::chlorophyteOre});
     int numEmpty = 0;
     if (!world.regionPasses(
-            pos.first - 10,
-            pos.second - 10,
+            pos.x - 10,
+            pos.y - 10,
             20,
             20,
             [&oreTiles](Tile &tile) {
@@ -624,8 +618,8 @@ bool addChestLavaTrap(int x, int y, Random &rnd, World &world)
                         oreTiles.contains(tile.blockID));
             }) ||
         !world.regionPasses(
-            pos.first - 9,
-            pos.second - 18,
+            pos.x - 9,
+            pos.y - 18,
             18,
             14,
             [&numEmpty, &oreTiles](Tile &tile) {
@@ -641,9 +635,8 @@ bool addChestLavaTrap(int x, int y, Random &rnd, World &world)
     for (int i = -7; i < 7; ++i) {
         for (int j = -7; j < 7; ++j) {
             double threshold = 4 * std::hypot(i, j) / 7 - 3;
-            if (rnd.getFineNoise(pos.first + i, pos.second + j - 11) >
-                threshold) {
-                Tile &tile = world.getTile(pos.first + i, pos.second + j - 11);
+            if (rnd.getFineNoise(pos.x + i, pos.y + j - 11) > threshold) {
+                Tile &tile = world.getTile(pos.x + i, pos.y + j - 11);
                 tile.blockID = TileID::empty;
                 tile.liquid = Liquid::lava;
                 tile.guarded = true;
@@ -700,8 +693,8 @@ void maybeAddChestPressureTraps(int x, int y, Random &rnd, World &world)
         return;
     }
     Point loc = rnd.select(locations);
-    placePressurePlate(loc.first, loc.second, true, world);
-    addChestTraps(loc.first, loc.second, rnd, world);
+    placePressurePlate(loc.x, loc.y, true, world);
+    addChestTraps(loc.x, loc.y, rnd, world);
 }
 
 Point selectDetonatorLocation(int x, int y, World &world)
@@ -745,21 +738,14 @@ void addOreTraps(std::vector<Point> &&locations, Random &rnd, World &world)
         }
         Point detonator = selectDetonatorLocation(x, y, world);
         Tile &tile = world.getTile(x, y - 1);
-        if (detonator.first == -1 || tile.blockID != TileID::empty ||
+        if (detonator.x == -1 || tile.blockID != TileID::empty ||
             isLocationUsed(x, y, 40, usedLocations)) {
             continue;
         }
         usedLocations.emplace_back(x, y);
         tile.blockID = TileID::explosives;
-        world.placeFramedTile(
-            detonator.first,
-            detonator.second,
-            TileID::detonator);
-        placeWire(
-            {x, y - 1},
-            {detonator.first, detonator.second + 1},
-            Wire::red,
-            world);
+        world.placeFramedTile(detonator.x, detonator.y, TileID::detonator);
+        placeWire({x, y - 1}, {detonator.x, detonator.y + 1}, Wire::red, world);
         --numTraps;
         if (numTraps < 0) {
             break;

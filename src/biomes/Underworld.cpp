@@ -49,13 +49,8 @@ void identifyGroup(
         return;
     }
     itr->second.second = group;
-    for (auto delta : {std::pair{0, 1}, {0, -1}, {1, 0}, {-1, 0}}) {
-        identifyGroup(
-            addPts(dest, delta),
-            group,
-            groundedGroups,
-            bridgeData,
-            world);
+    for (auto delta : {Point{0, 1}, {0, -1}, {1, 0}, {-1, 0}}) {
+        identifyGroup(dest + delta, group, groundedGroups, bridgeData, world);
     }
 }
 
@@ -113,15 +108,13 @@ void addBridges(int centerLevel, int lavaLevel, Random &rnd, World &world)
             continue;
         }
         Tile &tile = world.getTile(dest);
-        Tile &bridgeTile =
-            bridge.getTile(source.first.first, source.first.second);
-        copyTemplateTile(bridgeTile, tile, dest.first, dest.second, rnd);
-        tile.guarded = dest.second < lavaLevel;
+        Tile &bridgeTile = bridge.getTile(source.first.x, source.first.y);
+        copyTemplateTile(bridgeTile, tile, dest.x, dest.y, rnd);
+        tile.guarded = dest.y < lavaLevel;
         if (bridgeTile.blockID == TileID::lamp) {
             int offset = (bridgeTile.frameY % 54) / 18;
             for (int j = 0; j < 4; ++j) {
-                if (!bridgeData.contains(
-                        {dest.first, dest.second + j - offset})) {
+                if (!bridgeData.contains({dest.x, dest.y + j - offset})) {
                     tile.blockID = TileID::empty;
                     tile.frameX = 0;
                     tile.frameY = 0;

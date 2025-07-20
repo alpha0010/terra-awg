@@ -12,15 +12,13 @@
 #include <map>
 #include <set>
 
-typedef std::pair<int, int> Point;
-
 template <typename T> constexpr int getOrKey(const T &data, int key)
 {
     auto itr = data.find(key);
     return itr == data.end() ? key : itr->second;
 }
 
-Point makeHall(int x, int y, int steps, Point delta, World &world)
+std::pair<int, int> makeHall(int x, int y, int steps, Point delta, World &world)
 {
     constexpr auto accent1 = frozen::make_map<int, int>(
         {{WallID::Safe::sandstoneBrick, WallID::Safe::smoothSandstone},
@@ -37,7 +35,7 @@ Point makeHall(int x, int y, int steps, Point delta, World &world)
          TileID::ebonstoneBrick,
          TileID::crimstoneBrick,
          TileID::pearlstoneBrick});
-    for (; steps > 0; --steps, x += delta.first, y += delta.second) {
+    for (; steps > 0; --steps, x += delta.x, y += delta.y) {
         for (int j = 0; j < 7; ++j) {
             Tile &tile = world.getTile(x, y + j);
             if (validBlocks.contains(tile.blockID)) {
@@ -53,7 +51,7 @@ Point makeHall(int x, int y, int steps, Point delta, World &world)
     return {x, y};
 }
 
-Point fillTreasureRoom(int x, int y, Random &rnd, World &world)
+std::pair<int, int> fillTreasureRoom(int x, int y, Random &rnd, World &world)
 {
     TileBuffer treasureRoom =
         Data::getRoom(rnd.select(Data::pyramidRooms), world.getFramedTiles());
@@ -238,7 +236,7 @@ void genPyramid(Random &rnd, World &world)
          TileID::pinkBrick,
          TileID::meteorite});
     while (std::abs(x - world.surfaceEvilCenter) < 1.5 * size ||
-           std::abs(x - world.spawn.first) < 2 * size ||
+           std::abs(x - world.spawn.x) < 2 * size ||
            !world.regionPasses(
                x - size,
                world.getSurfaceLevel(x),
@@ -323,7 +321,7 @@ void genPyramid(Random &rnd, World &world)
     x -= 3;
     ++y;
     Point cave = findLinkingCave(x, y, world);
-    if (cave.first != -1 && cave.second > y + 2) {
+    if (cave.x != -1 && cave.y > y + 2) {
         constexpr auto clearTiles = frozen::make_set<int>(
             {TileID::sand,
              TileID::hardenedSand,
@@ -337,8 +335,8 @@ void genPyramid(Random &rnd, World &world)
              TileID::pearlsand,
              TileID::hardenedPearlsand,
              TileID::pearlsandstone});
-        double aspect = static_cast<double>(cave.first - x) / (cave.second - y);
-        for (int j = 0; y + j < cave.second; ++j) {
+        double aspect = static_cast<double>(cave.x - x) / (cave.y - y);
+        for (int j = 0; y + j < cave.y; ++j) {
             int minI = aspect * j - 3 + 4 * rnd.getFineNoise(0, j);
             int maxI = aspect * j + 3 + 4 * rnd.getFineNoise(x, j);
             for (int i = minI; i < maxI; ++i) {

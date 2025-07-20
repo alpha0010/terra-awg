@@ -1,12 +1,10 @@
 #ifndef GEMGROVE_H
 #define GEMGROVE_H
 
-#include <utility>
+#include "Point.h"
 
 class World;
 class Random;
-
-typedef std::pair<int, int> Point;
 
 void genGemGrove(Random &rnd, World &world);
 Point selectGemGroveLocation(double &groveSize, Random &rnd, World &world);

@@ -10,8 +10,6 @@
 #include "vendor/frozen/set.h"
 #include <iostream>
 
-typedef std::pair<int, int> Point;
-
 Point selectBoatLocation(int width, int height, Random &rnd, World &world)
 {
     int minX = world.conf.patches

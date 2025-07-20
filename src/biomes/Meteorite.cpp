@@ -79,7 +79,7 @@ void genMeteorite(Random &rnd, World &world)
     std::cout << "Bombarding surface\n";
     rnd.shuffleNoise();
     std::array avoidPoints{
-        world.spawn.first,
+        world.spawn.x,
         world.surfaceEvilCenter,
         computeDungeonCenter(world),
     };
@@ -97,8 +97,7 @@ void genMeteorite(Random &rnd, World &world)
         if (x == -1) {
             continue;
         }
-        int y = scanWhileEmpty({x, world.getSurfaceLevel(x)}, {0, 1}, world)
-                    .second +
+        int y = scanWhileEmpty({x, world.getSurfaceLevel(x)}, {0, 1}, world).y +
                 rnd.getInt(-1, 5);
         int numEmpty = 0;
         if (y < world.getUndergroundLevel() &&

@@ -47,12 +47,11 @@ void fillGlowingMossHex(
             if (tile.blockID == TileID::dirt || tile.blockID == TileID::stone) {
                 Point centroid = getHexCentroid(pt, 6);
                 if (std::max(
-                        std::abs(rnd.getBlurNoise(
-                            5 * centroid.first,
-                            5 * centroid.second)),
-                        std::abs(rnd.getBlurNoise(
-                            7 * centroid.first,
-                            7 * centroid.second))) > 0.6) {
+                        std::abs(
+                            rnd.getBlurNoise(5 * centroid.x, 5 * centroid.y)),
+                        std::abs(
+                            rnd.getBlurNoise(7 * centroid.x, 7 * centroid.y))) >
+                    0.6) {
                     tile.blockID = TileID::empty;
                 }
             }
@@ -75,8 +74,7 @@ void fillGlowingMossHex(
                 tile.wallID = itr->second;
             }
             if (tile.blockID == TileID::stone && tile.flag != Flag::hive &&
-                tile.flag != Flag::crispyHoney &&
-                world.isExposed(pt.first, pt.second)) {
+                tile.flag != Flag::crispyHoney && world.isExposed(pt.x, pt.y)) {
                 tile.blockID = mossType;
                 mossLocations.push_back(pt);
             }

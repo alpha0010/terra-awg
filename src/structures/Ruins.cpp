@@ -270,12 +270,9 @@ public:
             }
         }
         std::erase_if(queuedPlatforms, [this](const auto &pt) {
-            return world.getTile(pt.first, pt.second - 1).blockID !=
-                       TileID::empty ||
-                   world.getTile(pt.first, pt.second).blockID ==
-                       TileID::empty ||
-                   world.getTile(pt.first, pt.second + 1).blockID !=
-                       TileID::empty;
+            return world.getTile(pt.x, pt.y - 1).blockID != TileID::empty ||
+                   world.getTile(pt).blockID == TileID::empty ||
+                   world.getTile(pt.x, pt.y + 1).blockID != TileID::empty;
         });
         for (auto [x, y] : queuedPlatforms) {
             if (queuedPlatforms.contains({x - 1, y}) ||
@@ -329,7 +326,7 @@ void genRuins(Random &rnd, World &world)
     std::vector<Point> usedLocations;
     for (; locItr != locations.end(); ++locItr) {
         auto [x, y] = *locItr;
-        y = scanWhileEmpty({x, y}, {0, -1}, world).second;
+        y = scanWhileEmpty({x, y}, {0, -1}, world).y;
         if (windowStyle == Data::Window::square) {
             ++y;
         }
@@ -425,7 +422,7 @@ void genRuins(Random &rnd, World &world)
     for (; locItr != locations.end(); ++locItr) {
         auto [x, y] = *locItr;
         auto [width, height] = world.getPaintingDims(*paintingItr);
-        y = scanWhileNotSolid({x, y}, {0, -1}, world).second + 1;
+        y = scanWhileNotSolid({x, y}, {0, -1}, world).y + 1;
         if (!world.regionPasses(
                 x,
                 y,
@@ -456,7 +453,7 @@ void genRuins(Random &rnd, World &world)
     usedLocations.clear();
     for (; locItr != locations.end() && numPlacements > 0; ++locItr) {
         auto [x, y] = *locItr;
-        y = scanWhileNotSolid({x, y}, {0, 1}, world).second - 1;
+        y = scanWhileNotSolid({x, y}, {0, 1}, world).y - 1;
         if (!world.regionPasses(
                 x,
                 y,
@@ -486,7 +483,7 @@ void genRuins(Random &rnd, World &world)
          rItr != locations.rend() && numPlacements > 0;
          ++rItr) {
         auto [x, y] = *rItr;
-        y = scanWhileNotSolid({x, y}, {0, 1}, world).second - 1;
+        y = scanWhileNotSolid({x, y}, {0, 1}, world).y - 1;
         if (!world.regionPasses(
                 x,
                 y,
@@ -513,7 +510,7 @@ void genRuins(Random &rnd, World &world)
     usedLocations.clear();
     for (; locItr != locations.end() && numPlacements > 0; ++locItr) {
         auto [x, y] = *locItr;
-        y = scanWhileNotSolid({x, y}, {0, 1}, world).second - 1;
+        y = scanWhileNotSolid({x, y}, {0, 1}, world).y - 1;
         if (!world.regionPasses(
                 x,
                 y,

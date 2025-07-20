@@ -79,10 +79,10 @@ void placeGroveDecoGems(Random &rnd, World &world)
     std::vector<Point> rawLocations;
     for (int i = -groveSize; i < groveSize; ++i) {
         for (int j = -groveSize; j < groveSize; ++j) {
-            if (world.getTile(addPts(world.gemGrove, {i, j})).blockID ==
+            if (world.getTile(world.gemGrove + Point{i, j}).blockID ==
                     TileID::empty &&
                 std::hypot(i, j) < groveSize) {
-                rawLocations.push_back(addPts(world.gemGrove, {i, j}));
+                rawLocations.push_back(world.gemGrove + Point{i, j});
             }
         }
     }
@@ -123,8 +123,8 @@ void placeGemChest(Random &rnd, World &world)
                 j = -j;
             }
             if (world.regionPasses(
-                    world.gemGrove.first + i,
-                    world.gemGrove.second + j - 1,
+                    world.gemGrove.x + i,
+                    world.gemGrove.y + j - 1,
                     2,
                     3,
                     [](Tile &tile) {
@@ -132,14 +132,14 @@ void placeGemChest(Random &rnd, World &world)
                                tile.liquid == Liquid::none;
                     }) &&
                 world.regionPasses(
-                    world.gemGrove.first + i,
-                    world.gemGrove.second + j + 2,
+                    world.gemGrove.x + i,
+                    world.gemGrove.y + j + 2,
                     2,
                     1,
                     [](Tile &tile) { return tile.blockID == TileID::stone; })) {
                 Chest &chest = world.placeChest(
-                    world.gemGrove.first + i,
-                    world.gemGrove.second + j,
+                    world.gemGrove.x + i,
+                    world.gemGrove.y + j,
                     Variant::crystal);
                 fillCrystalChest(chest, rnd, world);
                 return;

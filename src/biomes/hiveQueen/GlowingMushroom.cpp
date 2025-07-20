@@ -25,7 +25,7 @@ void fillMushroomFieldHex(
         [&](Point pt) {
             auto coarseHexNoise = [&rnd](int x, int y) {
                 Point centroid = getHexCentroid(x, y, 10);
-                return rnd.getCoarseNoise(centroid.first, centroid.second);
+                return rnd.getCoarseNoise(centroid.x, centroid.y);
             };
             auto [x, y] = pt;
             Tile &tile = world.getTile(x, y);

@@ -54,9 +54,9 @@ void embedWaterfalls(
 {
     std::set<int> blocks{allowedBlocks.begin(), allowedBlocks.end()};
     std::vector<std::tuple<int, int, int>> waterSources;
-    for (int y = from.second; y < to.second; ++y) {
+    for (int y = from.y; y < to.y; ++y) {
         int state = 0;
-        for (int x = from.first; x < to.first; ++x) {
+        for (int x = from.x; x < to.x; ++x) {
             Tile &tile = world.getTile(x, y);
             int nextState = tile.blockID != TileID::empty ? -1
                             : tile.liquid != Liquid::none ? 0
@@ -103,9 +103,9 @@ void embedWaterfalls(
 
 void fillLargeWallGaps(Point from, Point to, Random &rnd, World &world)
 {
-    int yMax = std::min(to.second, world.getUnderworldLevel());
-    for (int x = from.first; x < to.first; ++x) {
-        for (int y = from.second; y < yMax; ++y) {
+    int maxY = std::min(to.y, world.getUnderworldLevel());
+    for (int x = from.x; x < to.x; ++x) {
+        for (int y = from.y; y < maxY; ++y) {
             Tile &tile = world.getTile(x, y);
             if (tile.wallID == WallID::empty && rnd.getFineNoise(x, y) < 0.55) {
                 // Most biome generation code coverts dirt walls to biome
@@ -176,7 +176,7 @@ Point findStoneCave(int yMin, int yMax, Random &rnd, World &world, int minSize)
 
 Point getHexCentroid(Point pt, int scale)
 {
-    return getHexCentroid(pt.first, pt.second, scale);
+    return getHexCentroid(pt.x, pt.y, scale);
 }
 
 Point getHexCentroid(int x, int y, int scale)
@@ -280,15 +280,15 @@ void iterateZone(
     while (!locations.empty()) {
         Point loc = locations.back();
         locations.pop_back();
-        if (loc.first < 0 || loc.second < 0 || loc.first >= world.getWidth() ||
-            loc.second >= world.getWidth() || visited.contains(loc) ||
+        if (loc.x < 0 || loc.y < 0 || loc.x >= world.getWidth() ||
+            loc.y >= world.getHeight() || visited.contains(loc) ||
             border.contains(loc)) {
             continue;
         }
         if (isValid(loc)) {
             visited.insert(loc);
-            for (auto delta : {std::pair{-1, 0}, {1, 0}, {0, -1}, {0, 1}}) {
-                locations.push_back(addPts(loc, delta));
+            for (auto delta : {Point{-1, 0}, {1, 0}, {0, -1}, {0, 1}}) {
+                locations.push_back(loc + delta);
             }
         } else {
             border.insert(loc);

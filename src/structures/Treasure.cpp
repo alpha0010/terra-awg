@@ -338,9 +338,7 @@ Point selectPurityAltarLocation(
         }
         int y = lavaLevel;
         for (int i : {1, 2, altar.getWidth() - 3, altar.getWidth() - 2}) {
-            y = std::min(
-                y,
-                scanWhileEmpty({x + i, scanY}, {0, 1}, world).second);
+            y = std::min(y, scanWhileEmpty({x + i, scanY}, {0, 1}, world).y);
         }
         y += 2 - altar.getHeight();
         return {x, y};
@@ -430,8 +428,8 @@ void placePurityAltars(Random &rnd, World &world)
         }
         if (world.conf.hardmode && iter % 4 != 0) {
             auto delta = scanForAltarOffset(altar);
-            x += delta.first;
-            y += delta.second;
+            x += delta.x;
+            y += delta.y;
             int paint = world.getTile(x, y).frameX == 0 ? Paint::purple
                                                         : Paint::deepRed;
             world.placeFramedTile(x, y, TileID::largePileGroup2, Variant::ash);
@@ -903,7 +901,7 @@ Variant getChestType(int x, int y, World &world)
 
 void placeStarterChest(Random &rnd, World &world)
 {
-    int centerX = world.spawn.first;
+    int centerX = world.spawn.x;
     for (int iSwap = 0; iSwap < 20; ++iSwap) {
         int x = iSwap % 2 == 0 ? centerX - iSwap / 2 : centerX + iSwap / 2;
         int surfaceLevel = world.getSurfaceLevel(x);

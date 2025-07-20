@@ -130,14 +130,14 @@ planTrackAt(int x, int y, double lengthScale, Random &rnd, World &world)
     int maxY = 0.2 * world.getHeight() + 0.8 * world.getUnderworldLevel();
     std::vector<Point> track;
     for (int i = 0; i < maxLen; ++i) {
-        double noise = rnd.getCoarseNoise(pos.first, pos.second);
-        delta.second = noise > 0.2 ? 1 : noise < -0.2 ? -1 : 0;
-        pos = addPts(pos, delta);
-        if (pos.first < 50 || pos.first > world.getWidth() - 50 ||
-            pos.second < minY || pos.second > maxY ||
+        double noise = rnd.getCoarseNoise(pos.x, pos.y);
+        delta.y = noise > 0.2 ? 1 : noise < -0.2 ? -1 : 0;
+        pos += delta;
+        if (pos.x < 50 || pos.x > world.getWidth() - 50 || pos.y < minY ||
+            pos.y > maxY ||
             !world.regionPasses(
-                pos.first,
-                pos.second - 10,
+                pos.x,
+                pos.y - 10,
                 1,
                 12,
                 [](Tile &tile) {
@@ -145,14 +145,9 @@ planTrackAt(int x, int y, double lengthScale, Random &rnd, World &world)
                            (!tile.actuator || tile.blockID != TileID::sand) &&
                            canTrackClearTile(tile);
                 }) ||
-            !world.regionPasses(
-                pos.first,
-                pos.second + 1,
-                1,
-                20,
-                [](Tile &tile) {
-                    return tile.blockID != TileID::minecartTrack;
-                })) {
+            !world.regionPasses(pos.x, pos.y + 1, 1, 20, [](Tile &tile) {
+                return tile.blockID != TileID::minecartTrack;
+            })) {
             break;
         }
         track.push_back(pos);
@@ -161,7 +156,7 @@ planTrackAt(int x, int y, double lengthScale, Random &rnd, World &world)
         return {};
     }
     track.resize(track.size() - rnd.getInt(4, 10));
-    if (delta.first == -1) {
+    if (delta.x == -1) {
         std::reverse(track.begin(), track.end());
     }
     return track;
@@ -260,7 +255,7 @@ void applyTrackSupport(int x, int y, World &world)
     if (x % 7 != 0 || world.getTile(x, y + 1).blockID != TileID::empty) {
         return;
     }
-    int supFloor = scanWhileEmpty({x, y + 1}, {0, 1}, world).second;
+    int supFloor = scanWhileEmpty({x, y + 1}, {0, 1}, world).y;
     ++supFloor;
     if (supFloor - y < 4 || supFloor - y > 24 ||
         !canTrackClearTile(world.getTile(x, supFloor))) {
@@ -279,7 +274,7 @@ void clearTrackHex(Point centroid, World &world)
         world,
         [centroid](Point pt) { return getHexCentroid(pt, 10) == centroid; },
         [&world](Point pt) {
-            Tile &prevTile = world.getTile(pt.first, pt.second - 1);
+            Tile &prevTile = world.getTile(pt.x, pt.y - 1);
             if (!canTrackClearTile(prevTile) &&
                 prevTile.blockID != TileID::minecartTrack &&
                 prevTile.blockID != TileID::platform) {
@@ -292,8 +287,8 @@ void clearTrackHex(Point centroid, World &world)
             }
         });
     for (int i = -10; i < 10; ++i) {
-        applyTrackGrass(centroid.first + i, centroid.second, world);
-        applyTrackGrass(centroid.first + i, centroid.second + 10, world);
+        applyTrackGrass(centroid.x + i, centroid.y, world);
+        applyTrackGrass(centroid.x + i, centroid.y + 10, world);
     }
 }
 
@@ -320,7 +315,7 @@ void genTracks(Random &rnd, World &world)
             continue;
         }
         Mode prevMode = Mode::none;
-        int noiseRow = track.front().second;
+        int noiseRow = track.front().y;
         std::set<Point> clearedHexes;
         for (size_t idx = 0; idx < track.size(); ++idx) {
             auto [x, y] = track[idx];
@@ -333,8 +328,7 @@ void genTracks(Random &rnd, World &world)
             }
             if (world.conf.hiveQueen) {
                 Point centroid = getHexCentroid(x, y - height, 10);
-                if (!clearedHexes.contains(centroid) &&
-                    centroid.second + 4 < y) {
+                if (!clearedHexes.contains(centroid) && centroid.y + 4 < y) {
                     clearTrackHex(centroid, world);
                     clearedHexes.insert(centroid);
                 }
@@ -352,10 +346,10 @@ void genTracks(Random &rnd, World &world)
             }
             tile.blockID = TileID::minecartTrack;
             tile.blockPaint = Paint::none;
-            Mode mode = idx + 2 == track.size()     ? Mode::none
-                        : y > track[idx + 1].second ? Mode::asc
-                        : y < track[idx + 1].second ? Mode::desc
-                                                    : Mode::flat;
+            Mode mode = idx + 2 == track.size() ? Mode::none
+                        : y > track[idx + 1].y  ? Mode::asc
+                        : y < track[idx + 1].y  ? Mode::desc
+                                                : Mode::flat;
             switch (prevMode) {
             case Mode::none:
                 tile.frameX = mode == Mode::asc    ? Track::ascEndLeft

@@ -12,8 +12,6 @@
 #include <numbers>
 #include <set>
 
-typedef std::pair<double, double> Pointf;
-
 int levitateIsland(int center, int width, Random &rnd, World &world)
 {
     int yMin = 0.45 * world.getUndergroundLevel();
@@ -59,8 +57,8 @@ bool drawMahoganySegment(Pointf from, Pointf to, double width, World &world)
 {
     std::set<Point> fillTiles;
     for (double t = 0; t <= 1; t += 0.1) {
-        double centerX = std::lerp(from.first, to.first, t);
-        double centerY = std::lerp(from.second, to.second, t);
+        double centerX = std::lerp(from.x, to.x, t);
+        double centerY = std::lerp(from.y, to.y, t);
         for (int x = centerX - width; x < centerX + width; ++x) {
             for (int y = centerY - width; y < centerY + width; ++y) {
                 if (std::hypot(x - centerX, y - centerY) < width) {
@@ -93,19 +91,18 @@ void growMahoganyVine(
         return;
     }
     angle += std::clamp(
-        1.8 * rnd.getFineNoise(from.first, from.second),
+        1.8 * rnd.getFineNoise(from.x, from.y),
         -std::numbers::pi / 3,
         std::numbers::pi / 3);
     Pointf to{
-        from.first + 3.9 * weight * std::cos(angle),
-        from.second + 3.9 * weight * std::sin(angle)};
+        from.x + 3.9 * weight * std::cos(angle),
+        from.y + 3.9 * weight * std::sin(angle)};
     bool crossedSegment = drawMahoganySegment(from, to, weight, world);
     if (crossedSegment && weight < 1.9) {
         return;
     }
     growMahoganyVine(to, rnd.getDouble(0.97, 0.98) * weight, angle, rnd, world);
-    switch (static_cast<int>(
-                99999 * (1 + rnd.getFineNoise(from.first, from.second))) %
+    switch (static_cast<int>(99999 * (1 + rnd.getFineNoise(from.x, from.y))) %
             11) {
     case 0:
         growMahoganyVine(
@@ -126,10 +123,10 @@ void growMahoganyVine(
     case 2:
     case 3:
     case 4:
-        for (int x = from.first - 6; x < from.first + 6; ++x) {
-            for (int y = from.second - 6; y < from.second + 6; ++y) {
+        for (int x = from.x - 6; x < from.x + 6; ++x) {
+            for (int y = from.y - 6; y < from.y + 6; ++y) {
                 Tile &tile = world.getTile(x, y);
-                double threshold = hypotPts(from, {x, y}) / 3 - 1;
+                double threshold = hypot(from, {x, y}) / 3 - 1;
                 if (tile.blockID == TileID::empty &&
                     rnd.getFineNoise(x, y) > threshold) {
                     tile.blockID = TileID::mahoganyLeaf;

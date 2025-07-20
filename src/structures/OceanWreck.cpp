@@ -16,7 +16,7 @@ bool tryPlaceWreck(int x, int y, TileBuffer &wreck, World &world)
     int rightX = x + wreck.getWidth() - 1;
     int surfaceRight =
         scanWhileEmpty({rightX, world.getSurfaceLevel(rightX)}, {0, 1}, world)
-            .second +
+            .y +
         1;
     constexpr auto clearableTiles = frozen::make_set<int>(
         {TileID::empty, TileID::sand, TileID::coralstone, TileID::honey});
@@ -66,7 +66,7 @@ void genOceanWreck(Random &rnd, World &world)
             if (tryPlaceWreck(
                     x,
                     scanWhileEmpty({x, world.getSurfaceLevel(x)}, {0, 1}, world)
-                            .second +
+                            .y +
                         1,
                     wreck,
                     world)) {

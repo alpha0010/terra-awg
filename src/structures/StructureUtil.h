@@ -1,12 +1,12 @@
 #ifndef STRUCTUREUTIL_H
 #define STRUCTUREUTIL_H
 
+#include "Point.h"
 #include <map>
 #include <vector>
 
 class World;
 
-typedef std::pair<int, int> Point;
 typedef std::map<int, std::vector<Point>> LocationBins;
 
 enum class Wire { red = 0, blue, green, yellow };
@@ -21,12 +21,6 @@ bool isLocationUsed(
     int maxCount = 1);
 
 bool isSolidBlock(int tileId);
-
-double hypotPts(Point a, Point b);
-
-Point addPts(Point a, Point b);
-
-Point subPts(Point a, Point b);
 
 Point scanWhileEmpty(Point from, Point delta, World &world);
 

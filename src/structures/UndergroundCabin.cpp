@@ -35,7 +35,7 @@ void applySupportBeam(int x, int y, World &world)
     if (world.getTile(x, y).blockID != TileID::empty) {
         return;
     }
-    int supFloor = scanWhileEmpty({x, y}, {0, 1}, world).second;
+    int supFloor = scanWhileEmpty({x, y}, {0, 1}, world).y;
     ++supFloor;
     if (supFloor - y < 2 || supFloor - y > 24 ||
         !cabinClearTiles.contains(world.getTile(x, supFloor).blockID)) {
@@ -258,7 +258,7 @@ void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
         break;
     }
     addCabinDebris(locations, world);
-    if (trap.first != -1 && rnd.getDouble(0, 1) < 0.2 * world.conf.traps) {
+    if (trap.x != -1 && rnd.getDouble(0, 1) < 0.2 * world.conf.traps) {
         world.queuedTraps.emplace_back(
             [chestX, chestY, trap](Random &, World &world) {
                 world.placeFramedTile(

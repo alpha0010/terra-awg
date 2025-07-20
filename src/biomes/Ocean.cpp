@@ -86,8 +86,8 @@ void addOceanCave(int waterTable, Random &rnd, World &world)
     std::vector<Point> locations;
     int centerX = world.oceanCaveCenter;
     int oceanFloor =
-        scanWhileEmpty({centerX - 90, waterTable}, {0, 1}, world).second;
-    int minY = scanWhileEmpty({centerX + 90, waterTable}, {0, 1}, world).second;
+        scanWhileEmpty({centerX - 90, waterTable}, {0, 1}, world).y;
+    int minY = scanWhileEmpty({centerX + 90, waterTable}, {0, 1}, world).y;
     if (minY > oceanFloor) {
         std::swap(minY, oceanFloor);
     }

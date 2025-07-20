@@ -14,8 +14,6 @@
 #include <iostream>
 #include <numbers>
 
-typedef std::pair<double, double> Pointf;
-
 void drawRect(
     Pointf topLeft,
     Pointf bottomRight,
@@ -24,12 +22,12 @@ void drawRect(
     std::vector<Point> &treeTiles,
     World &world)
 {
-    int width = bottomRight.first - topLeft.first;
-    int height = bottomRight.second - topLeft.second;
+    int width = bottomRight.x - topLeft.x;
+    int height = bottomRight.y - topLeft.y;
     for (int i = 0; i < width; ++i) {
         for (int j = 0; j < height; ++j) {
-            int x = topLeft.first + i + skewX * j;
-            int y = topLeft.second + j + skewY * i;
+            int x = topLeft.x + i + skewX * j;
+            int y = topLeft.y + j + skewY * i;
             Tile &tile = world.getTile(x, y);
             tile.blockID = TileID::livingWood;
             tile.wallID = WallID::Unsafe::livingWood;
@@ -45,28 +43,28 @@ void drawLine(
     std::vector<Point> &treeTiles,
     World &world)
 {
-    double deltaX = std::abs(to.first - from.first);
-    double deltaY = std::abs(to.second - from.second);
+    double deltaX = std::abs(to.x - from.x);
+    double deltaY = std::abs(to.y - from.y);
     if (deltaY > deltaX) {
-        if (from.second > to.second) {
+        if (from.y > to.y) {
             std::swap(from, to);
         }
         drawRect(
-            {std::floor(from.first - width), std::floor(from.second)},
-            {std::ceil(from.first + width), std::ceil(to.second)},
-            (to.first - from.first) / deltaY,
+            {std::floor(from.x - width), std::floor(from.y)},
+            {std::ceil(from.x + width), std::ceil(to.y)},
+            (to.x - from.x) / deltaY,
             0,
             treeTiles,
             world);
     } else {
-        if (from.first > to.first) {
+        if (from.x > to.x) {
             std::swap(from, to);
         }
         drawRect(
-            {std::floor(from.first), std::floor(from.second - width)},
-            {std::ceil(to.first), std::ceil(from.second + width)},
+            {std::floor(from.x), std::floor(from.y - width)},
+            {std::ceil(to.x), std::ceil(from.y + width)},
             0,
-            (to.second - from.second) / deltaX,
+            (to.y - from.y) / deltaX,
             treeTiles,
             world);
     }
@@ -79,13 +77,13 @@ void growLeaves(
     std::vector<Point> &treeTiles,
     World &world)
 {
-    int minX = std::floor(std::min(from.first, to.first) - leafSpan);
-    int maxX = std::ceil(std::max(from.first, to.first) + leafSpan);
-    int minY = std::floor(std::min(from.second, to.second) - leafSpan);
-    int maxY = std::ceil(std::max(from.second, to.second) + leafSpan);
+    int minX = std::floor(std::min(from.x, to.x) - leafSpan);
+    int maxX = std::ceil(std::max(from.x, to.x) + leafSpan);
+    int minY = std::floor(std::min(from.y, to.y) - leafSpan);
+    int maxY = std::ceil(std::max(from.y, to.y) + leafSpan);
     for (int x = minX; x < maxX; ++x) {
         for (int y = minY; y < maxY; ++y) {
-            if (hypotPts(from, {x, y}) + hypotPts(to, {x, y}) < 2 * leafSpan) {
+            if (hypot(from, {x, y}) + hypot(to, {x, y}) < 2 * leafSpan) {
                 Tile &tile = world.getTile(x, y);
                 if (tile.blockID == TileID::empty) {
                     tile.blockID = TileID::leaf;
@@ -111,8 +109,8 @@ void growBranch(
     }
     angle = (3 * angle - std::numbers::pi / 2) / 4;
     Pointf to{
-        from.first + stretch * weight * std::cos(angle),
-        from.second + stretch * weight * std::sin(angle)};
+        from.x + stretch * weight * std::cos(angle),
+        from.y + stretch * weight * std::sin(angle)};
     drawLine(from, to, weight / 2, treeTiles, world);
     if (weight < 2.3) {
         growLeaves(from, to, std::max(5.5, 4 * weight), treeTiles, world);
@@ -171,8 +169,8 @@ void growRoot(
     }
     angle = (4 * angle + std::numbers::pi / 2) / 5;
     Pointf to{
-        from.first + 1.8 * weight * std::cos(angle),
-        from.second + 1.8 * weight * std::sin(angle)};
+        from.x + 1.8 * weight * std::cos(angle),
+        from.y + 1.8 * weight * std::sin(angle)};
     std::vector<Point> ignored;
     drawLine(from, to, weight / 2, ignored, world);
     if (rnd.getDouble(0, 1) < 0.6) {
@@ -376,7 +374,7 @@ void expireLivingTree(
         treeTiles.begin(),
         treeTiles.begin() + baseScan,
         treeTiles.end(),
-        [](auto &a, auto &b) { return a.second > b.second; });
+        [](auto &a, auto &b) { return a.y > b.y; });
     world.queuedEvil.emplace_back(
         [baseScan, treeTiles = std::move(treeTiles)](Random &, World &world) {
             int numCorrupt = 0;
@@ -459,7 +457,7 @@ void growLivingTrees(Random &rnd, World &world)
         int numTrees = world.conf.livingTrees * rnd.getDouble(3, 7);
         for (int x = partition - 25 * numTrees; numTrees > 0;
              x += rnd.getInt(45, 55), --numTrees) {
-            if (std::abs(x - world.spawn.first) < 25) {
+            if (std::abs(x - world.spawn.x) < 25) {
                 continue;
             }
             int y = world.getSurfaceLevel(x);

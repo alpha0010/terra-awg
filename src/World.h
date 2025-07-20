@@ -2,6 +2,7 @@
 #define WORLD_H
 
 #include "Chest.h"
+#include "Point.h"
 #include "Tile.h"
 #include "ids/Biome.h"
 #include "ids/TileVariant.h"
@@ -12,8 +13,6 @@
 struct Config;
 class Random;
 class TileBuffer;
-
-typedef std::pair<int, int> Point;
 
 enum class Blend { normal, blockOnly };
 
@@ -54,7 +53,7 @@ public:
     Tile &getTile(int x, int y);
     Tile &getTile(Point pt)
     {
-        return getTile(pt.first, pt.second);
+        return getTile(pt.x, pt.y);
     }
     BiomeData &getBiome(int x, int y);
     std::vector<Point> placeBuffer(

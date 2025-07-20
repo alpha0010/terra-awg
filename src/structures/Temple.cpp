@@ -35,7 +35,7 @@ template <typename Func> void iterateTemple(Point center, World &world, Func f)
         --stepCtrl;
         int endScanY = scanY - (((i + scanX) / 3) % 2);
         for (int j = startScanY; j < endScanY; ++j) {
-            if (!f(center.first + i, center.second + j)) {
+            if (!f(center.x + i, center.y + j)) {
                 return;
             }
         }
@@ -127,10 +127,9 @@ void clearTempleSurface(Point center, int scanDist, Random &rnd, World &world)
          TileID::goldOre,       TileID::platinumOre, TileID::cobaltOre,
          TileID::palladiumOre,  TileID::mythrilOre,  TileID::orichalcumOre,
          TileID::adamantiteOre, TileID::titaniumOre, TileID::chlorophyteOre});
-    for (int x = center.first - scanDist; x < center.first + scanDist; ++x) {
-        for (int y = center.second - scanDist; y < center.second + scanDist;
-             ++y) {
-            double threshold = 3 * hypotPts(center, {x, y}) / scanDist - 2;
+    for (int x = center.x - scanDist; x < center.x + scanDist; ++x) {
+        for (int y = center.y - scanDist; y < center.y + scanDist; ++y) {
+            double threshold = 3 * hypot(center, {x, y}) / scanDist - 2;
             Tile &tile = world.getTile(x, y);
             if (rnd.getFineNoise(x, y) > threshold) {
                 if (tile.blockID == TileID::lihzahrdBrick) {
@@ -149,26 +148,21 @@ void clearTempleSurface(Point center, int scanDist, Random &rnd, World &world)
     }
 }
 
-Point avgPoints(Point a, Point b)
-{
-    return {(a.first + b.first) / 2, (a.second + b.second) / 2};
-}
-
 void applyRoomConnection(Point from, Point to, int roomSize, World &world)
 {
-    if (from.first == to.first) {
-        int minY = std::min(from.second, to.second);
-        int maxY = std::max(from.second, to.second);
-        for (int x = from.first; x < from.first + roomSize; ++x) {
+    if (from.x == to.x) {
+        int minY = std::min(from.y, to.y);
+        int maxY = std::max(from.y, to.y);
+        for (int x = from.x; x < from.x + roomSize; ++x) {
             for (int y = minY + roomSize; y < maxY; ++y) {
                 world.getTile(x, y).blockID = TileID::empty;
             }
         }
     } else {
-        int minX = std::min(from.first, to.first);
-        int maxX = std::max(from.first, to.first);
+        int minX = std::min(from.x, to.x);
+        int maxX = std::max(from.x, to.x);
         for (int x = minX + roomSize; x < maxX; ++x) {
-            for (int y = from.second; y < from.second + roomSize; ++y) {
+            for (int y = from.y; y < from.y + roomSize; ++y) {
                 world.getTile(x, y).blockID = TileID::empty;
             }
         }
@@ -347,7 +341,7 @@ void addWallTrap(
     Random &rnd,
     World &world)
 {
-    if (!canPlaceTempleTreasureAt(pos.first, pos.second, world)) {
+    if (!canPlaceTempleTreasureAt(pos.x, pos.y, world)) {
         return;
     }
     auto [x, y] = pos;
@@ -356,11 +350,11 @@ void addWallTrap(
     for (int j = 0; j < 4; ++j) {
         for (int dir : {-1, 1}) {
             Point trap = scanWhileNotSolid({x, y - j}, {dir, 0}, world);
-            double dist = hypotPts(trap, {x, y});
+            double dist = hypot(trap, {x, y});
             if (dist > 1.5 && dist < 20 &&
-                world.getTile(trap.first + dir, trap.second).blockID ==
+                world.getTile(trap.x + dir, trap.y).blockID ==
                     TileID::lihzahrdBrick) {
-                traps.push_back({trap.first + dir, trap.second});
+                traps.push_back({trap.x + dir, trap.y});
             }
         }
     }
@@ -372,22 +366,22 @@ void addWallTrap(
     for (auto trap : traps) {
         placeWire(trap, {x, y}, static_cast<Wire>((x + y) % 4), world);
         world.placeFramedTile(
-            trap.first,
-            trap.second,
+            trap.x,
+            trap.y,
             TileID::trap,
-            trap.first > x ? trapLeft : trapRight);
+            trap.x > x ? trapLeft : trapRight);
     }
     world.placeFramedTile(x, y, TileID::pressurePlate, Variant::lihzahrd);
 }
 
 void addCeilingTrap(Point pos, Variant trapType, World &world)
 {
-    if (!canPlaceTempleTreasureAt(pos.first, pos.second, world)) {
+    if (!canPlaceTempleTreasureAt(pos.x, pos.y, world)) {
         return;
     }
     auto [x, y] = pos;
     --y;
-    int trapCeiling = scanWhileEmpty({x, y}, {0, -1}, world).second - 1;
+    int trapCeiling = scanWhileEmpty({x, y}, {0, -1}, world).y - 1;
     if (world.getTile(x, trapCeiling).blockID != TileID::lihzahrdBrick ||
         (trapType == Variant::spear && y - trapCeiling > 18)) {
         return;
@@ -453,29 +447,26 @@ void addTempleTraps(
 
 void addTempleSpikesAt(Point pos, Random &rnd, World &world)
 {
-    if (static_cast<int>(
-            99999 * (1 + rnd.getFineNoise(pos.first, pos.second))) %
-            150 !=
+    if (static_cast<int>(99999 * (1 + rnd.getFineNoise(pos.x, pos.y))) % 150 !=
         0) {
         return;
     }
-    Point delta = rnd.select({std::pair{1, 0}, {-1, 0}, {0, 1}, {0, -1}});
+    Point delta = rnd.select({Point{1, 0}, {-1, 0}, {0, 1}, {0, -1}});
     Point wall = scanWhileNotSolid(pos, delta, world);
-    Point incr = delta.first == 0 ? std::pair{1, 0} : std::pair{0, 1};
+    Point incr = delta.x == 0 ? Point{1, 0} : Point{0, 1};
     for (int t = 0; t < 4; ++t) {
-        wall = subPts(wall, incr);
+        wall -= incr;
     }
-    for (int t = 0; t < 9; ++t, wall = addPts(wall, incr)) {
+    for (int t = 0; t < 9; ++t, wall += incr) {
         if (world.getTile(wall).blockID != TileID::empty ||
-            world.getTile(addPts(wall, delta)).blockID !=
-                TileID::lihzahrdBrick) {
+            world.getTile(wall + delta).blockID != TileID::lihzahrdBrick) {
             continue;
         }
         world.getTile(wall).blockID = TileID::woodenSpike;
-        if ((wall.first + wall.second) % 2 == 0) {
-            world.getTile(addPts(wall, delta)).blockID = TileID::woodenSpike;
+        if ((wall.x + wall.y) % 2 == 0) {
+            world.getTile(wall + delta).blockID = TileID::woodenSpike;
         } else {
-            Tile &tile = world.getTile(subPts(wall, delta));
+            Tile &tile = world.getTile(wall - delta);
             if (tile.blockID == TileID::empty) {
                 tile.blockID = TileID::woodenSpike;
             }
@@ -519,7 +510,7 @@ void genTemple(Random &rnd, World &world)
     }
     std::cout << "Training acolytes\n";
     Point center = selectTempleCenter(testTempleSelection, rnd, world);
-    if (center.first < 100) {
+    if (center.x < 100) {
         return;
     }
     iterateTemple(center, world, [&world](int x, int y) {
@@ -534,11 +525,11 @@ void genTemple(Random &rnd, World &world)
     int roomSize = 7;
     int roomStep = roomSize + wallThickness;
     std::set<Point> rooms;
-    int modTargetX = center.first % roomStep;
-    int modTargetY = center.second % roomStep;
+    int modTargetX = center.x % roomStep;
+    int modTargetY = center.y % roomStep;
     int centerRoomX = 0;
     int maxRoomY = 0;
-    int minY = center.second;
+    int minY = center.y;
     iterateTemple(center, world, [&](int x, int y) {
         minY = std::min(y, minY);
         if (x % roomStep == modTargetX && y % roomStep == modTargetY &&
@@ -550,8 +541,7 @@ void genTemple(Random &rnd, World &world)
                 [](Tile &tile) {
                     return tile.wallID == WallID::Unsafe::lihzahrdBrick;
                 })) {
-            if (std::abs(x - center.first) <
-                std::abs(centerRoomX - center.first)) {
+            if (std::abs(x - center.x) < std::abs(centerRoomX - center.x)) {
                 centerRoomX = x;
             }
             maxRoomY = std::max(y, maxRoomY);
@@ -573,15 +563,15 @@ void genTemple(Random &rnd, World &world)
     std::vector<Point> junctions;
     while (connectedRooms.size() < rooms.size()) {
         std::vector<Point> choices;
-        for (auto [i, j] :
-             {std::pair{-roomStep, 0},
+        for (Point step :
+             {Point{-roomStep, 0},
               {roomStep, 0},
               {0, -roomStep},
               {0, roomStep}}) {
-            Point candidate = {agent.first + i, agent.second + j};
+            Point candidate = agent + step;
             if (rooms.contains(candidate) &&
                 (!connectedRooms.contains(candidate) ||
-                 connections.contains(avgPoints(agent, candidate)))) {
+                 connections.contains(agent + candidate))) {
                 choices.push_back(candidate);
             }
         }
@@ -597,7 +587,7 @@ void genTemple(Random &rnd, World &world)
             }
             Point next = rnd.select(choices);
             if (!connectedRooms.contains(next)) {
-                connections.insert(avgPoints(agent, next));
+                connections.insert(agent + next);
                 connectedRooms.insert(next);
                 applyRoomConnection(agent, next, roomSize, world);
             }
@@ -618,7 +608,7 @@ void genTemple(Random &rnd, World &world)
             world.getTile(x, y).blockID = TileID::empty;
         }
     }
-    addTempleEntry(center.first, minY, world);
+    addTempleEntry(center.x, minY, world);
     addDeadEndPlatforms(roomSize, rooms, world);
     world.placeFramedTile(
         centerRoomX + roomSize / 2 - 1,

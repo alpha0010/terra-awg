@@ -110,16 +110,16 @@ private:
         int dungeonWidth,
         std::vector<Point> &zones)
     {
-        int thresholdY = zones.front().second + roomSize;
+        int thresholdY = zones.front().y + roomSize;
         auto endItr = zones.begin();
-        while (endItr != zones.end() && endItr->second <= thresholdY) {
+        while (endItr != zones.end() && endItr->y <= thresholdY) {
             ++endItr;
         }
         std::sort(zones.begin(), endItr);
         int thresholdX = dungeonCenter - dungeonWidth / 5;
         endItr = zones.begin();
-        while (endItr != zones.end() && endItr->first < thresholdX &&
-               endItr->second <= thresholdY) {
+        while (endItr != zones.end() && endItr->x < thresholdX &&
+               endItr->y <= thresholdY) {
             ++endItr;
         }
         if (endItr != zones.begin()) {
@@ -134,13 +134,12 @@ private:
         double skewY,
         bool filled)
     {
-        int width = bottomRight.first - topLeft.first;
-        int height = bottomRight.second - topLeft.second;
+        auto [width, height] = bottomRight - topLeft;
         for (int i = 0; i < width; ++i) {
             for (int j = 0; j < height; ++j) {
                 Tile &tile = world.getTile(
-                    topLeft.first + i + skewX * j,
-                    topLeft.second + j + skewY * i);
+                    topLeft.x + i + skewX * j,
+                    topLeft.y + j + skewY * i);
                 tile.blockPaint = Paint::none;
                 if (i < wallThickness || j < wallThickness ||
                     width - i <= wallThickness || height - j <= wallThickness) {
@@ -189,9 +188,9 @@ private:
     Point getClosestPoint(int x, int y, const std::set<Point> &points)
     {
         Point closest = *points.begin();
-        double minDist = hypotPts(closest, {x, y});
+        double minDist = hypot(closest, {x, y});
         for (Point pt : points) {
-            double curDist = hypotPts(pt, {x, y});
+            double curDist = hypot(pt, {x, y});
             if (curDist < minDist) {
                 minDist = curDist;
                 closest = pt;
@@ -202,38 +201,37 @@ private:
 
     void makeHallway(Point from, Point to)
     {
-        int deltaX = std::abs(to.first - from.first);
-        int deltaY = std::abs(to.second - from.second);
-        bool filled =
-            std::min(from.second, to.second) > world.getCavernLevel() &&
-            rnd.getInt(0, 4) == 0;
+        int deltaX = std::abs(to.x - from.x);
+        int deltaY = std::abs(to.y - from.y);
+        bool filled = std::min(from.y, to.y) > world.getCavernLevel() &&
+                      rnd.getInt(0, 4) == 0;
         if (deltaY == 0 && !filled) {
             requestedDoors.emplace_back(
-                std::min(from.first, to.first) + 1 + roomSize / 2,
-                from.second - hallSize / 2);
+                std::min(from.x, to.x) + 1 + roomSize / 2,
+                from.y - hallSize / 2);
             requestedDoors.emplace_back(
-                std::max(from.first, to.first) - 2 - roomSize / 2,
-                from.second - hallSize / 2);
+                std::max(from.x, to.x) - 2 - roomSize / 2,
+                from.y - hallSize / 2);
         }
         if (deltaY > deltaX) {
-            if (from.second > to.second) {
+            if (from.y > to.y) {
                 std::swap(from, to);
             }
             drawRect(
-                {from.first - hallSize, from.second - hallSize},
-                {from.first + hallSize, to.second + hallSize},
-                (to.first - from.first) / (2.0 * hallSize + deltaY),
+                {from.x - hallSize, from.y - hallSize},
+                {from.x + hallSize, to.y + hallSize},
+                (to.x - from.x) / (2.0 * hallSize + deltaY),
                 0,
                 filled);
         } else {
-            if (from.first > to.first) {
+            if (from.x > to.x) {
                 std::swap(from, to);
             }
             drawRect(
-                {from.first - hallSize, from.second - hallSize},
-                {to.first + hallSize, from.second + hallSize},
+                {from.x - hallSize, from.y - hallSize},
+                {to.x + hallSize, from.y + hallSize},
                 0,
-                (to.second - from.second) / (2.0 * hallSize + deltaX),
+                (to.y - from.y) / (2.0 * hallSize + deltaX),
                 filled);
         }
     }
@@ -350,7 +348,7 @@ private:
         while (true) {
             auto [x, y] = rnd.select(zones);
             x += rnd.getInt(-6, 2);
-            y = scanWhileEmpty({x, y}, {0, 1}, world).second;
+            y = scanWhileEmpty({x, y}, {0, 1}, world).y;
             if (isValidPlacementLocation(x, y, 6, 5, true)) {
                 return {x, y};
             }
@@ -580,36 +578,33 @@ private:
         std::set<int> attachTiles{theme.brick, theme.crackedBrick};
         for (int numPatches = 0.7 * zones.size(); numPatches > 0;
              --numPatches) {
-            Point delta =
-                rnd.select({std::pair{1, 0}, {-1, 0}, {0, 1}, {0, -1}});
+            Point delta = rnd.select({Point{1, 0}, {-1, 0}, {0, 1}, {0, -1}});
             Point wall = scanWhileEmpty(rnd.select(zones), delta, world);
-            Point incr = delta.first == 0 ? std::pair{1, 0} : std::pair{0, 1};
+            Point incr = delta.x == 0 ? Point{1, 0} : Point{0, 1};
             int patchSize = rnd.getInt(0.15 * roomSize, 0.6 * roomSize);
-            Point patchIncr{patchSize * incr.first, patchSize * incr.second};
-            Point minPos = subPts(wall, patchIncr);
-            Point maxPos = addPts(wall, patchIncr);
+            Point patchIncr{patchSize * incr.x, patchSize * incr.y};
+            Point minPos = wall - patchIncr;
+            Point maxPos = wall + patchIncr;
             // Scan back for patch start.
             for (; wall > minPos &&
-                   attachTiles.contains(
-                       world.getTile(addPts(wall, delta)).blockID);
-                 wall = subPts(wall, incr)) {
+                   attachTiles.contains(world.getTile(wall + delta).blockID);
+                 wall -= incr) {
                 if (world.getTile(wall).blockID != TileID::empty) {
                     break;
                 }
             }
             // Apply spike patch.
-            for (wall = addPts(wall, incr);
+            for (wall += incr;
                  wall < maxPos &&
-                 attachTiles.contains(
-                     world.getTile(addPts(wall, delta)).blockID);
-                 wall = addPts(wall, incr)) {
+                 attachTiles.contains(world.getTile(wall + delta).blockID);
+                 wall += incr) {
                 Tile &tile = world.getTile(wall);
                 if (tile.blockID != TileID::empty) {
                     break;
                 }
                 tile.blockID = TileID::spike;
-                if ((wall.first + wall.second) % 2 == 0) {
-                    Tile &spikeTile = world.getTile(subPts(wall, delta));
+                if ((wall.x + wall.y) % 2 == 0) {
+                    Tile &spikeTile = world.getTile(wall - delta);
                     if (spikeTile.blockID == TileID::empty) {
                         spikeTile.blockID = TileID::spike;
                     }
@@ -663,11 +658,11 @@ private:
             for (int j = 0; j < 4; ++j) {
                 for (int dir : {-1, 1}) {
                     Point trap = scanWhileEmpty({x, y - j}, {dir, 0}, world);
-                    double dist = hypotPts(trap, {x, y});
+                    double dist = hypot(trap, {x, y});
                     if (dist > 3 && dist < 40 &&
-                        (world.getTile(trap.first, trap.second + 1).blockID ==
+                        (world.getTile(trap.x, trap.y + 1).blockID ==
                              theme.brick ||
-                         world.getTile(trap.first + dir, trap.second).blockID ==
+                         world.getTile(trap.x + dir, trap.y).blockID ==
                              theme.brick)) {
                         traps.push_back(trap);
                     }
@@ -681,10 +676,10 @@ private:
             for (auto trap : traps) {
                 placeWire(trap, {x, y}, Wire::red, world);
                 world.placeFramedTile(
-                    trap.first,
-                    trap.second,
+                    trap.x,
+                    trap.y,
                     TileID::trap,
-                    trap.first > x ? Variant::dartLeft : Variant::dartRight);
+                    trap.x > x ? Variant::dartLeft : Variant::dartRight);
             }
             Tile &tile = world.getTile(x, y);
             tile.blockID = TileID::pressurePlate;
@@ -781,7 +776,7 @@ private:
 
     void addLanternsFor(int x, int y, Variant lanternStyle)
     {
-        int ceiling = scanWhileNotSolid({x, y}, {0, -1}, world).second;
+        int ceiling = scanWhileNotSolid({x, y}, {0, -1}, world).y;
         if (y - ceiling > 16 ||
             !world.regionPasses(
                 x - 1,
@@ -976,7 +971,7 @@ private:
                 continue;
             }
             if (anchorTop && world.getTile(x + 1, y).blockID == TileID::empty) {
-                y = scanWhileNotSolid({x + 1, y}, {0, -1}, world).second - 1;
+                y = scanWhileNotSolid({x + 1, y}, {0, -1}, world).y - 1;
             } else if (
                 anchorBot &&
                 world.getTile(x + 1, y + data.getHeight() - 1).blockID ==
@@ -985,13 +980,12 @@ private:
                         {x + 1, y + data.getHeight() - 1},
                         {0, 1},
                         world)
-                        .second -
+                        .y -
                     data.getHeight() + 2;
             }
             if (anchorLeftAt != -1 &&
                 world.getTile(x, y + anchorLeftAt).blockID == TileID::empty) {
-                x = scanWhileNotSolid({x, y + anchorLeftAt}, {-1, 0}, world)
-                        .first -
+                x = scanWhileNotSolid({x, y + anchorLeftAt}, {-1, 0}, world).x -
                     1;
             } else if (
                 anchorRightAt != -1 &&
@@ -1001,7 +995,7 @@ private:
                         {x + data.getWidth() - 1, y + anchorRightAt},
                         {1, 0},
                         world)
-                        .first -
+                        .x -
                     data.getWidth() + 2;
             }
             if (canPlaceFurniture(x, y, data) &&
@@ -1044,7 +1038,7 @@ private:
     {
         int scanDist = 0.1 * world.getWidth();
         world.dungeon = {dungeonCenter, world.getSurfaceLevel(dungeonCenter)};
-        int offset = world.dungeon.first < world.getWidth() / 2 ? 23 : -23;
+        int offset = world.dungeon.x < world.getWidth() / 2 ? 23 : -23;
         for (int swapI = 0; swapI < scanDist; ++swapI) {
             int i = swapI / 2;
             if (swapI % 2 == 0) {
@@ -1064,46 +1058,42 @@ private:
                                tile.blockID != TileID::aetherium &&
                                tile.wallID != WallID::Unsafe::livingWood;
                     })) {
-                world.dungeon.first = dungeonCenter + i;
+                world.dungeon.x = dungeonCenter + i;
                 break;
             }
         }
         std::vector<int> surface;
         for (int i = -30; i < 30; ++i) {
             surface.push_back(
-                world.getSurfaceLevel(world.dungeon.first + i + offset));
+                world.getSurfaceLevel(world.dungeon.x + i + offset));
         }
         std::sort(surface.begin(), surface.end());
-        world.dungeon.second = surface[0.15 * surface.size()];
+        world.dungeon.y = surface[0.15 * surface.size()];
     }
 
     void makeEntryHallway(Point entry, Point room)
     {
-        if (2 * std::abs(entry.first - room.first) <
-            std::abs(entry.second - room.second)) {
+        if (2 * std::abs(entry.x - room.x) < std::abs(entry.y - room.y)) {
             makeHallway(entry, room);
             return;
         }
-        Point mid{
-            (2 * entry.first + room.first) / 3,
-            (entry.second + 2 * room.second) / 3};
+        Point mid{(2 * entry.x + room.x) / 3, (entry.y + 2 * room.y) / 3};
         Point offset{
             roomSize / 2 + wallThickness,
             roomSize / 2 + wallThickness};
-        drawRect(subPts(mid, offset), addPts(mid, offset), 0, 0, false);
+        drawRect(mid - offset, mid + offset, 0, 0, false);
         makeHallway(entry, mid);
         makeHallway(mid, room);
     }
 
     void makeEntry()
     {
-        bool isOnLeft = world.dungeon.first < world.getWidth() / 2;
+        bool isOnLeft = world.dungeon.x < world.getWidth() / 2;
         TileBuffer entry = Data::getDungeonRoom(
             isOnLeft ? Data::Room::entranceRight : Data::Room::entranceLeft,
             theme.furniture,
             world.getFramedTiles());
-        int x = world.dungeon.first;
-        int y = world.dungeon.second;
+        auto [x, y] = world.dungeon;
         int minX = world.getWidth();
         int maxX = 0;
         for (int i = -20; i < 20; ++i) {
@@ -1133,8 +1123,7 @@ private:
                 Tile &tile = world.getTile(x + i, y + j);
                 if (entryTile.blockID == TileID::cloud) {
                     if (entryTile.blockPaint == Paint::red) {
-                        world.dungeon.first = x + i;
-                        world.dungeon.second = y + j;
+                        world.dungeon = {x + i, y + j};
                     }
                     if (entryTile.blockPaint == Paint::none) {
                         entryTile.blockID = tile.blockID;
@@ -1287,17 +1276,16 @@ private:
     void applyPaint(int dungeonCenter, int dungeonWidth)
     {
         int maxX = std::max(
-            world.dungeon.first + 80,
+            world.dungeon.x + 80,
             dungeonCenter + dungeonWidth + roomSize);
         int yDivide =
             wallThickness +
             (world.getUndergroundLevel() + 4 * world.getCavernLevel()) / 5;
-        for (int x = std::min(
-                 world.dungeon.first - 80,
-                 dungeonCenter - dungeonWidth);
+        for (int x =
+                 std::min(world.dungeon.x - 80, dungeonCenter - dungeonWidth);
              x < maxX;
              ++x) {
-            for (int y = world.dungeon.second - 40; y < yDivide; ++y) {
+            for (int y = world.dungeon.y - 40; y < yDivide; ++y) {
                 applyPaintAt(x, y);
             }
         }
@@ -1330,8 +1318,7 @@ private:
         if (world.conf.hiveQueen) {
             Point centroid = getHexCentroid(x, y, 8);
             if (static_cast<int>(
-                    99999 *
-                    (1 + rnd.getFineNoise(centroid.first, centroid.second))) %
+                    99999 * (1 + rnd.getFineNoise(centroid.x, centroid.y))) %
                     11 <
                 4) {
                 return theme.altPaint;
@@ -1396,7 +1383,7 @@ public:
             if (connectedZones.empty()) {
                 findConnectedZones(x, y, connectedZones, allZones);
                 makeEntryHallway(
-                    {world.dungeon.first, world.dungeon.second + hallSize - 3},
+                    {world.dungeon.x, world.dungeon.y + hallSize - 3},
                     {x, y});
                 continue;
             } else if (connectedZones.contains({x, y})) {
@@ -1419,7 +1406,7 @@ public:
                         tile.blockID = theme.brick;
                         tile.actuated = true;
                     } else if (
-                        scanWhileEmpty({x, y}, {0, 1}, world).second - y < 35) {
+                        scanWhileEmpty({x, y}, {0, 1}, world).y - y < 35) {
                         tile.blockID = theme.brick;
                         tile.actuated = true;
                         checkedForGround = true;
@@ -1451,12 +1438,8 @@ public:
             zones.begin(),
             zones.end(),
             [this, shuffleX, shuffleY](Point a, Point b) {
-                return rnd.getCoarseNoise(
-                           a.first + shuffleX,
-                           a.second + shuffleY) <
-                       rnd.getCoarseNoise(
-                           b.first + shuffleX,
-                           b.second + shuffleY);
+                return rnd.getCoarseNoise(a.x + shuffleX, a.y + shuffleY) <
+                       rnd.getCoarseNoise(b.x + shuffleX, b.y + shuffleY);
             });
         applyWallVariety(zones);
         if (world.conf.doubleTrouble || world.conf.hiveQueen ||
@@ -1470,7 +1453,7 @@ int computeDungeonCenter(World &world)
 {
     std::vector avoidPoints{
         0,
-        world.spawn.first,
+        world.spawn.x,
         world.getWidth(),
         world.surfaceEvilCenter,
         static_cast<int>(world.desertCenter),

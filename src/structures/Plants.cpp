@@ -27,7 +27,7 @@ bool isSunken(int x, int y, World &world)
                     world.getSurfaceLevel(world.getWidth() / 2),
                     world.getSurfaceLevel(world.getWidth() / 2 + delta)}) +
                    (world.conf.shattered ? 3 : 0) &&
-           hypotPts(world.dungeon, {x, y}) > 78;
+           hypot(world.dungeon, {x, y}) > 78;
 }
 
 void growBamboo(int x, int y, Random &rnd, World &world)
@@ -273,7 +273,7 @@ void growTree(
 
 bool inGemGrove(int x, int y, World &world)
 {
-    return hypotPts(world.gemGrove, {x, y}) < world.gemGroveSize;
+    return hypot(world.gemGrove, {x, y}) < world.gemGroveSize;
 }
 
 void genPlants(const LocationBins &locations, Random &rnd, World &world)

@@ -15,13 +15,13 @@
 bool canPlaceIglooAt(int x, int y, TileBuffer &igloo, World &world)
 {
     int surfaceLeft =
-        scanWhileEmpty({x, world.getSurfaceLevel(x)}, {0, 1}, world).second - y;
+        scanWhileEmpty({x, world.getSurfaceLevel(x)}, {0, 1}, world).y - y;
     int surfaceRight = scanWhileEmpty(
                            {x + igloo.getWidth() - 1,
                             world.getSurfaceLevel(x + igloo.getWidth() - 1)},
                            {0, 1},
                            world)
-                           .second -
+                           .y -
                        y;
     if (surfaceLeft < 0 || surfaceRight < 0 ||
         surfaceLeft >= igloo.getHeight() || surfaceRight >= igloo.getHeight() ||
@@ -58,9 +58,9 @@ bool placeIgloo(Point pt, TileBuffer &igloo, Random &rnd, World &world)
             maxOpenHeight = std::max(j, maxOpenHeight);
         }
     }
-    int x = pt.first;
-    int y = pt.second + std::midpoint(minOpenHeight, maxOpenHeight) -
-            igloo.getHeight();
+    int x = pt.x;
+    int y =
+        pt.y + std::midpoint(minOpenHeight, maxOpenHeight) - igloo.getHeight();
     for (int offsetSwap = 0; offsetSwap < 2 * igloo.getHeight(); ++offsetSwap) {
         int offset = offsetSwap / 2;
         if (offsetSwap % 2 == 1) {
@@ -124,7 +124,7 @@ void genIgloo(Random &rnd, World &world)
     std::vector<int> locations;
     if (world.conf.patches) {
         for (int x = 350; x < world.getWidth() - 350; ++x) {
-            if (std::abs(x - world.spawn.first) > 100 &&
+            if (std::abs(x - world.spawn.x) > 100 &&
                 world.getBiome(x, world.getSurfaceLevel(x)).snow > 0.99) {
                 locations.push_back(x);
             }
@@ -134,7 +134,7 @@ void genIgloo(Random &rnd, World &world)
         for (int x = world.snowCenter - scanDist;
              x < world.snowCenter + scanDist;
              ++x) {
-            if (std::abs(x - world.spawn.first) > 100) {
+            if (std::abs(x - world.spawn.x) > 100) {
                 locations.push_back(x);
             }
         }

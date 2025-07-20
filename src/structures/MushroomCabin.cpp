@@ -28,9 +28,8 @@ Point selectCabinLocation(
          TileID::silt,
          TileID::slime});
     for (int tries = 0; tries < 1000; ++tries) {
-        int x =
-            rnd.getInt(center.first - scanX - cabinWidth, center.first + scanX);
-        int y = rnd.getInt(center.second - scanY, center.second + scanY);
+        int x = rnd.getInt(center.x - scanX - cabinWidth, center.x + scanX);
+        int y = rnd.getInt(center.y - scanY, center.y + scanY);
         if (world.regionPasses(x, y, cabinWidth, 18, [](Tile &tile) {
                 return tile.blockID == TileID::empty &&
                        (tile.wallID == WallID::empty ||
@@ -38,8 +37,7 @@ Point selectCabinLocation(
             })) {
             std::vector<int> surface;
             for (int i = 0; i < cabinWidth; ++i) {
-                surface.push_back(
-                    scanWhileEmpty({x + i, y}, {0, 1}, world).second);
+                surface.push_back(scanWhileEmpty({x + i, y}, {0, 1}, world).y);
             }
             std::sort(surface.begin(), surface.end());
             y = surface[0.75 * surface.size()];

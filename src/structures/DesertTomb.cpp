@@ -192,15 +192,10 @@ void genDesertTomb(Random &rnd, World &world)
         y + 16,
         rnd.select({Painting::lifeAboveTheSand, Painting::oasis}));
     std::erase_if(locations, [&world](Point &pt) {
-        return !world.regionPasses(
-            pt.first - 1,
-            pt.second - 1,
-            3,
-            3,
-            [](Tile &tile) {
-                return tile.wallPaint != Paint::none ||
-                       tile.wallID == WallID::empty;
-            });
+        return !world.regionPasses(pt.x - 1, pt.y - 1, 3, 3, [](Tile &tile) {
+            return tile.wallPaint != Paint::none ||
+                   tile.wallID == WallID::empty;
+        });
     });
     degradeTombWalls(locations, rnd, world);
     addTombTreasure(locations, rnd, world);

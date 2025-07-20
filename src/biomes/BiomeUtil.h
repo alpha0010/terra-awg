@@ -1,15 +1,13 @@
 #ifndef BIOMEUTIL_H
 #define BIOMEUTIL_H
 
+#include "Point.h"
 #include "Tile.h"
 #include "ids/Biome.h"
 #include <functional>
-#include <utility>
 
 class World;
 class Random;
-
-typedef std::pair<int, int> Point;
 
 double computeOreThreshold(double oreMultiplier);
 

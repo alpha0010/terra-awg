@@ -18,10 +18,10 @@ void genAshenField(Random &rnd, World &world)
     if (world.conf.shattered) {
         width *= 0.82;
     }
-    int minX = world.spawn.first - width;
-    int maxX = world.spawn.first + width;
+    int minX = world.spawn.x - width;
+    int maxX = world.spawn.x + width;
     int minY = std::min(
-                   {world.spawn.second,
+                   {world.spawn.y,
                     world.getSurfaceLevel(minX),
                     world.getSurfaceLevel(maxX)}) -
                20;
@@ -54,18 +54,18 @@ void genAshenField(Random &rnd, World &world)
     for (int wallId : WallVariants::dirt) {
         stoneWalls[wallId] = rnd.select(WallVariants::stone);
     }
-    double height = maxY - world.spawn.second;
+    double height = maxY - world.spawn.y;
     for (int x = minX; x < maxX; ++x) {
-        int surface = scanWhileEmpty({x, minY}, {0, 1}, world).second;
+        int surface = scanWhileEmpty({x, minY}, {0, 1}, world).y;
         surface = std::lerp(
-            world.spawn.second,
+            world.spawn.y,
             surface < world.getUndergroundLevel() ? surface
                                                   : world.getSurfaceLevel(x),
-            std::abs(x - world.spawn.first) / width);
+            std::abs(x - world.spawn.x) / width);
         for (int y = minY; y < maxY; ++y) {
             double threshold = std::hypot(
-                (x - world.spawn.first) / width,
-                (y - world.spawn.second) / height);
+                (x - world.spawn.x) / width,
+                (y - world.spawn.y) / height);
             if (rnd.getFineNoise(x, y) < 9 * threshold - 8) {
                 continue;
             }
@@ -96,8 +96,8 @@ void genAshenField(Random &rnd, World &world)
             case TileID::mud:
             case TileID::sand:
             case TileID::clay:
-                tile.blockID = y > world.spawn.second + 10 ? TileID::obsidian
-                                                           : TileID::ash;
+                tile.blockID =
+                    y > world.spawn.y + 10 ? TileID::obsidian : TileID::ash;
                 break;
             default:
                 break;

@@ -17,14 +17,14 @@ void fillMarbleCaveHex(int x, int y, Random &rnd, World &world)
         world,
         [&world](Point pt) { return world.getTile(pt).flag != Flag::border; },
         [&](Point pt) {
-            if (pt.first != lastX) {
-                lastX = pt.first;
+            if (pt.x != lastX) {
+                lastX = pt.x;
                 stalactiteLen = 0;
                 stalacIter = 0;
             }
             Tile &tile = world.getTile(pt);
             bool nextTileIsEmpty =
-                world.getTile(pt.first, pt.second + 1).blockID == TileID::empty;
+                world.getTile(pt.x, pt.y + 1).blockID == TileID::empty;
             switch (tile.blockID) {
             case TileID::dirt:
             case TileID::stone:
@@ -33,8 +33,7 @@ void fillMarbleCaveHex(int x, int y, Random &rnd, World &world)
                 if (nextTileIsEmpty) {
                     stalactiteLen = std::max(
                         0.0,
-                        16 *
-                            rnd.getFineNoise(4 * (pt.first), 100 * stalacIter));
+                        16 * rnd.getFineNoise(4 * pt.x, 100 * stalacIter));
                     ++stalacIter;
                 }
                 break;

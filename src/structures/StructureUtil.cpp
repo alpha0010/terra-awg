@@ -157,41 +157,26 @@ bool isSolidBlock(int tileId)
     return !nonSolidTiles.contains(tileId);
 }
 
-double hypotPts(Point a, Point b)
-{
-    return std::hypot(a.first - b.first, a.second - b.second);
-}
-
-Point addPts(Point a, Point b)
-{
-    return {a.first + b.first, a.second + b.second};
-}
-
-Point subPts(Point a, Point b)
-{
-    return {a.first - b.first, a.second - b.second};
-}
-
 bool isInBounds(Point pt, World &world)
 {
-    return pt.first > 5 && pt.first < world.getWidth() - 5 && pt.second > 5 &&
-           pt.second < world.getHeight() - 5;
+    return pt.x > 5 && pt.x < world.getWidth() - 5 && pt.y > 5 &&
+           pt.y < world.getHeight() - 5;
 }
 
 Point scanWhileEmpty(Point from, Point delta, World &world)
 {
-    while (world.getTile(addPts(from, delta)).blockID == TileID::empty &&
+    while (world.getTile(from + delta).blockID == TileID::empty &&
            isInBounds(from, world)) {
-        from = addPts(from, delta);
+        from += delta;
     }
     return from;
 }
 
 Point scanWhileNotSolid(Point from, Point delta, World &world)
 {
-    while (!isSolidBlock(world.getTile(addPts(from, delta)).blockID) &&
+    while (!isSolidBlock(world.getTile(from + delta).blockID) &&
            isInBounds(from, world)) {
-        from = addPts(from, delta);
+        from += delta;
     }
     return from;
 }
@@ -199,7 +184,7 @@ Point scanWhileNotSolid(Point from, Point delta, World &world)
 void placeWire(Point from, Point to, Wire wire, World &world)
 {
     auto enableWireAt = [wire, &world](Point pt) {
-        Tile &tile = world.getTile(pt.first, pt.second);
+        Tile &tile = world.getTile(pt);
         switch (wire) {
         case Wire::red:
             tile.wireRed = true;
@@ -217,16 +202,16 @@ void placeWire(Point from, Point to, Wire wire, World &world)
     };
     enableWireAt(from);
     while (from != to) {
-        if (from.first < to.first) {
-            ++from.first;
-        } else if (from.first > to.first) {
-            --from.first;
+        if (from.x < to.x) {
+            ++from.x;
+        } else if (from.x > to.x) {
+            --from.x;
         }
         enableWireAt(from);
-        if (from.second < to.second) {
-            ++from.second;
-        } else if (from.second > to.second) {
-            --from.second;
+        if (from.y < to.y) {
+            ++from.y;
+        } else if (from.y > to.y) {
+            --from.y;
         }
         enableWireAt(from);
     }

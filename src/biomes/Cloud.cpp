@@ -157,11 +157,9 @@ void addCloudStructure(
 {
     TileBuffer room = Data::getSkyBox(roomId, world.getFramedTiles());
     int x = startX + (width - room.getWidth()) / 2;
-    int surfaceLeft = scanWhileEmpty({x, startY}, {0, 1}, world).second + 1;
+    int surfaceLeft = scanWhileEmpty({x, startY}, {0, 1}, world).y + 1;
     int surfaceRight =
-        scanWhileEmpty({x + room.getWidth() - 1, startY}, {0, 1}, world)
-            .second +
-        1;
+        scanWhileEmpty({x + room.getWidth() - 1, startY}, {0, 1}, world).y + 1;
     int y = std::max(surfaceLeft, surfaceRight) - room.getHeight();
     for (int j = 0; j < room.getHeight(); ++j) {
         int jLeft = surfaceLeft - y - j;
@@ -269,12 +267,9 @@ void genCloud(Random &rnd, World &world)
             continue;
         }
         for (int i = 0; i < width; ++i) {
-            int hI = i;
             for (int j = 0; j < height; ++j) {
-                int hJ = j;
-                if (world.conf.hiveQueen) {
-                    std::tie(hI, hJ) = getHexCentroid(i, j, 8);
-                }
+                auto [hI, hJ] = world.conf.hiveQueen ? getHexCentroid(i, j, 8)
+                                                     : Point{i, j};
                 double threshold =
                     8 * std::hypot(
                             static_cast<double>(hI) / width - 0.5,

@@ -271,12 +271,12 @@ int realSurfaceAt(int x, World &world, int prevY = -1)
     while (world.getTile(x, minY).blockID != TileID::empty) {
         --minY;
     }
-    return scanWhileEmpty({x, minY}, {0, 1}, world).second + 1;
+    return scanWhileEmpty({x, minY}, {0, 1}, world).y + 1;
 }
 
 void clearSpawnHive(World &world)
 {
-    int x = world.spawn.first;
+    int x = world.spawn.x;
     int y = world.getSurfaceLevel(x);
     int radius = 30;
     for (int i = -radius; i < radius; ++i) {
@@ -300,7 +300,7 @@ void genStarterHome(Random &rnd, World &world)
         clearSpawnHive(world);
     }
     std::map<int, int> tileCounts;
-    int x = world.spawn.first;
+    int x = world.spawn.x;
     int y = realSurfaceAt(x, world);
     for (int j = 0; j < 6; ++j) {
         tileCounts[world.getTile(x, y + j).blockID] += 1;
@@ -342,7 +342,7 @@ void genStarterHome(Random &rnd, World &world)
             y = std::min(realSurfaceAt(x + i, world, y), y);
         }
     }
-    world.spawn.second = y - 1;
+    world.spawn.y = y - 1;
     for (int j = 0; j < home.getHeight(); ++j) {
         --y;
         if (home.getTile(0, j).blockPaint == Paint::red) {

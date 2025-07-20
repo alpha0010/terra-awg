@@ -103,21 +103,21 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     for (int i = 0; i < 4; ++i) {
         w.putUint32(rnd.getInt(0, 7)); // Cave style.
     }
-    w.putUint32(rnd.getInt(0, 3));   // Ice style.
-    w.putUint32(rnd.getInt(0, 5));   // Jungle style.
-    w.putUint32(rnd.getInt(0, 2));   // Underworld style.
-    w.putUint32(world.spawn.first);  // Spawn X.
-    w.putUint32(world.spawn.second); // Spawn Y.
+    w.putUint32(rnd.getInt(0, 3)); // Ice style.
+    w.putUint32(rnd.getInt(0, 5)); // Jungle style.
+    w.putUint32(rnd.getInt(0, 2)); // Underworld style.
+    w.putUint32(world.spawn.x);    // Spawn X.
+    w.putUint32(world.spawn.y);    // Spawn Y.
     w.putFloat64(world.getUndergroundLevel());
     w.putFloat64(world.getCavernLevel());
-    w.putFloat64(13500);               // Time of day.
-    w.putBool(true);                   // Is day.
-    w.putUint32(0);                    // Moon phase.
-    w.putBool(false);                  // Blood moon.
-    w.putBool(false);                  // Eclipse.
-    w.putUint32(world.dungeon.first);  // Dungeon X.
-    w.putUint32(world.dungeon.second); // Dungeon Y.
-    w.putBool(world.isCrimson);        // Is crimson.
+    w.putFloat64(13500);          // Time of day.
+    w.putBool(true);              // Is day.
+    w.putUint32(0);               // Moon phase.
+    w.putBool(false);             // Blood moon.
+    w.putBool(false);             // Eclipse.
+    w.putUint32(world.dungeon.x); // Dungeon X.
+    w.putUint32(world.dungeon.y); // Dungeon Y.
+    w.putBool(world.isCrimson);   // Is crimson.
     for (int i = 0; i < 20; ++i) {
         w.putBool(false); // Bosses and npc saves.
     }
@@ -412,15 +412,15 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
                         "Seth",   "Steve", "Tanner",  "Trent",   "Wyatt",
                         "Zach"})); // NPC name.
     }
-    w.putFloat32(16 * world.spawn.first);        // NPC position X.
-    w.putFloat32(16 * (world.spawn.second - 2)); // NPC position Y.
-    w.putBool(true);                             // NPC is homeless.
-    w.putUint32(world.spawn.first);              // NPC home X.
-    w.putUint32(world.spawn.second);             // NPC home Y.
-    w.putBool(true);                             // Unknown?
-    w.putUint32(0);                              // NPC variation.
-    w.putBool(false);                            // End town NPC records.
-    w.putBool(false);                            // End pillar records.
+    w.putFloat32(16 * world.spawn.x);       // NPC position X.
+    w.putFloat32(16 * (world.spawn.y - 2)); // NPC position Y.
+    w.putBool(true);                        // NPC is homeless.
+    w.putUint32(world.spawn.x);             // NPC home X.
+    w.putUint32(world.spawn.y);             // NPC home Y.
+    w.putBool(true);                        // Unknown?
+    w.putUint32(0);                         // NPC variation.
+    w.putBool(false);                       // End town NPC records.
+    w.putBool(false);                       // End pillar records.
     sectionPointers.push_back(w.tellp());
 
     w.putUint32(sensors.size()); // Number of tile entities.

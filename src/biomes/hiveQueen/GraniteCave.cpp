@@ -44,8 +44,7 @@ void fillGraniteCaveHex(int x, int y, World &world)
                                    : TileID::smoothGranite;
                 break;
             }
-            if ((!world.conf.shattered &&
-                 pt.second < world.getUnderworldLevel()) ||
+            if ((!world.conf.shattered && pt.y < world.getUnderworldLevel()) ||
                 tile.wallID != WallID::empty) {
                 tile.wallID = WallID::Unsafe::granite;
             }

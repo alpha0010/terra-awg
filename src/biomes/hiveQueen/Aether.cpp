@@ -40,25 +40,22 @@ void genAetherHiveQueen(Random &rnd, World &world)
         [&world](Point pt) { return world.getTile(pt).flag != Flag::border; },
         [x, y, &maxBubblePos, &maxEditPos, &mossLocations, &rnd, &world](
             Point pt) {
-            double centralPropo = hypotPts(pt, {x, y}) / 75;
+            double centralPropo = hypot(pt, {x, y}) / 75;
             auto blurHexNoise = [&rnd](int a, int b) {
                 Point centroid = getHexCentroid(a, b, 10);
-                return rnd.getBlurNoise(
-                    4 * centroid.first,
-                    4 * centroid.second);
+                return rnd.getBlurNoise(4 * centroid.x, 4 * centroid.y);
             };
-            double noiseVal =
-                std::max(
-                    std::abs(blurHexNoise(pt.first, pt.second)),
-                    std::abs(blurHexNoise(pt.first + x, pt.second + y))) *
-                std::min(1.0, 3 * (1 - centralPropo));
+            double noiseVal = std::max(
+                                  std::abs(blurHexNoise(pt.x, pt.y)),
+                                  std::abs(blurHexNoise(pt.x + x, pt.y + y))) *
+                              std::min(1.0, 3 * (1 - centralPropo));
             Tile &tile = world.getTile(pt);
             if (tile.flag == Flag::yellow || tile.flag == Flag::orange) {
                 tile.flag = Flag::none;
             }
             if (noiseVal > 0.45) {
                 tile.blockID = TileID::bubble;
-                maxBubblePos = std::max(maxBubblePos, pt.second);
+                maxBubblePos = std::max(maxBubblePos, pt.y);
             } else if (noiseVal > 0.09) {
                 tile.blockID = TileID::empty;
             } else if (noiseVal > 0.02) {
@@ -69,7 +66,7 @@ void genAetherHiveQueen(Random &rnd, World &world)
             }
             if (noiseVal > 0.019) {
                 tile.wallID = WallID::empty;
-                maxEditPos = std::max(maxEditPos, pt.second);
+                maxEditPos = std::max(maxEditPos, pt.y);
             }
         });
     world.queuedDeco.emplace_back([mossLocations](Random &, World &world) {

@@ -24,9 +24,7 @@ void genGemGroveHiveQueen(Random &rnd, World &world)
             if (tile.flag == Flag::border) {
                 continue;
             }
-            Point centroid = getHexCentroid({x + aI, y + aJ}, 10);
-            int i = centroid.first - x;
-            int j = centroid.second - y;
+            auto [i, j] = getHexCentroid({x + aI, y + aJ}, 10) - Point{x, y};
             double threshold = std::min(std::hypot(i, j) / groveSize, 1.0);
             bool shouldClear =
                 std::abs(rnd.getCoarseNoise(x + i, 2 * (y + j)) + 0.1) <

@@ -52,7 +52,7 @@ Point selectArenaLocation(
                 y = rnd.getInt(minY, maxY);
             }
         }
-        if (hypotPts(world.gemGrove, {x, y}) < 150) {
+        if (hypot(world.gemGrove, {x, y}) < 150) {
             continue;
         }
         int numEmpty = 0;
@@ -186,7 +186,7 @@ void genTorchArena(Random &rnd, World &world)
     int torchBase = -3;
     for (int i = 2; i < torch.getWidth() - 2; ++i) {
         int curBase =
-            scanWhileEmpty({x + offset + i, y - 3}, {0, 1}, world).second - y;
+            scanWhileEmpty({x + offset + i, y - 3}, {0, 1}, world).y - y;
         if (curBase < 5) {
             torchBase = std::max(torchBase, curBase);
         }

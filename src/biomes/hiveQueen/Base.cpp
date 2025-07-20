@@ -46,9 +46,7 @@ inline std::array const underworldTiles{
     TileID::ash,
     TileID::ash};
 
-inline auto hashPoint = [](const Point &pt) {
-    return fnv1a32pt(pt.first, pt.second);
-};
+inline auto hashPoint = [](const Point &pt) { return fnv1a32pt(pt.x, pt.y); };
 
 std::vector<Point>
 iterateHex(Point start, int scale, std::function<void(Point)> f)
@@ -68,8 +66,8 @@ iterateHex(Point start, int scale, std::function<void(Point)> f)
         visited.insert(loc);
         if (centroid == getHexCentroid(loc, scale)) {
             f(loc);
-            for (auto delta : {std::pair{-1, 0}, {1, 0}, {0, -1}, {0, 1}}) {
-                locations.push_back(addPts(loc, delta));
+            for (auto delta : {Point{-1, 0}, {1, 0}, {0, -1}, {0, 1}}) {
+                locations.push_back(loc + delta);
             }
         } else {
             border.push_back(loc);
@@ -130,21 +128,19 @@ std::vector<Point> planHiveQueenBiomes(Random &rnd, World &world)
                 std::vector<Point> locations;
                 std::map<Biome, int> biomes;
                 std::vector<Point> hexBorder = iterateHex(
-                    addPts({x, y}, hexShift),
+                    hexShift + Point{x, y},
                     131,
                     [hexShift, &locations, &biomes, &rnd, &world](Point pt) {
-                        pt = subPts(pt, hexShift);
-                        if (pt.first < 0 || pt.second < 0 ||
-                            pt.first >= world.getWidth() ||
-                            pt.second >= world.getHeight()) {
+                        pt -= hexShift;
+                        if (pt.x < 0 || pt.y < 0 || pt.x >= world.getWidth() ||
+                            pt.y >= world.getHeight()) {
                             return;
                         }
                         locations.push_back(pt);
-                        biomes[getBiomeAt(pt.first, pt.second, rnd, world)] +=
-                            1;
+                        biomes[getBiomeAt(pt.x, pt.y, rnd, world)] += 1;
                     });
                 for (Point pt : hexBorder) {
-                    queuedBorders.push_back(subPts(pt, hexShift));
+                    queuedBorders.push_back(pt - hexShift);
                 }
                 auto targBiome =
                     std::max_element(biomes.begin(), biomes.end(), valueLess);
@@ -476,7 +472,8 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
     parallelFor(
         std::views::iota(0, world.getWidth()),
         [lavaLevel, &rnd, &world](int x) {
-            auto valueLess = [](const Point &a, const Point &b) {
+            auto valueLess = [](const std::pair<int, int> &a,
+                                const std::pair<int, int> &b) {
                 return a.second < b.second;
             };
             for (int y = 0; y < world.getHeight(); ++y) {
@@ -490,9 +487,8 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                     {x, y},
                     10,
                     [&locations, &tiles, &walls, &world](Point pt) {
-                        if (pt.first < 0 || pt.second < 0 ||
-                            pt.first >= world.getWidth() ||
-                            pt.second >= world.getHeight()) {
+                        if (pt.x < 0 || pt.y < 0 || pt.x >= world.getWidth() ||
+                            pt.y >= world.getHeight()) {
                             return;
                         }
                         locations.push_back(pt);
@@ -538,13 +534,12 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                 int rndFlag =
                     static_cast<int>(
                         99999 *
-                        (1 +
-                         rnd.getFineNoise(centroid.first, centroid.second))) %
+                        (1 + rnd.getFineNoise(centroid.x, centroid.y))) %
                     13;
-                Flag hexFlag = rndFlag > 5                   ? Flag::orange
-                               : rndFlag > 1                 ? Flag::yellow
-                               : centroid.second > lavaLevel ? Flag::crispyHoney
-                                                             : Flag::hive;
+                Flag hexFlag = rndFlag > 5              ? Flag::orange
+                               : rndFlag > 1            ? Flag::yellow
+                               : centroid.y > lavaLevel ? Flag::crispyHoney
+                                                        : Flag::hive;
                 for (auto pt : locations) {
                     Tile &tile = world.getTile(pt);
                     tile.wireRed = false;
@@ -563,7 +558,7 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
     parallelFor(std::views::iota(0, world.getWidth()), [&rnd, &world](int x) {
         int surfaceLevel =
             scanWhileEmpty({x, world.getSurfaceLevel(x) - 10}, {0, 1}, world)
-                .second +
+                .y +
             1;
         world.getSurfaceLevel(x) = surfaceLevel;
         for (int y = 0; y < world.getHeight(); ++y) {
@@ -616,7 +611,7 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
     parallelFor(hexBorders, [&world](Point pt) {
         for (int i = -3; i < 3; ++i) {
             for (int j = -3; j < 3; ++j) {
-                Tile &tile = world.getTile(pt.first + i, pt.second + j);
+                Tile &tile = world.getTile(pt + Point{i, j});
                 tile.blockID = TileID::hive;
                 tile.wallID = WallID::Unsafe::hive;
                 tile.flag = Flag::border;

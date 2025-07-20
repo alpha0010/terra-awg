@@ -33,8 +33,7 @@ private:
               {-roomSize, 0.578 * roomSize},
               {roomSize, -0.578 * roomSize},
               {roomSize, 0.578 * roomSize}}) {
-            neighbors.push_back(
-                getHexCentroid(pt.first + i, pt.second + j, roomSize));
+            neighbors.push_back(getHexCentroid(pt.x + i, pt.y + j, roomSize));
         }
         return neighbors;
     }
@@ -55,7 +54,7 @@ private:
                 tile.wallID = WallID::Unsafe::lihzahrdBrick;
                 for (int i = -2; i < 3; ++i) {
                     for (int j = -2; j < 3; ++j) {
-                        Point probe = addPts(pt, {i, j});
+                        Point probe = pt + Point{i, j};
                         visitCount[probe] += 1;
                         if (visitCount[probe] == 25) {
                             world.getTile(probe).blockID = TileID::empty;
@@ -67,20 +66,19 @@ private:
 
     bool hasHallway(Point a, Point b)
     {
-        return connections.contains(addPts(a, b));
+        return connections.contains(a + b);
     }
 
     void makeHallway(Point a, Point b)
     {
-        connections.insert(addPts(a, b));
-        if (a.second > b.second) {
+        connections.insert(a + b);
+        if (a.y > b.y) {
             std::swap(a, b);
         }
-        double slope =
-            static_cast<double>(b.first - a.first) / (b.second - a.second);
+        double slope = static_cast<double>(b.x - a.x) / (b.y - a.y);
         double scanDist = 2.5 * (1 + std::abs(slope));
-        for (int y = a.second; y <= b.second; ++y) {
-            double centerX = slope * (y - a.second) + a.first;
+        for (int y = a.y; y <= b.y; ++y) {
+            double centerX = slope * (y - a.y) + a.x;
             for (int x = std::round(centerX - scanDist); x < centerX + scanDist;
                  ++x) {
                 world.getTile(x, y).blockID = TileID::empty;
@@ -98,8 +96,7 @@ private:
         for (int i = -coreSize; i < coreSize; ++i) {
             for (int j = -coreSize; j < coreSize; ++j) {
                 if (std::hypot(i, j) < coreSize) {
-                    Tile &tile =
-                        world.getTile(center.first + i, center.second + j);
+                    Tile &tile = world.getTile(center.x + i, center.y + j);
                     tile.blockID = TileID::empty;
                     tile.blockPaint = Paint::none;
                     tile.wallID = WallID::Unsafe::lihzahrdBrick;
@@ -115,7 +112,7 @@ private:
         while (true) {
             std::vector<Point> choices;
             for (Point candidate : neighborCentroids(agent)) {
-                if (hypotPts(candidate, center) < threshold &&
+                if (hypot(candidate, center) < threshold &&
                     !core.contains(candidate) &&
                     (!connectedRooms.contains(candidate) ||
                      hasHallway(agent, candidate))) {
@@ -145,8 +142,8 @@ private:
             }
         }
         std::vector<Point> border;
-        for (int x = center.first - size; x < center.first + size; ++x) {
-            for (int y = center.second - size; y < center.second + size; ++y) {
+        for (int x = center.x - size; x < center.x + size; ++x) {
+            for (int y = center.y - size; y < center.y + size; ++y) {
                 if (world.getTile(x, y).wallID !=
                         WallID::Unsafe::lihzahrdBrick &&
                     !world.regionPasses(x - 2, y - 2, 5, 5, [](Tile &tile) {
@@ -166,12 +163,12 @@ private:
 
     void addEntries(Point center)
     {
-        int x = center.first - size;
-        int y = center.second;
+        int x = center.x - size;
+        int y = center.y;
         while (world.getTile(x, y).blockID != TileID::lihzahrdBrick) {
             ++x;
         }
-        std::tie(x, y) = getHexCentroid(x + roomSize / 2, y, roomSize);
+        std::tie(x, y) = getHexCentroid(x + roomSize / 2, y, roomSize).asPair();
         clearTempleSurface(
             {x - roomSize / 2, y - roomSize / 2},
             1.1 * roomSize,
@@ -190,11 +187,11 @@ private:
         world.placeFramedTile(x + 2, y - 1, TileID::door, Variant::lihzahrd);
         world.placeFramedTile(x + 4, y, TileID::pot, Variant::lihzahrd);
 
-        x = 2 * center.first - x;
+        x = 2 * center.x - x;
         while (world.getTile(x, y).blockID != TileID::lihzahrdBrick) {
             --x;
         }
-        std::tie(x, y) = getHexCentroid(x - roomSize / 2, y, roomSize);
+        std::tie(x, y) = getHexCentroid(x - roomSize / 2, y, roomSize).asPair();
         clearTempleSurface(
             {x + roomSize / 2, y - roomSize / 2},
             1.1 * roomSize,
@@ -216,18 +213,12 @@ private:
 
     void placeAltar(Point center)
     {
-        int altarLeft = scanWhileEmpty(
-                            {center.first - roomSize, center.second},
-                            {0, 1},
-                            world)
-                            .second;
-        int altarRight = scanWhileEmpty(
-                             {center.first + roomSize, center.second},
-                             {0, 1},
-                             world)
-                             .second;
+        int altarLeft =
+            scanWhileEmpty({center.x - roomSize, center.y}, {0, 1}, world).y;
+        int altarRight =
+            scanWhileEmpty({center.x + roomSize, center.y}, {0, 1}, world).y;
         world.placeFramedTile(
-            center.first - 1 -
+            center.x - 1 -
                 (altarLeft < altarRight   ? roomSize
                  : altarLeft > altarRight ? -roomSize
                                           : rnd.select({-roomSize, roomSize})),
@@ -238,8 +229,8 @@ private:
     std::vector<Point> placeTreasures(Point center)
     {
         std::vector<Point> locations;
-        for (int x = center.first - size; x < center.first + size; ++x) {
-            for (int y = center.second - size; y < center.second + size; ++y) {
+        for (int x = center.x - size; x < center.x + size; ++x) {
+            for (int y = center.y - size; y < center.y + size; ++y) {
                 if (canPlaceTempleTreasureAt(x, y, world)) {
                     locations.emplace_back(x, y);
                 }
@@ -251,8 +242,8 @@ private:
 
     void addSpikes(Point center)
     {
-        for (int x = center.first - size; x < center.first + size; ++x) {
-            for (int y = center.second - size; y < center.second + size; ++y) {
+        for (int x = center.x - size; x < center.x + size; ++x) {
+            for (int y = center.y - size; y < center.y + size; ++y) {
                 if (world.regionPasses(x - 1, y - 1, 3, 3, [](Tile &tile) {
                         return tile.blockID == TileID::empty &&
                                tile.wallID == WallID::Unsafe::lihzahrdBrick;
@@ -265,8 +256,8 @@ private:
 
     void applyPaint(Point center, int paint)
     {
-        for (int x = center.first - size; x < center.first + size; ++x) {
-            for (int y = center.second - size; y < center.second + size; ++y) {
+        for (int x = center.x - size; x < center.x + size; ++x) {
+            for (int y = center.y - size; y < center.y + size; ++y) {
                 Tile &tile = world.getTile(x, y);
                 if (tile.wallID == WallID::Unsafe::lihzahrdBrick) {
                     if (tile.blockID == TileID::lihzahrdBrick ||
@@ -333,8 +324,8 @@ void genTempleHiveQueen(Random &rnd, World &world)
                 TileID::pinkBrick,
             });
             return world.regionPasses(
-                center.first - scanDist,
-                center.second - scanDist,
+                center.x - scanDist,
+                center.y - scanDist,
                 2 * scanDist,
                 2 * scanDist,
                 [&avoidBlocks](Tile &tile) {
@@ -345,7 +336,7 @@ void genTempleHiveQueen(Random &rnd, World &world)
         },
         rnd,
         world);
-    if (center.first < 100) {
+    if (center.x < 100) {
         return;
     }
     HiveTemple structure(size, rnd, world);
