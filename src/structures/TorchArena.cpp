@@ -137,6 +137,28 @@ void placeTorchStructure(int x, int y, TileBuffer &data, World &world)
         });
 }
 
+void addArenaBubble(int x, int y, World &world)
+{
+    if (!world.conf.sunken || !world.conf.shattered || x < 420 ||
+        x > world.getWidth() - 420) {
+        return;
+    }
+    double maxS = 45.5;
+    double minS = maxS - 3;
+    for (int i = -maxS; i < maxS; ++i) {
+        for (int j = -maxS; j < maxS; ++j) {
+            Tile &tile = world.getTile(x + i, y + j);
+            if (tile.blockID != TileID::empty) {
+                continue;
+            }
+            double dist = std::hypot(i, j);
+            if (dist < maxS && dist > minS) {
+                tile.blockID = TileID::bubble;
+            }
+        }
+    }
+}
+
 void genTorchArena(Random &rnd, World &world)
 {
     std::cout << "Fueling TORCH\n";
@@ -175,6 +197,7 @@ void genTorchArena(Random &rnd, World &world)
         y + favorBase + 1 - torchFavor.getHeight(),
         torchFavor,
         world);
+    addArenaBubble(x, y + favorBase - torchFavor.getHeight(), world);
     int offset =
         rnd.select({-1, 1}) * (torchFavor.getWidth() / 2 + arenaWidth / 4);
     TileBuffer torch = Data::getTorch(
