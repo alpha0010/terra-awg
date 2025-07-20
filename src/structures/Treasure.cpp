@@ -689,7 +689,8 @@ Point selectShrineLocation(
 
 void placeJungleShrines(Random &rnd, World &world)
 {
-    int shrineCount = world.conf.chests * world.getWidth() * world.getHeight() /
+    int shrineCount = world.conf.chests * (world.conf.hiveQueen ? 1.4 : 1) *
+                      world.getWidth() * world.getHeight() /
                       rnd.getInt(590700, 677600);
     std::vector<Point> usedLocations;
     std::vector<int> shrines(Data::shrines.begin(), Data::shrines.end());

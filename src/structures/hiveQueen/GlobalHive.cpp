@@ -2,6 +2,7 @@
 
 #include "Util.h"
 #include "World.h"
+#include "biomes/BiomeUtil.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "vendor/frozen/set.h"
@@ -44,6 +45,33 @@ void genGlobalHive(World &world)
                         break;
                     default:
                         break;
+                    }
+                } else if (
+                    tile.blockID == TileID::mud && tile.flag == Flag::hive &&
+                    world.getBiome(x, y).active == Biome::jungle) {
+                    std::vector<Point> locations;
+                    iterateZone(
+                        {x, y},
+                        world,
+                        [centroid = getHexCentroid(x, y, 10)](Point pt) {
+                            return centroid == getHexCentroid(pt, 10);
+                        },
+                        [&locations, &world](Point pt) {
+                            Tile &tile = world.getTile(pt);
+                            if (tile.blockID == TileID::mud &&
+                                tile.flag == Flag::hive && !tile.actuated &&
+                                tile.blockPaint == Paint::none) {
+                                locations.push_back(pt);
+                            }
+                        });
+                    if (locations.size() > 115) {
+                        for (Point pt : locations) {
+                            world.getTile(pt).blockID = TileID::hive;
+                        }
+                    } else {
+                        for (Point pt : locations) {
+                            world.getTile(pt).flag = Flag::none;
+                        }
                     }
                 }
             }
