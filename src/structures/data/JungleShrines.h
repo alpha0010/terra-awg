@@ -7,7 +7,7 @@
 namespace Data
 {
 
-inline auto shrines = std::views::iota(0, 58);
+inline auto shrines = std::views::iota(0, 76);
 
 TileBuffer getShrine(int shrineId, const std::vector<bool> &framedTiles);
 
