@@ -152,7 +152,11 @@ void genDesertTomb(Random &rnd, World &world)
 {
     std::cout << "Embalming\n";
     TileBuffer tomb = Data::getBuilding(
-        rnd.select({Data::Building::desertTomb1, Data::Building::desertTomb2}),
+        rnd.select(
+            {Data::Building::desertTomb1,
+             Data::Building::desertTomb2,
+             Data::Building::desertTomb3,
+             Data::Building::desertTomb4}),
         world.getFramedTiles());
     auto [x, y] = selectTombLocation(tomb, rnd, world);
     if (x == -1) {
