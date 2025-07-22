@@ -1137,25 +1137,35 @@ private:
                     entryTile.blockID == theme.brick) {
                     continue;
                 }
-                int existingTileId = tile.blockID;
-                tile = entryTile;
                 double noise = rnd.getFineNoise(x + 2 * i, y + j);
                 double threshold = 1.9 * j / entry.getHeight() - 0.56;
                 if (noise > threshold + 0.15) {
-                    if (tile.blockID != TileID::empty &&
-                        !world.getFramedTiles()[tile.blockID]) {
-                        tile.blockID = TileID::empty;
+                    if (entryTile.blockID != TileID::empty &&
+                        !world.getFramedTiles()[entryTile.blockID]) {
+                        entryTile.blockID = TileID::empty;
                     }
-                    tile.wallID = WallID::empty;
+                    entryTile.wallID = WallID::empty;
                 } else if (noise > threshold) {
-                    if (tile.blockID != TileID::empty &&
-                        !world.getFramedTiles()[tile.blockID]) {
-                        tile.blockID = TileID::leaf;
+                    if (entryTile.blockID != TileID::empty &&
+                        !world.getFramedTiles()[entryTile.blockID]) {
+                        entryTile.blockID = TileID::leaf;
                     }
-                    if (tile.wallID != WallID::empty) {
-                        tile.wallID = WallID::Safe::livingLeaf;
+                    if (entryTile.wallID != WallID::empty) {
+                        entryTile.wallID = WallID::Safe::livingLeaf;
                     }
                 }
+                if (entryTile.blockID == TileID::empty &&
+                    entryTile.wallID == WallID::empty) {
+                    double halfI = 0.5 * entry.getWidth();
+                    double halfJ = 0.5 * entry.getHeight();
+                    if (j < halfJ &&
+                        std::hypot((i - halfI) / halfI, (j - halfJ) / halfJ) >
+                            1.1) {
+                        continue;
+                    }
+                }
+                int existingTileId = tile.blockID;
+                tile = entryTile;
                 if (tile.wallID != WallID::empty &&
                     std::abs(rnd.getFineNoise(x + 2 * i, y + 2 * j)) <
                         0.1 - 0.1 * j / entry.getHeight()) {
@@ -1216,9 +1226,12 @@ private:
         for (int i = 1; i < entry.getWidth() - 1; ++i) {
             for (int j = 0; j < entry.getHeight(); ++j) {
                 Tile &tile = world.getTile(x + i, y + j);
-                if (tile.blockID == TileID::dirt &&
+                if ((tile.blockID == TileID::dirt ||
+                     tile.blockID == TileID::mud) &&
                     world.isExposed(x + i, y + j)) {
-                    tile.blockID = TileID::grass;
+                    tile.blockID = tile.blockID == TileID::dirt
+                                       ? TileID::grass
+                                       : TileID::jungleGrass;
                 }
             }
         }
