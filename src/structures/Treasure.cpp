@@ -721,11 +721,17 @@ void placeJungleShrines(Random &rnd, World &world)
             }
         }
         for (auto [chestX, chestY] : chests) {
-            Chest &chest = world.placeChest(chestX, chestY, Variant::ivy);
-            if (y < world.getCavernLevel()) {
-                fillUndergroundIvyChest(chest, rnd, world);
+            Tile &tile = world.getTile(chestX, chestY);
+            if (tile.blockID == TileID::chest && tile.frameX == 180 &&
+                tile.frameY == 0) {
+                fillBarrel(world.registerStorage(chestX, chestY), rnd);
             } else {
-                fillCavernIvyChest(chest, rnd, world);
+                Chest &chest = world.placeChest(chestX, chestY, Variant::ivy);
+                if (y < world.getCavernLevel()) {
+                    fillUndergroundIvyChest(chest, rnd, world);
+                } else {
+                    fillCavernIvyChest(chest, rnd, world);
+                }
             }
         }
         --shrineCount;
