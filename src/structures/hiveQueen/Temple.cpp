@@ -240,6 +240,21 @@ private:
         return locations;
     }
 
+    void placeLarvae(const std::vector<Point> &locations)
+    {
+        int numLarvae = size * size / 8000;
+        for (auto itr = locations.begin();
+             numLarvae > 0 && itr != locations.end();
+             ++itr) {
+            auto [x, y] = *itr;
+            if (canPlaceTempleTreasureAt(x, y, world) &&
+                canPlaceTempleTreasureAt(x + 2, y, world)) {
+                world.placeFramedTile(x, y - 3, TileID::larva);
+                --numLarvae;
+            }
+        }
+    }
+
     void addSpikes(Point center)
     {
         for (int x = center.x - size; x < center.x + size; ++x) {
@@ -285,6 +300,7 @@ public:
         placeAltar(center);
         std::vector<Point> flatLocations = placeTreasures(center);
         std::shuffle(flatLocations.begin(), flatLocations.end(), rnd.getPRNG());
+        placeLarvae(flatLocations);
         addTempleTraps(flatLocations, 45, rnd, world);
         addSpikes(center);
         applyPaint(
