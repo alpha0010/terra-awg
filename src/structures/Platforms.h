@@ -13,6 +13,7 @@ enum {
     obsidian = 234,
     lihzahrd = 594,
     stone = 774,
+    balloon = 828,
 };
 }
 

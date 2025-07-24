@@ -90,6 +90,9 @@ patchesTemperature = 0.0
 # How rapidly to transition biomes for biome patches.
 patchesSize = 1.0
 
+# Activates "celebrationmk10" secret seed.
+celebration = false
+
 # Activates "not the bees" secret seed.
 hiveQueen = false
 
@@ -578,6 +581,7 @@ Config readConfig(Random &rnd)
         0.0,   // patchesHumidity
         0.0,   // patchesTemperature
         1.0,   // patchesSize
+        false, // celebration
         false, // hiveQueen
         false, // forTheWorthy
         0,     // meteorites
@@ -650,6 +654,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, patchesHumidity, Real);
     READ_CONF_VALUE(variation, patchesTemperature, Real);
     READ_CONF_AREA_VALUE(variation, patchesSize);
+    READ_CONF_VALUE(variation, celebration, Boolean);
     READ_CONF_VALUE(variation, hiveQueen, Boolean);
     READ_CONF_VALUE(variation, forTheWorthy, Boolean);
     READ_CONF_VALUE(variation, meteorites, Integer);

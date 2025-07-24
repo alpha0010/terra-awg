@@ -4,12 +4,61 @@
 #include "World.h"
 #include "Writer.h"
 #include "map/ImgWriter.h"
+#include "structures/StructureUtil.h"
 #include <array>
 #include <chrono>
 #include <iostream>
 
 #define FOREST_BACKGROUNDS 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 31, 51, 71, 72, 73
 #define SNOW_BACKGROUNDS 0, 1, 2, 3, 4, 5, 6, 7, 21, 22, 31, 32, 41, 42
+
+namespace NPC
+{
+enum {
+    guide = 22,
+    merchant = 17,
+    nurse = 18,
+    painter = 227,
+    dyeTrader = 207,
+    zoologist = 633,
+    golfer = 588,
+    partyGirl = 208,
+    angler = 369,
+    stylist = 353,
+    demolitionist = 38,
+    dryad = 20,
+    tavernkeep = 550,
+    armsDealer = 19,
+    goblinTinkerer = 107,
+    witchDoctor = 228,
+    clothier = 54,
+    mechanic = 124,
+    taxCollector = 441,
+    pirate = 229,
+    truffle = 160,
+    wizard = 108,
+    steampunker = 178,
+    cyborg = 209,
+    santaClaus = 142,
+    princess = 663,
+    travelingMerchant = 368,
+    oldMan = 37,
+    skeletonMerchant = 453,
+    townBunny = 656,
+};
+}
+
+std::array townNPCs{
+    NPC::guide,        NPC::merchant,        NPC::nurse,
+    NPC::painter,      NPC::dyeTrader,       NPC::zoologist,
+    NPC::golfer,       NPC::partyGirl,       NPC::angler,
+    NPC::stylist,      NPC::demolitionist,   NPC::dryad,
+    NPC::tavernkeep,   NPC::armsDealer,      NPC::goblinTinkerer,
+    NPC::witchDoctor,  NPC::clothier,        NPC::mechanic,
+    NPC::taxCollector, NPC::pirate,          NPC::truffle,
+    NPC::wizard,       NPC::steampunker,     NPC::cyborg,
+    NPC::santaClaus,   NPC::princess,        NPC::travelingMerchant,
+    NPC::oldMan,       NPC::skeletonMerchant};
 
 /**
  * Compatible with C# DateTime binary format.
@@ -40,12 +89,54 @@ Seed determineSeed(Config &conf)
         return Seed::forTheWorthy;
     } else if (conf.hiveQueen) {
         return Seed::notTheBees;
+    } else if (conf.celebration) {
+        return Seed::celebrationmk10;
     } else if (conf.doubleTrouble) {
         return Seed::drunkWorld;
     } else if (conf.traps > 14) {
         return Seed::noTraps;
     }
     return Seed::normal;
+}
+
+void writeNPC(
+    int npcId,
+    const std::string &npcName,
+    Writer &w,
+    Random &rnd,
+    World &world,
+    int npcVariation = 0)
+{
+    std::vector<Point> options;
+    for (int i = -6; i < 6; ++i) {
+        for (int j = -3; j < 3; ++j) {
+            if (world.regionPasses(
+                    world.spawn.x + i,
+                    world.spawn.y - 2 + j,
+                    2,
+                    3,
+                    [](Tile &tile) { return !isSolidBlock(tile.blockID); }) &&
+                !world.regionPasses(
+                    world.spawn.x + i,
+                    world.spawn.y + 1 + j,
+                    2,
+                    1,
+                    [](Tile &tile) { return !isSolidBlock(tile.blockID); })) {
+                options.emplace_back(world.spawn.x + i, world.spawn.y + j);
+            }
+        }
+    }
+    Point pos = options.empty() ? world.spawn : rnd.select(options);
+    w.putBool(true);                // Begin town NPC record.
+    w.putUint32(npcId);             // NPC ID.
+    w.putString(npcName);           // NPC name.
+    w.putFloat32(16 * pos.x - 8);   // NPC position X.
+    w.putFloat32(16 * (pos.y - 2)); // NPC position Y.
+    w.putBool(true);                // NPC is homeless.
+    w.putUint32(pos.x);             // NPC home X.
+    w.putUint32(pos.y);             // NPC home Y.
+    w.putBool(true);                // Has variation field.
+    w.putUint32(npcVariation);      // NPC variation.
 }
 
 void saveWorldFile(Config &conf, Random &rnd, World &world)
@@ -147,8 +238,8 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     w.putUint8(rnd.getInt(0, 4));                 // Desert style.
     w.putUint8(rnd.getInt(0, 5));                 // Ocean style.
     w.putUint32(0);                               // Cloud background.
-    w.putUint16(0);                               // Number of clouds.
-    w.putFloat32(0);                              // Wind speed.
+    w.putUint16(rnd.getInt(50, 150));             // Number of clouds.
+    w.putFloat32(rnd.getDouble(-0.2, 0.2));       // Wind speed.
     w.putUint32(0);                 // Players finished angler quest.
     w.putBool(false);               // Saved angler.
     w.putUint32(rnd.getInt(0, 38)); // Angler quest.
@@ -161,16 +252,18 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     for (int i = 0; i < 688; ++i) {
         w.putUint32(0); // Mob kill tally.
     }
-    for (int i = 0; i < 21; ++i) {
+    for (int i = 0; i < 19; ++i) {
         w.putBool(false); // Bosses.
     }
-    w.putUint32(0);               // Party cooldown.
-    w.putUint32(0);               // Partying NPCs.
-    w.putBool(false);             // Sandstorm active.
-    w.putUint32(0);               // Sandstorm remaining time.
-    w.putFloat32(0);              // Sandstorm severity.
-    w.putFloat32(0);              // Sandstorm intended severity.
-    w.putBool(false);             // Saved tavernkeep.
+    w.putBool(false);                            // Manual party.
+    w.putBool(special == Seed::celebrationmk10); // Genuine party.
+    w.putUint32(0);                              // Party cooldown.
+    w.putUint32(0);                              // Partying NPCs.
+    w.putBool(false);                            // Sandstorm active.
+    w.putUint32(0);                              // Sandstorm remaining time.
+    w.putFloat32(0);                             // Sandstorm severity.
+    w.putFloat32(0);                             // Sandstorm intended severity.
+    w.putBool(false);                            // Saved tavernkeep.
     w.putBool(false);             // Old one's army tier 1 complete.
     w.putBool(false);             // Old one's army tier 2 complete.
     w.putBool(false);             // Old one's army tier 3 complete.
@@ -203,8 +296,20 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     w.putUint32(world.ironVariant);
     w.putUint32(world.silverVariant);
     w.putUint32(world.goldVariant);
-    for (int i = 0; i < 25; ++i) {
-        w.putBool(false); // Bosses and npc saves.
+    std::vector<bool> unlocks(25);
+    if (special == Seed::forTheWorthy) {
+        unlocks[8] = true; // Demolitionist.
+    } else if (special == Seed::notTheBees) {
+        unlocks[7] = true; // Merchant.
+    } else if (special == Seed::celebrationmk10) {
+        unlocks[2] = true;  // Town Bunny.
+        unlocks[9] = true;  // Party Girl.
+        unlocks[14] = true; // Princess.
+    } else if (special == Seed::drunkWorld) {
+        unlocks[9] = true; // Party Girl.
+    }
+    for (bool unlock : unlocks) {
+        w.putBool(unlock); // Bosses and npc saves.
     }
     w.putUint8(0); // Moondial cooldown.
     sectionPointers.push_back(w.tellp());
@@ -362,65 +467,98 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     w.putUint16(0); // Number of signs.
     sectionPointers.push_back(w.tellp());
 
-    w.putUint32(0);  // Number of shimmered NPCs.
-    w.putBool(true); // Begin town NPC record.
+    if (conf.celebration) {
+        w.putUint32(townNPCs.size()); // Number of shimmered NPCs.
+        std::sort(townNPCs.begin(), townNPCs.end());
+        for (auto npc : townNPCs) {
+            w.putUint32(npc);
+        }
+    } else {
+        w.putUint32(0); // Number of shimmered NPCs.
+    }
     if (special == Seed::forTheWorthy) {
-        w.putUint32(38); // Demolitionist.
-        w.putString(rnd.select(
-            {"Bazdin", "Beldin",  "Boften",   "Darur",   "Dias",   "Dolbere",
-             "Dolgen", "Dolgrim", "Duerthen", "Durim",   "Fikod",  "Garval",
-             "Gimli",  "Gimut",   "Jarut",    "Morthal", "Norkas", "Norsun",
-             "Oten",   "Ovbere",  "Tordak",   "Urist"})); // NPC name.
+        writeNPC(
+            NPC::demolitionist,
+            rnd.select({"Bazdin",  "Beldin", "Boften",  "Darur",    "Dias",
+                        "Dolbere", "Dolgen", "Dolgrim", "Duerthen", "Durim",
+                        "Fikod",   "Garval", "Gimli",   "Gimut",    "Jarut",
+                        "Morthal", "Norkas", "Norsun",  "Oten",     "Ovbere",
+                        "Tordak",  "Urist"}),
+            w,
+            rnd,
+            world);
     } else if (special == Seed::notTheBees) {
-        w.putUint32(17); // Merchant.
-        w.putString(
+        writeNPC(
+            NPC::merchant,
             rnd.select({"Alfred",   "Barney", "Calvin",    "Edmund",   "Edwin",
                         "Eugene",   "Frank",  "Frederick", "Gilbert",  "Gus",
                         "Harold",   "Howard", "Humphrey",  "Isaac",    "Joseph",
                         "Kristian", "Louis",  "Milton",    "Mortimer", "Ralph",
-                        "Seymour",  "Walter", "Wilbur"})); // NPC name.
+                        "Seymour",  "Walter", "Wilbur"}),
+            w,
+            rnd,
+            world);
+    } else if (special == Seed::celebrationmk10) {
+        writeNPC(NPC::guide, "Andrew", w, rnd, world);
+        writeNPC(NPC::steampunker, "Whitney", w, rnd, world);
+        writeNPC(NPC::princess, "Yorai", w, rnd, world);
+        writeNPC(NPC::partyGirl, "Amanda", w, rnd, world);
+        writeNPC(
+            NPC::townBunny,
+            rnd.select(
+                {"Babs",
+                 "Breadbuns",
+                 "Fluffy",
+                 "Greg",
+                 "Loaf",
+                 "Maximus",
+                 "Muffin",
+                 "Pom"}),
+            w,
+            rnd,
+            world,
+            1);
     } else if (special == Seed::drunkWorld) {
-        w.putUint32(208); // Party Girl.
-        w.putString(rnd.select(
-            {"Amanda",
-             "Bailey",
-             "Bambi",
-             "Bunny",
-             "Candy",
-             "Cherry",
-             "Dazzle",
-             "Destiny",
-             "Fantasia",
-             "Fantasy",
-             "Glitter",
-             "Isis",
-             "Lexus",
-             "Paris",
-             "Sparkle",
-             "Star",
-             "Sugar",
-             "Trixy"})); // NPC name.
+        writeNPC(
+            NPC::partyGirl,
+            rnd.select(
+                {"Amanda",
+                 "Bailey",
+                 "Bambi",
+                 "Bunny",
+                 "Candy",
+                 "Cherry",
+                 "Dazzle",
+                 "Destiny",
+                 "Fantasia",
+                 "Fantasy",
+                 "Glitter",
+                 "Isis",
+                 "Lexus",
+                 "Paris",
+                 "Sparkle",
+                 "Star",
+                 "Sugar",
+                 "Trixy"}),
+            w,
+            rnd,
+            world);
     } else {
-        w.putUint32(22); // The guide.
-        w.putString(
-            rnd.select({"Andrew", "Asher", "Bradley", "Brandon", "Brett",
-                        "Brian",  "Cody",  "Cole",    "Colin",   "Connor",
-                        "Daniel", "Dylan", "Garrett", "Harley",  "Jack",
-                        "Jacob",  "Jake",  "Jan",     "Jeff",    "Jeffrey",
-                        "Joe",    "Kevin", "Kyle",    "Levi",    "Logan",
-                        "Luke",   "Marty", "Maxwell", "Ryan",    "Scott",
-                        "Seth",   "Steve", "Tanner",  "Trent",   "Wyatt",
-                        "Zach"})); // NPC name.
+        writeNPC(
+            NPC::guide,
+            rnd.select(
+                {"Andrew",  "Asher",   "Bradley", "Brandon", "Brett",  "Brian",
+                 "Cody",    "Cole",    "Colin",   "Connor",  "Daniel", "Dylan",
+                 "Garrett", "Harley",  "Jack",    "Jacob",   "Jake",   "Jan",
+                 "Jeff",    "Jeffrey", "Joe",     "Kevin",   "Kyle",   "Levi",
+                 "Logan",   "Luke",    "Marty",   "Maxwell", "Ryan",   "Scott",
+                 "Seth",    "Steve",   "Tanner",  "Trent",   "Wyatt",  "Zach"}),
+            w,
+            rnd,
+            world);
     }
-    w.putFloat32(16 * world.spawn.x);       // NPC position X.
-    w.putFloat32(16 * (world.spawn.y - 2)); // NPC position Y.
-    w.putBool(true);                        // NPC is homeless.
-    w.putUint32(world.spawn.x);             // NPC home X.
-    w.putUint32(world.spawn.y);             // NPC home Y.
-    w.putBool(true);                        // Unknown?
-    w.putUint32(0);                         // NPC variation.
-    w.putBool(false);                       // End town NPC records.
-    w.putBool(false);                       // End pillar records.
+    w.putBool(false); // End town NPC records.
+    w.putBool(false); // End pillar records.
     sectionPointers.push_back(w.tellp());
 
     w.putUint32(sensors.size()); // Number of tile entities.
@@ -506,6 +644,13 @@ int main()
         world.cobaltVariant = TileID::empty;
         world.mythrilVariant = TileID::empty;
         world.adamantiteVariant = TileID::empty;
+    }
+    if (conf.celebration) {
+        conf.pots *= 1.6;
+        conf.chests *= 1.1;
+        conf.gems *= 1.15;
+        conf.minecartTracks *= 1.1;
+        conf.minecartLength *= 1.35;
     }
     if (conf.hiveQueen) {
         conf.jungleSize *= 2;

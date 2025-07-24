@@ -113,11 +113,35 @@ bool canTrackClearTile(Tile &tile)
            (tile.blockID == TileID::hive && tile.flag != Flag::none);
 }
 
-std::vector<Point>
-planTrackAt(int x, int y, double lengthScale, Random &rnd, World &world)
+inline std::array paintRainbow{
+    Paint::deepRed,    Paint::deepOrange, Paint::deepYellow, Paint::deepLime,
+    Paint::deepGreen,  Paint::deepTeal,   Paint::deepCyan,   Paint::deepSkyBlue,
+    Paint::deepBlue,   Paint::deepPurple, Paint::deepViolet, Paint::deepPink,
+    Paint::deepViolet, Paint::deepPurple, Paint::deepBlue,   Paint::deepSkyBlue,
+    Paint::deepCyan,   Paint::deepTeal,   Paint::deepGreen,  Paint::deepLime,
+    Paint::deepYellow, Paint::deepOrange, Paint::deepRed};
+
+int getRainbowPaint(int x, int y)
 {
-    Point pos{x, y};
-    Point delta{rnd.select({-1, 1}), 0};
+    return paintRainbow[(x + y) % paintRainbow.size()];
+}
+
+inline std::array gemsparkRainbow{
+    WallID::Safe::rubyGemspark,
+    WallID::Safe::amberGemspark,
+    WallID::Safe::topazGemspark,
+    WallID::Safe::emeraldGemspark,
+    WallID::Safe::sapphireGemspark,
+    WallID::Safe::amethystGemspark};
+
+int getRainbowGemsparkWall(int x, int y)
+{
+    return gemsparkRainbow[(x + y) % gemsparkRainbow.size()];
+}
+
+std::pair<size_t, int>
+computeTrackBounds(double lengthScale, Random &rnd, World &world)
+{
     int hardMaxLen = world.getWidth() / 4.2;
     int maxLen = std::min(
         std::max<int>(
@@ -126,28 +150,41 @@ planTrackAt(int x, int y, double lengthScale, Random &rnd, World &world)
         hardMaxLen);
     size_t minLen =
         std::min<int>(lengthScale * (120 + world.getWidth() / 70), maxLen - 10);
+    return {minLen, maxLen};
+}
+
+bool isValidTrackSegment(int x, int y, World &world)
+{
     int minY = 0.8 * world.getUndergroundLevel();
     int maxY = 0.2 * world.getHeight() + 0.8 * world.getUnderworldLevel();
+    return x > 50 && x < world.getWidth() - 50 && y > minY && y < maxY &&
+           world.regionPasses(
+               x,
+               y - 10,
+               1,
+               12,
+               [](Tile &tile) {
+                   return !tile.guarded &&
+                          (!tile.actuator || tile.blockID != TileID::sand) &&
+                          canTrackClearTile(tile);
+               }) &&
+           world.regionPasses(x, y + 1, 1, 20, [](Tile &tile) {
+               return tile.blockID != TileID::minecartTrack;
+           });
+}
+
+std::vector<Point>
+planStandardTrackAt(int x, int y, double lengthScale, Random &rnd, World &world)
+{
+    Point pos{x, y};
+    Point delta{rnd.select({-1, 1}), 0};
+    auto [minLen, maxLen] = computeTrackBounds(lengthScale, rnd, world);
     std::vector<Point> track;
     for (int i = 0; i < maxLen; ++i) {
         double noise = rnd.getCoarseNoise(pos.x, pos.y);
         delta.y = noise > 0.2 ? 1 : noise < -0.2 ? -1 : 0;
         pos += delta;
-        if (pos.x < 50 || pos.x > world.getWidth() - 50 || pos.y < minY ||
-            pos.y > maxY ||
-            !world.regionPasses(
-                pos.x,
-                pos.y - 10,
-                1,
-                12,
-                [](Tile &tile) {
-                    return !tile.guarded &&
-                           (!tile.actuator || tile.blockID != TileID::sand) &&
-                           canTrackClearTile(tile);
-                }) ||
-            !world.regionPasses(pos.x, pos.y + 1, 1, 20, [](Tile &tile) {
-                return tile.blockID != TileID::minecartTrack;
-            })) {
+        if (!isValidTrackSegment(pos.x, pos.y, world)) {
             break;
         }
         track.push_back(pos);
@@ -160,6 +197,57 @@ planTrackAt(int x, int y, double lengthScale, Random &rnd, World &world)
         std::reverse(track.begin(), track.end());
     }
     return track;
+}
+
+std::vector<Point>
+planWavyTrackAt(int x, int y, double lengthScale, Random &rnd, World &world)
+{
+    Pointf pos{x, y};
+    int delta = rnd.select({-1, 1});
+    auto [minLen, maxLen] = computeTrackBounds(lengthScale, rnd, world);
+    double noiseScale = rnd.getDouble(1.2, 3.8);
+    double angle = std::numbers::pi *
+                   rnd.getCoarseNoise(noiseScale * x, noiseScale * y) / 4;
+    int prevY = y;
+    int curY = y;
+    std::vector<Point> track;
+    for (int i = 0; i < maxLen; ++i) {
+        double noise =
+            rnd.getCoarseNoise(noiseScale * pos.x, noiseScale * pos.y);
+        double turn = std::max(std::abs(noise) / 10, 0.015);
+        angle = std::clamp(
+            0.975 * angle + (noise > 0 ? turn : -turn),
+            -std::numbers::pi / 4,
+            std::numbers::pi / 4);
+        pos.x += delta;
+        pos.y += std::tan(angle);
+        if (!isValidTrackSegment(pos.x, pos.y, world)) {
+            break;
+        }
+        int nextY = std::clamp<int>(
+            std::round(pos.y),
+            prevY < curY ? curY : curY - 1,
+            prevY > curY ? curY : curY + 1);
+        prevY = curY;
+        curY = nextY;
+        track.emplace_back(std::round(pos.x), curY);
+    }
+    if (track.size() < minLen) {
+        return {};
+    }
+    track.resize(track.size() - rnd.getInt(4, 10));
+    if (delta == -1) {
+        std::reverse(track.begin(), track.end());
+    }
+    return track;
+}
+
+std::vector<Point>
+planTrackAt(int x, int y, double lengthScale, Random &rnd, World &world)
+{
+    return world.conf.celebration
+               ? planWavyTrackAt(x, y, lengthScale, rnd, world)
+               : planStandardTrackAt(x, y, lengthScale, rnd, world);
 }
 
 std::vector<Point> planTrack(double lengthScale, Random &rnd, World &world)
@@ -244,14 +332,15 @@ void applyTrackGrass(int x, int y, World &world)
 
 void applyTrackSupport(int x, int y, World &world)
 {
-    constexpr auto allowed =
-        frozen::make_set<int>({TileID::platform, TileID::woodenBeam});
+    constexpr auto allowed = frozen::make_set<int>(
+        {TileID::platform, TileID::marbleColumn, TileID::woodenBeam});
     if (!allowed.contains(world.getTile(x - 1, y).blockID) ||
         !allowed.contains(world.getTile(x + 1, y).blockID)) {
         return;
     }
     Tile &tile = world.getTile(x, y);
-    tile.wallID = WallID::Safe::palmWood;
+    tile.wallID = world.conf.celebration ? getRainbowGemsparkWall(x, y)
+                                         : WallID::Safe::palmWood;
     if (x % 7 != 0 || world.getTile(x, y + 1).blockID != TileID::empty) {
         return;
     }
@@ -263,7 +352,13 @@ void applyTrackSupport(int x, int y, World &world)
     }
     tile.blockPaint = Paint::none;
     for (int beamY = y; beamY < supFloor; ++beamY) {
-        world.getTile(x, beamY).blockID = TileID::woodenBeam;
+        if (world.conf.celebration) {
+            Tile &beamTile = world.getTile(x, beamY);
+            beamTile.blockID = TileID::marbleColumn;
+            beamTile.blockPaint = getRainbowPaint(x, beamY);
+        } else {
+            world.getTile(x, beamY).blockID = TileID::woodenBeam;
+        }
     }
 }
 
@@ -345,7 +440,8 @@ void genTracks(Random &rnd, World &world)
                 continue;
             }
             tile.blockID = TileID::minecartTrack;
-            tile.blockPaint = Paint::none;
+            tile.blockPaint = world.conf.celebration ? getRainbowPaint(x, tries)
+                                                     : Paint::none;
             Mode mode = idx + 2 == track.size() ? Mode::none
                         : y > track[idx + 1].y  ? Mode::asc
                         : y < track[idx + 1].y  ? Mode::desc
@@ -379,8 +475,12 @@ void genTracks(Random &rnd, World &world)
             Tile &supportTile = world.getTile(x, y + 1);
             if (tile.frameX == Track::flat &&
                 supportTile.blockID == TileID::empty) {
-                placePlatform(x, y + 1, Platform::stone, world);
-                supportTile.blockPaint = Paint::brown;
+                if (world.conf.celebration) {
+                    placePlatform(x, y + 1, Platform::balloon, world);
+                } else {
+                    placePlatform(x, y + 1, Platform::stone, world);
+                    supportTile.blockPaint = Paint::brown;
+                }
                 supportTile.guarded = true;
                 applyTrackSupport(x - 1, y + 1, world);
             }
