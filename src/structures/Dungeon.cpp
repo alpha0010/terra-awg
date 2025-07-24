@@ -345,7 +345,7 @@ private:
 
     Point selectBiomeChestLocation(const std::vector<Point> &zones)
     {
-        while (true) {
+        for (int tries = 0; tries < 1000; ++tries) {
             auto [x, y] = rnd.select(zones);
             x += rnd.getInt(-6, 2);
             y = scanWhileEmpty({x, y}, {0, 1}, world).y;
@@ -353,6 +353,7 @@ private:
                 return {x, y};
             }
         }
+        return {-1, -1};
     }
 
     void addBiomeChests(const std::vector<Point> &zones)
@@ -386,6 +387,9 @@ private:
                TileID::sandstoneBrick,
                {ItemID::desertTigerStaff, rnd.select(PrefixSet::magic), 1}}}) {
             auto [x, y] = selectBiomeChestLocation(zones);
+            if (x == -1) {
+                continue;
+            }
             for (int i = 0; i < 6; ++i) {
                 world.getTile(x + i, y).blockID = platformBlock;
             }

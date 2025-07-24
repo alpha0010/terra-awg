@@ -75,6 +75,8 @@ void genMarbleCave(Random &rnd, World &world)
             rnd,
             world,
             30);
-        fillMarbleCave(x, y, rnd, world);
+        if (x != -1) {
+            fillMarbleCave(x, y, rnd, world);
+        }
     }
 }

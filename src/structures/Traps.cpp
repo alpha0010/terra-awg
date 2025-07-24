@@ -462,7 +462,8 @@ void placeDartTraps(Random &rnd, World &world)
     int numDartTraps = world.conf.traps * world.getWidth() * world.getHeight() /
                        rnd.getInt(209000, 256000);
     int scanDist = 0.12 * world.getWidth();
-    while (numDartTraps > 0) {
+    for (int tries = 20 * numDartTraps; numDartTraps > 0 && tries > 0;
+         --tries) {
         int bias = rnd.select({world.jungleCenter, world.snowCenter});
         int x = rnd.getInt(bias - scanDist, bias + scanDist);
         int y = rnd.getInt(

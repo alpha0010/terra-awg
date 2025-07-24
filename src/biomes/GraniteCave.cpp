@@ -109,6 +109,8 @@ void genGraniteCave(Random &rnd, World &world)
             rnd,
             world,
             30);
-        fillGraniteCave(x, y, rnd, world);
+        if (x != -1) {
+            fillGraniteCave(x, y, rnd, world);
+        }
     }
 }

@@ -118,8 +118,7 @@ void fillLargeWallGaps(Point from, Point to, Random &rnd, World &world)
 
 Point findStoneCave(int yMin, int yMax, Random &rnd, World &world, int minSize)
 {
-    int numTries = 0;
-    while (true) {
+    for (int numTries = 0; numTries < 5000; ++numTries) {
         if (numTries % 100 == 99 && minSize > 3) {
             // Slowly reduce size requirements if finding a cave is taking too
             // long.
@@ -172,6 +171,7 @@ Point findStoneCave(int yMin, int yMax, Random &rnd, World &world, int minSize)
         // Success.
         return {(left + right) / 2, (caveFloor + caveRoof) / 2};
     }
+    return {-1, -1};
 }
 
 Point getHexCentroid(Point pt, int scale)

@@ -79,15 +79,17 @@ void genGemCave(Random &rnd, World &world)
                 world.getUndergroundLevel() + bandHeight * (band + 1),
                 rnd,
                 world);
-            fillGemCave(
-                x,
-                y,
-                gemTypes[band].first,
-                gemTypes[band].second,
-                gemTypes[band + 1].first,
-                gemTypes[band + 1].second,
-                rnd,
-                world);
+            if (x != -1) {
+                fillGemCave(
+                    x,
+                    y,
+                    gemTypes[band].first,
+                    gemTypes[band].second,
+                    gemTypes[band + 1].first,
+                    gemTypes[band + 1].second,
+                    rnd,
+                    world);
+            }
         }
     }
 }

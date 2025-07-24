@@ -35,6 +35,8 @@ void genSpiderNest(Random &rnd, World &world)
             world.getUnderworldLevel() - 20,
             rnd,
             world);
-        fillSpiderNest(x, y, rnd, world);
+        if (x != -1) {
+            fillSpiderNest(x, y, rnd, world);
+        }
     }
 }

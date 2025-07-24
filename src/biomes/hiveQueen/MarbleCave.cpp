@@ -65,7 +65,7 @@ void genMarbleCaveHiveQueen(Random &rnd, World &world)
             rnd,
             world,
             30);
-        if (world.getTile(x, y).flag != Flag::border) {
+        if (x != -1 && world.getTile(x, y).flag != Flag::border) {
             fillMarbleCaveHex(x, y, rnd, world);
         }
     }

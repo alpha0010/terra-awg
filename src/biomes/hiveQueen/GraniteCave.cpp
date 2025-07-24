@@ -64,7 +64,7 @@ void genGraniteCaveHiveQueen(Random &rnd, World &world)
             rnd,
             world,
             30);
-        if (world.getTile(x, y).flag != Flag::border) {
+        if (x != -1 && world.getTile(x, y).flag != Flag::border) {
             fillGraniteCaveHex(x, y, world);
             for (int probes = world.conf.graniteSize * 20; probes > 0;
                  --probes) {

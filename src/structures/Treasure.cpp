@@ -283,7 +283,7 @@ void placeAltars(int maxBin, LocationBins &locations, Random &rnd, World &world)
          TileID::crimsandstone,
          TileID::hardenedCrimsand,
          TileID::flesh});
-    while (altarCount > 0) {
+    for (int tries = 400 * altarCount; altarCount > 0 && tries > 0; --tries) {
         int binId = rnd.getInt(0, maxBin);
         if (locations[binId].empty()) {
             continue;
