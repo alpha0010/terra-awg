@@ -61,6 +61,9 @@ enum {
     marble = 183,
     granite = 184,
     crystalBlock = 186,
+    sillyPinkBalloon = 228,
+    sillyPurpleBalloon = 229,
+    sillyGreenBalloon = 230,
     ironBrick = 231,
     crimstoneBrick = 234,
     smoothSandstone = 235,
@@ -68,6 +71,8 @@ enum {
     ice = 266,
     obsidian = 267,
     sandstone = 275,
+    hallowedPrism = 288,
+    hallowedCrystalline = 291,
     lichenStone = 292,
     leafyJungle = 293,
     ember = 296,
@@ -78,6 +83,13 @@ enum {
     largeBamboo = 313,
     ashWood = 316,
     aetherium = 321,
+    aetheriumBrick = 322,
+    lunarRustBrick = 323,
+    darkCelestialBrick = 324,
+    cryocoreBrick = 327,
+    argonMossBrick = 342,
+    kryptonMossBrick = 343,
+    neonMossBrick = 345,
 };
 }
 

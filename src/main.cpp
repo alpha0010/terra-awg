@@ -499,10 +499,10 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
             rnd,
             world);
     } else if (special == Seed::celebrationmk10) {
-        writeNPC(NPC::guide, "Andrew", w, rnd, world);
-        writeNPC(NPC::steampunker, "Whitney", w, rnd, world);
-        writeNPC(NPC::princess, "Yorai", w, rnd, world);
-        writeNPC(NPC::partyGirl, "Amanda", w, rnd, world);
+        writeNPC(NPC::guide, "Andrew", w, rnd, world, 1);
+        writeNPC(NPC::steampunker, "Whitney", w, rnd, world, 1);
+        writeNPC(NPC::princess, "Yorai", w, rnd, world, 1);
+        writeNPC(NPC::partyGirl, "Amanda", w, rnd, world, 1);
         writeNPC(
             NPC::townBunny,
             rnd.select(
@@ -649,6 +649,7 @@ int main()
         conf.pots *= 1.6;
         conf.chests *= 1.1;
         conf.gems *= 1.15;
+        conf.trees *= 1.1;
         conf.minecartTracks *= 1.1;
         conf.minecartLength *= 1.35;
     }

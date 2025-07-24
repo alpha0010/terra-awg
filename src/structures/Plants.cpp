@@ -117,11 +117,14 @@ void growPalmTree(int x, int y, Random &rnd, World &world)
     if (!isRegionEmpty(x, y - 4 - height, 3, height + 4, world)) {
         return;
     }
+    int paint =
+        world.conf.celebration ? getRainbowPaint(x / 6, y / 6) : Paint::none;
     int bend = 0;
     int targetBend = 2 * rnd.getInt(-8, 8);
     for (int j = 0; j < height; ++j) {
         Tile &tile = world.getTile(x + 1, y - j - 1);
         tile.blockID = TileID::palmTree;
+        tile.blockPaint = paint;
         tile.frameX = j == height - 1 ? 22 * rnd.getInt(4, 6)
                       : j == 0        ? 66
                                       : 22 * rnd.getInt(0, 2);
@@ -249,9 +252,9 @@ void growTree(
          TileID::rubyTree,
          TileID::amberTree,
          TileID::diamondTree});
-    int paint = gemTrees.contains(treeTile)
-                    ? Paint::none
-                    : world.getTile(x + 1, y).blockPaint;
+    int paint = gemTrees.contains(treeTile) ? Paint::none
+                : world.conf.celebration    ? getRainbowPaint(x / 6, y / 6)
+                                         : world.getTile(x + 1, y).blockPaint;
     for (int j = 0; j < height; ++j) {
         TileBuffer tree =
             Data::getTree(rnd.select(Data::trees), world.getFramedTiles());
@@ -313,7 +316,9 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
                         curTileID,
                         curTileID == TileID::grass &&
                                 rnd.getDouble(0, 1) <
-                                    (world.conf.doubleTrouble ? 0.23 : 0.1)
+                                    (world.conf.celebration     ? 0.75
+                                     : world.conf.doubleTrouble ? 0.23
+                                                                : 0.1)
                             ? rnd.select(
                                   {TileID::sakuraTree,
                                    TileID::yellowWillowTree})

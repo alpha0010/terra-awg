@@ -35,6 +35,37 @@ void placeHomeAt(
              {WallID::Safe::stone,
               rnd.select({WallID::Safe::ember, WallID::Safe::wornStone})}});
         break;
+    case Data::Variant::balloon:
+        themeTiles.insert(
+            {{TileID::wood,
+              rnd.select(
+                  {TileID::sillyPinkBalloon,
+                   TileID::sillyPurpleBalloon,
+                   TileID::sillyGreenBalloon})},
+             {TileID::woodenBeam, TileID::marbleColumn},
+             {TileID::grayBrick,
+              rnd.select(
+                  {TileID::argonMossBrick,
+                   TileID::neonMossBrick,
+                   TileID::kryptonMossBrick})},
+             {TileID::dirt, TileID::sand}});
+        themeWalls.insert(
+            {{WallID::Safe::wood,
+              rnd.select(
+                  {WallID::Safe::sillyPinkBalloon,
+                   WallID::Safe::sillyPurpleBalloon,
+                   WallID::Safe::sillyGreenBalloon})},
+             {WallID::Safe::planked,
+              rnd.select(
+                  {WallID::Safe::darkCelestialBrick,
+                   WallID::Safe::cryocoreBrick,
+                   WallID::Safe::lunarRustBrick})},
+             {WallID::Safe::stone,
+              rnd.select(
+                  {WallID::Safe::hallowedPrism,
+                   WallID::Safe::hallowedCrystalline,
+                   WallID::Safe::aetheriumBrick})}});
+        break;
     case Data::Variant::boreal:
         themeTiles.insert(
             {{TileID::wood, TileID::borealWood},
@@ -153,12 +184,15 @@ void placeHomeAt(
             rnd.select({TileID::grayBrick, TileID::redBrick, TileID::tinBrick});
     }
     constexpr auto brickToWall = frozen::make_map<int, int>({
+        {TileID::argonMossBrick, WallID::Safe::argonMossBrick},
         {TileID::grayBrick, WallID::Safe::grayBrick},
         {TileID::hive, WallID::Safe::hive},
         {TileID::iceBrick, WallID::Safe::iceBrick},
         {TileID::iridescentBrick, WallID::Safe::iridescentBrick},
         {TileID::ironBrick, WallID::Safe::ironBrick},
+        {TileID::kryptonMossBrick, WallID::Safe::kryptonMossBrick},
         {TileID::mudstoneBrick, WallID::Safe::mudstoneBrick},
+        {TileID::neonMossBrick, WallID::Safe::neonMossBrick},
         {TileID::pearlstoneBrick, WallID::Safe::pearlstoneBrick},
         {TileID::redBrick, WallID::Safe::redBrick},
         {TileID::richMahogany, WallID::Safe::richMahogany},
@@ -178,6 +212,7 @@ void placeHomeAt(
          TileID::marble,
          TileID::sand,
          TileID::snow});
+    int rainbowOffset = rnd.getInt(0, 999);
     for (int i = 0; i < home.getWidth(); ++i) {
         int numSolid = 0;
         for (int j = 0; j < home.getHeight(); ++j) {
@@ -210,6 +245,11 @@ void placeHomeAt(
             auto tileItr = themeTiles.find(homeTile.blockID);
             if (tileItr != themeTiles.end()) {
                 homeTile.blockID = tileItr->second;
+                if (theme == Data::Variant::balloon &&
+                    homeTile.blockID == TileID::marbleColumn) {
+                    homeTile.blockPaint =
+                        getDeepRainbowPaint(x + i + rainbowOffset, y + j);
+                }
             }
             auto wallItr = themeWalls.find(homeTile.wallID);
             if (wallItr != themeWalls.end()) {
@@ -333,6 +373,10 @@ void genStarterHome(Random &rnd, World &world)
                    tile.liquid != Liquid::honey;
         })) {
         theme = Data::Variant::honey;
+    }
+    if (world.conf.celebration && !world.conf.forTheWorthy &&
+        !world.conf.hiveQueen) {
+        theme = Data::Variant::balloon;
     }
     TileBuffer home =
         Data::getHome(rnd.select(Data::homes), world.getFramedTiles());

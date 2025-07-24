@@ -118,6 +118,9 @@ void placePressurePlate(int x, int y, bool isSingleUse, World &world)
             break;
         }
     }
+    if (world.conf.celebration && !world.conf.forTheWorthy) {
+        tile.blockPaint = Paint::deepRed;
+    }
 }
 
 void placeSandTraps(Random &rnd, World &world)

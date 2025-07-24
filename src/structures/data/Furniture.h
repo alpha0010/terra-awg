@@ -15,6 +15,7 @@ enum class Variant {
     mushroom,
     obsidian,
     ashWood,
+    balloon,
     boreal,
     forest,
     granite,

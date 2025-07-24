@@ -11,6 +11,7 @@
 #include "vendor/frozen/set.h"
 #include <algorithm>
 #include <iostream>
+#include <numbers>
 #include <set>
 
 namespace Track
@@ -111,19 +112,6 @@ bool canTrackClearTile(Tile &tile)
 {
     return trackClearTiles.contains(tile.blockID) ||
            (tile.blockID == TileID::hive && tile.flag != Flag::none);
-}
-
-inline std::array paintRainbow{
-    Paint::deepRed,    Paint::deepOrange, Paint::deepYellow, Paint::deepLime,
-    Paint::deepGreen,  Paint::deepTeal,   Paint::deepCyan,   Paint::deepSkyBlue,
-    Paint::deepBlue,   Paint::deepPurple, Paint::deepViolet, Paint::deepPink,
-    Paint::deepViolet, Paint::deepPurple, Paint::deepBlue,   Paint::deepSkyBlue,
-    Paint::deepCyan,   Paint::deepTeal,   Paint::deepGreen,  Paint::deepLime,
-    Paint::deepYellow, Paint::deepOrange, Paint::deepRed};
-
-int getRainbowPaint(int x, int y)
-{
-    return paintRainbow[(x + y) % paintRainbow.size()];
 }
 
 inline std::array gemsparkRainbow{
@@ -355,7 +343,7 @@ void applyTrackSupport(int x, int y, World &world)
         if (world.conf.celebration) {
             Tile &beamTile = world.getTile(x, beamY);
             beamTile.blockID = TileID::marbleColumn;
-            beamTile.blockPaint = getRainbowPaint(x, beamY);
+            beamTile.blockPaint = getDeepRainbowPaint(x, beamY);
         } else {
             world.getTile(x, beamY).blockID = TileID::woodenBeam;
         }
@@ -440,8 +428,9 @@ void genTracks(Random &rnd, World &world)
                 continue;
             }
             tile.blockID = TileID::minecartTrack;
-            tile.blockPaint = world.conf.celebration ? getRainbowPaint(x, tries)
-                                                     : Paint::none;
+            tile.blockPaint = world.conf.celebration
+                                  ? getDeepRainbowPaint(x, tries)
+                                  : Paint::none;
             Mode mode = idx + 2 == track.size() ? Mode::none
                         : y > track[idx + 1].y  ? Mode::asc
                         : y < track[idx + 1].y  ? Mode::desc

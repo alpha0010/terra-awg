@@ -269,6 +269,7 @@ inline constexpr auto frameDetail =
         {{TileID::candelabra, Variant::mushroom}, {36, 684}},
         {{TileID::candelabra, Variant::obsidian}, {0, 900}},
         {{TileID::candelabra, Variant::ashWood}, {0, 1512}},
+        {{TileID::candelabra, Variant::balloon}, {0, 1476}},
         {{TileID::candelabra, Variant::boreal}, {0, 720}},
         {{TileID::candelabra, Variant::forest}, {0, 0}},
         {{TileID::candelabra, Variant::granite}, {0, 1044}},
@@ -284,6 +285,7 @@ inline constexpr auto frameDetail =
         {{TileID::candle, Variant::mushroom}, {18, 418}},
         {{TileID::candle, Variant::obsidian}, {0, 550}},
         {{TileID::candle, Variant::ashWood}, {0, 902}},
+        {{TileID::candle, Variant::balloon}, {0, 880}},
         {{TileID::candle, Variant::boreal}, {0, 440}},
         {{TileID::candle, Variant::forest}, {0, 0}},
         {{TileID::candle, Variant::granite}, {0, 616}},
@@ -299,6 +301,7 @@ inline constexpr auto frameDetail =
         {{TileID::chair, Variant::mushroom}, {0, 360}},
         {{TileID::chair, Variant::obsidian}, {0, 640}},
         {{TileID::chair, Variant::ashWood}, {0, 1880}},
+        {{TileID::chair, Variant::balloon}, {0, 1840}},
         {{TileID::chair, Variant::boreal}, {0, 1200}},
         {{TileID::chair, Variant::forest}, {0, 0}},
         {{TileID::chair, Variant::granite}, {0, 1360}},
@@ -314,6 +317,7 @@ inline constexpr auto frameDetail =
         {{TileID::chandelier, Variant::mushroom}, {54, 1296}},
         {{TileID::chandelier, Variant::obsidian}, {0, 1728}},
         {{TileID::chandelier, Variant::ashWood}, {108, 594}},
+        {{TileID::chandelier, Variant::balloon}, {108, 540}},
         {{TileID::chandelier, Variant::boreal}, {0, 1350}},
         {{TileID::chandelier, Variant::forest}, {0, 0}},
         {{TileID::chandelier, Variant::granite}, {0, 1890}},
@@ -328,6 +332,7 @@ inline constexpr auto frameDetail =
         {{TileID::chest, Variant::pinkDungeon}, {1332, 0}},
         {{TileID::chest, Variant::obsidian}, {1584, 0}},
         {{TileID::chest, Variant::ashWood}, {576, 0}},
+        {{TileID::chest, Variant::balloon}, {540, 0}},
         {{TileID::chest, Variant::boreal}, {1188, 0}},
         {{TileID::chest, Variant::forest}, {0, 0}},
         {{TileID::chest, Variant::granite}, {1800, 0}},
@@ -347,6 +352,7 @@ inline constexpr auto frameDetail =
         {{TileID::door, Variant::pinkDungeon}, {0, 972}},
         {{TileID::door, Variant::obsidian}, {0, 1026}},
         {{TileID::door, Variant::ashWood}, {54, 648}},
+        {{TileID::door, Variant::balloon}, {54, 594}},
         {{TileID::door, Variant::boreal}, {0, 1620}},
         {{TileID::door, Variant::forest}, {0, 0}},
         {{TileID::door, Variant::granite}, {0, 1836}},
@@ -368,6 +374,7 @@ inline constexpr auto frameDetail =
         {{TileID::lamp, Variant::mushroom}, {18, 1026}},
         {{TileID::lamp, Variant::obsidian}, {0, 1242}},
         {{TileID::lamp, Variant::ashWood}, {0, 2268}},
+        {{TileID::lamp, Variant::balloon}, {0, 2214}},
         {{TileID::lamp, Variant::boreal}, {0, 1080}},
         {{TileID::lamp, Variant::forest}, {0, 216}},
         {{TileID::lamp, Variant::granite}, {0, 1566}},
@@ -383,6 +390,7 @@ inline constexpr auto frameDetail =
         {{TileID::lantern, Variant::mushroom}, {18, 1008}},
         {{TileID::lantern, Variant::obsidian}, {0, 1152}},
         {{TileID::lantern, Variant::ashWood}, {0, 1728}},
+        {{TileID::lantern, Variant::balloon}, {0, 1692}},
         {{TileID::lantern, Variant::boreal}, {0, 1044}},
         {{TileID::lantern, Variant::forest}, {0, 108}},
         {{TileID::lantern, Variant::granite}, {0, 1260}},
@@ -404,6 +412,7 @@ inline constexpr auto frameDetail =
         {{TileID::platform, Variant::mushroom}, {0, 324}},
         {{TileID::platform, Variant::obsidian}, {0, 234}},
         {{TileID::platform, Variant::ashWood}, {0, 846}},
+        {{TileID::platform, Variant::balloon}, {0, 828}},
         {{TileID::platform, Variant::boreal}, {0, 342}},
         {{TileID::platform, Variant::forest}, {0, 0}},
         {{TileID::platform, Variant::granite}, {0, 504}},
@@ -430,6 +439,7 @@ inline constexpr auto frameDetail =
         {{TileID::table, Variant::mushroom}, {1458, 0}},
         {{TileID::table, Variant::obsidian}, {702, 0}},
         {{TileID::table, Variant::ashWood}, {594, 0}},
+        {{TileID::table, Variant::balloon}, {540, 0}},
         {{TileID::table, Variant::boreal}, {1512, 0}},
         {{TileID::table, Variant::forest}, {0, 0}},
         {{TileID::table, Variant::granite}, {1782, 0}},
@@ -461,11 +471,12 @@ bool convertFurniture(Tile &tile, Variant furnitureSet)
     auto [frameX, frameY] = itr->second;
     tile.frameX += frameX;
     tile.frameY += frameY;
-    if (tile.blockID == TileID::chest && furnitureSet == Variant::ashWood) {
-        tile.blockID = TileID::chestGroup2;
-    } else if (
-        tile.blockID == TileID::table && furnitureSet == Variant::ashWood) {
-        tile.blockID = TileID::tableGroup2;
+    if (furnitureSet == Variant::ashWood || furnitureSet == Variant::balloon) {
+        if (tile.blockID == TileID::chest) {
+            tile.blockID = TileID::chestGroup2;
+        } else if (tile.blockID == TileID::table) {
+            tile.blockID = TileID::tableGroup2;
+        }
     }
     return true;
 }

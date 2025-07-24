@@ -1,6 +1,7 @@
 #include "structures/StructureUtil.h"
 
 #include "World.h"
+#include "ids/Paint.h"
 #include "vendor/frozen/set.h"
 #include <cmath>
 
@@ -179,6 +180,31 @@ Point scanWhileNotSolid(Point from, Point delta, World &world)
         from += delta;
     }
     return from;
+}
+
+inline std::array paintRainbow{
+    Paint::red,     Paint::orange, Paint::yellow,  Paint::lime,   Paint::green,
+    Paint::teal,    Paint::cyan,   Paint::skyBlue, Paint::blue,   Paint::purple,
+    Paint::violet,  Paint::pink,   Paint::violet,  Paint::purple, Paint::blue,
+    Paint::skyBlue, Paint::cyan,   Paint::teal,    Paint::green,  Paint::lime,
+    Paint::yellow,  Paint::orange, Paint::red};
+
+int getRainbowPaint(int x, int y)
+{
+    return paintRainbow[(x + y) % paintRainbow.size()];
+}
+
+inline std::array paintDeepRainbow{
+    Paint::deepRed,    Paint::deepOrange, Paint::deepYellow, Paint::deepLime,
+    Paint::deepGreen,  Paint::deepTeal,   Paint::deepCyan,   Paint::deepSkyBlue,
+    Paint::deepBlue,   Paint::deepPurple, Paint::deepViolet, Paint::deepPink,
+    Paint::deepViolet, Paint::deepPurple, Paint::deepBlue,   Paint::deepSkyBlue,
+    Paint::deepCyan,   Paint::deepTeal,   Paint::deepGreen,  Paint::deepLime,
+    Paint::deepYellow, Paint::deepOrange, Paint::deepRed};
+
+int getDeepRainbowPaint(int x, int y)
+{
+    return paintDeepRainbow[(x + y) % paintDeepRainbow.size()];
 }
 
 void placeWire(Point from, Point to, Wire wire, World &world)

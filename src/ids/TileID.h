@@ -219,6 +219,9 @@ enum {
     detonator = 411,
     sensor = 423,
     geyser = 443,
+    sillyPinkBalloon = 446,
+    sillyPurpleBalloon = 447,
+    sillyGreenBalloon = 448,
     snowCloud = 460,
     sandDrip = 461,
     chestGroup2 = 467,
@@ -265,12 +268,15 @@ enum {
     ashVines = 638,
     manaCrystal = 639,
     TNTBarrel = 654,
+    aetherium = 659,
     corruptJungleGrass = 661,
     crimsonJungleGrass = 662,
     bouncyBoulder = 664,
     lifeCrystalBoulder = 665,
     dirtiestBlock = 668,
-    aetherium = 659
+    argonMossBrick = 688,
+    kryptonMossBrick = 689,
+    neonMossBrick = 691,
 };
 }
 
