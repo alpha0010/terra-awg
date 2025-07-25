@@ -115,6 +115,7 @@ void fillAetherShimmer(
     Random &rnd,
     World &world)
 {
+    world.aether = {centerX, centerY};
     for (int x = centerX - size; x < centerX + size; ++x) {
         for (int y = centerY - size; y < centerY + size; ++y) {
             Tile &tile = world.getTile(x, y);

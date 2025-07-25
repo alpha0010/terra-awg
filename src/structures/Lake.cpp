@@ -278,6 +278,35 @@ void convertExtraLava(Random &rnd, World &world, int x)
     }
 }
 
+void spreadShimmer(World &world)
+{
+    int minX = std::max<int>(300, world.aether.x - 0.03 * world.getWidth());
+    int maxX = std::min<int>(
+        world.getWidth() - 300,
+        world.aether.x + 0.03 * world.getWidth());
+    int minY = std::max<int>(
+        world.getUndergroundLevel(),
+        world.aether.y - 0.3 * world.getHeight());
+    for (int x = minX; x < maxX; ++x) {
+        for (int y = minY; y < world.getUnderworldLevel(); ++y) {
+            if (std::abs(y - world.aether.y) < 200 &&
+                world.getTile(x, y).liquid == Liquid::lava) {
+                convertLiquid(x, y, Liquid::lava, Liquid::shimmer, world);
+            } else {
+                convertLiquid(x, y, Liquid::water, Liquid::shimmer, world);
+            }
+        }
+    }
+    minX = world.oceanCaveCenter < 400 ? world.getWidth() - 200 : 50;
+    maxX = minX + 150;
+    for (int x = minX; x < maxX; ++x) {
+        for (int y = world.getSurfaceLevel(x); y < world.getUndergroundLevel();
+             ++y) {
+            convertLiquid(x, y, Liquid::water, Liquid::shimmer, world);
+        }
+    }
+}
+
 void genLake(Random &rnd, World &world)
 {
     std::cout << "Raining\n";
@@ -320,5 +349,8 @@ void genLake(Random &rnd, World &world)
         parallelFor(
             std::views::iota(0, world.getWidth()),
             [&rnd, &world](int x) { convertExtraLava(rnd, world, x); });
+    }
+    if (world.conf.celebration) {
+        spreadShimmer(world);
     }
 }

@@ -125,6 +125,7 @@ public:
     double snowCenter;
     int surfaceEvilCenter;
     int oceanCaveCenter;
+    Point aether;
     Point dungeon;
     Point gemGrove;
     int gemGroveSize;

@@ -69,6 +69,11 @@ void placePressurePlate(int x, int y, bool isSingleUse, World &world)
 {
     Tile &tile = world.getTile(x, y);
     tile.blockID = TileID::pressurePlate;
+    if (makeSaferTraps(world)) {
+        tile.frameY = isSingleUse ? 126 : 54;
+        tile.blockPaint = Paint::red;
+        return;
+    }
     if (isSingleUse) {
         tile.frameY = 126;
         switch (world.getTile(x, y + 1).blockID) {
@@ -122,9 +127,6 @@ void placePressurePlate(int x, int y, bool isSingleUse, World &world)
             tile.blockPaint = Paint::skyBlue;
             break;
         }
-    }
-    if (makeSaferTraps(world)) {
-        tile.blockPaint = Paint::deepRed;
     }
 }
 
