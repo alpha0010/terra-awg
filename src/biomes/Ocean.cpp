@@ -165,6 +165,61 @@ void addOceanCave(int waterTable, Random &rnd, World &world)
         });
 }
 
+void setOceanSpawn(Random &rnd, World &world)
+{
+    std::vector<Point> opts;
+    std::vector<Point> opts4;
+    auto addSpawnOpt = [&opts, &opts4, &world](int x, int y) {
+        if (world.regionPasses(
+                x - 1,
+                y - 4,
+                3,
+                5,
+                [](Tile &tile) { return tile.blockID == TileID::empty; }) &&
+            world.regionPasses(x - 1, y + 1, 3, 1, [](Tile &tile) {
+                return tile.blockID != TileID::empty;
+            })) {
+            opts.emplace_back(x, y);
+            if (world.regionPasses(
+                    x - 2,
+                    y - 4,
+                    1,
+                    5,
+                    [](Tile &tile) { return tile.blockID == TileID::empty; }) &&
+                world.regionPasses(x - 2, y + 1, 1, 1, [](Tile &tile) {
+                    return tile.blockID != TileID::empty;
+                })) {
+                opts4.emplace_back(x, y);
+            }
+        }
+    };
+    std::vector<int> centers;
+    if (world.conf.celebration || world.conf.hiveQueen) {
+        centers.push_back(
+            world.oceanCaveCenter < 400 ? 300 : world.getWidth() - 300);
+    } else {
+        centers.insert(centers.end(), {300, world.getWidth() - 300});
+    }
+    for (int x : centers) {
+        int y = world.getSurfaceLevel(x);
+        for (int i = -50; i < 50; ++i) {
+            for (int j = -20; j < 20; ++j) {
+                addSpawnOpt(x + i, y + j);
+            }
+        }
+    }
+    if (!opts4.empty()) {
+        opts = opts4;
+    } else if (opts.empty()) {
+        return;
+    }
+    std::shuffle(opts.begin(), opts.end(), rnd.getPRNG());
+    world.spawn = *std::min_element(
+        opts.begin(),
+        opts.end(),
+        [](const Point &a, const Point &b) { return a.y < b.y; });
+}
+
 void genOceans(Random &rnd, World &world)
 {
     std::cout << "Filling oceans\n";
@@ -239,4 +294,7 @@ void genOceans(Random &rnd, World &world)
         fillColumn(world.getWidth() - x - 1);
     }
     addOceanCave(waterTable, rnd, world);
+    if (world.conf.spawn == SpawnPoint::ocean) {
+        setOceanSpawn(rnd, world);
+    }
 }

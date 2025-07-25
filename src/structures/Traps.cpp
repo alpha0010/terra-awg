@@ -60,6 +60,11 @@ bool isTrappable(Tile &tile)
             (tile.blockID == TileID::hive && tile.flag != Flag::none));
 }
 
+bool makeSaferTraps(World &world)
+{
+    return world.conf.celebration && !world.conf.forTheWorthy;
+}
+
 void placePressurePlate(int x, int y, bool isSingleUse, World &world)
 {
     Tile &tile = world.getTile(x, y);
@@ -118,7 +123,7 @@ void placePressurePlate(int x, int y, bool isSingleUse, World &world)
             break;
         }
     }
-    if (world.conf.celebration && !world.conf.forTheWorthy) {
+    if (makeSaferTraps(world)) {
         tile.blockPaint = Paint::deepRed;
     }
 }

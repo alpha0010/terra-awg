@@ -646,6 +646,9 @@ int main()
         world.adamantiteVariant = TileID::empty;
     }
     if (conf.celebration) {
+        if (conf.spawn == SpawnPoint::normal) {
+            conf.spawn = SpawnPoint::ocean;
+        }
         conf.pots *= 1.6;
         conf.chests *= 1.1;
         conf.gems *= 1.15;
@@ -665,6 +668,9 @@ int main()
         conf.templeSize *= 1.4;
         conf.glowingMossSize *= 1.225;
         conf.evilSize *= 1.58;
+    }
+    if (conf.spawn == SpawnPoint::normal) {
+        conf.spawn = SpawnPoint::surface;
     }
 
     doWorldGen(rnd, world);

@@ -57,6 +57,11 @@ home = false
 #   none/iron/platinum/hellstone/mythril
 equipment = none
 
+# Select spawn point. "normal" spawn automatically determines location
+# based on active secret seeds.
+#   normal/surface/cloud/ocean/cavern/underworld
+spawn = normal
+
 # Include both evil biomes and all ore variants.
 # Activates "drunk world" secret seed.
 doubleTrouble = false
@@ -498,6 +503,24 @@ int parseEquipment(const std::string &equipment)
     return 0;
 }
 
+SpawnPoint parseSpawn(const std::string &spawn)
+{
+    if (spawn == "surface") {
+        return SpawnPoint::surface;
+    } else if (spawn == "cloud") {
+        return SpawnPoint::cloud;
+    } else if (spawn == "ocean") {
+        return SpawnPoint::ocean;
+    } else if (spawn == "cavern") {
+        return SpawnPoint::cavern;
+    } else if (spawn == "underworld") {
+        return SpawnPoint::underworld;
+    } else if (spawn != "normal") {
+        std::cout << "Unknown spawn '" << spawn << "'\n";
+    }
+    return SpawnPoint::normal;
+}
+
 std::string genRandomName(Random &rnd)
 {
     switch (rnd.getInt(0, 7)) {
@@ -571,6 +594,7 @@ Config readConfig(Random &rnd)
         EvilBiome::random,
         false, // starterHome
         0,     // equipment
+        SpawnPoint::normal,
         false, // doubleTrouble
         false, // shattered
         false, // sunken
@@ -644,6 +668,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(world, home, Boolean);
     conf.equipment =
         parseEquipment(reader.Get("variation", "equipment", "none"));
+    conf.spawn = parseSpawn(reader.Get("variation", "spawn", "normal"));
     READ_CONF_VALUE(variation, doubleTrouble, Boolean);
     READ_CONF_VALUE(variation, shattered, Boolean);
     READ_CONF_VALUE(variation, sunken, Boolean);

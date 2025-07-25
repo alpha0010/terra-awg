@@ -27,7 +27,7 @@ bool isSunken(int x, int y, World &world)
                     world.getSurfaceLevel(world.getWidth() / 2),
                     world.getSurfaceLevel(world.getWidth() / 2 + delta)}) +
                    (world.conf.shattered ? 3 : 0) &&
-           hypot(world.dungeon, {x, y}) > 78;
+           hypot(world.spawn, {x, y}) > 38 && hypot(world.dungeon, {x, y}) > 78;
 }
 
 void growBamboo(int x, int y, Random &rnd, World &world)

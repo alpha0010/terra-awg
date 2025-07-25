@@ -9,6 +9,8 @@ enum class GameMode { journey = 3, classic = 0, expert = 1, master = 2 };
 
 enum class EvilBiome { random, corruption, crimson };
 
+enum class SpawnPoint { normal, surface, cloud, ocean, cavern, underworld };
+
 struct Config {
     std::string name;
     std::string seed;
@@ -18,6 +20,7 @@ struct Config {
     EvilBiome evil;
     bool home;
     int equipment;
+    SpawnPoint spawn;
     bool doubleTrouble;
     bool shattered;
     bool sunken;

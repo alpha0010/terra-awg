@@ -95,6 +95,36 @@ void floodFill(int startX, int startY, int minY, World &world)
     }
 }
 
+void floodBubbleInit(Point center, int size, World &world)
+{
+    for (int i = -size; i < size; ++i) {
+        for (int j = -size; j < size; ++j) {
+            if (std::hypot(i, j) < size) {
+                Tile &tile = world.getTile(center + Point{i, j});
+                if (tile.blockID == TileID::empty &&
+                    !skipWalls.contains(tile.wallID)) {
+                    tile.blockID = TileID::bubble;
+                }
+            }
+        }
+    }
+}
+
+void floodBubbleFinalize(Point center, int size, World &world)
+{
+    for (int i = -size; i < size; ++i) {
+        for (int j = -size; j < size; ++j) {
+            if (std::hypot(i, j) < size) {
+                Tile &tile = world.getTile(center + Point{i, j});
+                tile.liquid = Liquid::none;
+                if (tile.blockID == TileID::bubble) {
+                    tile.blockID = TileID::empty;
+                }
+            }
+        }
+    }
+}
+
 void genFlood(World &world)
 {
     std::cout << "Flooding\n";
@@ -106,17 +136,10 @@ void genFlood(World &world)
              world.getSurfaceLevel(world.getWidth() / 2 + probeDelta)}) +
         (world.conf.shattered ? 3 : 0);
     if (floodLevel < world.dungeon.y + 4) {
-        for (int i = -85; i < 85; ++i) {
-            for (int j = -85; j < 85; ++j) {
-                if (std::hypot(i, j) < 85) {
-                    Tile &tile = world.getTile(world.dungeon + Point{i, j});
-                    if (tile.blockID == TileID::empty &&
-                        !skipWalls.contains(tile.wallID)) {
-                        tile.blockID = TileID::bubble;
-                    }
-                }
-            }
-        }
+        floodBubbleInit(world.dungeon, 85, world);
+    }
+    if (floodLevel < world.spawn.y - 2) {
+        floodBubbleInit(world.spawn, 45, world);
     }
     for (int x = 0; x < world.getWidth(); ++x) {
         for (int y = floodLevel; y < world.getUndergroundLevel() + 30; ++y) {
@@ -124,16 +147,9 @@ void genFlood(World &world)
         }
     }
     if (floodLevel < world.dungeon.y + 4) {
-        for (int i = -82; i < 82; ++i) {
-            for (int j = -82; j < 82; ++j) {
-                if (std::hypot(i, j) < 82) {
-                    Tile &tile = world.getTile(world.dungeon + Point{i, j});
-                    tile.liquid = Liquid::none;
-                    if (tile.blockID == TileID::bubble) {
-                        tile.blockID = TileID::empty;
-                    }
-                }
-            }
-        }
+        floodBubbleFinalize(world.dungeon, 82, world);
+    }
+    if (floodLevel < world.spawn.y - 2) {
+        floodBubbleFinalize(world.spawn, 42, world);
     }
 }
