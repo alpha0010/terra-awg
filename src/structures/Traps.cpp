@@ -320,6 +320,9 @@ void placeBoulderTraps(Random &rnd, World &world)
                     probeTileId == TileID::pinkSlime ||
                     probeWallId == WallID::Unsafe::mushroom
                 ? TileID::bouncyBoulder
+            : makeSaferTraps(world) &&
+                    rnd.getDouble(0, 1) < 0.1 / std::max(world.conf.traps, 1.0)
+                ? TileID::lifeCrystalBoulder
                 : TileID::boulder);
         for (int i = -2; i < 4; ++i) {
             for (int j = -2; j < 4; ++j) {
@@ -452,6 +455,9 @@ bool targetWithDartTraps(int x, int y, int maxTraps, Random &rnd, World &world)
     if (traps.empty()) {
         return false;
     }
+    if (makeSaferTraps(world)) {
+        maxTraps = std::max(maxTraps / 2, 1);
+    }
     std::shuffle(traps.begin(), traps.end(), rnd.getPRNG());
     traps.resize(rnd.getInt(1, std::min<int>(traps.size(), maxTraps)));
     for (auto trap : traps) {
@@ -537,6 +543,10 @@ bool addChestBoulderTraps(int x, int y, Random &rnd, World &world)
     if (traps.empty()) {
         return false;
     }
+    if (makeSaferTraps(world) && traps.size() > 2) {
+        std::shuffle(traps.begin(), traps.end(), rnd.getPRNG());
+        traps.resize(traps.size() / 2);
+    }
     for (auto trap : traps) {
         placeWire({trap.x, trap.y + 2}, {x, y}, Wire::red, world);
         for (int i = 0; i < 2; ++i) {
@@ -570,6 +580,9 @@ bool addChestDartTraps(int x, int y, Random &rnd, World &world)
 bool addChestExplosiveTraps(int x, int y, Random &rnd, World &world)
 {
     double numExplosives = rnd.getDouble(0, 3);
+    if (makeSaferTraps(world)) {
+        numExplosives *= 0.7;
+    }
     bool didTrap = false;
     while (numExplosives > 0) {
         int i = rnd.getInt(-9, 9);
