@@ -1,6 +1,7 @@
 #include "biomes/hardmode/Hallow.h"
 
 #include "Cleanup.h"
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
@@ -233,7 +234,7 @@ void genHallow(Random &rnd, World &world)
             if (wallItr != hallowWalls.end()) {
                 tile.wallID = wallItr->second;
             }
-            if (paintedBlocks.contains(tile.blockID)) {
+            if (!world.conf.unpainted && paintedBlocks.contains(tile.blockID)) {
                 tile.blockPaint = tile.blockID == TileID::jungleGrass
                                       ? Paint::cyan
                                       : Paint::pink;

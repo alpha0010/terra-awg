@@ -303,13 +303,15 @@ public:
         placeLarvae(flatLocations);
         addTempleTraps(flatLocations, 45, rnd, world);
         addSpikes(center);
-        applyPaint(
-            center,
-            rnd.select(
-                {Paint::yellow,
-                 Paint::orange,
-                 Paint::deepYellow,
-                 Paint::deepOrange}));
+        if (!world.conf.unpainted) {
+            applyPaint(
+                center,
+                rnd.select(
+                    {Paint::yellow,
+                     Paint::orange,
+                     Paint::deepYellow,
+                     Paint::deepOrange}));
+        }
     }
 };
 

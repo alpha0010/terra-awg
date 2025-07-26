@@ -62,6 +62,9 @@ equipment = none
 #   normal/surface/cloud/ocean/cavern/underworld
 spawn = normal
 
+# Prevent other settings from fully painting large structures and biomes.
+unpainted = false
+
 # Include both evil biomes and all ore variants.
 # Activates "drunk world" secret seed.
 doubleTrouble = false
@@ -595,6 +598,7 @@ Config readConfig(Random &rnd)
         false, // starterHome
         0,     // equipment
         SpawnPoint::normal,
+        false, // unpainted
         false, // doubleTrouble
         false, // shattered
         false, // sunken
@@ -669,6 +673,7 @@ Config readConfig(Random &rnd)
     conf.equipment =
         parseEquipment(reader.Get("variation", "equipment", "none"));
     conf.spawn = parseSpawn(reader.Get("variation", "spawn", "normal"));
+    READ_CONF_VALUE(variation, unpainted, Boolean);
     READ_CONF_VALUE(variation, doubleTrouble, Boolean);
     READ_CONF_VALUE(variation, shattered, Boolean);
     READ_CONF_VALUE(variation, sunken, Boolean);

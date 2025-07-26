@@ -1,5 +1,6 @@
 #include "structures/hiveQueen/GlobalHive.h"
 
+#include "Config.h"
 #include "Util.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -38,10 +39,14 @@ void genGlobalHive(World &world)
                         }
                         break;
                     case Flag::yellow:
-                        tile.blockPaint = Paint::deepYellow;
+                        if (!world.conf.unpainted) {
+                            tile.blockPaint = Paint::deepYellow;
+                        }
                         break;
                     case Flag::orange:
-                        tile.blockPaint = Paint::deepOrange;
+                        if (!world.conf.unpainted) {
+                            tile.blockPaint = Paint::deepOrange;
+                        }
                         break;
                     default:
                         break;

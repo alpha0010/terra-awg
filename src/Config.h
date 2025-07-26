@@ -21,6 +21,7 @@ struct Config {
     bool home;
     int equipment;
     SpawnPoint spawn;
+    bool unpainted;
     bool doubleTrouble;
     bool shattered;
     bool sunken;

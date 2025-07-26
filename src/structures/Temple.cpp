@@ -486,18 +486,18 @@ void addSpikes(Point center, Random &rnd, World &world)
     });
 }
 
-void paintTemple(Point center, int paint, World &world)
+void paintTemple(Point center, int blockPaint, int wallPaint, World &world)
 {
-    iterateTemple(center, world, [paint, &world](int x, int y) {
+    iterateTemple(center, world, [blockPaint, wallPaint, &world](int x, int y) {
         Tile &tile = world.getTile(x, y);
         if (tile.blockID == TileID::lihzahrdBrick ||
             tile.blockID == TileID::platform ||
             tile.blockID == TileID::pressurePlate ||
             tile.blockID == TileID::trap) {
-            tile.blockPaint = paint;
+            tile.blockPaint = blockPaint;
         }
         if (tile.wallID == WallID::Unsafe::lihzahrdBrick) {
-            tile.wallPaint = paint;
+            tile.wallPaint = wallPaint;
         }
         return true;
     });
@@ -622,9 +622,13 @@ void genTemple(Random &rnd, World &world)
     std::shuffle(flatLocations.begin(), flatLocations.end(), rnd.getPRNG());
     addTempleTraps(flatLocations, 75, rnd, world);
     addSpikes(center, rnd, world);
-    if (world.conf.forTheWorthy) {
-        paintTemple(center, Paint::deepGreen, world);
-    } else if (world.conf.doubleTrouble) {
-        paintTemple(center, Paint::deepLime, world);
+    if (!world.conf.unpainted) {
+        if (world.conf.forTheWorthy) {
+            paintTemple(center, Paint::deepGreen, Paint::deepGreen, world);
+        } else if (world.conf.celebration) {
+            paintTemple(center, Paint::purple, Paint::cyan, world);
+        } else if (world.conf.doubleTrouble) {
+            paintTemple(center, Paint::deepLime, Paint::deepLime, world);
+        }
     }
 }
