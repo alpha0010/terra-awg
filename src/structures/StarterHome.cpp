@@ -65,6 +65,9 @@ void placeHomeAt(
                   {WallID::Safe::hallowedPrism,
                    WallID::Safe::hallowedCrystalline,
                    WallID::Safe::aetheriumBrick})}});
+        if (y > world.getUnderworldLevel()) {
+            themeTiles[TileID::dirt] = TileID::ash;
+        }
         break;
     case Data::Variant::boreal:
         themeTiles.insert(
@@ -314,6 +317,19 @@ int realSurfaceAt(int x, World &world, int prevY = -1)
     return scanWhileEmpty({x, minY}, {0, 1}, world).y + 1;
 }
 
+int underworldSurfaceAt(int x, World &world, int prevY = -1)
+{
+    int minY = world.getUnderworldLevel() +
+               0.32 * (world.getHeight() - world.getUnderworldLevel());
+    if (prevY != -1) {
+        minY = std::min(minY, prevY);
+    }
+    while (world.getTile(x, minY).blockID != TileID::empty) {
+        --minY;
+    }
+    return scanWhileEmpty({x, minY}, {0, 1}, world).y + 1;
+}
+
 void clearSpawnHive(World &world)
 {
     int x = world.spawn.x;
@@ -336,17 +352,20 @@ void clearSpawnHive(World &world)
 void genStarterHome(Random &rnd, World &world)
 {
     std::cout << "Purchasing property\n";
-    if (world.conf.hiveQueen) {
+    if (world.conf.hiveQueen &&
+        std::abs(world.getSurfaceLevel(world.spawn.x) - world.spawn.y) < 30) {
         clearSpawnHive(world);
     }
     std::map<int, int> tileCounts;
     int x = world.spawn.x;
-    int y = realSurfaceAt(x, world);
+    int y = world.spawn.y > world.getUnderworldLevel()
+                ? underworldSurfaceAt(x, world)
+                : realSurfaceAt(x, world);
     for (int j = 0; j < 6; ++j) {
         tileCounts[world.getTile(x, y + j).blockID] += 1;
     }
     Data::Variant theme = Data::Variant::forest;
-    if (tileCounts[TileID::ash] > 2) {
+    if (tileCounts[TileID::ash] + tileCounts[TileID::hellstone] > 2) {
         theme = Data::Variant::ashWood;
     } else if (tileCounts[TileID::snow] > 2) {
         theme = Data::Variant::boreal;
@@ -383,7 +402,11 @@ void genStarterHome(Random &rnd, World &world)
     x -= home.getWidth() / 2;
     for (int iter = 0; iter < 2; ++iter) {
         for (int i = 7; i < home.getWidth() - 7; ++i) {
-            y = std::min(realSurfaceAt(x + i, world, y), y);
+            y = std::min(
+                world.spawn.y > world.getUnderworldLevel()
+                    ? underworldSurfaceAt(x + i, world, y)
+                    : realSurfaceAt(x + i, world, y),
+                y);
         }
     }
     world.spawn.y = y - 1;

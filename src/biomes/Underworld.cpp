@@ -7,6 +7,7 @@
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
 #include "structures/data/Bridges.h"
+#include <algorithm>
 #include <iostream>
 #include <map>
 #include <set>
@@ -134,8 +135,9 @@ void genUnderworld(Random &rnd, World &world)
     double upperDist = centerLevel - world.getUnderworldLevel();
     double lowerDist = world.getHeight() - centerLevel;
     int lavaLevel = world.getUnderworldLevel() + 0.46 * underworldHeight;
-    double aspectRatio =
-        static_cast<double>(world.getHeight()) / world.getWidth();
+    double aspectRatio = std::min(
+        static_cast<double>(world.getHeight()) / world.getWidth(),
+        0.5);
     parallelFor(
         std::views::iota(0, world.getWidth()),
         [aspectRatio,
@@ -207,6 +209,7 @@ void genUnderworld(Random &rnd, World &world)
     addBridges(centerLevel, lavaLevel, rnd, world);
     int skipFrom = 0.15 * world.getWidth();
     int skipTo = 0.85 * world.getWidth();
+    std::vector<Point> spawnOpts;
     for (int x = 0; x < world.getWidth(); ++x) {
         if (x == skipFrom) {
             x = skipTo;
@@ -215,7 +218,36 @@ void genUnderworld(Random &rnd, World &world)
             Tile &tile = world.getTile(x, y);
             if (tile.blockID == TileID::ash && world.isExposed(x, y)) {
                 tile.blockID = TileID::ashGrass;
+                if (world.conf.spawn == SpawnPoint::underworld &&
+                    y > centerLevel && x > 150 && x < world.getWidth() - 150) {
+                    spawnOpts.emplace_back(x, y - 1);
+                }
             }
+        }
+    }
+    std::shuffle(spawnOpts.begin(), spawnOpts.end(), rnd.getPRNG());
+    for (auto [x, y] : spawnOpts) {
+        int numEmpty = 0;
+        if (world.regionPasses(
+                x - 7,
+                y - 4,
+                15,
+                1,
+                [](Tile &tile) { return tile.blockID == TileID::empty; }) &&
+            world.regionPasses(
+                x - 3,
+                y - 3,
+                7,
+                4,
+                [](Tile &tile) { return tile.blockID == TileID::empty; }) &&
+            world.regionPasses(x - 5, y + 1, 11, 2, [&numEmpty](Tile &tile) {
+                if (tile.blockID == TileID::empty) {
+                    ++numEmpty;
+                }
+                return numEmpty < 4;
+            })) {
+            world.spawn = {x, y};
+            break;
         }
     }
 }

@@ -138,7 +138,12 @@ void genFlood(World &world)
     if (floodLevel < world.dungeon.y + 4) {
         floodBubbleInit(world.dungeon, 85, world);
     }
-    if (floodLevel < world.spawn.y - 2) {
+    bool shouldBubbleSpawn =
+        floodLevel < world.spawn.y - 2 &&
+        world.spawn.y < (world.conf.shattered
+                             ? world.getUnderworldLevel()
+                             : world.getUndergroundLevel() + 30);
+    if (shouldBubbleSpawn) {
         floodBubbleInit(world.spawn, 45, world);
     }
     for (int x = 0; x < world.getWidth(); ++x) {
@@ -149,7 +154,7 @@ void genFlood(World &world)
     if (floodLevel < world.dungeon.y + 4) {
         floodBubbleFinalize(world.dungeon, 82, world);
     }
-    if (floodLevel < world.spawn.y - 2) {
+    if (shouldBubbleSpawn) {
         floodBubbleFinalize(world.spawn, 42, world);
     }
 }
