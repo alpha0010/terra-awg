@@ -55,6 +55,7 @@ void fillDungeonBiomeChest(
     Chest &chest,
     Random &rnd,
     World &world,
+    int dye,
     Item &&primaryItem);
 void fillLihzahrdChest(Chest &chest, Random &rnd, World &world);
 void fillStarterChest(int level, Chest &chest, Random &rnd, World &world);

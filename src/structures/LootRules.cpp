@@ -2134,6 +2134,7 @@ void fillDungeonBiomeChest(
     Chest &chest,
     Random &rnd,
     World &world,
+    int dye,
     Item &&primaryItem)
 {
     fillLoot(
@@ -2141,6 +2142,7 @@ void fillDungeonBiomeChest(
         rnd,
         {{1, primaryItem},
          getGlobalItemPrimary(rnd, world),
+         {1, {dye, Prefix::none, rnd.getInt(3, 6)}},
          {0.5, {ItemID::remnantsOfDevotion, Prefix::none, 1}},
          {1,
           {rnd.select(

@@ -358,33 +358,39 @@ private:
 
     void addBiomeChests(const std::vector<Point> &zones)
     {
-        for (auto [chestType, lampType, platformBlock, item] :
+        for (auto [chestType, lampType, platformBlock, dye, item] :
              {std::tuple{
                   Variant::jungle,
                   Variant::dynasty,
                   TileID::mudstoneBrick,
+                  ItemID::chlorophyteDye,
                   Item{ItemID::piranhaGun, rnd.select(PrefixSet::ranged), 1}},
               {Variant::corruption,
                Variant::lesion,
                TileID::ebonstoneBrick,
+               ItemID::reflectiveObsidianDye,
                {ItemID::scourgeOfTheCorruptor,
                 rnd.select(PrefixSet::common),
                 1}},
               {Variant::crimson,
                Variant::flesh,
                TileID::crimstoneBrick,
+               ItemID::bloodbathDye,
                {ItemID::vampireKnives, rnd.select(PrefixSet::common), 1}},
               {Variant::hallowed,
                Variant::crystal,
                TileID::pearlstoneBrick,
+               ItemID::rainbowDye,
                {ItemID::rainbowGun, rnd.select(PrefixSet::magic), 1}},
               {Variant::ice,
                Variant::frozen,
                TileID::iceBrick,
+               ItemID::hadesDye,
                {ItemID::staffOfTheFrostHydra, rnd.select(PrefixSet::magic), 1}},
               {Variant::desert,
                Variant::sandstone,
                TileID::sandstoneBrick,
+               ItemID::shiftingSandsDye,
                {ItemID::desertTigerStaff, rnd.select(PrefixSet::magic), 1}}}) {
             auto [x, y] = selectBiomeChestLocation(zones);
             if (x == -1) {
@@ -397,7 +403,7 @@ private:
                 world.getTile(x + i, y - 1).blockID = platformBlock;
             }
             Chest &chest = world.placeChest(x + 2, y - 3, chestType);
-            fillDungeonBiomeChest(chest, rnd, world, std::move(item));
+            fillDungeonBiomeChest(chest, rnd, world, dye, std::move(item));
             world.placeFramedTile(x, y - 3, TileID::lamp, lampType);
             world.placeFramedTile(x + 5, y - 3, TileID::lamp, lampType);
         }
