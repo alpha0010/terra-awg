@@ -279,12 +279,14 @@ const uint8_t *getTileColor(int x, int y, World &world)
 {
     std::memcpy(colorBuffer, getRawTileColor(x, y, world), 3);
     Tile &tile = world.getTile(x, y);
-    if (tile.blockID != TileID::empty) {
+    if (tile.blockID != TileID::empty && !tile.echoCoatBlock) {
         applyPaint(tile.blockPaint);
-    } else if (tile.liquid == Liquid::none && tile.wallID != WallID::empty) {
+    } else if (
+        tile.liquid == Liquid::none && tile.wallID != WallID::empty &&
+        !tile.echoCoatWall) {
         applyPaint(tile.wallPaint);
     }
-    if (tile.actuated) {
+    if (tile.actuated && !tile.echoCoatBlock) {
         blendColor(0, 0, 0);
     }
     if (tile.wireRed) {

@@ -238,7 +238,7 @@ void genCloud(Random &rnd, World &world)
     std::cout << "Condensing clouds\n";
     rnd.shuffleNoise();
     int numClouds =
-        world.conf.clouds * world.getWidth() / rnd.getInt(600, 1300);
+        world.conf.clouds * world.getWidth() / rnd.getInt(600, 1250);
     std::vector<int> rooms(Data::skyBoxes.begin(), Data::skyBoxes.end());
     std::shuffle(rooms.begin(), rooms.end(), rnd.getPRNG());
     auto roomItr = rooms.begin();

@@ -48,6 +48,7 @@
 #include "structures/BuriedBoat.h"
 #include "structures/DesertTomb.h"
 #include "structures/Dungeon.h"
+#include "structures/GlobalEcho.h"
 #include "structures/Lake.h"
 #include "structures/MinecartTracks.h"
 #include "structures/MushroomCabin.h"
@@ -117,6 +118,7 @@ enum class Step {
     finalizeWalls,
     genVines,
     genGrasses,
+    genGlobalEcho,
     // Double Trouble.
     swapResources,
     genSecondaryCrimson,
@@ -193,7 +195,7 @@ inline std::array baseStructureRules{
     Step::applyHardmodeLoot, Step::genGlobalHive,    Step::genPlants,
     Step::genTraps,          Step::genTracks,        Step::genFlood,
     Step::smoothSurfaces,    Step::finalizeWalls,    Step::genVines,
-    Step::genGrasses,
+    Step::genGrasses,        Step::genGlobalEcho,
 };
 
 inline std::array patchesBiomeRules{
@@ -333,6 +335,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
     case Step::genGrasses:
         genGrasses(locations, rnd, world);
         break;
+        GEN_STEP(genGlobalEcho)
         GEN_STEP(swapResources)
         GEN_STEP(genSecondaryCrimson)
         GEN_STEP(genSecondaryCorruption)
@@ -372,6 +375,9 @@ void doWorldGen(Random &rnd, World &world)
     excludes.insert(world.isCrimson ? Step::genCorruption : Step::genCrimson);
     if (!world.conf.home) {
         excludes.insert(Step::genStarterHome);
+    }
+    if (world.conf.fadedMemories < 0.001) {
+        excludes.insert(Step::genGlobalEcho);
     }
     if (world.conf.doubleTrouble) {
         excludes.insert(

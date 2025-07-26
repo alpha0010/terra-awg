@@ -65,6 +65,10 @@ spawn = normal
 # Prevent other settings from fully painting large structures and biomes.
 unpainted = false
 
+# Apply echo coating to a portion of the world. 0.5 means apply to half
+# the tiles, 1.0 means apply to everything.
+fadedMemories = 0.0
+
 # Include both evil biomes and all ore variants.
 # Activates "drunk world" secret seed.
 doubleTrouble = false
@@ -599,6 +603,7 @@ Config readConfig(Random &rnd)
         0,     // equipment
         SpawnPoint::normal,
         false, // unpainted
+        0.0,   // fadedMemories
         false, // doubleTrouble
         false, // shattered
         false, // sunken
@@ -674,6 +679,7 @@ Config readConfig(Random &rnd)
         parseEquipment(reader.Get("variation", "equipment", "none"));
     conf.spawn = parseSpawn(reader.Get("variation", "spawn", "normal"));
     READ_CONF_VALUE(variation, unpainted, Boolean);
+    READ_CONF_VALUE(variation, fadedMemories, Real);
     READ_CONF_VALUE(variation, doubleTrouble, Boolean);
     READ_CONF_VALUE(variation, shattered, Boolean);
     READ_CONF_VALUE(variation, sunken, Boolean);
