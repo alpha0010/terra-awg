@@ -23,7 +23,8 @@ enum class Variant {
     livingWood,
     mahogany,
     marble,
-    palm
+    palm,
+    skyware,
 };
 
 inline auto furnitureLayouts = std::views::iota(0, 29);

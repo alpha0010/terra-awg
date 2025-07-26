@@ -84,7 +84,7 @@ void makeResourceCloud(
         bool prevWasEmpty = true;
         while (depth > 0) {
             Tile &tile = world.getTile(x, y);
-            if (tile.blockID != TileID::empty) {
+            if (tile.blockID != TileID::empty && tile.blockID != TileID::hive) {
                 tile.blockID = TileID::dirt;
                 if (prevWasEmpty) {
                     tile.wallID = WallID::empty;
@@ -100,7 +100,7 @@ void makeResourceCloud(
     for (int x = startX; x < startX + width; ++x) {
         for (int y = startY; y < startY + height; ++y) {
             Tile &tile = world.getTile(x, y);
-            if (tile.blockID != TileID::empty &&
+            if (tile.blockID != TileID::empty && tile.blockID != TileID::hive &&
                 (std::abs(rnd.getFineNoise(x, y + startY)) > 0.65 ||
                  std::abs(rnd.getFineNoise(x + startX, y)) > 0.65)) {
                 tile.blockID = world.goldVariant;
@@ -233,10 +233,81 @@ void addCloudStructure(
         });
 }
 
+Point selectCloudSpawn(int width, int height, Random &rnd, World &world)
+{
+    int maxY = 0.45 * world.getUndergroundLevel();
+    int x = world.conf.celebration && !world.conf.forTheWorthy
+                ? (world.oceanCaveCenter < 400 ? 350 : world.getWidth() - 350)
+                : world.getWidth() / 2;
+    int y = std::max(std::midpoint<int>(50 + height, maxY), maxY - 85);
+    for (int tries = 0; tries < 10000; ++tries) {
+        int i = rnd.getInt(-190, 190);
+        int j = rnd.getInt(-80, 80);
+        int buffer = 10 - tries / 110;
+        if (y + j > 90 && y + j + 2 * height < maxY &&
+            world.regionPasses(
+                x + i + buffer / 2 - width,
+                y + j + buffer / 4 - 20 - height,
+                2 * width + buffer,
+                2 * height + buffer / 2 + 20,
+                [](Tile &tile) { return tile.blockID == TileID::empty; })) {
+            return {x + i, y + j};
+        }
+    }
+    return {-1, -1};
+}
+
+void setCloudSpawn(Random &rnd, World &world)
+{
+    int width = rnd.getInt(75, 85);
+    int height = rnd.getInt(22, 28);
+    auto [x, y] = selectCloudSpawn(width, height, rnd, world);
+    if (x == -1) {
+        return;
+    }
+    for (int i = -width; i < width; ++i) {
+        for (int j = -height; j < height; ++j) {
+            auto [hX, hY] = world.conf.hiveQueen
+                                ? getHexCentroid(x + i, y + j, 8)
+                                : Point{x + i, y + j};
+            double threshold = 4 * std::hypot(
+                                       static_cast<double>(hX - x) / width,
+                                       static_cast<double>(hY - y) / height) -
+                               3;
+            if (rnd.getFineNoise(hX, hY) < threshold) {
+                continue;
+            }
+            Tile &tile = world.getTile(x + i, y + j);
+            tile.blockID = TileID::cloud;
+            tile.wallID = WallID::Safe::cloud;
+        }
+    }
+    makeResourceCloud(x - width, y - height, 2 * width, 2 * height, rnd, world);
+    for (int i = -width; i < width; ++i) {
+        for (int j = -height; j < height; ++j) {
+            Tile &tile = world.getTile(x + i, y + j);
+            if (tile.blockID == world.goldVariant) {
+                tile.blockID = tile.wallID == WallID::Safe::cloud
+                                   ? world.copperVariant
+                                   : TileID::stone;
+            }
+        }
+    }
+    while (!world.regionPasses(x - 1, y - 2, 3, 3, [](Tile &tile) {
+        return tile.blockID == TileID::empty || tile.blockID == TileID::hive;
+    }) && y > 60) {
+        --y;
+    }
+    world.spawn = {x, y};
+}
+
 void genCloud(Random &rnd, World &world)
 {
     std::cout << "Condensing clouds\n";
     rnd.shuffleNoise();
+    if (world.conf.spawn == SpawnPoint::cloud) {
+        setCloudSpawn(rnd, world);
+    }
     int numClouds =
         world.conf.clouds * world.getWidth() / rnd.getInt(600, 1250);
     std::vector<int> rooms(Data::skyBoxes.begin(), Data::skyBoxes.end());

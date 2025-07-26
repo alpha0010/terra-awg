@@ -31,6 +31,7 @@ enum {
     livingLeaf = 60,
     cloud = 73,
     livingWood = 78,
+    disc = 82,
     iceBrick = 84,
     shadewood = 85,
     redStainedGlass = 92,

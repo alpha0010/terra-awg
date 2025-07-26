@@ -14,10 +14,32 @@
 #include <iostream>
 #include <map>
 
+int themeToDirtVariant(Data::Variant theme)
+{
+    switch (theme) {
+    case Data::Variant::ashWood:
+        return TileID::ash;
+    case Data::Variant::boreal:
+        return TileID::snow;
+    case Data::Variant::granite:
+        return TileID::granite;
+    case Data::Variant::honey:
+    case Data::Variant::mahogany:
+        return TileID::mud;
+    case Data::Variant::marble:
+        return TileID::marble;
+    case Data::Variant::palm:
+        return TileID::sand;
+    default:
+        return TileID::dirt;
+    }
+}
+
 void placeHomeAt(
     int x,
     int y,
     Data::Variant theme,
+    Data::Variant origTheme,
     TileBuffer &home,
     Random &rnd,
     World &world)
@@ -48,7 +70,7 @@ void placeHomeAt(
                   {TileID::argonMossBrick,
                    TileID::neonMossBrick,
                    TileID::kryptonMossBrick})},
-             {TileID::dirt, TileID::sand}});
+             {TileID::dirt, themeToDirtVariant(origTheme)}});
         themeWalls.insert(
             {{WallID::Safe::wood,
               rnd.select(
@@ -65,9 +87,6 @@ void placeHomeAt(
                   {WallID::Safe::hallowedPrism,
                    WallID::Safe::hallowedCrystalline,
                    WallID::Safe::aetheriumBrick})}});
-        if (y > world.getUnderworldLevel()) {
-            themeTiles[TileID::dirt] = TileID::ash;
-        }
         break;
     case Data::Variant::boreal:
         themeTiles.insert(
@@ -178,6 +197,22 @@ void placeHomeAt(
              {WallID::Safe::stone,
               rnd.select(
                   {WallID::Safe::hardenedSand, WallID::Safe::sandstone})}});
+        break;
+    case Data::Variant::skyware:
+        themeTiles.insert(
+            {{TileID::wood, TileID::sunplate},
+             {TileID::woodenBeam, TileID::sandstoneColumn},
+             {TileID::grayBrick,
+              rnd.select({TileID::ironBrick, TileID::tinBrick})},
+             {TileID::dirt, themeToDirtVariant(origTheme)}});
+        themeWalls.insert(
+            {{WallID::Safe::wood, WallID::Safe::disc},
+             {WallID::Safe::planked,
+              rnd.select(
+                  {WallID::Safe::whiteDynasty, WallID::Safe::blueDynasty})},
+             {WallID::Safe::stone,
+              rnd.select(
+                  {WallID::Safe::lichenStone, WallID::Safe::mudstoneBrick})}});
         break;
     default:
         break;
@@ -300,7 +335,7 @@ void placeHomeAt(
     }
 }
 
-int realSurfaceAt(int x, World &world, int prevY = -1)
+int realSurfaceAt(int x, World &world, int prevY)
 {
     int minY = world.getSurfaceLevel(x) - 2;
     if (!world.regionPasses(x, minY - 5, 1, 4, [](Tile &tile) {
@@ -317,31 +352,34 @@ int realSurfaceAt(int x, World &world, int prevY = -1)
     return scanWhileEmpty({x, minY}, {0, 1}, world).y + 1;
 }
 
-int underworldSurfaceAt(int x, World &world, int prevY = -1)
+int scanForSurfaceAt(int x, World &world, int prevY)
 {
-    int minY = world.getUnderworldLevel() +
-               0.32 * (world.getHeight() - world.getUnderworldLevel());
-    if (prevY != -1) {
-        minY = std::min(minY, prevY);
-    }
-    while (world.getTile(x, minY).blockID != TileID::empty) {
+    int minY = prevY;
+    while (!world.regionPasses(x, minY - 3, 1, 4, [](Tile &tile) {
+        return tile.blockID == TileID::empty;
+    })) {
         --minY;
+        if (minY < 50) {
+            return prevY;
+        }
     }
     return scanWhileEmpty({x, minY}, {0, 1}, world).y + 1;
 }
 
-void clearSpawnHive(World &world)
+void clearSpawnHive(bool isNearSurface, World &world)
 {
     int x = world.spawn.x;
-    int y = world.getSurfaceLevel(x);
+    int y = isNearSurface ? world.getSurfaceLevel(x) : world.spawn.y;
     int radius = 30;
     for (int i = -radius; i < radius; ++i) {
-        for (int j = -radius; j < radius; ++j) {
-            if (y + j >= world.getSurfaceLevel(x + i)) {
+        for (int j = -radius; j < (isNearSurface ? radius : 3); ++j) {
+            if (isNearSurface && y + j >= world.getSurfaceLevel(x + i)) {
                 break;
             }
             Tile &tile = world.getTile(x + i, y + j);
-            if (tile.flag == Flag::border && tile.blockID == TileID::hive &&
+            if (tile.flag == Flag::border &&
+                (tile.blockID == TileID::hive ||
+                 tile.blockID == TileID::crispyHoney) &&
                 std::hypot(i, j) < radius) {
                 tile.blockID = TileID::empty;
             }
@@ -352,15 +390,15 @@ void clearSpawnHive(World &world)
 void genStarterHome(Random &rnd, World &world)
 {
     std::cout << "Purchasing property\n";
-    if (world.conf.hiveQueen &&
-        std::abs(world.getSurfaceLevel(world.spawn.x) - world.spawn.y) < 30) {
-        clearSpawnHive(world);
+    bool isNearSurface =
+        std::abs(world.getSurfaceLevel(world.spawn.x) - world.spawn.y) < 30;
+    if (world.conf.hiveQueen) {
+        clearSpawnHive(isNearSurface, world);
     }
     std::map<int, int> tileCounts;
     int x = world.spawn.x;
-    int y = world.spawn.y > world.getUnderworldLevel()
-                ? underworldSurfaceAt(x, world)
-                : realSurfaceAt(x, world);
+    int y = isNearSurface ? realSurfaceAt(x, world, world.spawn.y)
+                          : scanForSurfaceAt(x, world, world.spawn.y);
     for (int j = 0; j < 6; ++j) {
         tileCounts[world.getTile(x, y + j).blockID] += 1;
     }
@@ -393,9 +431,12 @@ void genStarterHome(Random &rnd, World &world)
         })) {
         theme = Data::Variant::honey;
     }
+    Data::Variant origTheme = theme;
     if (world.conf.celebration && !world.conf.forTheWorthy &&
         !world.conf.hiveQueen) {
         theme = Data::Variant::balloon;
+    } else if (y < 0.45 * world.getUndergroundLevel()) {
+        theme = Data::Variant::skyware;
     }
     TileBuffer home =
         Data::getHome(rnd.select(Data::homes), world.getFramedTiles());
@@ -403,9 +444,8 @@ void genStarterHome(Random &rnd, World &world)
     for (int iter = 0; iter < 2; ++iter) {
         for (int i = 7; i < home.getWidth() - 7; ++i) {
             y = std::min(
-                world.spawn.y > world.getUnderworldLevel()
-                    ? underworldSurfaceAt(x + i, world, y)
-                    : realSurfaceAt(x + i, world, y),
+                isNearSurface ? realSurfaceAt(x + i, world, y)
+                              : scanForSurfaceAt(x + i, world, y),
                 y);
         }
     }
@@ -416,5 +456,5 @@ void genStarterHome(Random &rnd, World &world)
             break;
         }
     }
-    placeHomeAt(x, y, theme, home, rnd, world);
+    placeHomeAt(x, y, theme, origTheme, home, rnd, world);
 }

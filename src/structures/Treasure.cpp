@@ -1083,7 +1083,7 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
     int chestCount =
         world.conf.chests * world.getWidth() * world.getHeight() / 41800 -
         world.getChests().size();
-    std::vector<Point> usedLocations;
+    std::vector<Point> usedLocations{world.spawn};
     for (auto &chest : world.getChests()) {
         usedLocations.emplace_back(chest.x, chest.y);
     }
