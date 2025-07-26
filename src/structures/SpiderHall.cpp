@@ -1,5 +1,6 @@
 #include "structures/SpiderHall.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
@@ -9,6 +10,25 @@
 #include "vendor/frozen/set.h"
 #include <algorithm>
 #include <iostream>
+
+void convertRainbowBricks(int x, int y, Tile &tile)
+{
+    if (tile.blockID == TileID::stoneSlab) {
+        tile.blockID = TileID::rainbowBrick;
+    } else if (
+        tile.blockID == TileID::stone || tile.blockID == TileID::grayBrick) {
+        tile.blockPaint = getDeepRainbowPaint(x, y);
+    }
+    constexpr auto paintWalls = frozen::make_set<int>(
+        {WallID::Unsafe::craggyStone,
+         WallID::Safe::grayBrick,
+         WallID::Unsafe::spider});
+    if (tile.wallID == WallID::Safe::stoneSlab) {
+        tile.wallID = WallID::Safe::rainbowBrick;
+    } else if (paintWalls.contains(tile.wallID)) {
+        tile.wallPaint = getDeepRainbowPaint(x, y);
+    }
+}
 
 bool canPlaceSpiderDecoAt(int x, int y, int width, int height, World &world)
 {
@@ -269,6 +289,9 @@ void genSpiderHall(Random &rnd, World &world)
                     hallTile.wallID = WallID::Unsafe::spider;
                 } else if (hallTile.wallID == WallID::empty) {
                     hallTile.wallID = tile.wallID;
+                }
+                if (world.conf.celebration) {
+                    convertRainbowBricks(x + i, y + j, hallTile);
                 }
                 tile = hallTile;
                 tile.guarded = true;

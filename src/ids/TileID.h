@@ -107,6 +107,7 @@ enum {
     redStucco = 153,
     grayStucco = 156,
     richMahogany = 158,
+    rainbowBrick = 160,
     ice = 161,
     thinIce = 162,
     corruptIce = 163,

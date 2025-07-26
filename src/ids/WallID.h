@@ -25,6 +25,7 @@ enum {
     sandstoneBrick = 34,
     ebonstoneBrick = 35,
     richMahogany = 42,
+    rainbowBrick = 44,
     tinBrick = 45,
     platinumBrick = 47,
     livingLeaf = 60,
