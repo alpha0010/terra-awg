@@ -909,16 +909,32 @@ Variant getChestType(int x, int y, World &world)
     return fuzzyIsSurfaceChest(x, y, world) ? Variant::none : Variant::gold;
 }
 
+int scanForSurface(int x, int y, World &world)
+{
+    while (world.getTile(x, y).blockID != TileID::empty) {
+        --y;
+    }
+    return scanWhileEmpty({x, y}, {0, 1}, world).y;
+}
+
 void placeStarterChest(Random &rnd, World &world)
 {
     int centerX = world.spawn.x;
     for (int iSwap = 0; iSwap < 20; ++iSwap) {
         int x = iSwap % 2 == 0 ? centerX - iSwap / 2 : centerX + iSwap / 2;
-        int surfaceLevel = world.getSurfaceLevel(x);
+        int surfaceLevel = scanForSurface(x, world.spawn.y, world);
+        if (std::abs(surfaceLevel - world.spawn.y) > 5) {
+            continue;
+        }
         for (int y = surfaceLevel - 4; y < surfaceLevel + 4; ++y) {
             if (isPlacementCandidate(x, y, world)) {
-                Chest &chest =
-                    world.placeChest(x, y - 2, getChestType(x, y, world));
+                Variant type = getChestType(x, y, world);
+                if (type == Variant::shadow) {
+                    type = Variant::ashWood;
+                } else if (type == Variant::goldLocked) {
+                    type = Variant::none;
+                }
+                Chest &chest = world.placeChest(x, y - 2, type);
                 fillStarterChest(world.conf.equipment, chest, rnd, world);
                 return;
             }
