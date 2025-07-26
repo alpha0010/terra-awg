@@ -26,6 +26,7 @@
 #include "biomes/Snow.h"
 #include "biomes/SpiderNest.h"
 #include "biomes/Underworld.h"
+#include "biomes/celebration/AsteroidField.h"
 #include "biomes/doubleTrouble/Corruption.h"
 #include "biomes/doubleTrouble/Crimson.h"
 #include "biomes/doubleTrouble/ResourceSwap.h"
@@ -138,6 +139,8 @@ enum class Step {
     genCloudPatches,
     genJunglePatches,
     genHivePatches,
+    // Celebration
+    genAsteroidFieldCelebration,
     // Hive queen.
     genWorldBaseHiveQueen,
     genMarbleCaveHiveQueen,
@@ -180,6 +183,7 @@ inline std::array baseBiomeRules{
     Step::genHallow,
     Step::swapResources,
     Step::genAsteroidField,
+    Step::genAsteroidFieldCelebration,
     Step::genGemCave,
     Step::genSpiderNest,
     Step::genGlowingMoss,
@@ -224,6 +228,7 @@ inline std::array patchesBiomeRules{
     Step::genHallow,
     Step::swapResources,
     Step::genAsteroidField,
+    Step::genAsteroidFieldCelebration,
     Step::genGemCave,
     Step::genSpiderNest,
     Step::genGlowingMoss,
@@ -355,6 +360,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genCloudPatches)
         GEN_STEP(genJunglePatches)
         GEN_STEP(genHivePatches)
+        GEN_STEP(genAsteroidFieldCelebration)
         GEN_STEP(genWorldBaseHiveQueen)
         GEN_STEP(genMarbleCaveHiveQueen)
         GEN_STEP(genGlowingMushroomHiveQueen)
@@ -410,6 +416,9 @@ void doWorldGen(Random &rnd, World &world)
     if (!world.conf.hardmodeLoot) {
         excludes.insert(Step::applyHardmodeLoot);
     }
+    excludes.insert(
+        world.conf.celebration ? Step::genAsteroidField
+                               : Step::genAsteroidFieldCelebration);
     if (world.conf.hiveQueen) {
         excludes.insert(Step::genTemple);
     } else {

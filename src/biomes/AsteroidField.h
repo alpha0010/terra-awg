@@ -6,6 +6,9 @@
 class World;
 class Random;
 
+std::pair<int, int>
+selectAsteroidFieldLocation(int &width, int height, Random &rnd, World &world);
+
 void genAsteroidField(Random &rnd, World &world);
 
 void doGenAsteroidField(

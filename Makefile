@@ -4,6 +4,7 @@ CFLAGS := -Wall -Wextra -pedantic -Werror -O2 -msse4.1 -mpclmul
 CXXFLAGS := -Wall -Wextra -pedantic -Werror -std=c++20 -O2 -msse4.1 -mpclmul
 
 SRCS := $(wildcard src/*.cpp) $(wildcard src/biomes/*.cpp) \
+    $(wildcard src/biomes/celebration/*.cpp) \
     $(wildcard src/biomes/doubleTrouble/*.cpp) \
     $(wildcard src/biomes/hardmode/*.cpp) \
     $(wildcard src/biomes/hiveQueen/*.cpp) \

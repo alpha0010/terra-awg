@@ -20,13 +20,14 @@ bool isSolidArea(int x, int y, int size, World &world)
 Point findSolidArea(int minY, int maxY, Random &rnd, World &world)
 {
     int size = 8;
-    while (true) {
+    for (int tries = 0; tries < 100; ++tries) {
         int x = rnd.getInt(0, world.getWidth() - size);
         int y = rnd.getInt(minY, maxY - size);
         if (isSolidArea(x, y, size, world)) {
             return {x + size / 2, y + size / 2};
         }
     }
+    return {-1, -1};
 }
 
 void fillGlowingMossCave(Random &rnd, World &world)
@@ -37,6 +38,9 @@ void fillGlowingMossCave(Random &rnd, World &world)
         world.getUnderworldLevel(),
         rnd,
         world);
+    if (centerX == -1) {
+        return;
+    }
     double size = world.conf.glowingMossSize * world.getWidth() *
                   world.getHeight() / rnd.getDouble(95000, 210000);
     for (int x = centerX - size; x < centerX + size; ++x) {

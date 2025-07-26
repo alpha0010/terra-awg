@@ -5,6 +5,7 @@
 #include "Util.h"
 #include "World.h"
 #include "ids/WallID.h"
+#include <algorithm>
 #include <iostream>
 
 void genGlobalEcho(Random &rnd, World &world)

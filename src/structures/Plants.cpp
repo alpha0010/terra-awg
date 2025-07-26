@@ -393,7 +393,8 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
                     world.getTile(x, y - 1).liquid == Liquid::none &&
                     (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
                              std::max<int>(
-                                 100 / std::max(world.conf.trees, 0.1),
+                                 (world.conf.celebration ? 75 : 100) /
+                                     std::max(world.conf.trees, 0.1),
                                  2) ==
                          0 ||
                      (inGemGrove(x, y, world) &&

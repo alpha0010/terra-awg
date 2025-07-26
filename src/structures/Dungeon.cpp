@@ -1175,7 +1175,7 @@ private:
                         0.1 - 0.1 * j / entry.getHeight()) {
                     if (!world.conf.unpainted &&
                         (world.conf.doubleTrouble || world.conf.hiveQueen ||
-                         world.conf.forTheWorthy)) {
+                         world.conf.celebration || world.conf.forTheWorthy)) {
                         tile.wallID = WallID::Safe::mudstoneBrick;
                         tile.wallPaint = theme.paint;
                     } else {
@@ -1367,6 +1367,9 @@ public:
                      Paint::deepYellow,
                      Paint::deepOrange});
             }
+        } else if (world.conf.celebration && !world.conf.forTheWorthy) {
+            theme.paint = rnd.select({Paint::deepPink, Paint::deepViolet});
+            theme.altPaint = theme.paint;
         }
     }
 
@@ -1462,7 +1465,7 @@ public:
         applyWallVariety(zones);
         if (!world.conf.unpainted &&
             (world.conf.doubleTrouble || world.conf.hiveQueen ||
-             world.conf.forTheWorthy)) {
+             world.conf.celebration || world.conf.forTheWorthy)) {
             applyPaint(dungeonCenter, dungeonWidth);
         }
     }
