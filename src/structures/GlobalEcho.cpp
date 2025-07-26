@@ -32,18 +32,28 @@ void genGlobalEcho(Random &rnd, World &world)
                 Tile &tile = world.getTile(x, y);
                 if (tile.blockID != TileID::empty) {
                     tile.echoCoatBlock = true;
-                }
-                if (tile.wallID != WallID::empty) {
+                    for (int i = -1; i < 2; ++i) {
+                        for (int j = -1; j < 2; ++j) {
+                            Tile &wallTile = world.getTile(x + i, y + j);
+                            if (wallTile.wallID != WallID::empty) {
+                                wallTile.echoCoatWall = true;
+                            }
+                        }
+                    }
+                } else if (tile.wallID != WallID::empty) {
                     tile.echoCoatWall = true;
                 }
             }
         });
     for (int i = -25; i < 25; ++i) {
         for (int j = -25; j < 25; ++j) {
-            if (std::hypot(i, j) < 25) {
+            double dist = std::hypot(i, j);
+            if (dist < 25) {
                 Tile &tile = world.getTile(world.spawn + Point{i, j});
                 tile.echoCoatBlock = false;
-                tile.echoCoatWall = false;
+                if (dist < 24) {
+                    tile.echoCoatWall = false;
+                }
             }
         }
     }
