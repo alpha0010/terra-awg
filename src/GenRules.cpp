@@ -47,6 +47,7 @@
 #include "biomes/patches/Jungle.h"
 #include "biomes/shattered/ShatteredLand.h"
 #include "structures/BuriedBoat.h"
+#include "structures/CavernSpawn.h"
 #include "structures/DesertTomb.h"
 #include "structures/Dungeon.h"
 #include "structures/GlobalEcho.h"
@@ -100,6 +101,7 @@ enum class Step {
     genGemGrove,
     genDungeon,
     genTemple,
+    genCavernSpawn,
     genPyramid,
     genDesertTomb,
     genBuriedBoat,
@@ -191,15 +193,15 @@ inline std::array baseBiomeRules{
 };
 
 inline std::array baseStructureRules{
-    Step::genDungeon,        Step::genTemple,        Step::genTempleHiveQueen,
-    Step::genPyramid,        Step::genDesertTomb,    Step::genBuriedBoat,
-    Step::genSpiderHall,     Step::genRuins,         Step::genTorchArena,
-    Step::genOceanWreck,     Step::genLake,          Step::genStarterHome,
-    Step::genIgloo,          Step::genMushroomCabin, Step::genTreasure,
-    Step::applyHardmodeLoot, Step::genGlobalHive,    Step::genPlants,
-    Step::genTraps,          Step::genTracks,        Step::genFlood,
-    Step::smoothSurfaces,    Step::finalizeWalls,    Step::genVines,
-    Step::genGrasses,        Step::genGlobalEcho,
+    Step::genDungeon,     Step::genTemple,         Step::genTempleHiveQueen,
+    Step::genCavernSpawn, Step::genPyramid,        Step::genDesertTomb,
+    Step::genBuriedBoat,  Step::genSpiderHall,     Step::genRuins,
+    Step::genTorchArena,  Step::genOceanWreck,     Step::genLake,
+    Step::genStarterHome, Step::genIgloo,          Step::genMushroomCabin,
+    Step::genTreasure,    Step::applyHardmodeLoot, Step::genGlobalHive,
+    Step::genPlants,      Step::genTraps,          Step::genTracks,
+    Step::genFlood,       Step::smoothSurfaces,    Step::finalizeWalls,
+    Step::genVines,       Step::genGrasses,        Step::genGlobalEcho,
 };
 
 inline std::array patchesBiomeRules{
@@ -315,6 +317,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genGemGrove)
         GEN_STEP(genDungeon)
         GEN_STEP(genTemple)
+        GEN_STEP(genCavernSpawn)
         GEN_STEP(genPyramid)
         GEN_STEP(genDesertTomb)
         GEN_STEP(genBuriedBoat)
@@ -381,6 +384,9 @@ void doWorldGen(Random &rnd, World &world)
     excludes.insert(world.isCrimson ? Step::genCorruption : Step::genCrimson);
     if (!world.conf.home) {
         excludes.insert(Step::genStarterHome);
+    }
+    if (world.conf.spawn != SpawnPoint::cavern) {
+        excludes.insert(Step::genCavernSpawn);
     }
     if (world.conf.fadedMemories < 0.001) {
         excludes.insert(Step::genGlobalEcho);

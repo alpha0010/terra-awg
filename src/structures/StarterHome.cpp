@@ -322,6 +322,8 @@ void placeHomeAt(
             Tile &tile = world.getTile(x + i, y + j);
             auto toGrassItr = blockToGrass.find(tile.blockID);
             if (toGrassItr != blockToGrass.end() &&
+                (y < world.getUndergroundLevel() ||
+                 toGrassItr->second != TileID::grass) &&
                 world.isExposed(x + i, y + j)) {
                 tile.blockID = toGrassItr->second;
             } else {
