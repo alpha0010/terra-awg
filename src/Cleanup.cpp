@@ -217,7 +217,7 @@ void smoothSurfaces(World &world)
         });
 }
 
-void applyCelebrationFinalize(int x, int y, World &world)
+void applyCelebrationFinalize(int x, int y, int rainbowOffset, World &world)
 {
     if (!world.conf.celebration) {
         return;
@@ -227,25 +227,55 @@ void applyCelebrationFinalize(int x, int y, World &world)
         y < 0.45 * world.getUndergroundLevel()) {
         tile.blockID = TileID::hallowedGrass;
     }
-    if (!world.conf.unpainted && tile.blockPaint == Paint::none) {
+    if (world.conf.unpainted) {
+        return;
+    }
+    if (tile.blockPaint == Paint::none) {
         switch (tile.blockID) {
         case TileID::cloud:
         case TileID::rainCloud:
         case TileID::snowCloud:
-            if (!world.conf.forTheWorthy) {
-                tile.blockPaint = Paint::pink;
+            if (world.conf.forTheWorthy) {
+                break;
             }
-            break;
+            [[fallthrough]];
         case TileID::leaf:
         case TileID::livingWood:
-            if (!tile.guarded) {
-                tile.blockPaint = Paint::pink;
-            }
+            tile.blockPaint = Paint::pink;
             break;
         case TileID::sand:
         case TileID::hardenedSand:
         case TileID::sandstone:
+        case TileID::shellPile:
+        case TileID::coralstone:
             tile.blockPaint = Paint::cyan;
+            break;
+        case TileID::mushroomGrass:
+        case TileID::slime:
+            tile.blockPaint = getRainbowPaint((x + y) / 45, rainbowOffset);
+            break;
+        }
+    }
+    if (tile.wallPaint == Paint::none) {
+        switch (tile.wallID) {
+        case WallID::Safe::cloud:
+            if (world.conf.forTheWorthy) {
+                break;
+            }
+            [[fallthrough]];
+        case WallID::Safe::livingLeaf:
+        case WallID::Unsafe::livingWood:
+            tile.wallPaint = Paint::pink;
+            break;
+        case WallID::Unsafe::hardenedSand:
+        case WallID::Unsafe::sandstone:
+        case WallID::Safe::hardenedSand:
+        case WallID::Safe::sandstone:
+        case WallID::Safe::smoothSandstone:
+            tile.wallPaint = Paint::cyan;
+            break;
+        case WallID::Unsafe::mushroom:
+            tile.wallPaint = getRainbowPaint((x + y) / 45, rainbowOffset);
             break;
         }
     }
@@ -304,11 +334,18 @@ void finalizeWalls(Random &rnd, World &world)
         (2 * world.getUndergroundLevel() + world.getCavernLevel()) / 3;
     double stoneBound =
         (4 * world.getCavernLevel() + world.getUnderworldLevel()) / 5;
+    int rainbowOffset = rnd.getInt(0, 999);
     parallelFor(
         std::views::iota(0, world.getWidth()),
-        [mossBound, stoneBound, &mosses, &stoneWalls, &rnd, &world](int x) {
+        [mossBound,
+         stoneBound,
+         rainbowOffset,
+         &mosses,
+         &stoneWalls,
+         &rnd,
+         &world](int x) {
             for (int y = 0; y < world.getHeight(); ++y) {
-                applyCelebrationFinalize(x, y, world);
+                applyCelebrationFinalize(x, y, rainbowOffset, world);
                 if (y < world.getUndergroundLevel()) {
                     continue;
                 }

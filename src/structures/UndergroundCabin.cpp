@@ -3,6 +3,7 @@
 #include "Config.h"
 #include "Random.h"
 #include "World.h"
+#include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/Statues.h"
@@ -42,7 +43,11 @@ void applySupportBeam(int x, int y, World &world)
         return;
     }
     for (int beamY = y; beamY < supFloor; ++beamY) {
-        world.getTile(x, beamY).blockID = TileID::woodenBeam;
+        Tile &tile = world.getTile(x, beamY);
+        tile.blockID = TileID::woodenBeam;
+        if (!world.conf.unpainted && world.conf.celebration) {
+            tile.blockPaint = getDeepRainbowPaint(x, beamY);
+        }
     }
 }
 
@@ -198,6 +203,10 @@ void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
             if (cabinTile.blockID == TileID::cloud) {
                 continue;
             }
+            if (!world.conf.unpainted && world.conf.celebration) {
+                cabinTile.blockPaint = getDeepRainbowPaint(x + i, y + j);
+                cabinTile.wallPaint = cabinTile.blockPaint;
+            }
             Tile &tile = world.getTile(x + i, y + j);
             if (std::abs(rnd.getFineNoise(x + 3 * i, y + 3 * j)) > 0.34) {
                 if (tile.blockID == TileID::empty &&
@@ -268,5 +277,14 @@ void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
                     Variant::deadMans);
                 placeWire(trap, {chestX, chestY}, Wire::red, world);
             });
+    }
+    for (Point pos : locations) {
+        Tile &tile = world.getTile(pos);
+        if (tile.blockID == TileID::empty) {
+            tile.blockPaint = Paint::none;
+        }
+        if (tile.wallID == WallID::empty) {
+            tile.wallPaint = Paint::none;
+        }
     }
 }

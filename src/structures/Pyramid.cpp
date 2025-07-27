@@ -225,11 +225,15 @@ void applyPyramidPaint(std::vector<Point> &queuedPaint, World &world)
 {
     for (Point pos : queuedPaint) {
         Tile &tile = world.getTile(pos);
-        if (tile.blockID == TileID::sandstoneBrick) {
+        if (tile.blockID == TileID::sandstoneBrick ||
+            tile.blockID == TileID::sandstoneColumn ||
+            tile.blockID == TileID::pot) {
             tile.blockPaint = Paint::pink;
         }
         if (tile.wallID == WallID::Safe::sandstoneBrick) {
             tile.wallPaint = Paint::pink;
+        } else if (tile.wallID == WallID::Safe::goldBrick) {
+            tile.wallPaint = Paint::violet;
         }
     }
 }
