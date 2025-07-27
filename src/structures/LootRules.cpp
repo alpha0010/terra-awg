@@ -100,6 +100,15 @@ std::pair<double, Item> getGlobalItemPotion(World &world)
         {ItemID::redPotion, Prefix::none, 1}};
 }
 
+std::pair<double, Item> getCavernBonusItem(int y, Random &rnd, World &world)
+{
+    if (y < (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3) {
+        return {0.05, {ItemID::extractinator, Prefix::none, 1}};
+    } else {
+        return {0.15, {ItemID::lavaCharm, rnd.select(PrefixSet::accessory), 1}};
+    }
+}
+
 bool skipPrimaryLoot(Random &rnd, World &world)
 {
     return world.conf.forTheWorthy && rnd.getDouble(0, 1) < 0.06;
@@ -1157,8 +1166,6 @@ void fillCavernChest(
     Random &rnd,
     World &world)
 {
-    int lavaLevel =
-        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     fillLoot(
         chest,
         rnd,
@@ -1167,10 +1174,7 @@ void fillCavernChest(
             getGlobalItemPrimary(rnd, world),
             {isTrapped ? 1.0 / 3 : 0,
              {ItemID::deadMansSweater, Prefix::none, 1}},
-            {chest.y < lavaLevel ? 0.05 : 0.15,
-             {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
-              Prefix::none,
-              1}},
+            getCavernBonusItem(chest.y, rnd, world),
             {0.2, {ItemID::suspiciousLookingEye, Prefix::none, 1}},
             {1.0 / 3, {ItemID::dynamite, Prefix::none, 1}},
             {0.25, {ItemID::jestersArrow, Prefix::none, rnd.getInt(25, 50)}},
@@ -1280,8 +1284,6 @@ void fillCavernFrozenChest(Chest &chest, Random &rnd, World &world)
 
 void fillCavernHoneyChest(Chest &chest, Random &rnd, World &world)
 {
-    int lavaLevel =
-        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     fillLoot(
         chest,
         rnd,
@@ -1289,10 +1291,7 @@ void fillCavernHoneyChest(Chest &chest, Random &rnd, World &world)
             {1, getHoneyPrimaryLoot(rnd)},
             getGlobalItemPrimary(rnd, world),
             {1.0 / 3, {ItemID::honeyBomb, Prefix::none, rnd.getInt(3, 5)}},
-            {chest.y < lavaLevel ? 0.05 : 0.15,
-             {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
-              Prefix::none,
-              1}},
+            getCavernBonusItem(chest.y, rnd, world),
             {0.2, {ItemID::suspiciousLookingEye, Prefix::none, 1}},
             {0.25, {ItemID::jestersArrow, Prefix::none, rnd.getInt(25, 50)}},
             {0.5,
@@ -1343,8 +1342,6 @@ void fillCavernHoneyChest(Chest &chest, Random &rnd, World &world)
 
 void fillCavernIvyChest(Chest &chest, Random &rnd, World &world)
 {
-    int lavaLevel =
-        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     fillLoot(
         chest,
         rnd,
@@ -1354,10 +1351,7 @@ void fillCavernIvyChest(Chest &chest, Random &rnd, World &world)
             {1.0 / 6, {ItemID::livingMahoganyWand, Prefix::none, 1}},
             {0.1, {ItemID::beeMinecart, Prefix::none, 1}},
             {0.2, {ItemID::honeyDispenser, Prefix::none, 1}},
-            {chest.y < lavaLevel ? 0.05 : 0.15,
-             {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
-              Prefix::none,
-              1}},
+            getCavernBonusItem(chest.y, rnd, world),
             {0.2, {ItemID::suspiciousLookingEye, Prefix::none, 1}},
             {1.0 / 3, {ItemID::dynamite, Prefix::none, 1}},
             {0.25, {ItemID::jestersArrow, Prefix::none, rnd.getInt(25, 50)}},
@@ -1409,8 +1403,6 @@ void fillCavernIvyChest(Chest &chest, Random &rnd, World &world)
 
 void fillCavernMushroomChest(Chest &chest, Random &rnd, World &world)
 {
-    int lavaLevel =
-        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     fillLoot(
         chest,
         rnd,
@@ -1421,10 +1413,7 @@ void fillCavernMushroomChest(Chest &chest, Random &rnd, World &world)
               Prefix::none,
               1}},
             getGlobalItemPrimary(rnd, world),
-            {chest.y < lavaLevel ? 0.05 : 0.15,
-             {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
-              Prefix::none,
-              1}},
+            getCavernBonusItem(chest.y, rnd, world),
             {0.2, {ItemID::suspiciousLookingEye, Prefix::none, 1}},
             {1.0 / 3, {ItemID::dynamite, Prefix::none, 1}},
             {0.25, {ItemID::jestersArrow, Prefix::none, rnd.getInt(25, 50)}},
@@ -1474,18 +1463,13 @@ void fillCavernMushroomChest(Chest &chest, Random &rnd, World &world)
 
 void fillCavernPearlwoodChest(Chest &chest, Random &rnd, World &world)
 {
-    int lavaLevel =
-        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     fillLoot(
         chest,
         rnd,
         {
             {1, getCavernPrimaryLoot(rnd, world)},
             getGlobalItemPrimary(rnd, world),
-            {chest.y < lavaLevel ? 0.05 : 0.15,
-             {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
-              Prefix::none,
-              1}},
+            getCavernBonusItem(chest.y, rnd, world),
             {0.2, {ItemID::suspiciousLookingEye, Prefix::none, 1}},
             {1.0 / 3, {ItemID::dynamite, Prefix::none, 1}},
             {0.25, {ItemID::holyArrow, Prefix::none, rnd.getInt(25, 50)}},
@@ -1535,8 +1519,6 @@ void fillCavernPearlwoodChest(Chest &chest, Random &rnd, World &world)
 
 void fillCavernSandstoneChest(Chest &chest, Random &rnd, World &world)
 {
-    int lavaLevel =
-        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     fillLoot(
         chest,
         rnd,
@@ -1558,10 +1540,7 @@ void fillCavernSandstoneChest(Chest &chest, Random &rnd, World &world)
               1}},
             {1.0 / 15, {ItemID::desertMinecart, Prefix::none, 1}},
             {1.0 / 7, {ItemID::encumberingStone, Prefix::none, 1}},
-            {chest.y < lavaLevel ? 0.05 : 0.15,
-             {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
-              Prefix::none,
-              1}},
+            getCavernBonusItem(chest.y, rnd, world),
             {0.2, {ItemID::suspiciousLookingEye, Prefix::none, 1}},
             {1.0 / 3, {ItemID::dynamite, Prefix::none, 1}},
             {0.25, {ItemID::jestersArrow, Prefix::none, rnd.getInt(25, 50)}},
@@ -1611,18 +1590,13 @@ void fillCavernSandstoneChest(Chest &chest, Random &rnd, World &world)
 
 void fillCavernRichMahoganyChest(Chest &chest, Random &rnd, World &world)
 {
-    int lavaLevel =
-        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     fillLoot(
         chest,
         rnd,
         {
             {1, getCavernPrimaryLoot(rnd, world)},
             getGlobalItemPrimary(rnd, world),
-            {chest.y < lavaLevel ? 0.05 : 0.15,
-             {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
-              Prefix::none,
-              1}},
+            getCavernBonusItem(chest.y, rnd, world),
             {0.2, {ItemID::suspiciousLookingEye, Prefix::none, 1}},
             {1.0 / 3, {ItemID::dynamite, Prefix::none, 1}},
             {0.25, {ItemID::jestersArrow, Prefix::none, rnd.getInt(25, 50)}},
@@ -1674,8 +1648,6 @@ void fillCavernRichMahoganyChest(Chest &chest, Random &rnd, World &world)
 
 void fillCavernWaterChest(Chest &chest, Random &rnd, World &world)
 {
-    int lavaLevel =
-        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     bool nearEdge = chest.x < 350 || chest.x > world.getWidth() - 350;
     fillLoot(
         chest,
@@ -1689,10 +1661,7 @@ void fillCavernWaterChest(Chest &chest, Random &rnd, World &world)
               1}},
             {0.5, {ItemID::sandcastleBucket, Prefix::none, 1}},
             {0.5, {ItemID::sharkBait, Prefix::none, 1}},
-            {0.05,
-             {chest.y < lavaLevel ? ItemID::extractinator : ItemID::lavaCharm,
-              Prefix::none,
-              1}},
+            getCavernBonusItem(chest.y, rnd, world),
             {0.2, {ItemID::suspiciousLookingEye, Prefix::none, 1}},
             {1.0 / 3, {ItemID::dynamite, Prefix::none, 1}},
             {0.25, {ItemID::jestersArrow, Prefix::none, rnd.getInt(25, 50)}},

@@ -3,6 +3,7 @@
 #include "Random.h"
 #include "World.h"
 #include "Writer.h"
+#include "ids/Prefix.h"
 #include "map/ImgWriter.h"
 #include "structures/StructureUtil.h"
 #include <array>
@@ -653,8 +654,10 @@ int main()
         conf.chests *= 1.1;
         conf.gems *= 1.15;
         conf.trees *= 1.1;
+        conf.livingTrees *= 1.5;
         conf.minecartTracks *= 1.1;
         conf.minecartLength *= 1.35;
+        PrefixSet::initCelebration();
     }
     if (conf.hiveQueen) {
         conf.jungleSize *= 2;

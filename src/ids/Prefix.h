@@ -1,7 +1,7 @@
 #ifndef PREFIX_H
 #define PREFIX_H
 
-#include <array>
+#include <vector>
 
 namespace Prefix
 {
@@ -75,92 +75,14 @@ enum {
 
 namespace PrefixSet
 {
-inline std::array const accessory = {
-    Prefix::none,
-    Prefix::hard,
-    Prefix::guarding,
-    Prefix::armored,
-    Prefix::warding,
-    Prefix::precise,
-    Prefix::lucky,
-    Prefix::jagged,
-    Prefix::spiked,
-    Prefix::angry,
-    Prefix::menacing,
-    Prefix::brisk,
-    Prefix::fleeting,
-    Prefix::hasty_accessory,
-    Prefix::quick_accessory,
-    Prefix::wild,
-    Prefix::rash,
-    Prefix::intrepid,
-    Prefix::violent,
-    Prefix::arcane};
+void initCelebration();
 
-inline std::array const universal = {
-    Prefix::none,
-    Prefix::keen,
-    Prefix::superior,
-    Prefix::forceful,
-    Prefix::hurtful,
-    Prefix::strong,
-    Prefix::unpleasant,
-    Prefix::ruthless,
-    Prefix::godly,
-    Prefix::demonic,
-    Prefix::zealous};
-
-inline std::array const common = {
-    Prefix::none,
-    Prefix::keen,
-    Prefix::superior,
-    Prefix::forceful,
-    Prefix::hurtful,
-    Prefix::strong,
-    Prefix::unpleasant,
-    Prefix::ruthless,
-    Prefix::godly,
-    Prefix::demonic,
-    Prefix::zealous,
-    Prefix::quick_common,
-    Prefix::deadly_common,
-    Prefix::agile,
-    Prefix::nimble,
-    Prefix::murderous,
-    Prefix::nasty};
-
-inline std::array const melee = {
-    Prefix::none,          Prefix::keen,      Prefix::superior,
-    Prefix::forceful,      Prefix::hurtful,   Prefix::strong,
-    Prefix::unpleasant,    Prefix::ruthless,  Prefix::godly,
-    Prefix::demonic,       Prefix::zealous,   Prefix::quick_common,
-    Prefix::deadly_common, Prefix::agile,     Prefix::nimble,
-    Prefix::murderous,     Prefix::nasty,     Prefix::large,
-    Prefix::massive,       Prefix::dangerous, Prefix::savage,
-    Prefix::sharp,         Prefix::pointy,    Prefix::bulky,
-    Prefix::heavy,         Prefix::light,     Prefix::legendary};
-
-inline std::array const ranged = {
-    Prefix::none,         Prefix::keen,         Prefix::superior,
-    Prefix::forceful,     Prefix::hurtful,      Prefix::strong,
-    Prefix::unpleasant,   Prefix::ruthless,     Prefix::godly,
-    Prefix::demonic,      Prefix::zealous,      Prefix::quick_common,
-    Prefix::agile,        Prefix::nimble,       Prefix::murderous,
-    Prefix::nasty,        Prefix::sighted,      Prefix::rapid,
-    Prefix::hasty_ranged, Prefix::intimidating, Prefix::deadly_ranged,
-    Prefix::staunch,      Prefix::powerful,     Prefix::frenzying,
-    Prefix::unreal};
-
-inline std::array const magic = {
-    Prefix::none,          Prefix::keen,      Prefix::superior,
-    Prefix::forceful,      Prefix::hurtful,   Prefix::strong,
-    Prefix::unpleasant,    Prefix::ruthless,  Prefix::godly,
-    Prefix::demonic,       Prefix::zealous,   Prefix::quick_common,
-    Prefix::deadly_common, Prefix::agile,     Prefix::nimble,
-    Prefix::murderous,     Prefix::nasty,     Prefix::mystic,
-    Prefix::adept,         Prefix::masterful, Prefix::intense,
-    Prefix::taboo,         Prefix::celestial, Prefix::furious,
-    Prefix::manic,         Prefix::mythical};
+extern std::vector<int> accessory;
+extern std::vector<int> universal;
+extern std::vector<int> common;
+extern std::vector<int> melee;
+extern std::vector<int> ranged;
+extern std::vector<int> magic;
 } // namespace PrefixSet
 
 #endif // PREFIX_H

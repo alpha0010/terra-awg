@@ -122,6 +122,9 @@ void simulateRain(Random &rnd, World &world, int x)
                         : world.conf.patches && y < lavaLevel
                             ? 1.2 + rnd.getHumidity(x, y)
                             : 1.65;
+        if (world.conf.celebration && hypot(world.aether, {x, y}) < 200) {
+            pendingWater += 1.5;
+        }
         if (pendingWater > 10) {
             pendingWater *= 0.94;
         }
