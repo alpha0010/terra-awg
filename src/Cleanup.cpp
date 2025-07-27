@@ -1,5 +1,6 @@
 #include "Cleanup.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
@@ -7,10 +8,11 @@
 #include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
+#include "vendor/frozen/map.h"
+#include "vendor/frozen/set.h"
 #include <algorithm>
 #include <iostream>
 #include <map>
-#include <set>
 
 std::pair<int, int> getAttachedOpenWall(World &world, int x, int y)
 {
@@ -46,7 +48,8 @@ Slope computeSlope(World &world, int x, int y)
     // 1 6
     // 247
     size_t flags = 0;
-    std::set<int> emptyIds{TileID::empty, TileID::minecartTrack};
+    constexpr auto emptyIds =
+        frozen::make_set<int>({TileID::empty, TileID::minecartTrack});
     for (int i = -1; i < 2; ++i) {
         for (int j = -1; j < 2; ++j) {
             if (i == 0 && j == 0) {
@@ -105,15 +108,16 @@ Slope computeSlope(World &world, int x, int y)
 void smoothSurfaces(World &world)
 {
     std::cout << "Smoothing surfaces\n";
-    std::map<int, int> stablizeBlocks{
+    constexpr auto stablizeBlocks = frozen::make_map<int, int>({
         {TileID::sand, TileID::hardenedSand},
         {TileID::ebonsand, TileID::hardenedEbonsand},
         {TileID::pearlsand, TileID::hardenedPearlsand},
         {TileID::silt, TileID::mud},
         {TileID::slush, TileID::snow},
         {TileID::crimsand, TileID::hardenedCrimsand},
-        {TileID::shellPile, TileID::hardenedSand}};
-    std::set<int> slopedTiles{
+        {TileID::shellPile, TileID::hardenedSand},
+    });
+    constexpr auto slopedTiles = frozen::make_set<int>({
         TileID::dirt,
         TileID::stone,
         TileID::grass,
@@ -178,7 +182,8 @@ void smoothSurfaces(World &world)
         TileID::ashGrass,
         TileID::corruptJungleGrass,
         TileID::crimsonJungleGrass,
-        TileID::aetherium};
+        TileID::aetherium,
+    });
     parallelFor(
         std::views::iota(0, world.getWidth()),
         [&stablizeBlocks, &slopedTiles, &world](int x) {
@@ -210,6 +215,40 @@ void smoothSurfaces(World &world)
                 }
             }
         });
+}
+
+void applyCelebrationFinalize(int x, int y, World &world)
+{
+    if (!world.conf.celebration) {
+        return;
+    }
+    Tile &tile = world.getTile(x, y);
+    if (tile.blockID == TileID::grass &&
+        y < 0.45 * world.getUndergroundLevel()) {
+        tile.blockID = TileID::hallowedGrass;
+    }
+    if (!world.conf.unpainted && tile.blockPaint == Paint::none) {
+        switch (tile.blockID) {
+        case TileID::cloud:
+        case TileID::rainCloud:
+        case TileID::snowCloud:
+            if (!world.conf.forTheWorthy) {
+                tile.blockPaint = Paint::pink;
+            }
+            break;
+        case TileID::leaf:
+        case TileID::livingWood:
+            if (!tile.guarded) {
+                tile.blockPaint = Paint::pink;
+            }
+            break;
+        case TileID::sand:
+        case TileID::hardenedSand:
+        case TileID::sandstone:
+            tile.blockPaint = Paint::cyan;
+            break;
+        }
+    }
 }
 
 struct MossRegion {
@@ -268,8 +307,11 @@ void finalizeWalls(Random &rnd, World &world)
     parallelFor(
         std::views::iota(0, world.getWidth()),
         [mossBound, stoneBound, &mosses, &stoneWalls, &rnd, &world](int x) {
-            for (int y = world.getUndergroundLevel(); y < world.getHeight();
-                 ++y) {
+            for (int y = 0; y < world.getHeight(); ++y) {
+                applyCelebrationFinalize(x, y, world);
+                if (y < world.getUndergroundLevel()) {
+                    continue;
+                }
                 double threshold = 15 * (mossBound - y) / world.getHeight();
                 if (rnd.getCoarseNoise(x, y) < threshold) {
                     continue;

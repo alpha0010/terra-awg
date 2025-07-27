@@ -61,8 +61,12 @@ public:
         int y,
         const TileBuffer &data,
         Blend blendMode = Blend::normal);
-    void
-    placeFramedTile(int x, int y, int blockID, Variant type = Variant::none);
+    void placeFramedTile(
+        int x,
+        int y,
+        int blockID,
+        Variant type = Variant::none,
+        int paint = 0);
     void placePainting(int x, int y, Painting painting);
     Point getPaintingDims(Painting painting);
     Chest &placeChest(int x, int y, Variant type);

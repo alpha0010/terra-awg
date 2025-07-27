@@ -3,6 +3,7 @@
 #include "Config.h"
 #include "Random.h"
 #include "World.h"
+#include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/data/Rooms.h"
@@ -220,6 +221,19 @@ std::vector<int> getDesertSurfaceCols(int size, World &world)
     return vals;
 }
 
+void applyPyramidPaint(std::vector<Point> &queuedPaint, World &world)
+{
+    for (Point pos : queuedPaint) {
+        Tile &tile = world.getTile(pos);
+        if (tile.blockID == TileID::sandstoneBrick) {
+            tile.blockPaint = Paint::pink;
+        }
+        if (tile.wallID == WallID::Safe::sandstoneBrick) {
+            tile.wallPaint = Paint::pink;
+        }
+    }
+}
+
 void genPyramid(Random &rnd, World &world)
 {
     std::cout << "Building monuments\n";
@@ -279,6 +293,7 @@ void genPyramid(Random &rnd, World &world)
          TileID::crimtane,
          TileID::flesh,
          TileID::crystalBlock});
+    std::vector<Point> queuedPaint;
     for (int i = 0; i < 2 * size; ++i) {
         for (int j = std::abs(i - size); j < size; ++j) {
             Tile &tile = world.getTile(x + i, y + j);
@@ -289,6 +304,7 @@ void genPyramid(Random &rnd, World &world)
             if (itr == convertTiles.end()) {
                 tile.blockID = TileID::sandstoneBrick;
                 tile.wallID = WallID::Safe::sandstoneBrick;
+                queuedPaint.emplace_back(x + i, y + j);
             } else {
                 tile.blockID = itr->second;
                 tile.wallID = itr->second == TileID::ebonstoneBrick
@@ -346,5 +362,8 @@ void genPyramid(Random &rnd, World &world)
                 }
             }
         }
+    }
+    if (!world.conf.unpainted && world.conf.celebration) {
+        applyPyramidPaint(queuedPaint, world);
     }
 }

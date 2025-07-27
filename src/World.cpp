@@ -3,6 +3,7 @@
 #include "Config.h"
 #include "Random.h"
 #include "TileBuffer.h"
+#include "ids/Paint.h"
 #include "ids/WallID.h"
 #include <iostream>
 
@@ -312,7 +313,7 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::trap, Variant::superDartRight}, {1, 1, 18, 18}},
 };
 
-void World::placeFramedTile(int x, int y, int blockID, Variant type)
+void World::placeFramedTile(int x, int y, int blockID, Variant type, int paint)
 {
     if (blockID == TileID::chest &&
         (type == Variant::ashWood || type == Variant::crystal ||
@@ -534,6 +535,9 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type)
             tile.blockID = blockID;
             tile.frameX = 18 * i + offsetX;
             tile.frameY = 18 * j + offsetY;
+            if (paint != Paint::none) {
+                tile.blockPaint = paint;
+            }
         }
     }
 }

@@ -509,7 +509,8 @@ void placeLivingTreeDecoAt(int x, Random &rnd, World &world)
                     x,
                     y + j,
                     TileID::largePileGroup2,
-                    Variant::livingLeaf);
+                    Variant::livingLeaf,
+                    world.getTile(x, y + j + 2).blockPaint);
                 return;
             }
         }

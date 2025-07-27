@@ -433,14 +433,13 @@ void placePurityAltars(Random &rnd, World &world)
             auto delta = scanForAltarOffset(altar);
             x += delta.x;
             y += delta.y;
-            int paint = world.getTile(x, y).frameX == 0 ? Paint::purple
-                                                        : Paint::deepRed;
-            world.placeFramedTile(x, y, TileID::largePileGroup2, Variant::ash);
-            for (int i = 0; i < 3; ++i) {
-                for (int j = 0; j < 2; ++j) {
-                    world.getTile(x + i, y + j).blockPaint = paint;
-                }
-            }
+            world.placeFramedTile(
+                x,
+                y,
+                TileID::largePileGroup2,
+                Variant::ash,
+                world.getTile(x, y).frameX == 0 ? Paint::purple
+                                                : Paint::deepRed);
         }
     }
 }
