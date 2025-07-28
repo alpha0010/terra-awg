@@ -83,6 +83,7 @@ extern std::vector<int> common;
 extern std::vector<int> melee;
 extern std::vector<int> ranged;
 extern std::vector<int> magic;
+extern std::vector<int> magiclownokb;
 } // namespace PrefixSet
 
 #endif // PREFIX_H
