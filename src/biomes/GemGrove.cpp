@@ -218,8 +218,8 @@ Point selectGemGroveLocation(double &groveSize, Random &rnd, World &world)
         if (x < 75 + groveSize || x > world.getWidth() - 75 - groveSize) {
             continue;
         }
-        int threshold =
-            groveSize * groveSize * (world.conf.patches ? 0.8 : 0.1);
+        int threshold = groveSize * groveSize *
+                        (world.conf.biomes == BiomeLayout::patches ? 0.8 : 0.1);
         if (world.regionPasses(
                 x - groveSize,
                 y - groveSize,

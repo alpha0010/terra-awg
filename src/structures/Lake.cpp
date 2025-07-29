@@ -106,7 +106,7 @@ void simulateRain(Random &rnd, World &world, int x)
         WallID::Unsafe::spider};
     dryWalls.insert(WallVariants::dungeon.begin(), WallVariants::dungeon.end());
     double pendingWater =
-        world.conf.patches ? 0
+        world.conf.biomes != BiomeLayout::columns ? 0
         : std::abs(x - world.jungleCenter) <
                 world.conf.jungleSize * 0.08 * world.getWidth()
             ? 15
@@ -118,10 +118,11 @@ void simulateRain(Random &rnd, World &world, int x)
             pendingWater = 2.1;
             continue;
         }
-        pendingWater += world.getTile(x, y).wallID == WallID::Unsafe::hive ? 2.4
-                        : world.conf.patches && y < lavaLevel
-                            ? 1.2 + rnd.getHumidity(x, y)
-                            : 1.65;
+        pendingWater +=
+            world.getTile(x, y).wallID == WallID::Unsafe::hive ? 2.4
+            : world.conf.biomes != BiomeLayout::columns && y < lavaLevel
+                ? 1.2 + rnd.getHumidity(x, y)
+                : 1.65;
         if (world.conf.celebration && hypot(world.aether, {x, y}) < 200) {
             pendingWater += 1.5;
         }
@@ -319,7 +320,7 @@ void genLake(Random &rnd, World &world)
     parallelFor(std::views::iota(0, world.getWidth()), [&world](int x) {
         evaporateSmallPools(world, x);
     });
-    if (world.conf.patches) {
+    if (world.conf.biomes != BiomeLayout::columns) {
         rnd.shuffleNoise();
         parallelFor(
             std::views::iota(0, world.getWidth()),

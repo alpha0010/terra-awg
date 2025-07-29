@@ -76,18 +76,18 @@ Point selectTempleCenter(
     Random &rnd,
     World &world)
 {
-    int minX = world.conf.patches
-                   ? 350
-                   : std::max<int>(
+    int minX = world.conf.biomes == BiomeLayout::columns
+                   ? std::max<int>(
                          world.jungleCenter -
                              world.conf.jungleSize * 0.079 * world.getWidth(),
-                         350);
-    int maxX = world.conf.patches
-                   ? world.getWidth() - 350
-                   : std::min<int>(
+                         350)
+                   : 350;
+    int maxX = world.conf.biomes == BiomeLayout::columns
+                   ? std::min<int>(
                          world.jungleCenter +
                              world.conf.jungleSize * 0.079 * world.getWidth(),
-                         world.getWidth() - 350);
+                         world.getWidth() - 350)
+                   : world.getWidth() - 350;
     if (maxX < minX) {
         minX = std::midpoint(minX, maxX);
         maxX = minX + 1;
@@ -96,7 +96,7 @@ Point selectTempleCenter(
     for (int numTries = 0; numTries < 1000; ++numTries) {
         int x = rnd.getInt(minX, maxX);
         int y = rnd.getInt(minY, world.getUnderworldLevel());
-        if ((!world.conf.patches ||
+        if ((world.conf.biomes == BiomeLayout::columns ||
              isInBiome(x, y, 200 - 0.19 * numTries, Biome::jungle, world)) &&
             isValid({x, y}, world)) {
             return {x, y};

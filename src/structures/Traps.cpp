@@ -133,9 +133,12 @@ void placePressurePlate(int x, int y, bool isSingleUse, World &world)
 void placeSandTraps(Random &rnd, World &world)
 {
     double scanDist = world.conf.desertSize * 0.065 * world.getWidth();
-    int minX = world.conf.patches ? 350 : world.desertCenter - scanDist;
-    int maxX = world.conf.patches ? world.getWidth() - 350
-                                  : world.desertCenter + scanDist;
+    int minX = world.conf.biomes == BiomeLayout::columns
+                   ? world.desertCenter - scanDist
+                   : 350;
+    int maxX = world.conf.biomes == BiomeLayout::columns
+                   ? world.desertCenter + scanDist
+                   : world.getWidth() - 350;
     LocationBins locations;
     for (int x = minX; x < maxX; ++x) {
         int fallingCount = 0;

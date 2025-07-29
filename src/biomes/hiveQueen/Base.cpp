@@ -84,7 +84,7 @@ int getWallVarIndex(
 
 Biome getBiomeAt(int x, int y, Random &rnd, World &world)
 {
-    if (world.conf.patches) {
+    if (world.conf.biomes != BiomeLayout::columns) {
         return computeBiomeData(x, y, rnd).active;
     }
     if (y >= world.getUnderworldLevel() + 20 * rnd.getCoarseNoise(x, 0)) {
@@ -181,7 +181,7 @@ std::vector<Point> planHiveQueenBiomes(Random &rnd, World &world)
             }
         }
     });
-    if (world.conf.patches) {
+    if (world.conf.biomes != BiomeLayout::columns) {
         identifySurfaceBiomes(world);
     }
     return borders;

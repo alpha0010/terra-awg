@@ -130,9 +130,12 @@ void placeGems(Random &rnd, World &world)
     int numGems = world.conf.gems * world.getWidth() * world.getHeight() /
                   rnd.getInt(65800, 76800);
     int scanDist = world.conf.desertSize * 0.08 * world.getWidth();
-    int minX = world.conf.patches ? 350 : world.desertCenter - scanDist;
-    int maxX = world.conf.patches ? world.getWidth() - 350
-                                  : world.desertCenter + scanDist;
+    int minX = world.conf.biomes == BiomeLayout::columns
+                   ? world.desertCenter - scanDist
+                   : 350;
+    int maxX = world.conf.biomes == BiomeLayout::columns
+                   ? world.desertCenter + scanDist
+                   : world.getWidth() - 350;
     constexpr auto validAnchors = frozen::make_set<int>(
         {TileID::sand,
          TileID::hardenedSand,
@@ -151,7 +154,8 @@ void placeGems(Random &rnd, World &world)
         int x = rnd.getInt(minX, maxX);
         int y =
             rnd.getInt(world.getUndergroundLevel(), world.getUnderworldLevel());
-        if ((world.conf.patches && world.getBiome(x, y).desert < 0.99) ||
+        if ((world.conf.biomes != BiomeLayout::columns &&
+             world.getBiome(x, y).desert < 0.99) ||
             !validAnchors.contains(world.getTile(x, y).blockID)) {
             continue;
         }
@@ -589,19 +593,19 @@ Point selectShrineLocation(
          TileID::cobaltOre,     TileID::palladiumOre,  TileID::mythrilOre,
          TileID::orichalcumOre, TileID::adamantiteOre, TileID::titaniumOre,
          TileID::chlorophyteOre});
-    int minX = world.conf.patches
-                   ? 350
-                   : world.jungleCenter -
-                         world.conf.jungleSize * 0.09 * world.getWidth();
-    int maxX = world.conf.patches
-                   ? world.getWidth() - 350
-                   : world.jungleCenter +
-                         world.conf.jungleSize * 0.09 * world.getWidth();
+    int minX = world.conf.biomes == BiomeLayout::columns
+                   ? world.jungleCenter -
+                         world.conf.jungleSize * 0.09 * world.getWidth()
+                   : 350;
+    int maxX = world.conf.biomes == BiomeLayout::columns
+                   ? world.jungleCenter +
+                         world.conf.jungleSize * 0.09 * world.getWidth()
+                   : world.getWidth() - 350;
     for (int numTries = 0; numTries < 10000; ++numTries) {
         int x = rnd.getInt(minX, maxX);
         int y =
             rnd.getInt(world.getUndergroundLevel(), world.getUnderworldLevel());
-        if ((world.conf.patches &&
+        if ((world.conf.biomes != BiomeLayout::columns &&
              !isInBiome(x, y, 10, Biome::jungle, world)) ||
             !world.regionPasses(
                 x,

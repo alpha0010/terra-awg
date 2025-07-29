@@ -6,6 +6,8 @@
 #include <source_location>
 #include <vector>
 
+struct Config;
+
 class Random
 {
 private:
@@ -41,11 +43,7 @@ public:
      * Precompute noise samples for other noise functions.
      */
     void initNoise(int width, int height, double scale);
-    void initBiomeNoise(
-        double scale,
-        double humidityOffset,
-        double temperatureOffset,
-        bool hiveQueen);
+    void initBiomeNoise(double scale, const Config &conf);
     /**
      * Shift cached noise samples, effectively producing new noise samples,
      * cheaply.

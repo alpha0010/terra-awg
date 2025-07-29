@@ -660,7 +660,11 @@ int main()
         PrefixSet::initCelebration();
     }
     if (conf.hiveQueen) {
-        conf.jungleSize *= 2;
+        if (conf.biomes == BiomeLayout::columns) {
+            conf.jungleSize *= 2;
+        } else if (conf.biomes == BiomeLayout::layers) {
+            conf.jungleSize *= 1.35;
+        }
     }
     if (conf.forTheWorthy) {
         conf.spiderNestFreq *= 2.5;

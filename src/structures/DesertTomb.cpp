@@ -24,15 +24,15 @@ Point selectTombLocation(TileBuffer &tomb, Random &rnd, World &world)
         TileID::mythrilOre,  TileID::orichalcumOre, TileID::adamantiteOre,
         TileID::titaniumOre,
     });
-    int minX = world.conf.patches
-                   ? 350
-                   : world.desertCenter -
-                         world.conf.desertSize * 0.06 * world.getWidth();
-    int maxX = world.conf.patches
-                   ? world.getWidth() - 350
-                   : world.desertCenter +
+    int minX = world.conf.biomes == BiomeLayout::columns
+                   ? world.desertCenter -
+                         world.conf.desertSize * 0.06 * world.getWidth()
+                   : 350;
+    int maxX = world.conf.biomes == BiomeLayout::columns
+                   ? world.desertCenter +
                          world.conf.desertSize * 0.06 * world.getWidth() -
-                         tomb.getWidth();
+                         tomb.getWidth()
+                   : world.getWidth() - 350;
     int minY = world.getCavernLevel();
     int maxY = (world.getCavernLevel() + 4 * world.getUnderworldLevel()) / 5 -
                tomb.getHeight();
@@ -44,12 +44,12 @@ Point selectTombLocation(TileBuffer &tomb, Random &rnd, World &world)
         int numEmpty = 0;
         int numFilled = 0;
         int maxEntryFilled = tries / 250;
-        if ((!world.conf.patches || isInBiome(
-                                        x + biomeScan,
-                                        y + biomeScan,
-                                        biomeScan,
-                                        Biome::desert,
-                                        world)) &&
+        if ((world.conf.biomes == BiomeLayout::columns || isInBiome(
+                                                              x + biomeScan,
+                                                              y + biomeScan,
+                                                              biomeScan,
+                                                              Biome::desert,
+                                                              world)) &&
             world.regionPasses(
                 x - 3,
                 y + tomb.getHeight() - 9,

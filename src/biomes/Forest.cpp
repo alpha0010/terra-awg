@@ -593,7 +593,7 @@ void genForest(Random &rnd, World &world)
     std::cout << "Nurturing forests\n";
     rnd.shuffleNoise();
     // Grow grass.
-    if (!world.conf.patches && !world.conf.hiveQueen) {
+    if (world.conf.biomes == BiomeLayout::columns && !world.conf.hiveQueen) {
         applyForestGrass(rnd, world);
     }
     // Add living tree clumps.

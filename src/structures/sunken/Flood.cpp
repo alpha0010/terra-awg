@@ -52,7 +52,7 @@ void floodFill(int startX, int startY, int minY, World &world)
             if (y + 10 > world.getUnderworldLevel() &&
                 hardenTiles.contains(tile.blockID)) {
                 int mixBlock = TileID::ash;
-                if (world.conf.patches) {
+                if (world.conf.biomes != BiomeLayout::columns) {
                     switch (world.getBiome(x, y).active) {
                     case Biome::forest:
                         mixBlock = TileID::stone;

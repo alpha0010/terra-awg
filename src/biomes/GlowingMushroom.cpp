@@ -2,6 +2,7 @@
 
 #include "Config.h"
 #include "Random.h"
+#include "Util.h"
 #include "World.h"
 #include "ids/WallID.h"
 #include <iostream>
@@ -88,6 +89,39 @@ void fillMushroomField(
     }
 }
 
+void fillMushroomLayer(Random &rnd, World &world)
+{
+    parallelFor(std::views::iota(0, world.getWidth()), [&rnd, &world](int x) {
+        for (int y =
+                 world.getHeight() * (0.84 + 0.05 * rnd.getCoarseNoise(x, 0));
+             y < world.getHeight();
+             ++y) {
+            if (world.getBiome(x, y).active != Biome::jungle) {
+                continue;
+            }
+            Tile &tile = world.getTile(x, y);
+            switch (tile.blockID) {
+            case TileID::mud:
+            case TileID::jungleGrass:
+                tile.blockID =
+                    world.isExposed(x, y) ||
+                            static_cast<int>(
+                                99999 * (1 + rnd.getFineNoise(x, y))) %
+                                    35 ==
+                                0
+                        ? TileID::mushroomGrass
+                        : TileID::mud;
+                [[fallthrough]];
+            case TileID::empty:
+                if (tile.wallID != WallID::empty) {
+                    tile.wallID = WallID::Unsafe::mushroom;
+                }
+                break;
+            }
+        }
+    });
+}
+
 void genGlowingMushroom(Random &rnd, World &world)
 {
     std::cout << "Fertilizing glowing mushrooms\n";
@@ -107,7 +141,7 @@ void genGlowingMushroom(Random &rnd, World &world)
         int centerX = world.getWidth() * rnd.getDouble(0.05, 0.95);
         int fieldFloor =
             rnd.getInt(world.getCavernLevel(), world.getUnderworldLevel() - 50);
-        if (world.conf.patches) {
+        if (world.conf.biomes != BiomeLayout::columns) {
             if (world.getBiome(centerX, fieldFloor).forest < 0.99) {
                 continue;
             }
@@ -124,5 +158,8 @@ void genGlowingMushroom(Random &rnd, World &world)
             rnd,
             world);
         --numFields;
+    }
+    if (world.conf.biomes == BiomeLayout::layers) {
+        fillMushroomLayer(rnd, world);
     }
 }

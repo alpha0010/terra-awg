@@ -58,7 +58,7 @@ home = false
 equipment = none
 
 # Select spawn point. "normal" spawn automatically determines location
-# based on active secret seeds.
+# based on active secret seeds. Options:
 #   normal/surface/cloud/ocean/cavern/underworld
 spawn = normal
 
@@ -91,8 +91,9 @@ hardmode = false
 # Modify chest loot to be more applicable to a hardmode start.
 hardmodeLoot = false
 
-# Distribute biomes in patches (instead of columns).
-patches = false
+# Biome distribution layout. Options:
+#   columns/layers/patches
+biomes = columns
 
 # Tuning options for biome patches. Reasonable values
 # are between -0.5 and 0.5.
@@ -528,6 +529,18 @@ SpawnPoint parseSpawn(const std::string &spawn)
     return SpawnPoint::normal;
 }
 
+BiomeLayout parseBiomeLayout(const std::string &biomes)
+{
+    if (biomes == "layers") {
+        return BiomeLayout::layers;
+    } else if (biomes == "patches") {
+        return BiomeLayout::patches;
+    } else if (biomes != "columns") {
+        std::cout << "Unknown biome layout '" << biomes << "'\n";
+    }
+    return BiomeLayout::columns;
+}
+
 std::string genRandomName(Random &rnd)
 {
     switch (rnd.getInt(0, 7)) {
@@ -610,7 +623,7 @@ Config readConfig(Random &rnd)
         false, // purity
         false, // hardmode
         false, // hardmodeLoot
-        false, // patches
+        BiomeLayout::columns,
         0.0,   // patchesHumidity
         0.0,   // patchesTemperature
         1.0,   // patchesSize
@@ -686,7 +699,8 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, purity, Boolean);
     READ_CONF_VALUE(variation, hardmode, Boolean);
     READ_CONF_VALUE(variation, hardmodeLoot, Boolean);
-    READ_CONF_VALUE(variation, patches, Boolean);
+    conf.biomes =
+        parseBiomeLayout(reader.Get("variation", "biomes", "columns"));
     READ_CONF_VALUE(variation, patchesHumidity, Real);
     READ_CONF_VALUE(variation, patchesTemperature, Real);
     READ_CONF_AREA_VALUE(variation, patchesSize);

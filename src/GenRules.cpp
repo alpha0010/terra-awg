@@ -353,11 +353,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genHallow)
         GEN_STEP_WORLD(applyHardmodeLoot)
     case Step::initBiomeNoise:
-        rnd.initBiomeNoise(
-            0.00097 / world.conf.patchesSize,
-            world.conf.patchesHumidity,
-            world.conf.patchesTemperature,
-            world.conf.hiveQueen);
+        rnd.initBiomeNoise(0.00097 / world.conf.patchesSize, world.conf);
         break;
         GEN_STEP(genWorldBasePatches)
         GEN_STEP(genCloudPatches)
@@ -437,10 +433,10 @@ void doWorldGen(Random &rnd, World &world)
             steps.end(),
             hiveQueenBiomeRules.begin(),
             hiveQueenBiomeRules.end());
-        if (!world.conf.patches) {
+        if (world.conf.biomes == BiomeLayout::columns) {
             excludes.insert(Step::initBiomeNoise);
         }
-    } else if (world.conf.patches) {
+    } else if (world.conf.biomes != BiomeLayout::columns) {
         steps.insert(
             steps.end(),
             patchesBiomeRules.begin(),

@@ -11,6 +11,8 @@ enum class EvilBiome { random, corruption, crimson };
 
 enum class SpawnPoint { normal, surface, cloud, ocean, cavern, underworld };
 
+enum class BiomeLayout { columns, layers, patches };
+
 struct Config {
     std::string name;
     std::string seed;
@@ -29,7 +31,7 @@ struct Config {
     bool purity;
     bool hardmode;
     bool hardmodeLoot;
-    bool patches;
+    BiomeLayout biomes;
     double patchesHumidity;
     double patchesTemperature;
     double patchesSize;

@@ -1,5 +1,6 @@
 #include "Random.h"
 
+#include "Config.h"
 #include "Util.h"
 #include "vendor/OpenSimplexNoise.hpp"
 #include <algorithm>
@@ -96,11 +97,7 @@ void Random::computeBlurNoise()
     });
 }
 
-void Random::initBiomeNoise(
-    double scale,
-    double humidityOffset,
-    double temperatureOffset,
-    bool hiveQueen)
+void Random::initBiomeNoise(double scale, const Config &conf)
 {
     std::cout << "Measuring weather\n";
     humidity.resize(noiseWidth * noiseHeight);
@@ -111,8 +108,7 @@ void Random::initBiomeNoise(
     OpenSimplexNoise noise{dist(rnd)};
     parallelFor(
         std::views::iota(0, noiseWidth),
-        [scale, humidityOffset, temperatureOffset, hiveQueen, &noise, this](
-            int x) {
+        [scale, &conf, &noise, this](int x) {
             double offset = scale * (noiseWidth + noiseHeight);
             double xS = 1.4 * scale * x;
             for (int y = 0; y < noiseHeight; ++y) {
@@ -121,22 +117,66 @@ void Random::initBiomeNoise(
                 humidity[index] = noise.Evaluate(xS, yS) +
                                   0.5 * noise.Evaluate(2 * xS, 2 * yS) +
                                   0.25 * noise.Evaluate(4 * xS, 4 * yS) +
-                                  humidityOffset;
+                                  conf.patchesHumidity;
                 temperature[index] =
                     noise.Evaluate(offset + xS, offset + yS) +
                     0.5 * noise.Evaluate(offset + 2 * xS, offset + 2 * yS) +
                     0.25 * noise.Evaluate(offset + 4 * xS, offset + 4 * yS) +
                     std::max(0.01 * (y + 355 - noiseHeight), 0.0) +
-                    temperatureOffset;
-                if (hiveQueen) {
-                    double jungleBoost = std::clamp(
-                        0.7 - 2.4 * std::abs(x - 0.5 * noiseWidth) / noiseWidth,
-                        0.0,
-                        0.5);
-                    humidity[index] =
-                        std::lerp(humidity[index], 0.82, jungleBoost);
-                    temperature[index] =
-                        std::lerp(temperature[index], 0.82, jungleBoost);
+                    conf.patchesTemperature;
+                if (conf.hiveQueen || conf.biomes == BiomeLayout::layers) {
+                    double forestBoost = 0;
+                    double snowBoost = 0;
+                    double desertBoost = 0;
+                    double jungleBoost = 0;
+                    if (conf.biomes == BiomeLayout::layers) {
+                        forestBoost = std::clamp(
+                            0.9 - 2.1 * std::abs(y - 0.196 * noiseHeight) /
+                                      noiseHeight,
+                            0.0,
+                            0.53);
+                        snowBoost = std::clamp(
+                            conf.snowSize * 0.7 -
+                                4.8 * std::abs(y - 0.345 * noiseHeight) /
+                                    noiseHeight,
+                            0.0,
+                            0.5);
+                        desertBoost = std::clamp(
+                            conf.desertSize * 0.7 -
+                                4.8 * std::abs(y - 0.526 * noiseHeight) /
+                                    noiseHeight,
+                            0.0,
+                            0.5);
+                        jungleBoost = std::clamp(
+                            conf.jungleSize * 0.73 -
+                                4.5 * std::abs(y - 0.759 * noiseHeight) /
+                                    noiseHeight,
+                            0.0,
+                            0.5);
+                    }
+                    if (conf.hiveQueen) {
+                        jungleBoost = std::max(
+                            std::min(
+                                0.7 - 2.4 * std::abs(x - 0.5 * noiseWidth) /
+                                          noiseWidth,
+                                0.5),
+                            jungleBoost);
+                    }
+                    for (auto [boost, minH, maxH, minT, maxT] : {
+                             std::tuple{forestBoost, -0.15, 0.0, -0.15, 0.0},
+                             {snowBoost, -0.1, 0.1, -2.0, -1.1},
+                             {desertBoost, -2, -1.1, -0.1, 0.1},
+                             {jungleBoost, 0.82, 1.01, 0.82, 1.01},
+                         }) {
+                        humidity[index] = std::lerp(
+                            humidity[index],
+                            std::clamp(humidity[index], minH, maxH),
+                            boost);
+                        temperature[index] = std::lerp(
+                            temperature[index],
+                            std::clamp(temperature[index], minT, maxT),
+                            boost);
+                    }
                 }
             }
         });

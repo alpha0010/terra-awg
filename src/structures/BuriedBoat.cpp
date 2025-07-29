@@ -12,14 +12,14 @@
 
 Point selectBoatLocation(int width, int height, Random &rnd, World &world)
 {
-    int minX = world.conf.patches
-                   ? 350
-                   : world.snowCenter -
-                         world.conf.snowSize * 0.06 * world.getWidth() - width;
+    int minX = world.conf.biomes == BiomeLayout::columns
+                   ? world.snowCenter -
+                         world.conf.snowSize * 0.06 * world.getWidth() - width
+                   : 350;
     int maxX =
-        world.conf.patches
-            ? world.getWidth() - width - 350
-            : world.snowCenter + world.conf.snowSize * 0.06 * world.getWidth();
+        world.conf.biomes == BiomeLayout::columns
+            ? world.snowCenter + world.conf.snowSize * 0.06 * world.getWidth()
+            : world.getWidth() - width - 350;
     int maxY =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3 - height;
     constexpr auto avoidBlocks = frozen::make_set<int>({
@@ -42,12 +42,12 @@ Point selectBoatLocation(int width, int height, Random &rnd, World &world)
         int x = rnd.getInt(minX, maxX);
         int y = rnd.getInt(world.getCavernLevel(), maxY);
         int maxEmpty = 0.7 * width * height;
-        if ((!world.conf.patches || isInBiome(
-                                        x + biomeScan,
-                                        y + biomeScan,
-                                        biomeScan,
-                                        Biome::snow,
-                                        world)) &&
+        if ((world.conf.biomes == BiomeLayout::columns || isInBiome(
+                                                              x + biomeScan,
+                                                              y + biomeScan,
+                                                              biomeScan,
+                                                              Biome::snow,
+                                                              world)) &&
             world.regionPasses(
                 x,
                 y,

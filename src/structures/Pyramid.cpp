@@ -203,19 +203,19 @@ Point findLinkingCave(int x, int y, World &world)
 std::vector<int> getDesertSurfaceCols(int size, World &world)
 {
     std::vector<int> vals;
-    if (world.conf.patches) {
-        for (int x = 350; x < world.getWidth() - 350; ++x) {
-            if (world.getBiome(x, world.getSurfaceLevel(x)).desert > 0.99) {
-                vals.push_back(x);
-            }
-        }
-    } else {
+    if (world.conf.biomes == BiomeLayout::columns) {
         double scanDist =
             world.conf.desertSize * 0.061 * world.getWidth() - size;
         for (int x = world.desertCenter - scanDist;
              x < world.desertCenter + scanDist;
              ++x) {
             vals.push_back(x);
+        }
+    } else {
+        for (int x = 350; x < world.getWidth() - 350; ++x) {
+            if (world.getBiome(x, world.getSurfaceLevel(x)).desert > 0.99) {
+                vals.push_back(x);
+            }
         }
     }
     return vals;
