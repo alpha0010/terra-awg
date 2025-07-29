@@ -409,13 +409,15 @@ void genStarterHome(Random &rnd, World &world)
         theme = Data::Variant::ashWood;
     } else if (tileCounts[TileID::snow] > 2) {
         theme = Data::Variant::boreal;
-    } else if (tileCounts[TileID::granite] > 2) {
+    } else if (
+        tileCounts[TileID::granite] + tileCounts[TileID::smoothGranite] > 2) {
         theme = Data::Variant::granite;
     } else if (
         (tileCounts[TileID::jungleGrass] > 0 && tileCounts[TileID::mud] > 1) ||
         tileCounts[TileID::livingMahogany] > 2) {
         theme = Data::Variant::mahogany;
-    } else if (tileCounts[TileID::marble] > 2) {
+    } else if (
+        tileCounts[TileID::marble] + tileCounts[TileID::smoothMarble] > 2) {
         theme = Data::Variant::marble;
     } else if (tileCounts[TileID::sand] + tileCounts[TileID::pearlsand] > 2) {
         theme = Data::Variant::palm;
