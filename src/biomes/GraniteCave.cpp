@@ -102,13 +102,14 @@ void genGraniteCave(Random &rnd, World &world)
     int numCaves =
         world.conf.graniteFreq * world.getWidth() * world.getHeight() / 2000000;
     rnd.restoreShuffleState();
+    int minY = world.conf.biomes == BiomeLayout::layers && !world.conf.hiveQueen
+                   ? 0.526 * world.getHeight()
+                   : std::midpoint(
+                         world.getUndergroundLevel(),
+                         world.getCavernLevel());
     for (int i = 0; i < numCaves; ++i) {
-        auto [x, y] = findStoneCave(
-            (world.getUndergroundLevel() + world.getCavernLevel()) / 2,
-            world.getUnderworldLevel(),
-            rnd,
-            world,
-            30);
+        auto [x, y] =
+            findStoneCave(minY, world.getUnderworldLevel(), rnd, world, 30);
         if (x != -1) {
             fillGraniteCave(x, y, rnd, world);
         }

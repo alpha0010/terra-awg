@@ -238,15 +238,13 @@ void applyPyramidPaint(std::vector<Point> &queuedPaint, World &world)
     }
 }
 
-void genPyramid(Random &rnd, World &world)
+Point selectPyramidLocation(int size, Random &rnd, World &world)
 {
-    std::cout << "Building monuments\n";
-    int size = 80;
     int x = world.surfaceEvilCenter;
     int numTries = 0;
     auto desertSurface = getDesertSurfaceCols(size, world);
     if (desertSurface.empty()) {
-        return;
+        return {-1, -1};
     }
     constexpr auto avoidTiles = frozen::make_set<int>(
         {TileID::blueBrick,
@@ -266,7 +264,7 @@ void genPyramid(Random &rnd, World &world)
         x = rnd.select(desertSurface);
         ++numTries;
         if (numTries > 1000) {
-            return;
+            return {-1, -1};
         }
     }
     int y = world.getSurfaceLevel(x);
@@ -276,8 +274,97 @@ void genPyramid(Random &rnd, World &world)
            y < 0.85 * world.getUndergroundLevel()) {
         ++y;
     }
-    x -= size;
-    y -= 5;
+    return {x - size, y - 5};
+}
+
+std::pair<int, int>
+selectUndergroundPyramidLocation(int size, Random &rnd, World &world)
+{
+    int maxX = world.getWidth() - 350 - 2 * size;
+    if (maxX < 400) {
+        return {-1, -1};
+    }
+    constexpr auto clearableTiles = frozen::make_set<int>({
+        TileID::empty,
+        TileID::sand,
+        TileID::hardenedSand,
+        TileID::sandstone,
+        TileID::ebonsand,
+        TileID::hardenedEbonsand,
+        TileID::ebonsandstone,
+        TileID::demonite,
+        TileID::lesion,
+        TileID::crimsand,
+        TileID::hardenedCrimsand,
+        TileID::crimsandstone,
+        TileID::crimtane,
+        TileID::flesh,
+        TileID::pearlsand,
+        TileID::hardenedPearlsand,
+        TileID::pearlsandstone,
+        TileID::crystalBlock,
+        TileID::desertFossil,
+        TileID::copperOre,
+        TileID::tinOre,
+        TileID::ironOre,
+        TileID::leadOre,
+        TileID::silverOre,
+        TileID::tungstenOre,
+        TileID::goldOre,
+        TileID::platinumOre,
+        TileID::cobaltOre,
+        TileID::palladiumOre,
+        TileID::mythrilOre,
+        TileID::orichalcumOre,
+        TileID::adamantiteOre,
+        TileID::titaniumOre,
+    });
+    for (int tries = 0; tries < 5000; ++tries) {
+        int x = rnd.getInt(350, maxX);
+        int y = rnd.getInt(
+            world.getUndergroundLevel(),
+            std::midpoint(world.getCavernLevel(), world.getUnderworldLevel()));
+        int maxEmpty = 0.12 * size * size;
+        if (world.regionPasses(
+                x + size / 2,
+                y,
+                size,
+                size / 2,
+                [&clearableTiles](Tile &tile) {
+                    return !tile.guarded && tile.liquid != Liquid::shimmer &&
+                           clearableTiles.contains(tile.blockID);
+                }) &&
+            world.regionPasses(
+                x,
+                y + size / 2,
+                2 * size,
+                size / 2,
+                [&maxEmpty, &clearableTiles](Tile &tile) {
+                    if (tile.blockID == TileID::empty) {
+                        --maxEmpty;
+                    }
+                    return maxEmpty > 0 && !tile.guarded &&
+                           tile.liquid != Liquid::shimmer &&
+                           (clearableTiles.contains(tile.blockID) ||
+                            tile.flag == Flag::border);
+                })) {
+            return {x, y};
+        }
+    }
+    return {-1, -1};
+}
+
+void genPyramid(Random &rnd, World &world)
+{
+    std::cout << "Building monuments\n";
+    int size = 80;
+    auto [x, y] = selectPyramidLocation(size, rnd, world);
+    if (x == -1) {
+        std::tie(x, y) = selectUndergroundPyramidLocation(size, rnd, world);
+        if (x == -1) {
+            return;
+        }
+    }
     constexpr auto convertTiles = frozen::make_map<int, int>(
         {{TileID::ebonstone, TileID::ebonstoneBrick},
          {TileID::ebonsand, TileID::ebonstoneBrick},

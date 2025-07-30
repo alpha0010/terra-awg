@@ -68,10 +68,13 @@ void genMarbleCave(Random &rnd, World &world)
     std::cout << "Excavating marble\n";
     int numCaves =
         world.conf.marbleFreq * world.getWidth() * world.getHeight() / 1200000;
+    int maxY = world.conf.biomes == BiomeLayout::layers && !world.conf.hiveQueen
+                   ? 0.526 * world.getHeight()
+                   : world.getUnderworldLevel();
     for (int i = 0; i < numCaves; ++i) {
         auto [x, y] = findStoneCave(
             (world.getUndergroundLevel() + world.getCavernLevel()) / 2,
-            world.getUnderworldLevel(),
+            maxY,
             rnd,
             world,
             30);

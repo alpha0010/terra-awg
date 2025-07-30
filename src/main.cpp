@@ -665,6 +665,11 @@ int main()
         } else if (conf.biomes == BiomeLayout::layers) {
             conf.jungleSize *= 1.35;
         }
+    } else if (conf.biomes == BiomeLayout::layers) {
+        conf.graniteFreq *= 2;
+        conf.graniteSize *= 0.7071;
+        conf.marbleFreq *= 2;
+        conf.marbleSize *= 0.7071;
     }
     if (conf.forTheWorthy) {
         conf.spiderNestFreq *= 2.5;
