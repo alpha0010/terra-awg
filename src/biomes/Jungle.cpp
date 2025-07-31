@@ -242,125 +242,51 @@ void genJungle(Random &rnd, World &world)
 {
     std::cout << "Generating jungle\n";
     rnd.shuffleNoise();
-    double islandScale = world.conf.jungleSize > 1
-                             ? std::sqrt(world.conf.jungleSize)
-                             : world.conf.jungleSize;
-    double center = world.jungleCenter +
-                    islandScale * rnd.getDouble(-0.05, 0.05) * world.getWidth();
-    double scanDist =
-        islandScale * rnd.getDouble(0.03, 0.035) * world.getWidth();
-    levitateIslands(center - scanDist, center + scanDist, rnd, world);
-
-    center = world.jungleCenter;
-    scanDist = world.conf.jungleSize * 0.11 * world.getWidth();
-    std::map<int, int> surfaceJungleWalls;
-    for (int wallId : WallVariants::dirt) {
-        surfaceJungleWalls[wallId] = rnd.select(
-            {WallID::Unsafe::jungle,
-             WallID::Unsafe::jungle,
-             rnd.select(WallVariants::stone)});
-    }
-    std::map<int, int> undergroundJungleWalls;
-    for (int wallId : WallVariants::dirt) {
-        undergroundJungleWalls[wallId] = rnd.select(WallVariants::jungle);
-    }
-    parallelFor(
-        std::views::iota(
-            std::max<int>(center - scanDist, 0),
-            std::min<int>(center + scanDist, world.getWidth())),
-        [center, &surfaceJungleWalls, &undergroundJungleWalls, &rnd, &world](
-            int x) {
-            int lastTileID = TileID::empty;
-            for (int y = 0; y < world.getHeight(); ++y) {
-                double threshold =
-                    std::abs(x - center) / 100.0 -
-                    (world.conf.jungleSize * world.getWidth() / 1050.0);
-                if (rnd.getCoarseNoise(x, y) < threshold) {
-                    continue;
-                }
-                Tile &tile = world.getTile(x, y);
-                threshold = 2.0 * (y - world.getCavernLevel()) *
-                                (y - world.getHeight()) /
-                                std::pow(
-                                    world.getHeight() - world.getCavernLevel(),
-                                    2) +
-                            0.75;
-                if ((y > world.getCavernLevel() &&
-                     rnd.getCoarseNoise(2 * x, 2 * y) > threshold) ||
-                    (y > world.getUndergroundLevel() &&
-                     y < world.getUnderworldLevel() &&
-                     rnd.getFineNoise(2 * x, 2 * y) > 0.78)) {
-                    tile.blockID = TileID::empty;
-                    if (lastTileID == TileID::mud) {
-                        Tile &prevTile = world.getTile(x, y - 1);
-                        if (prevTile.blockID == TileID::mud) {
-                            prevTile.blockID = TileID::jungleGrass;
-                        }
-                    }
-                }
-                switch (tile.blockID) {
-                case TileID::ice:
-                case TileID::sandstone:
-                    if (rnd.getFineNoise(x, y) > -0.02) {
-                        break;
-                    }
-                    [[fallthrough]];
-                case TileID::dirt:
-                case TileID::stone:
-                    threshold =
-                        std::abs(x - center) / 260.0 -
-                        (world.conf.jungleSize * world.getWidth() / 2700.0);
-                    if (rnd.getFineNoise(x, y) > threshold) {
-                        tile.blockID = world.isExposed(x, y)
-                                           ? TileID::jungleGrass
-                                           : TileID::mud;
-                        if (y < world.getUndergroundLevel() &&
-                            tile.blockID == TileID::mud &&
-                            static_cast<int>(
-                                99999 * (1 + rnd.getFineNoise(x, y))) %
-                                    100 ==
-                                0) {
-                            tile.blockID = TileID::jungleGrass;
-                        }
-                    }
-                    break;
-                case TileID::grass:
-                    tile.blockID = TileID::jungleGrass;
-                    break;
-                case TileID::sand:
-                case TileID::smoothMarble:
-                    tile.blockID = TileID::silt;
-                    break;
-                case TileID::snow:
-                    tile.blockID = TileID::slush;
-                    break;
-                case TileID::mud:
-                    tile.blockID = TileID::stone;
-                    break;
-                case TileID::cloud:
-                    tile.blockID = TileID::rainCloud;
-                    break;
-                default:
-                    break;
-                }
-                if (y < world.getUndergroundLevel()) {
-                    if (tile.blockID == TileID::empty) {
-                        auto itr = surfaceJungleWalls.find(tile.wallID);
-                        if (itr != surfaceJungleWalls.end()) {
-                            tile.wallID = itr->second;
-                        }
-                    } else if (
-                        tile.wallID != WallID::Unsafe::livingWood &&
-                        tile.wallID != WallID::Safe::livingLeaf) {
-                        tile.wallID = WallID::Unsafe::mud;
-                    }
-                } else {
-                    auto itr = undergroundJungleWalls.find(tile.wallID);
-                    if (itr != undergroundJungleWalls.end()) {
-                        tile.wallID = itr->second;
-                    }
-                }
-                lastTileID = tile.blockID;
+    int minX;
+    int maxX;
+    if (world.conf.biomes == BiomeLayout::columns && !world.conf.hiveQueen) {
+        double islandScale = world.conf.jungleSize > 1
+                                 ? std::sqrt(world.conf.jungleSize)
+                                 : world.conf.jungleSize;
+        double center = world.jungleCenter + islandScale *
+                                                 rnd.getDouble(-0.05, 0.05) *
+                                                 world.getWidth();
+        double scanDist =
+            islandScale * rnd.getDouble(0.03, 0.035) * world.getWidth();
+        minX = center - scanDist;
+        maxX = center + scanDist;
+    } else {
+        int scanDist = rnd.getDouble(0.03, 0.035) * world.getWidth();
+        int jungleCenter = world.jungleCenter;
+        if (world.conf.hiveQueen) {
+            if (jungleCenter > world.getWidth() / 2) {
+                jungleCenter += 0.018 * world.getWidth();
+            } else {
+                jungleCenter -= 0.018 * world.getWidth();
             }
-        });
+        }
+        minX = jungleCenter;
+        while (minX > 350 && minX > jungleCenter - scanDist &&
+               world.getBiome(minX, world.getSurfaceLevel(minX)).jungle > 0.8) {
+            --minX;
+        }
+        maxX = jungleCenter;
+        while (
+            maxX < world.getWidth() - 350 && maxX < jungleCenter + scanDist &&
+            world.getBiome(maxX + 25, world.getSurfaceLevel(maxX + 25)).jungle >
+                0.8) {
+            ++maxX;
+        }
+    }
+    levitateIslands(minX, maxX, rnd, world);
+    for (int x = minX; x < maxX + 45; ++x) {
+        for (int y = 0.45 * world.getUndergroundLevel();
+             y < world.getUndergroundLevel();
+             ++y) {
+            Tile &tile = world.getTile(x, y);
+            if (tile.blockID == TileID::mud && world.isExposed(x, y)) {
+                tile.blockID = TileID::jungleGrass;
+            }
+        }
+    }
 }

@@ -76,13 +76,9 @@ uint32_t fnv1a32pt(uint32_t x, uint32_t y)
 
 World::World(const Config &c)
     : width(c.width), height(c.height), tiles(width * height),
-      framedTiles(genFramedTileLookup()), surface(width), conf(c)
+      framedTiles(genFramedTileLookup()), surface(width),
+      biomeMap(width * height), conf(c)
 {
-}
-
-void World::initBiomeData()
-{
-    biomeMap.resize(width * height);
 }
 
 int World::getWidth() const

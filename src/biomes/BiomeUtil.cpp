@@ -118,6 +118,18 @@ void fillLargeWallGaps(Point from, Point to, Random &rnd, World &world)
 
 Point findStoneCave(int yMin, int yMax, Random &rnd, World &world, int minSize)
 {
+    return findCave(yMin, yMax, rnd, world, minSize, {TileID::stone});
+}
+
+Point findCave(
+    int yMin,
+    int yMax,
+    Random &rnd,
+    World &world,
+    int minSize,
+    std::initializer_list<int> allowedBlocks)
+{
+    std::set<int> blocks{allowedBlocks.begin(), allowedBlocks.end()};
     for (int numTries = 0; numTries < 5000; ++numTries) {
         if (numTries % 100 == 99 && minSize > 3) {
             // Slowly reduce size requirements if finding a cave is taking too
@@ -136,7 +148,7 @@ Point findStoneCave(int yMin, int yMax, Random &rnd, World &world, int minSize)
                world.getTile(x, caveRoof).blockID == TileID::empty) {
             --caveRoof;
         }
-        if (world.getTile(x, caveRoof).blockID != TileID::stone) {
+        if (!blocks.contains(world.getTile(x, caveRoof).blockID)) {
             continue;
         }
         // Scan down.
@@ -145,7 +157,7 @@ Point findStoneCave(int yMin, int yMax, Random &rnd, World &world, int minSize)
                world.getTile(x, caveFloor).blockID == TileID::empty) {
             ++caveFloor;
         }
-        if (world.getTile(x, caveFloor).blockID != TileID::stone ||
+        if (!blocks.contains(world.getTile(x, caveFloor).blockID) ||
             caveFloor - caveRoof < minSize ||
             caveFloor - caveRoof > minSize + 50) {
             continue;
@@ -155,7 +167,7 @@ Point findStoneCave(int yMin, int yMax, Random &rnd, World &world, int minSize)
         while (left > 0 && world.getTile(left, y).blockID == TileID::empty) {
             --left;
         }
-        if (world.getTile(left, y).blockID != TileID::stone) {
+        if (!blocks.contains(world.getTile(left, y).blockID)) {
             continue;
         }
         // Scan right.
@@ -164,7 +176,7 @@ Point findStoneCave(int yMin, int yMax, Random &rnd, World &world, int minSize)
                world.getTile(right, y).blockID == TileID::empty) {
             ++right;
         }
-        if (world.getTile(right, y).blockID != TileID::stone ||
+        if (!blocks.contains(world.getTile(right, y).blockID) ||
             right - left < minSize || right - left > minSize + 50) {
             continue;
         }

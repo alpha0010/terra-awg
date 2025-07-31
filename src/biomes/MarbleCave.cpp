@@ -34,6 +34,8 @@ void fillMarbleCave(int x, int y, Random &rnd, World &world)
             switch (tile.blockID) {
             case TileID::dirt:
             case TileID::stone:
+            case TileID::ice:
+            case TileID::sandstone:
             case TileID::mud:
             case TileID::jungleGrass:
                 tile.blockID = TileID::marble;
@@ -46,7 +48,9 @@ void fillMarbleCave(int x, int y, Random &rnd, World &world)
                 break;
             case TileID::clay:
             case TileID::sand:
-                tile.blockID = TileID::smoothMarble;
+                if (world.getBiome(x + i, y + j).active != Biome::desert) {
+                    tile.blockID = TileID::smoothMarble;
+                }
                 break;
             case TileID::empty:
                 if (nextTileIsEmpty && stalactiteLen > 0) {
@@ -68,16 +72,25 @@ void genMarbleCave(Random &rnd, World &world)
     std::cout << "Excavating marble\n";
     int numCaves =
         world.conf.marbleFreq * world.getWidth() * world.getHeight() / 1200000;
+    int minY =
+        std::midpoint(world.getUndergroundLevel(), world.getCavernLevel());
     int maxY = world.conf.biomes == BiomeLayout::layers && !world.conf.hiveQueen
                    ? 0.526 * world.getHeight()
                    : world.getUnderworldLevel();
     for (int i = 0; i < numCaves; ++i) {
-        auto [x, y] = findStoneCave(
-            (world.getUndergroundLevel() + world.getCavernLevel()) / 2,
-            maxY,
-            rnd,
-            world,
-            30);
+        auto [x, y] = i % 3 == 0 ? findStoneCave(minY, maxY, rnd, world, 30)
+                                 : findCave(
+                                       minY,
+                                       maxY,
+                                       rnd,
+                                       world,
+                                       30,
+                                       {TileID::stone,
+                                        TileID::snow,
+                                        TileID::ice,
+                                        TileID::sandstone,
+                                        i % 2 == 0 ? TileID::jungleGrass
+                                                   : TileID::hardenedSand});
         if (x != -1) {
             fillMarbleCave(x, y, rnd, world);
         }

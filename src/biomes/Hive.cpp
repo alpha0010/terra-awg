@@ -183,15 +183,10 @@ void fillHive(int hiveX, int hiveY, double size, Random &rnd, World &world)
         });
 }
 
-void genHive(Random &rnd, World &world)
+Point selectHiveLocation(Random &rnd, World &world)
 {
-    std::cout << "Importing bees\n";
-    int numHives =
-        world.conf.hiveFreq * std::max(0.4 * world.conf.jungleSize, 1.0) *
-        (2 +
-         rnd.getDouble(0, world.getWidth() * world.getHeight() / 5750000.0));
-    for (int i = 0; i < numHives; ++i) {
-        fillHive(
+    if (world.conf.biomes == BiomeLayout::columns && !world.conf.hiveQueen) {
+        return {
             rnd.getInt(
                 std::max<int>(
                     world.jungleCenter -
@@ -203,8 +198,45 @@ void genHive(Random &rnd, World &world)
                     world.getWidth() - 100)),
             rnd.getInt(
                 (world.getUndergroundLevel() + world.getCavernLevel()) / 2,
-                (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3),
-            rnd,
-            world);
+                (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3)};
+    }
+    for (int numTries = 0; numTries < 100; ++numTries) {
+        int x = rnd.getInt(350, world.getWidth() - 350);
+        int y = rnd.getInt(
+            (world.getUndergroundLevel() + world.getCavernLevel()) / 2,
+            (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3);
+        int borderScan = 90 - numTries / 2;
+        if (isInBiome(
+                x,
+                y,
+                15 + world.getWidth() / 120,
+                Biome::jungle,
+                world) &&
+            (!world.conf.hiveQueen ||
+             world.regionPasses(
+                 x - borderScan / 2,
+                 y - borderScan / 2,
+                 borderScan,
+                 borderScan,
+                 [](Tile &tile) { return tile.flag != Flag::border; }))) {
+            return {x, y};
+        }
+    }
+    return {-1, -1};
+}
+
+void genHive(Random &rnd, World &world)
+{
+    std::cout << "Importing bees\n";
+    int numHives =
+        world.conf.hiveFreq * std::max(0.4 * world.conf.jungleSize, 1.0) *
+        (2.1 +
+         rnd.getDouble(0, world.getWidth() * world.getHeight() / 5750000.0));
+    for (int tries = 5 * numHives; tries > 0 && numHives > 0; --tries) {
+        auto [x, y] = selectHiveLocation(rnd, world);
+        if (x != -1) {
+            fillHive(x, y, rnd, world);
+            --numHives;
+        }
     }
 }

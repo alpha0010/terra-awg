@@ -4,11 +4,10 @@
 #include "Random.h"
 #include "World.h"
 #include "biomes/Hive.h"
-#include "biomes/patches/Hive.h"
 
 void genHiveHiveQueen(Random &rnd, World &world)
 {
-    genHivePatches(rnd, world);
+    genHive(rnd, world);
     fillHive(
         (0.5 + rnd.getDouble(-0.05, 0.05)) * world.getWidth(),
         std::midpoint(

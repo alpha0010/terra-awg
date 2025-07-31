@@ -11,7 +11,6 @@
 #include "biomes/Cloud.h"
 #include "biomes/Corruption.h"
 #include "biomes/Crimson.h"
-#include "biomes/Desert.h"
 #include "biomes/Forest.h"
 #include "biomes/GemCave.h"
 #include "biomes/GemGrove.h"
@@ -23,7 +22,6 @@
 #include "biomes/MarbleCave.h"
 #include "biomes/Meteorite.h"
 #include "biomes/Ocean.h"
-#include "biomes/Snow.h"
 #include "biomes/SpiderNest.h"
 #include "biomes/Underworld.h"
 #include "biomes/celebration/AsteroidField.h"
@@ -42,9 +40,6 @@
 #include "biomes/hiveQueen/Hive.h"
 #include "biomes/hiveQueen/MarbleCave.h"
 #include "biomes/patches/Base.h"
-#include "biomes/patches/Cloud.h"
-#include "biomes/patches/Hive.h"
-#include "biomes/patches/Jungle.h"
 #include "biomes/shattered/ShatteredLand.h"
 #include "structures/BuriedBoat.h"
 #include "structures/CavernSpawn.h"
@@ -80,8 +75,6 @@ enum class Step {
     genOceans,
     genCloud,
     genMarbleCave,
-    genSnow,
-    genDesert,
     genJungle,
     genForest,
     genAshenField,
@@ -138,9 +131,6 @@ enum class Step {
     // Patches.
     initBiomeNoise,
     genWorldBasePatches,
-    genCloudPatches,
-    genJunglePatches,
-    genHivePatches,
     // Celebration
     genAsteroidFieldCelebration,
     // Hive queen.
@@ -160,13 +150,13 @@ enum class Step {
 inline std::array baseBiomeRules{
     Step::planBiomes,
     Step::initNoise,
+    Step::initBiomeNoise,
     Step::genWorldBase,
+    Step::genWorldBasePatches,
     Step::genOceans,
+    Step::genShatteredLand,
     Step::genCloud,
     Step::genMarbleCave,
-    Step::genSnow,
-    Step::genDesert,
-    Step::genShatteredLand,
     Step::genJungle,
     Step::genForest,
     Step::genAshenField,
@@ -204,39 +194,6 @@ inline std::array baseStructureRules{
     Step::genVines,       Step::genGrasses,        Step::genGlobalEcho,
 };
 
-inline std::array patchesBiomeRules{
-    Step::initNoise,
-    Step::initBiomeNoise,
-    Step::genWorldBasePatches,
-    Step::genOceans,
-    Step::genShatteredLand,
-    Step::genCloudPatches,
-    Step::genMarbleCave,
-    Step::genJunglePatches,
-    Step::genForest,
-    Step::genAshenField,
-    Step::genUnderworld,
-    Step::genGlowingMushroom,
-    Step::genGraniteCave,
-    Step::genHivePatches,
-    Step::genAether,
-    Step::genCrimson,
-    Step::genCorruption,
-    Step::genSecondaryCrimson,
-    Step::genSecondaryCorruption,
-    Step::applyQueuedEvil,
-    Step::genMeteorite,
-    Step::genHardmodeOres,
-    Step::genHallow,
-    Step::swapResources,
-    Step::genAsteroidField,
-    Step::genAsteroidFieldCelebration,
-    Step::genGemCave,
-    Step::genSpiderNest,
-    Step::genGlowingMoss,
-    Step::genGemGrove,
-};
-
 inline std::array hiveQueenBiomeRules{
     Step::planBiomes,
     Step::initNoise,
@@ -244,9 +201,9 @@ inline std::array hiveQueenBiomeRules{
     Step::genWorldBaseHiveQueen,
     Step::genOceans,
     Step::genShatteredLand,
-    Step::genCloudPatches,
+    Step::genCloud,
     Step::genMarbleCaveHiveQueen,
-    Step::genJunglePatches,
+    Step::genJungle,
     Step::genForest,
     Step::genUnderworld,
     Step::genGlowingMushroomHiveQueen,
@@ -292,8 +249,6 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genOceans)
         GEN_STEP(genCloud)
         GEN_STEP(genMarbleCave)
-        GEN_STEP(genSnow)
-        GEN_STEP(genDesert)
         GEN_STEP(genJungle)
         GEN_STEP(genForest)
         GEN_STEP(genAshenField)
@@ -356,9 +311,6 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         rnd.initBiomeNoise(0.00097 / world.conf.patchesSize, world.conf);
         break;
         GEN_STEP(genWorldBasePatches)
-        GEN_STEP(genCloudPatches)
-        GEN_STEP(genJunglePatches)
-        GEN_STEP(genHivePatches)
         GEN_STEP(genAsteroidFieldCelebration)
         GEN_STEP(genWorldBaseHiveQueen)
         GEN_STEP(genMarbleCaveHiveQueen)
@@ -418,6 +370,11 @@ void doWorldGen(Random &rnd, World &world)
     if (!world.conf.hardmodeLoot) {
         excludes.insert(Step::applyHardmodeLoot);
     }
+    if (world.conf.biomes == BiomeLayout::columns) {
+        excludes.insert({Step::initBiomeNoise, Step::genWorldBasePatches});
+    } else {
+        excludes.insert(Step::genWorldBase);
+    }
     excludes.insert(
         world.conf.celebration ? Step::genAsteroidField
                                : Step::genAsteroidFieldCelebration);
@@ -433,14 +390,6 @@ void doWorldGen(Random &rnd, World &world)
             steps.end(),
             hiveQueenBiomeRules.begin(),
             hiveQueenBiomeRules.end());
-        if (world.conf.biomes == BiomeLayout::columns) {
-            excludes.insert(Step::initBiomeNoise);
-        }
-    } else if (world.conf.biomes != BiomeLayout::columns) {
-        steps.insert(
-            steps.end(),
-            patchesBiomeRules.begin(),
-            patchesBiomeRules.end());
     } else {
         steps.insert(steps.end(), baseBiomeRules.begin(), baseBiomeRules.end());
     }

@@ -565,37 +565,10 @@ void buryEnchantedSwords(Random &rnd, World &world)
     }
 }
 
-void applyForestGrass(Random &rnd, World &world)
-{
-    for (int x = 0; x < world.getWidth(); ++x) {
-        for (int y = 0; y < world.getUndergroundLevel(); ++y) {
-            Tile &tile = world.getTile(x, y);
-            if (tile.blockID == TileID::dirt) {
-                if (world.isExposed(x, y) ||
-                    static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
-                            100 ==
-                        0) {
-                    tile.blockID = TileID::grass;
-                }
-            } else if (
-                tile.blockID == TileID::empty &&
-                tile.wallID == WallID::Unsafe::dirt) {
-                tile.wallID = rnd.getFineNoise(x, y) > 0
-                                  ? WallID::Unsafe::grass
-                                  : WallID::Unsafe::flower;
-            }
-        }
-    }
-}
-
 void genForest(Random &rnd, World &world)
 {
     std::cout << "Nurturing forests\n";
     rnd.shuffleNoise();
-    // Grow grass.
-    if (world.conf.biomes == BiomeLayout::columns && !world.conf.hiveQueen) {
-        applyForestGrass(rnd, world);
-    }
     // Add living tree clumps.
     growLivingTrees(rnd, world);
     buryEnchantedSwords(rnd, world);

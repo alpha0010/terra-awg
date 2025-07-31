@@ -109,7 +109,6 @@ Biome getBiomeAt(int x, int y, Random &rnd, World &world)
 
 std::vector<Point> planHiveQueenBiomes(Random &rnd, World &world)
 {
-    world.initBiomeData();
     std::mutex ptMtx;
     std::vector<Point> borders;
     Point hexShift{rnd.getInt(0, 99999), rnd.getInt(0, 99999)};

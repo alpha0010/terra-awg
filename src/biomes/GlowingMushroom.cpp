@@ -141,14 +141,7 @@ void genGlowingMushroom(Random &rnd, World &world)
         int centerX = world.getWidth() * rnd.getDouble(0.05, 0.95);
         int fieldFloor =
             rnd.getInt(world.getCavernLevel(), world.getUnderworldLevel() - 50);
-        if (world.conf.biomes != BiomeLayout::columns) {
-            if (world.getBiome(centerX, fieldFloor).forest < 0.99) {
-                continue;
-            }
-        } else if (
-            std::abs(world.desertCenter - centerX) < buffer ||
-            std::abs(world.jungleCenter - centerX) < buffer ||
-            std::abs(world.snowCenter - centerX) < buffer) {
+        if (world.getBiome(centerX, fieldFloor).forest < 0.99) {
             continue;
         }
         fillMushroomField(

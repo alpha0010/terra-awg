@@ -147,9 +147,7 @@ void genShatteredLand(Random &rnd, World &world)
                 tile.flag = flag;
             }
         }
-        if ((world.conf.biomes != BiomeLayout::columns ||
-             world.conf.hiveQueen) &&
-            x != 0) {
+        if (x != 0) {
             for (int y = 0.5 * world.getUndergroundLevel();
                  y < world.getUnderworldLevel();
                  ++y) {

@@ -42,8 +42,6 @@ private:
 public:
     World(const Config &c);
 
-    void initBiomeData();
-
     int getWidth() const;
     int getHeight() const;
     int &getSurfaceLevel(int x);

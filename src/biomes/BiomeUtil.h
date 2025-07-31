@@ -36,6 +36,14 @@ Point findStoneCave(
     World &world,
     int minSize = 6);
 
+Point findCave(
+    int yMin,
+    int yMax,
+    Random &rnd,
+    World &world,
+    int minSize,
+    std::initializer_list<int> allowedBlocks);
+
 Point getHexCentroid(Point pt, int scale);
 Point getHexCentroid(int x, int y, int scale);
 
