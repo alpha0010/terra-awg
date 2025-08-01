@@ -233,7 +233,12 @@ planWavyTrackAt(int x, int y, double lengthScale, Random &rnd, World &world)
 std::vector<Point>
 planTrackAt(int x, int y, double lengthScale, Random &rnd, World &world)
 {
-    return world.conf.celebration
+    return world.conf.celebration ||
+                   (!world.conf.hiveQueen &&
+                    hypot(world.aether, {x, y}) <
+                        world.conf.aetherSize *
+                            (80 +
+                             world.getWidth() * world.getHeight() / 115200))
                ? planWavyTrackAt(x, y, lengthScale, rnd, world)
                : planStandardTrackAt(x, y, lengthScale, rnd, world);
 }
