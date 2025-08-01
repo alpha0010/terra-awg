@@ -1733,7 +1733,8 @@ void fillSkywareChest(Chest &chest, Random &rnd, World &world)
                 })},
          getGlobalItemPrimary(rnd, world),
          {1.0 / 3, {ItemID::skyMill, Prefix::none, 1}},
-         {0.025, {ItemID::fledglingWings, rnd.select(PrefixSet::accessory), 1}},
+         {world.conf.celebration ? 0.08 : 0.025,
+          {ItemID::fledglingWings, rnd.select(PrefixSet::accessory), 1}},
          {1,
           {rnd.pool(
                {ItemID::highPitch,
