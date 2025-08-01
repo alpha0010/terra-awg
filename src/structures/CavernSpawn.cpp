@@ -60,6 +60,24 @@ Point selectCavernSpawn(Random &rnd, World &world)
     return {-1, -1};
 }
 
+int getNearestWall(Point pos, World &world)
+{
+    int i = 0;
+    int j = 0;
+    for (int iter = 0; iter < 225; ++iter) {
+        int wallId = world.getTile(pos + Point{i, j}).wallID;
+        if (wallId != WallID::empty) {
+            return wallId;
+        }
+        if (std::abs(i) > std::abs(j) || (i == j && i < 0)) {
+            j += i < 0 ? 1 : -1;
+        } else {
+            i += j < 0 ? -1 : 1;
+        }
+    }
+    return WallID::Unsafe::dirt;
+}
+
 void genCavernSpawn(Random &rnd, World &world)
 {
     std::cout << "Beginning expedition\n";
@@ -87,9 +105,7 @@ void genCavernSpawn(Random &rnd, World &world)
               {11, -4}}) {
             Tile &tile = world.getTile(pos + delta);
             tile.blockID = TileID::torch;
-            if (tile.wallID == WallID::empty) {
-                tile.wallID = WallID::Unsafe::dirt;
-            }
+            tile.wallID = getNearestWall(pos + delta, world);
         }
     }
 }
