@@ -236,7 +236,7 @@ void genMushroomCabin(Random &rnd, World &world)
         Chest &chest = world.placeChest(
             x + rnd.getDouble(0.25, 0.75) * cabinWidth,
             y - 2,
-            Variant ::mushroom);
+            Variant::mushroom);
         if (y < world.getCavernLevel()) {
             fillUndergroundMushroomChest(chest, rnd, world);
         } else {

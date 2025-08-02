@@ -250,6 +250,7 @@ void applyCelebrationFinalize(int x, int y, int rainbowOffset, World &world)
         case TileID::coralstone:
             tile.blockPaint = Paint::cyan;
             break;
+        case TileID::glowingMushroom:
         case TileID::mushroomGrass:
         case TileID::slime:
             tile.blockPaint = getRainbowPaint((x + y) / 45, rainbowOffset);
