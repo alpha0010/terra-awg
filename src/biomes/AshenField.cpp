@@ -11,7 +11,9 @@
 
 void genAshenField(Random &rnd, World &world)
 {
-    if (world.conf.spawn != SpawnPoint::surface || rnd.getDouble(0, 1) > 0.7) {
+    if (world.conf.spawn != SpawnPoint::ashen &&
+        (world.conf.spawn != SpawnPoint::surface ||
+         rnd.getDouble(0, 1) > 0.7)) {
         return;
     }
     double width = 100 + world.getWidth() / rnd.getInt(64, 85);

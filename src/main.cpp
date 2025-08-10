@@ -215,7 +215,7 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     }
     w.putUint8(0); // Shadow orbs smashed.
     w.putUint32(
-        conf.hardmode ? conf.doubleTrouble ? 6 : 3 : 0); // Alters smashed.
+        conf.hardmode ? conf.doubleTrouble ? 6 : 3 : 0); // Altars smashed.
     w.putBool(conf.hardmode);                            // Hard mode.
     w.putBool(false);                                    // After party of doom.
     w.putUint32(0);                                      // Invasion delay.

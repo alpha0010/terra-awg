@@ -708,7 +708,14 @@ void World::planBiomes(Random &rnd)
 {
     std::cout << "Planning biomes\n";
     for (int tries = 0; tries < 1000; ++tries) {
-        desertCenter = rnd.getDouble(0.09, 0.91);
+        if (conf.spawn == SpawnPoint::ashen) {
+            desertCenter = rnd.getDouble(0.09, 0.41);
+            if (rnd.getBool()) {
+                desertCenter = 1 - desertCenter;
+            }
+        } else {
+            desertCenter = rnd.getDouble(0.09, 0.91);
+        }
         if (conf.hiveQueen) {
             jungleCenter = rnd.getDouble(0.39, 0.61);
         } else {
@@ -717,7 +724,14 @@ void World::planBiomes(Random &rnd)
                 jungleCenter = 1 - jungleCenter;
             }
         }
-        snowCenter = rnd.getDouble(0.12, 0.88);
+        if (conf.spawn == SpawnPoint::ashen) {
+            snowCenter = rnd.getDouble(0.12, 0.41);
+            if (rnd.getBool()) {
+                snowCenter = 1 - snowCenter;
+            }
+        } else {
+            snowCenter = rnd.getDouble(0.12, 0.88);
+        }
 
         if (std::abs(desertCenter - jungleCenter) >
                 0.075 * std::lerp(

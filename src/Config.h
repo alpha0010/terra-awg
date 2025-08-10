@@ -9,7 +9,15 @@ enum class GameMode { journey = 3, classic = 0, expert = 1, master = 2 };
 
 enum class EvilBiome { random, corruption, crimson };
 
-enum class SpawnPoint { normal, surface, cloud, ocean, cavern, underworld };
+enum class SpawnPoint {
+    normal,
+    surface,
+    ashen,
+    cloud,
+    ocean,
+    cavern,
+    underworld,
+};
 
 enum class BiomeLayout { columns, layers, patches };
 

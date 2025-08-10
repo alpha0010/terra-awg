@@ -58,8 +58,10 @@ home = false
 equipment = none
 
 # Select spawn point. "normal" spawn automatically determines location
-# based on active secret seeds. Options:
-#   normal/surface/cloud/ocean/cavern/underworld
+# based on active secret seeds.
+# "ashen" spawn increases the chances (but does not guarantee) of
+# spawning in surface ashen fields. Options:
+#   normal/surface/ashen/cloud/ocean/cavern/underworld
 spawn = normal
 
 # Prevent other settings from fully painting large structures and biomes.
@@ -515,6 +517,8 @@ SpawnPoint parseSpawn(const std::string &spawn)
 {
     if (spawn == "surface") {
         return SpawnPoint::surface;
+    } else if (spawn == "ashen") {
+        return SpawnPoint::ashen;
     } else if (spawn == "cloud") {
         return SpawnPoint::cloud;
     } else if (spawn == "ocean") {

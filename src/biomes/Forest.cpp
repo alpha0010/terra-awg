@@ -453,11 +453,15 @@ void growLivingTrees(Random &rnd, World &world)
         world.getWidth());
     std::vector<int> rooms(Data::treeRooms.begin(), Data::treeRooms.end());
     std::shuffle(rooms.begin(), rooms.end(), rnd.getPRNG());
+    int spawnBuffer = world.conf.spawn == SpawnPoint::surface ? 25
+                      : world.conf.spawn == SpawnPoint::ashen
+                          ? 120 + world.getWidth() / 64
+                          : 0;
     for (int partition : partitions) {
         int numTrees = world.conf.livingTrees * rnd.getDouble(3, 7);
         for (int x = partition - 25 * numTrees; numTrees > 0;
              x += rnd.getInt(45, 55), --numTrees) {
-            if (std::abs(x - world.spawn.x) < 25) {
+            if (std::abs(x - world.spawn.x) < spawnBuffer) {
                 continue;
             }
             int y = world.getSurfaceLevel(x);
