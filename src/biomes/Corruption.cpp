@@ -169,6 +169,10 @@ void genCorruptionAt(int surfaceX, int undergroundX, Random &rnd, World &world)
         parallelFor(
             std::views::iota(sourceX - scanDist, sourceX + scanDist),
             [&, scanDist, sourceX, sourceY](int x) {
+                int tendrilMinY = world.conf.trimEvilTendrils
+                                      ? world.getSurfaceLevel(x) - 20 +
+                                            10 * rnd.getFineNoise(x, 0)
+                                      : 0;
                 for (int y = std::max(sourceY - scanDist, 0);
                      y < sourceY + scanDist;
                      ++y) {
@@ -187,17 +191,23 @@ void genCorruptionAt(int surfaceX, int undergroundX, Random &rnd, World &world)
                             // Corruption spreads from tendrils of lesion
                             // blocks. Fill the core of central tendrils with
                             // demonite.
-                            tile.blockID = std::abs(rnd.getCoarseNoise(x, y)) <
-                                                   threshold - 0.065
-                                               ? y > world.getUndergroundLevel()
-                                                     ? TileID::demonite
-                                                     : TileID::ebonstone
-                                               : TileID::lesion;
-                            if (tile.wallID != WallID::empty) {
-                                tile.wallID = WallID::Unsafe::corruptTendril;
+                            if (tile.blockID != TileID::empty ||
+                                tile.wallID != WallID::empty ||
+                                y > tendrilMinY) {
+                                tile.blockID =
+                                    std::abs(rnd.getCoarseNoise(x, y)) <
+                                            threshold - 0.065
+                                        ? y > world.getUndergroundLevel()
+                                              ? TileID::demonite
+                                              : TileID::ebonstone
+                                        : TileID::lesion;
+                                if (tile.wallID != WallID::empty) {
+                                    tile.wallID =
+                                        WallID::Unsafe::corruptTendril;
+                                }
+                                // Handle aether bubble.
+                                tile.echoCoatBlock = false;
                             }
-                            // Handle aether bubble.
-                            tile.echoCoatBlock = false;
                         } else {
                             auto blockItr = corruptBlocks.find(tile.blockID);
                             if (blockItr != corruptBlocks.end()) {

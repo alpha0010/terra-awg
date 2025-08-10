@@ -175,6 +175,10 @@ void genCrimsonAt(int surfaceX, int undergroundX, Random &rnd, World &world)
         parallelFor(
             std::views::iota(sourceX - scanDist, sourceX + scanDist),
             [&, scanDist, sourceX, sourceY](int x) {
+                int tendrilMinY = world.conf.trimEvilTendrils
+                                      ? world.getSurfaceLevel(x) - 20 +
+                                            10 * rnd.getFineNoise(x, 0)
+                                      : 0;
                 for (int y = std::max(sourceY - scanDist, 0);
                      y < sourceY + scanDist;
                      ++y) {
@@ -192,17 +196,23 @@ void genCrimsonAt(int surfaceX, int undergroundX, Random &rnd, World &world)
                         if (std::abs(rnd.getBlurNoise(x, y)) < threshold) {
                             // Crimson spreads from tendrils of flesh blocks.
                             // Fill the core of central tendrils with crimtane.
-                            tile.blockID = std::abs(rnd.getBlurNoise(x, y)) <
-                                                   threshold - 0.045
-                                               ? y > world.getUndergroundLevel()
-                                                     ? TileID::crimtane
-                                                     : TileID::crimstone
-                                               : TileID::flesh;
-                            if (tile.wallID != WallID::empty) {
-                                tile.wallID = WallID::Unsafe::crimsonBlister;
+                            if (tile.blockID != TileID::empty ||
+                                tile.wallID != WallID::empty ||
+                                y > tendrilMinY) {
+                                tile.blockID =
+                                    std::abs(rnd.getBlurNoise(x, y)) <
+                                            threshold - 0.045
+                                        ? y > world.getUndergroundLevel()
+                                              ? TileID::crimtane
+                                              : TileID::crimstone
+                                        : TileID::flesh;
+                                if (tile.wallID != WallID::empty) {
+                                    tile.wallID =
+                                        WallID::Unsafe::crimsonBlister;
+                                }
+                                // Handle aether bubble.
+                                tile.echoCoatBlock = false;
                             }
-                            // Handle aether bubble.
-                            tile.echoCoatBlock = false;
                         } else {
                             auto blockItr = crimsonBlocks.find(tile.blockID);
                             if (blockItr != crimsonBlocks.end()) {

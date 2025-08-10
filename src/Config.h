@@ -48,6 +48,7 @@ struct Config {
     bool forTheWorthy;
     int meteorites;
     double meteoriteSize;
+    bool trimEvilTendrils;
     double ore;
     double lifeCrystals;
     double manaCrystals;
