@@ -4,6 +4,7 @@
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
+#include "biomes/Corruption.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "vendor/frozen/map.h"
@@ -58,22 +59,9 @@ void genCloudCrimson(Random &rnd, World &world)
 void genCrimson(Random &rnd, World &world)
 {
     std::cout << "Infecting the world\n";
-    // Avoid selecting too near spawn.
-    int surfaceX = world.getWidth() * rnd.getDouble(0.12, 0.39);
-    if (rnd.getBool()) {
-        surfaceX = world.getWidth() - surfaceX;
-    }
+    auto [surfaceX, undergroundX] = selectEvilLocations(rnd, world);
     // Register location for use in other generators.
     world.surfaceEvilCenter = surfaceX;
-    int undergroundX;
-    if (world.conf.hiveQueen) {
-        undergroundX = world.getWidth() * rnd.getDouble(0.08, 0.42);
-        if (rnd.getBool()) {
-            undergroundX = world.getWidth() - undergroundX;
-        }
-    } else {
-        undergroundX = world.getWidth() * rnd.getDouble(0.08, 0.92);
-    }
     genCrimsonAt(surfaceX, undergroundX, rnd, world);
     if (world.conf.forTheWorthy) {
         genCloudCrimson(rnd, world);

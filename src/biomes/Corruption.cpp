@@ -55,16 +55,13 @@ void genCloudCorruption(Random &rnd, World &world)
         });
 }
 
-void genCorruption(Random &rnd, World &world)
+std::pair<int, int> baseSelectEvilLocations(Random &rnd, World &world)
 {
-    std::cout << "Corrupting the world\n";
     // Avoid selecting too near spawn.
     int surfaceX = world.getWidth() * rnd.getDouble(0.12, 0.39);
     if (rnd.getBool()) {
         surfaceX = world.getWidth() - surfaceX;
     }
-    // Register location for use in other generators.
-    world.surfaceEvilCenter = surfaceX;
     int undergroundX;
     if (world.conf.hiveQueen) {
         undergroundX = world.getWidth() * rnd.getDouble(0.08, 0.42);
@@ -74,6 +71,51 @@ void genCorruption(Random &rnd, World &world)
     } else {
         undergroundX = world.getWidth() * rnd.getDouble(0.08, 0.92);
     }
+    return {surfaceX, undergroundX};
+}
+
+std::pair<int, int> selectAvoidantEvilLocations(Random &rnd, World &world)
+{
+    int scanDist = 0.06 * world.getWidth();
+    double maxForest = 0;
+    int bestSurface = -1;
+    int betUnderground = -1;
+    int undergroundY =
+        std::midpoint(world.getCavernLevel(), world.getUnderworldLevel());
+    for (int tries = 0; tries < 10; ++tries) {
+        auto [surfaceX, undergroundX] = baseSelectEvilLocations(rnd, world);
+        double forestScore = 0;
+        for (int i = -scanDist; i < scanDist; ++i) {
+            for (int j = -scanDist; j < scanDist; ++j) {
+                forestScore +=
+                    world
+                        .getBiome(surfaceX + i, world.getUndergroundLevel() + j)
+                        .forest;
+                forestScore +=
+                    world.getBiome(undergroundX + i, undergroundY + j).forest;
+            }
+        }
+        if (forestScore > maxForest) {
+            maxForest = forestScore;
+            bestSurface = surfaceX;
+            betUnderground = undergroundX;
+        }
+    }
+    return {bestSurface, betUnderground};
+}
+
+std::pair<int, int> selectEvilLocations(Random &rnd, World &world)
+{
+    return world.conf.avoidantEvil ? selectAvoidantEvilLocations(rnd, world)
+                                   : baseSelectEvilLocations(rnd, world);
+}
+
+void genCorruption(Random &rnd, World &world)
+{
+    std::cout << "Corrupting the world\n";
+    auto [surfaceX, undergroundX] = selectEvilLocations(rnd, world);
+    // Register location for use in other generators.
+    world.surfaceEvilCenter = surfaceX;
     genCorruptionAt(surfaceX, undergroundX, rnd, world);
     if (world.conf.forTheWorthy) {
         genCloudCorruption(rnd, world);

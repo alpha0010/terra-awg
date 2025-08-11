@@ -121,6 +121,9 @@ meteoriteSize = 1.0
 # Prevent corruption/crimson tendrils from extending into the sky.
 trimEvilTendrils = false
 
+# Reduce corruption/crimson overlap with major biomes.
+avoidantEvil = false
+
 # Placement frequency multipliers. 0.5 means half the
 # normal amount, 2.0 means double the normal amount.
 ore = 1.0
@@ -640,6 +643,7 @@ Config readConfig(Random &rnd)
         0,     // meteorites
         1.0,   // meteoriteSize
         false, // trimEvilTendrils
+        false, // avoidantEvil
         1.0,   // ore
         1.0,   // lifeCrystals
         1.0,   // manaCrystals
@@ -718,6 +722,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, meteorites, Integer);
     READ_CONF_AREA_VALUE(variation, meteoriteSize);
     READ_CONF_VALUE(variation, trimEvilTendrils, Boolean);
+    READ_CONF_VALUE(variation, avoidantEvil, Boolean);
     READ_CONF_VALUE(variation, ore, Real);
     READ_CONF_VALUE(variation, lifeCrystals, Real);
     READ_CONF_VALUE(variation, manaCrystals, Real);

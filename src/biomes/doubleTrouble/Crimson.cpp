@@ -1,7 +1,9 @@
 #include "biomes/doubleTrouble/Crimson.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
+#include "biomes/BiomeUtil.h"
 #include "biomes/Crimson.h"
 #include "vendor/frozen/set.h"
 #include <iostream>
@@ -11,7 +13,13 @@ void genSecondaryCrimson(Random &rnd, World &world)
     std::cout << "Infecting the world\n";
     int scanDist = 0.08 * world.getWidth();
     int surfaceX = world.surfaceEvilCenter;
-    while (std::abs(surfaceX - world.surfaceEvilCenter) < scanDist) {
+    while (std::abs(surfaceX - world.surfaceEvilCenter) < scanDist ||
+           (world.conf.avoidantEvil && !isInBiome(
+                                           surfaceX,
+                                           world.getUndergroundLevel(),
+                                           scanDist / 3,
+                                           Biome::forest,
+                                           world))) {
         surfaceX = world.getWidth() * rnd.getDouble(0.12, 0.39);
         if (rnd.getBool()) {
             surfaceX = world.getWidth() - surfaceX;
