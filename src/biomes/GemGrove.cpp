@@ -205,13 +205,19 @@ Point selectGemGroveLocation(double &groveSize, Random &rnd, World &world)
         WallVariants::underworld.begin(),
         WallVariants::underworld.end());
     int safeMinY =
-        (2 * world.getCavernLevel() + world.getUnderworldLevel()) / 3;
+        world.conf.dontDigUp
+            ? (4 * world.getUndergroundLevel() + world.getCavernLevel()) / 5
+            : (2 * world.getCavernLevel() + world.getUnderworldLevel()) / 3;
     int safeMaxY =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     double shrink = groveSize / 10000.0;
     for (int numTries = 0; numTries < 5000; ++numTries, groveSize -= shrink) {
         auto [x, y] = findStoneCave(
-            std::min<int>(world.getCavernLevel() + groveSize, safeMinY),
+            std::min<int>(
+                (world.conf.dontDigUp ? world.getUndergroundLevel()
+                                      : world.getCavernLevel()) +
+                    groveSize,
+                safeMinY),
             std::max<int>(world.getUnderworldLevel() - groveSize, safeMaxY),
             rnd,
             world);

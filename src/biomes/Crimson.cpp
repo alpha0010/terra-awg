@@ -65,7 +65,7 @@ void genCrimson(Random &rnd, World &world)
         world.surfaceEvilCenter = surfaceX;
         genCrimsonAt(surfaceX, undergroundX, rnd, world);
     }
-    if (world.conf.forTheWorthy) {
+    if (world.conf.forTheWorthy || world.conf.dontDigUp) {
         genCloudCrimson(rnd, world);
     }
 }

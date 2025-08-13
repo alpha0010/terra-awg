@@ -1179,11 +1179,9 @@ private:
                 if (tile.wallID != WallID::empty &&
                     std::abs(rnd.getFineNoise(x + 2 * i, y + 2 * j)) <
                         0.1 - 0.1 * j / entry.getHeight()) {
-                    if (!world.conf.unpainted &&
-                        (world.conf.doubleTrouble || world.conf.hiveQueen ||
-                         world.conf.celebration || world.conf.forTheWorthy)) {
+                    if (shouldPaint()) {
                         tile.wallID = WallID::Safe::mudstoneBrick;
-                        tile.wallPaint = theme.paint;
+                        tile.wallPaint = selectWallPaintAt(x + i, y + j);
                     } else {
                         tile.wallID = WallID::Unsafe::craggyStone;
                     }
@@ -1297,6 +1295,14 @@ private:
         }
     }
 
+    bool shouldPaint()
+    {
+        return !world.conf.unpainted &&
+               (world.conf.doubleTrouble || world.conf.hiveQueen ||
+                world.conf.celebration || world.conf.forTheWorthy ||
+                world.conf.dontDigUp);
+    }
+
     void applyPaint(int dungeonCenter, int dungeonWidth)
     {
         int maxX = std::max(
@@ -1348,7 +1354,7 @@ private:
                 return theme.altPaint;
             }
         }
-        return theme.paint;
+        return world.conf.dontDigUp ? theme.altPaint : theme.paint;
     }
 
 public:
@@ -1373,9 +1379,15 @@ public:
                      Paint::deepYellow,
                      Paint::deepOrange});
             }
-        } else if (world.conf.celebration && !world.conf.forTheWorthy) {
-            theme.paint = rnd.select({Paint::deepPink, Paint::deepViolet});
-            theme.altPaint = theme.paint;
+        } else if (!world.conf.forTheWorthy) {
+            if (world.conf.dontDigUp) {
+                theme.paint =
+                    world.isCrimson ? Paint::deepRed : Paint::deepPurple;
+                theme.altPaint = Paint::black;
+            } else if (world.conf.celebration) {
+                theme.paint = rnd.select({Paint::deepPink, Paint::deepViolet});
+                theme.altPaint = theme.paint;
+            }
         }
     }
 
@@ -1472,9 +1484,7 @@ public:
                        rnd.getCoarseNoise(b.x + shuffleX, b.y + shuffleY);
             });
         applyWallVariety(zones);
-        if (!world.conf.unpainted &&
-            (world.conf.doubleTrouble || world.conf.hiveQueen ||
-             world.conf.celebration || world.conf.forTheWorthy)) {
+        if (shouldPaint()) {
             applyPaint(dungeonCenter, dungeonWidth);
         }
     }

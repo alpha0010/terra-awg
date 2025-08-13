@@ -20,8 +20,13 @@ Point selectBoatLocation(int width, int height, Random &rnd, World &world)
         world.conf.biomes == BiomeLayout::columns
             ? world.snowCenter + world.conf.snowSize * 0.06 * world.getWidth()
             : world.getWidth() - width - 350;
+    int minY = world.conf.dontDigUp ? world.getUndergroundLevel() + height
+                                    : world.getCavernLevel();
     int maxY =
-        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3 - height;
+        world.conf.dontDigUp
+            ? world.getCavernLevel()
+            : (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3 -
+                  height;
     constexpr auto avoidBlocks = frozen::make_set<int>({
         TileID::aetherium,
         TileID::blueBrick,
@@ -40,7 +45,7 @@ Point selectBoatLocation(int width, int height, Random &rnd, World &world)
     int biomeScan = std::max(width, height) / 2;
     for (int tries = 0; tries < 8000; ++tries) {
         int x = rnd.getInt(minX, maxX);
-        int y = rnd.getInt(world.getCavernLevel(), maxY);
+        int y = rnd.getInt(minY, maxY);
         int maxEmpty = 0.7 * width * height;
         if ((world.conf.biomes == BiomeLayout::columns || isInBiome(
                                                               x + biomeScan,

@@ -138,7 +138,7 @@ void genCorruption(Random &rnd, World &world)
         world.surfaceEvilCenter = surfaceX;
         genCorruptionAt(surfaceX, undergroundX, rnd, world);
     }
-    if (world.conf.forTheWorthy) {
+    if (world.conf.forTheWorthy || world.conf.dontDigUp) {
         genCloudCorruption(rnd, world);
     }
 }

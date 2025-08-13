@@ -172,6 +172,7 @@ private:
         clearTempleSurface(
             {x - roomSize / 2, y - roomSize / 2},
             1.1 * roomSize,
+            TileID::jungleGrass,
             rnd,
             world);
         for (bool inTemple = true; inTemple; --x) {
@@ -195,6 +196,7 @@ private:
         clearTempleSurface(
             {x + roomSize / 2, y - roomSize / 2},
             1.1 * roomSize,
+            TileID::jungleGrass,
             rnd,
             world);
         for (bool inTemple = true; inTemple; ++x) {

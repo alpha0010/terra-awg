@@ -390,7 +390,7 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
                 break;
             case TileID::stone:
             case TileID::pearlstone:
-                if (y > world.getCavernLevel() &&
+                if ((y > world.getCavernLevel() || world.conf.dontDigUp) &&
                     world.getTile(x, y - 1).liquid == Liquid::none &&
                     (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
                              std::max<int>(

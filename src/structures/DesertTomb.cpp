@@ -33,9 +33,14 @@ Point selectTombLocation(TileBuffer &tomb, Random &rnd, World &world)
                          world.conf.desertSize * 0.06 * world.getWidth() -
                          tomb.getWidth()
                    : world.getWidth() - 350;
-    int minY = world.getCavernLevel();
-    int maxY = (world.getCavernLevel() + 4 * world.getUnderworldLevel()) / 5 -
-               tomb.getHeight();
+    int minY = world.conf.dontDigUp
+                   ? world.getUndergroundLevel() + tomb.getHeight()
+                   : world.getCavernLevel();
+    int maxY =
+        world.conf.dontDigUp
+            ? world.getCavernLevel()
+            : (world.getCavernLevel() + 4 * world.getUnderworldLevel()) / 5 -
+                  tomb.getHeight();
     int maxFoundationEmpty = 0.4 * tomb.getWidth();
     int biomeScan = std::max(tomb.getWidth(), tomb.getHeight()) / 2;
     for (int tries = 0; tries < 8000; ++tries) {

@@ -302,7 +302,8 @@ void applyBaseTerrain(Random &rnd, World &world)
                 }
                 case Biome::desert:
                     tile.blockID = desertTiles[tileType];
-                    if (y > world.getCavernLevel() &&
+                    if (y > (world.conf.dontDigUp ? world.getUndergroundLevel()
+                                                  : world.getCavernLevel()) &&
                         tile.blockID == TileID::sandstone) {
                         if (std::abs(
                                 rnd.getCoarseNoise(
@@ -453,7 +454,11 @@ void applyBaseTerrain(Random &rnd, World &world)
                 if (biome.snow > 0.01) {
                     threshold = std::max(
                         -0.1,
-                        1 + 15.0 * (world.getCavernLevel() - y) /
+                        1 + 15.0 *
+                                ((world.conf.dontDigUp
+                                      ? world.getUndergroundLevel()
+                                      : world.getCavernLevel()) -
+                                 y) /
                                 world.getHeight());
                     threshold = std::lerp(1.0, threshold, biome.snow);
                     if (std::abs(rnd.getCoarseNoise(2 * x, y) + 0.1) < 0.12 &&

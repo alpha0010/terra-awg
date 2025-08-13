@@ -44,19 +44,23 @@ template <typename Func> void iterateTemple(Point center, World &world, Func f)
 
 bool testTempleSelection(Point center, World &world)
 {
-    constexpr auto avoidBlocks = frozen::make_set<int>({
+    std::set<int> avoidBlocks{
         TileID::aetherium,
         TileID::ash,
         TileID::blueBrick,
-        TileID::corruptJungleGrass,
-        TileID::crimsonJungleGrass,
         TileID::granite,
         TileID::greenBrick,
         TileID::hive,
+        TileID::livingMahogany,
+        TileID::livingWood,
         TileID::marble,
         TileID::mushroomGrass,
         TileID::pinkBrick,
-    });
+    };
+    if (!world.conf.dontDigUp) {
+        avoidBlocks.insert(
+            {TileID::corruptJungleGrass, TileID::crimsonJungleGrass});
+    }
     bool isValid = true;
     iterateTemple(
         center,
@@ -92,35 +96,50 @@ Point selectTempleCenter(
         minX = std::midpoint(minX, maxX);
         maxX = minX + 1;
     }
-    int minY = (world.getUndergroundLevel() + world.getCavernLevel()) / 2;
+    int minY = world.conf.dontDigUp
+                   ? world.getSurfaceLevel(world.jungleCenter) +
+                         std::max(
+                             world.conf.templeSize * 0.009 * world.getWidth(),
+                             40.0) -
+                         20
+                   : std::midpoint(
+                         world.getUndergroundLevel(),
+                         world.getCavernLevel());
+    int maxY = world.conf.dontDigUp ? minY + 30 : world.getUnderworldLevel();
     for (int numTries = 0; numTries < 1000; ++numTries) {
         int x = rnd.getInt(minX, maxX);
-        int y = rnd.getInt(minY, world.getUnderworldLevel());
+        int y = rnd.getInt(minY, maxY);
         if ((world.conf.biomes == BiomeLayout::columns ||
              isInBiome(x, y, 200 - 0.19 * numTries, Biome::jungle, world)) &&
             isValid({x, y}, world)) {
             return {x, y};
         }
     }
-    return {
-        world.jungleCenter,
-        std::midpoint(minY, world.getUnderworldLevel())};
+    return {world.jungleCenter, std::midpoint(minY, maxY)};
 }
 
-void clearTempleSurface(Point center, Random &rnd, World &world)
+void clearTempleSurface(Point center, int grassTile, Random &rnd, World &world)
 {
     clearTempleSurface(
         center,
         std::max<double>(world.conf.templeSize * 0.019 * world.getWidth(), 82),
+        grassTile,
         rnd,
         world);
 }
 
-void clearTempleSurface(Point center, int scanDist, Random &rnd, World &world)
+void clearTempleSurface(
+    Point center,
+    int scanDist,
+    int grassTile,
+    Random &rnd,
+    World &world)
 {
     rnd.shuffleNoise();
     constexpr auto clearableTiles = frozen::make_set<int>(
         {TileID::dirt,          TileID::mud,         TileID::jungleGrass,
+         TileID::ebonstone,     TileID::demonite,    TileID::corruptJungleGrass,
+         TileID::crimstone,     TileID::crimtane,    TileID::crimsonJungleGrass,
          TileID::stone,         TileID::clay,        TileID::silt,
          TileID::copperOre,     TileID::tinOre,      TileID::ironOre,
          TileID::leadOre,       TileID::silverOre,   TileID::tungstenOre,
@@ -138,11 +157,11 @@ void clearTempleSurface(Point center, int scanDist, Random &rnd, World &world)
                     tile.blockID = TileID::empty;
                     Tile &leftTile = world.getTile(x - 1, y);
                     if (leftTile.blockID == TileID::mud) {
-                        leftTile.blockID = TileID::jungleGrass;
+                        leftTile.blockID = grassTile;
                     }
                 }
             } else if (tile.blockID == TileID::mud && world.isExposed(x, y)) {
-                tile.blockID = TileID::jungleGrass;
+                tile.blockID = grassTile;
             }
         }
     }
@@ -513,14 +532,30 @@ void genTemple(Random &rnd, World &world)
     if (center.x < 100) {
         return;
     }
-    iterateTemple(center, world, [&world](int x, int y) {
-        Tile &tile = world.getTile(x, y);
-        tile.blockID = TileID::lihzahrdBrick;
-        tile.blockPaint = Paint::none;
-        tile.wallID = WallID::Unsafe::lihzahrdBrick;
-        return true;
-    });
-    clearTempleSurface(center, rnd, world);
+    int numCorrupt = 0;
+    int numCrimson = 0;
+    iterateTemple(
+        center,
+        world,
+        [&numCorrupt, &numCrimson, &world](int x, int y) {
+            Tile &tile = world.getTile(x, y);
+            if (tile.blockID == TileID::corruptJungleGrass) {
+                ++numCorrupt;
+            } else if (tile.blockID == TileID::crimsonJungleGrass) {
+                ++numCrimson;
+            }
+            tile.blockID = TileID::lihzahrdBrick;
+            tile.blockPaint = Paint::none;
+            tile.wallID = WallID::Unsafe::lihzahrdBrick;
+            return true;
+        });
+    clearTempleSurface(
+        center,
+        numCrimson > numCorrupt ? TileID::crimsonJungleGrass
+        : numCorrupt == 0       ? TileID::jungleGrass
+                                : TileID::corruptJungleGrass,
+        rnd,
+        world);
     int wallThickness = 4;
     int roomSize = 7;
     int roomStep = roomSize + wallThickness;
@@ -625,6 +660,12 @@ void genTemple(Random &rnd, World &world)
     if (!world.conf.unpainted) {
         if (world.conf.forTheWorthy) {
             paintTemple(center, Paint::deepGreen, Paint::deepGreen, world);
+        } else if (world.conf.dontDigUp) {
+            paintTemple(
+                center,
+                numCrimson > numCorrupt ? Paint::deepRed : Paint::deepPurple,
+                Paint::black,
+                world);
         } else if (world.conf.celebration) {
             paintTemple(center, Paint::purple, Paint::cyan, world);
         } else if (world.conf.doubleTrouble) {
