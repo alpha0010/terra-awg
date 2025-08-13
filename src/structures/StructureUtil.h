@@ -11,6 +11,8 @@ typedef std::map<int, std::vector<Point>> LocationBins;
 
 enum class Wire { red = 0, blue, green, yellow };
 
+int makeCongruent(int val, int mod);
+
 int binLocation(int x, int y, int maxY);
 
 bool isLocationUsed(

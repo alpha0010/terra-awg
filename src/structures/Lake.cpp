@@ -311,6 +311,20 @@ void spreadShimmer(World &world)
     }
 }
 
+void convertUndergroundLava(World &world, int x)
+{
+    if (x < 200 || x > world.getWidth() - 200) {
+        return;
+    }
+    int minY = (5 * world.getUndergroundLevel() + world.getCavernLevel()) / 6;
+    int maxY = (world.getUndergroundLevel() + 5 * world.getCavernLevel()) / 6;
+    for (int y = minY; y < maxY; ++y) {
+        if (world.getTile(x, y).liquid == Liquid::water) {
+            convertLiquid(x, y, Liquid::water, Liquid::lava, world);
+        }
+    }
+}
+
 void genLake(Random &rnd, World &world)
 {
     std::cout << "Raining\n";
@@ -356,5 +370,10 @@ void genLake(Random &rnd, World &world)
     }
     if (world.conf.celebration) {
         spreadShimmer(world);
+    }
+    if (world.conf.dontDigUp) {
+        parallelFor(std::views::iota(0, world.getWidth()), [&world](int x) {
+            convertUndergroundLava(world, x);
+        });
     }
 }

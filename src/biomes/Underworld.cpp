@@ -65,7 +65,18 @@ void addBridges(int centerLevel, int lavaLevel, Random &rnd, World &world)
         return rnd.getFineNoise(x, y) < threshold;
     };
     std::map<Point, std::pair<Point, int>> bridgeData;
+    int skipFrom =
+        world.conf.dontDigUp
+            ? makeCongruent(0.39 * world.getWidth() - 10, bridge.getWidth())
+            : -1;
+    int skipTo =
+        world.conf.dontDigUp
+            ? makeCongruent(0.61 * world.getWidth() + 10, bridge.getWidth())
+            : -1;
     for (int x = 0; x < world.getWidth(); x += bridge.getWidth()) {
+        if (x == skipFrom) {
+            x = skipTo;
+        }
         for (int i = 0; i < bridge.getWidth(); ++i) {
             for (int j = 0; j < bridge.getHeight(); ++j) {
                 Tile &bridgeTile = bridge.getTile(i, j);
@@ -138,6 +149,19 @@ void genUnderworld(Random &rnd, World &world)
     double aspectRatio = std::min(
         static_cast<double>(world.getHeight()) / world.getWidth(),
         0.5);
+    auto getIslandSurface = [lavaLevel, &rnd, &world](int x) {
+        if (!world.conf.dontDigUp) {
+            return world.getHeight();
+        }
+        double threshold = std::clamp(
+            100 * std::abs(x - 0.5 * world.getWidth()) / world.getWidth() - 10,
+            0.0,
+            1.0);
+        return static_cast<int>(std::lerp(
+            lavaLevel - 10 + 5 * rnd.getFineNoise(x, 0),
+            world.getHeight(),
+            threshold));
+    };
     parallelFor(
         std::views::iota(0, world.getWidth()),
         [aspectRatio,
@@ -145,6 +169,7 @@ void genUnderworld(Random &rnd, World &world)
          lavaLevel,
          upperDist,
          lowerDist,
+         &getIslandSurface,
          &rnd,
          &world](int x) {
             int stalactiteLen =
@@ -166,13 +191,22 @@ void genUnderworld(Random &rnd, World &world)
                     }
                 }
             }
+            int islandSurface = getIslandSurface(x);
             for (int y = world.getUnderworldLevel(); y < world.getHeight();
                  ++y) {
+                Tile &tile = world.getTile(x, y);
+                if (y > islandSurface) {
+                    tile.blockID = TileID::ash;
+                    continue;
+                } else if (
+                    islandSurface < lavaLevel &&
+                    tile.blockID == TileID::hellstone) {
+                    tile.blockID = TileID::ash;
+                }
                 double threshold =
                     0.25 - 0.25 * (y < centerLevel
                                        ? (centerLevel - y) / upperDist
                                        : (y - centerLevel) / lowerDist);
-                Tile &tile = world.getTile(x, y);
                 if (tile.blockID == TileID::hive &&
                     static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
                             7 ==
@@ -209,8 +243,11 @@ void genUnderworld(Random &rnd, World &world)
     addBridges(centerLevel, lavaLevel, rnd, world);
     int skipFrom = 0.15 * world.getWidth();
     int skipTo = 0.85 * world.getWidth();
+    int minX = world.conf.dontDigUp ? 0.39 * world.getWidth() : 0;
+    int maxX =
+        world.conf.dontDigUp ? 0.61 * world.getWidth() : world.getWidth();
     std::vector<Point> spawnOpts;
-    for (int x = 0; x < world.getWidth(); ++x) {
+    for (int x = minX; x < maxX; ++x) {
         if (x == skipFrom) {
             x = skipTo;
         }
@@ -224,6 +261,12 @@ void genUnderworld(Random &rnd, World &world)
                 }
             }
         }
+    }
+    if (world.conf.dontDigUp && spawnOpts.size() > 1002) {
+        spawnOpts.erase(
+            spawnOpts.begin(),
+            spawnOpts.begin() + (spawnOpts.size() / 2 - 500));
+        spawnOpts.resize(1000);
     }
     std::shuffle(spawnOpts.begin(), spawnOpts.end(), rnd.getPRNG());
     for (auto [x, y] : spawnOpts) {

@@ -194,6 +194,31 @@ void registerUnderworld(Random &rnd, World &world)
     });
 }
 
+double computeStoneThreshold(int y, World &world)
+{
+    std::array<std::pair<int, double>, 5> steps{{
+        {0, -3},
+        {world.getUndergroundLevel(), 0},
+        {std::midpoint(world.getUndergroundLevel(), world.getCavernLevel()),
+         world.conf.dontDigUp ? 0.8225 : 0.0918},
+        {world.getCavernLevel(), world.conf.dontDigUp ? 0.1127 : 0.1836},
+        {world.getUnderworldLevel(), world.conf.dontDigUp ? -0.6413 : 0.8225},
+    }};
+    std::pair<int, double> from;
+    std::pair<int, double> to;
+    for (auto step : steps) {
+        from = to;
+        to = step;
+        if (y < to.first) {
+            break;
+        }
+    }
+    return std::lerp(
+        from.second,
+        to.second,
+        static_cast<double>(y - from.first) / (to.first - from.first));
+}
+
 void applyBaseTerrain(Random &rnd, World &world)
 {
     rnd.shuffleNoise();
@@ -238,11 +263,7 @@ void applyBaseTerrain(Random &rnd, World &world)
                 35 * rnd.getCoarseNoise(x, 0.66 * world.getHeight());
             for (int y = world.getSurfaceLevel(x); y < world.getHeight(); ++y) {
                 BiomeData &biome = world.getBiome(x, y);
-                double threshold =
-                    y < world.getUndergroundLevel()
-                        ? 3.0 * y / world.getUndergroundLevel() - 3
-                        : static_cast<double>(y - world.getUndergroundLevel()) /
-                              (world.getHeight() - world.getUndergroundLevel());
+                double threshold = computeStoneThreshold(y, world);
                 int tileType = rnd.getFineNoise(
                                    x + depositNoise[0].first,
                                    y + depositNoise[1].second) > threshold
@@ -488,12 +509,22 @@ void applyBaseTerrain(Random &rnd, World &world)
     parallelFor(std::views::iota(0, world.getWidth()), [&rnd, &world](int x) {
         int stalactiteLen = 0;
         int stalacIter = 0;
+        int cavernGrassLevel =
+            world.conf.dontDigUp
+                ? 25 * rnd.getCoarseNoise(x, world.getCavernLevel()) +
+                      world.getCavernLevel()
+                : world.getHeight();
         for (int y = 0; y < world.getHeight(); ++y) {
             if (y % 500 == 0) {
                 stalacIter = y / 35;
             }
             Tile &tile = world.getTile(x, y);
             if (tile.blockID == TileID::empty) {
+                if (y > cavernGrassLevel &&
+                    world.getBiome(x, y).active != Biome::underworld &&
+                    rnd.getCoarseNoise(x, y) > 0) {
+                    tile.wallID = WallID::empty;
+                }
                 if (stalactiteLen > 0 &&
                     world.getTile(x, y + 1).blockID == TileID::empty) {
                     tile.blockID = TileID::marble;
@@ -520,7 +551,7 @@ void applyBaseTerrain(Random &rnd, World &world)
             }
             BiomeData &biome = world.getBiome(x, y);
             if (biome.active == Biome::forest &&
-                y < world.getUndergroundLevel()) {
+                (y < world.getUndergroundLevel() || y > cavernGrassLevel)) {
                 if (tile.blockID == TileID::dirt) {
                     tile.blockID = TileID::grass;
                 }

@@ -88,6 +88,8 @@ Seed determineSeed(Config &conf)
 {
     if (conf.forTheWorthy) {
         return Seed::forTheWorthy;
+    } else if (conf.dontDigUp) {
+        return Seed::dontDigUp;
     } else if (conf.hiveQueen) {
         return Seed::notTheBees;
     } else if (conf.celebration) {
@@ -241,15 +243,15 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     w.putUint32(0);                               // Cloud background.
     w.putUint16(rnd.getInt(50, 150));             // Number of clouds.
     w.putFloat32(rnd.getDouble(-0.2, 0.2));       // Wind speed.
-    w.putUint32(0);                 // Players finished angler quest.
-    w.putBool(false);               // Saved angler.
-    w.putUint32(rnd.getInt(0, 38)); // Angler quest.
-    w.putBool(false);               // Saved stylist.
-    w.putBool(false);               // Saved tax collector.
-    w.putBool(false);               // Saved golfer.
-    w.putUint32(0);                 // Invasion start size.
-    w.putUint32(0);                 // Cultist delay.
-    w.putUint16(688);               // Mob types.
+    w.putUint32(0);                        // Players finished angler quest.
+    w.putBool(false);                      // Saved angler.
+    w.putUint32(rnd.getInt(0, 38));        // Angler quest.
+    w.putBool(false);                      // Saved stylist.
+    w.putBool(special == Seed::dontDigUp); // Saved tax collector.
+    w.putBool(false);                      // Saved golfer.
+    w.putUint32(0);                        // Invasion start size.
+    w.putUint32(0);                        // Cultist delay.
+    w.putUint16(688);                      // Mob types.
     for (int i = 0; i < 688; ++i) {
         w.putUint32(0); // Mob kill tally.
     }
@@ -488,6 +490,31 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
             w,
             rnd,
             world);
+    } else if (special == Seed::dontDigUp) {
+        writeNPC(
+            NPC::taxCollector,
+            rnd.select(
+                {"Agnew",
+                 "Blanton",
+                 "Carroll",
+                 "Chester",
+                 "Cleveland",
+                 "Dwyer",
+                 "Fillmore",
+                 "Grover",
+                 "Harrison",
+                 "Herbert",
+                 "Lyndon",
+                 "McKinly",
+                 "Millard",
+                 "Ronald",
+                 "Rutherford",
+                 "Theodore",
+                 "Tweed",
+                 "Warren"}),
+            w,
+            rnd,
+            world);
     } else if (special == Seed::notTheBees) {
         writeNPC(
             NPC::merchant,
@@ -680,6 +707,12 @@ int main()
         conf.templeSize *= 1.4;
         conf.glowingMossSize *= 1.225;
         conf.evilSize *= 1.58;
+    }
+    if (conf.dontDigUp) {
+        if (conf.spawn == SpawnPoint::normal) {
+            conf.spawn = SpawnPoint::underworld;
+        }
+        conf.evilSize *= 1.5;
     }
     if (conf.spawn == SpawnPoint::normal) {
         conf.spawn = SpawnPoint::surface;

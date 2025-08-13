@@ -16,11 +16,6 @@
 
 inline std::array const roofCurve{1, 2, 3, 5, 8, 13, 21, 26, 29, 31, 32, 33};
 
-int makeCongruent(int val, int mod)
-{
-    return mod * (val / mod);
-}
-
 bool canPlaceFurniture(int x, int y, TileBuffer &data, World &world)
 {
     for (int i = 0; i < data.getWidth(); ++i) {
@@ -206,10 +201,25 @@ public:
         int step = 8;
         int underworldHeight = world.getHeight() - world.getUnderworldLevel();
         int cityBase = world.getUnderworldLevel() + 0.47 * underworldHeight;
-        int minX = makeCongruent(0.15 * world.getWidth(), step);
-        int maxX = makeCongruent(0.85 * world.getWidth(), step);
+        int minX = makeCongruent(
+            world.conf.dontDigUp ? 100 : 0.15 * world.getWidth(),
+            step);
+        int maxX = makeCongruent(
+            world.conf.dontDigUp ? world.getWidth() - 100
+                                 : 0.85 * world.getWidth(),
+            step);
+        int skipFrom = world.conf.dontDigUp
+                           ? makeCongruent(0.39 * world.getWidth(), step)
+                           : -1;
+        int skipTo = world.conf.dontDigUp
+                         ? makeCongruent(0.61 * world.getWidth(), step)
+                         : -1;
         int ruinStartX = -1;
         for (int x = minX; x < maxX; ++x) {
+            if (x == skipFrom) {
+                x = skipTo;
+                ruinStartX = -1;
+            }
             if (x % step == 0 &&
                 (rnd.getCoarseNoise(x, 0) < 0.15 ||
                  !world.regionPasses(

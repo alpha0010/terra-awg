@@ -104,19 +104,40 @@ std::pair<int, int> selectAvoidantEvilLocations(Random &rnd, World &world)
     return {bestSurface, betUnderground};
 }
 
-std::pair<int, int> selectEvilLocations(Random &rnd, World &world)
+std::vector<std::pair<int, int>> selectEvilLocations(Random &rnd, World &world)
 {
-    return world.conf.avoidantEvil ? selectAvoidantEvilLocations(rnd, world)
-                                   : baseSelectEvilLocations(rnd, world);
+    if (world.conf.dontDigUp) {
+        auto partitions =
+            rnd.partitionRange(rnd.getInt(20, 24), world.getWidth());
+        std::vector<std::pair<int, int>> locations;
+        for (int partition : partitions) {
+            locations.emplace_back(partition, -1);
+        }
+        locations[0].second = world.getWidth() * rnd.getDouble(0.02, 0.06);
+        locations[1].second = world.getWidth() * rnd.getDouble(0.05, 0.09);
+        locations[2].second = world.getWidth() * rnd.getDouble(0.08, 0.12);
+        locations[locations.size() - 3].second =
+            world.getWidth() * rnd.getDouble(0.88, 0.92);
+        locations[locations.size() - 2].second =
+            world.getWidth() * rnd.getDouble(0.91, 0.95);
+        locations[locations.size() - 1].second =
+            world.getWidth() * rnd.getDouble(0.94, 0.98);
+        return locations;
+    }
+    return {
+        world.conf.avoidantEvil ? selectAvoidantEvilLocations(rnd, world)
+                                : baseSelectEvilLocations(rnd, world)};
 }
 
 void genCorruption(Random &rnd, World &world)
 {
     std::cout << "Corrupting the world\n";
-    auto [surfaceX, undergroundX] = selectEvilLocations(rnd, world);
-    // Register location for use in other generators.
-    world.surfaceEvilCenter = surfaceX;
-    genCorruptionAt(surfaceX, undergroundX, rnd, world);
+    rnd.shuffleNoise();
+    for (auto [surfaceX, undergroundX] : selectEvilLocations(rnd, world)) {
+        // Register location for use in other generators.
+        world.surfaceEvilCenter = surfaceX;
+        genCorruptionAt(surfaceX, undergroundX, rnd, world);
+    }
     if (world.conf.forTheWorthy) {
         genCloudCorruption(rnd, world);
     }
@@ -124,10 +145,15 @@ void genCorruption(Random &rnd, World &world)
 
 void genCorruptionAt(int surfaceX, int undergroundX, Random &rnd, World &world)
 {
-    rnd.shuffleNoise();
-    int surfaceY = rnd.getInt(
-        0.95 * world.getUndergroundLevel(),
-        (2 * world.getUndergroundLevel() + world.getCavernLevel()) / 3);
+    int surfaceY =
+        world.conf.dontDigUp
+            ? rnd.getInt(
+                  0.7 * world.getUndergroundLevel(),
+                  0.9 * world.getUndergroundLevel())
+            : rnd.getInt(
+                  0.95 * world.getUndergroundLevel(),
+                  (2 * world.getUndergroundLevel() + world.getCavernLevel()) /
+                      3);
     int scanDist = world.conf.evilSize * 0.08 * world.getWidth();
     // Conversion mappings.
     constexpr auto corruptBlocks = frozen::make_map<int, int>(
@@ -180,36 +206,52 @@ void genCorruptionAt(int surfaceX, int undergroundX, Random &rnd, World &world)
          TileID::leaf,
          TileID::livingMahogany,
          TileID::mahoganyLeaf});
+    int halfWidth = world.getWidth() / 2;
     int scaleFactor =
         world.conf.evilSize *
-        std::midpoint<double>(world.getWidth(), 3.5 * world.getHeight());
+        std::midpoint<double>(world.getWidth(), 3.5 * world.getHeight()) *
+        (world.conf.dontDigUp ? std::abs(surfaceX - halfWidth) < halfWidth / 2
+                                    ? rnd.getDouble(0.45, 0.65)
+                                    : rnd.getDouble(0.7, 1)
+                              : 1);
     // Dig surface chasms, edged with ebonstone.
-    for (int x = surfaceX - scanDist; x < surfaceX + scanDist; ++x) {
-        for (int y = 0.45 * world.getUndergroundLevel();
-             y < world.getCavernLevel();
-             ++y) {
-            double threshold = std::min(
-                {2 - 50.0 * std::abs(x - surfaceX) / scaleFactor,
-                 0.01 * (world.getCavernLevel() - y),
-                 0.16});
-            if (std::abs(rnd.getCoarseNoise(3 * x, y) + 0.1) < threshold) {
-                Tile &tile = world.getTile(x, y);
-                if (chasmSkipTiles.contains(tile.blockID) ||
-                    tile.wallID == WallID::Unsafe::livingWood) {
-                    continue;
-                }
-                if (std::abs(rnd.getCoarseNoise(3 * x, y) + 0.1) <
-                    threshold - 0.07) {
-                    tile.blockID = TileID::empty;
-                } else if (tile.blockID != TileID::empty) {
-                    tile.blockID = TileID::ebonstone;
+    if (!world.conf.dontDigUp || rnd.getInt(0, 4) == 0) {
+        int maxY = world.conf.dontDigUp ? std::midpoint(
+                                              world.getUndergroundLevel(),
+                                              world.getCavernLevel())
+                                        : world.getCavernLevel();
+        for (int x = std::max(surfaceX - scanDist, 0);
+             x < std::min(surfaceX + scanDist, world.getWidth());
+             ++x) {
+            for (int y = 0.45 * world.getUndergroundLevel(); y < maxY; ++y) {
+                double threshold = std::min(
+                    {2 - 50.0 * std::abs(x - surfaceX) / scaleFactor,
+                     0.01 * (maxY - y),
+                     0.16});
+                if (std::abs(rnd.getCoarseNoise(3 * x, y) + 0.1) < threshold) {
+                    Tile &tile = world.getTile(x, y);
+                    if (chasmSkipTiles.contains(tile.blockID) ||
+                        tile.wallID == WallID::Unsafe::livingWood) {
+                        continue;
+                    }
+                    if (std::abs(rnd.getCoarseNoise(3 * x, y) + 0.1) <
+                        threshold - 0.07) {
+                        tile.blockID = TileID::empty;
+                    } else if (tile.blockID != TileID::empty) {
+                        tile.blockID = TileID::ebonstone;
+                    }
                 }
             }
         }
     }
     auto applyCorruption = [&](int sourceX, int sourceY) {
+        if (sourceX == -1) {
+            return;
+        }
         parallelFor(
-            std::views::iota(sourceX - scanDist, sourceX + scanDist),
+            std::views::iota(
+                std::max(sourceX - scanDist, 0),
+                std::min(sourceX + scanDist, world.getWidth())),
             [&, scanDist, sourceX, sourceY](int x) {
                 int tendrilMinY = world.conf.trimEvilTendrils
                                       ? world.getSurfaceLevel(x) - 20 +
@@ -282,7 +324,9 @@ void genCorruptionAt(int surfaceX, int undergroundX, Random &rnd, World &world)
     applyCorruption(
         undergroundX,
         rnd.getInt(
-            (2 * world.getCavernLevel() + world.getUnderworldLevel()) / 3,
+            world.conf.dontDigUp
+                ? (world.getUndergroundLevel() + 2 * world.getCavernLevel()) / 3
+                : (2 * world.getCavernLevel() + world.getUnderworldLevel()) / 3,
             world.getUnderworldLevel()));
     // Remove high above surface unconnected tendrils.
     bool clearFloating = false;

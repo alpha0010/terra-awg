@@ -5,6 +5,11 @@
 #include "vendor/frozen/set.h"
 #include <cmath>
 
+int makeCongruent(int val, int mod)
+{
+    return mod * (val / mod);
+}
+
 int binLocation(int x, int y, int maxY)
 {
     int factor = 128;

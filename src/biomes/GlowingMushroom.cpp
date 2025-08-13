@@ -122,6 +122,47 @@ void fillMushroomLayer(Random &rnd, World &world)
     });
 }
 
+void fillForestMushroomLayer(Random &rnd, World &world)
+{
+    parallelFor(std::views::iota(0, world.getWidth()), [&rnd, &world](int x) {
+        for (int y = world.getUnderworldLevel() *
+                     (0.9 + 0.03 * rnd.getCoarseNoise(x, 0));
+             y < world.getHeight();
+             ++y) {
+            if (world.getBiome(x, y).active != Biome::forest) {
+                continue;
+            }
+            Tile &tile = world.getTile(x, y);
+            switch (tile.blockID) {
+            case TileID::stone:
+                tile.blockID = TileID::silt;
+                break;
+            case TileID::clay:
+            case TileID::sand:
+                tile.blockID = TileID::slime;
+                tile.wallID = WallID::Unsafe::mushroom;
+                break;
+            case TileID::dirt:
+            case TileID::grass:
+                tile.blockID =
+                    world.isExposed(x, y) ||
+                            static_cast<int>(
+                                99999 * (1 + rnd.getFineNoise(x, y))) %
+                                    35 ==
+                                0
+                        ? TileID::mushroomGrass
+                        : TileID::mud;
+                [[fallthrough]];
+            case TileID::empty:
+                if (tile.wallID != WallID::empty) {
+                    tile.wallID = WallID::Unsafe::mushroom;
+                }
+                break;
+            }
+        }
+    });
+}
+
 void genGlowingMushroom(Random &rnd, World &world)
 {
     std::cout << "Fertilizing glowing mushrooms\n";
@@ -139,8 +180,13 @@ void genGlowingMushroom(Random &rnd, World &world)
                           : world.conf.glowingMushroomSize) *
                      0.06 * world.getWidth();
         int centerX = world.getWidth() * rnd.getDouble(0.05, 0.95);
-        int fieldFloor =
-            rnd.getInt(world.getCavernLevel(), world.getUnderworldLevel() - 50);
+        int fieldFloor = world.conf.dontDigUp
+                             ? rnd.getInt(
+                                   world.getUndergroundLevel() + buffer,
+                                   world.getCavernLevel())
+                             : rnd.getInt(
+                                   world.getCavernLevel(),
+                                   world.getUnderworldLevel() - 50);
         if (world.getBiome(centerX, fieldFloor).forest < 0.99) {
             continue;
         }
@@ -154,5 +200,8 @@ void genGlowingMushroom(Random &rnd, World &world)
     }
     if (world.conf.biomes == BiomeLayout::layers) {
         fillMushroomLayer(rnd, world);
+    }
+    if (world.conf.dontDigUp) {
+        fillForestMushroomLayer(rnd, world);
     }
 }

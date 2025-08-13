@@ -11,6 +11,7 @@
 void genSecondaryCrimson(Random &rnd, World &world)
 {
     std::cout << "Infecting the world\n";
+    rnd.shuffleNoise();
     int scanDist = 0.08 * world.getWidth();
     int surfaceX = world.surfaceEvilCenter;
     while (std::abs(surfaceX - world.surfaceEvilCenter) < scanDist ||

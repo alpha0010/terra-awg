@@ -46,6 +46,7 @@ void fillGraniteCave(int centerX, int centerY, Random &rnd, World &world)
             Tile &tile = world.getTile(x, y);
             switch (tile.blockID) {
             case TileID::dirt:
+            case TileID::grass:
             case TileID::stone:
                 tile.blockID = shouldClear ? TileID::empty : TileID::granite;
                 break;
@@ -79,7 +80,7 @@ void fillGraniteCave(int centerX, int centerY, Random &rnd, World &world)
         }
     }
     caveSize += 60;
-    if (centerY - caveSize < world.getCavernLevel()) {
+    if (centerY - caveSize < world.getCavernLevel() || world.conf.dontDigUp) {
         return;
     }
     for (int x = std::max(centerX - caveSize, 0.0); x < centerX + caveSize;

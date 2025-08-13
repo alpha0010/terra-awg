@@ -306,9 +306,10 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
             case TileID::grass:
             case TileID::hallowedGrass:
             case TileID::snow:
-                if (y < world.getUndergroundLevel() &&
+                if ((world.conf.dontDigUp ||
+                     (y < world.getUndergroundLevel() &&
+                      world.getTile(x, y - 1).wallID == WallID::empty)) &&
                     world.getTile(x, y - 1).liquid == Liquid::none &&
-                    world.getTile(x, y - 1).wallID == WallID::empty &&
                     rnd.getDouble(0, 1) < 0.21 * world.conf.trees) {
                     growTree(
                         x,
@@ -698,9 +699,9 @@ bool placeSunflower(int x, int y, World &world)
 {
     Tile &nextBase = world.getTile(x + 1, y);
     if (nextBase.blockID != TileID::grass || nextBase.slope != Slope::none ||
-        !world.regionPasses(x, y - 4, 2, 4, [](Tile &tile) {
+        !world.regionPasses(x, y - 4, 2, 4, [&world](Tile &tile) {
             return tile.blockID == TileID::empty &&
-                   tile.wallID == WallID::empty;
+                   (tile.wallID == WallID::empty || world.conf.dontDigUp);
         })) {
         return false;
     }
@@ -807,7 +808,8 @@ void growGrass(int x, int y, Random &rnd, World &world)
         placeGeyser(x, y, world)) {
         return;
     }
-    if (baseTile.blockID == TileID::grass && randInt % 3 == 0 &&
+    if (baseTile.blockID == TileID::grass &&
+        randInt % (world.conf.dontDigUp ? 11 : 3) == 0 &&
         rnd.getCoarseNoise(x, y) < -0.3 && placeSunflower(x, y, world)) {
         return;
     }

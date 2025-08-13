@@ -33,6 +33,7 @@ void fillMarbleCave(int x, int y, Random &rnd, World &world)
                 world.getTile(x + i, y + j + 1).blockID == TileID::empty;
             switch (tile.blockID) {
             case TileID::dirt:
+            case TileID::grass:
             case TileID::stone:
             case TileID::ice:
             case TileID::sandstone:

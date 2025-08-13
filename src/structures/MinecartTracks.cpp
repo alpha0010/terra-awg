@@ -313,7 +313,8 @@ void applyTrackGrass(int x, int y, World &world)
     for (int j = -10; j < 2; ++j) {
         Tile &tile = world.getTile(x, y + j);
         bool isDirt =
-            tile.blockID == TileID::dirt && y + j < world.getUndergroundLevel();
+            tile.blockID == TileID::dirt &&
+            (y + j < world.getUndergroundLevel() || world.conf.dontDigUp);
         if ((!isDirt && tile.blockID != TileID::mud) ||
             !world.isExposed(x, y + j)) {
             continue;

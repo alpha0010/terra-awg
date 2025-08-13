@@ -114,6 +114,9 @@ hiveQueen = false
 # Activates "for the worthy" secret seed.
 forTheWorthy = false
 
+# Activates "dont dig up" secret seed.
+dontDigUp = false
+
 # Number of meteorites to place.
 meteorites = 0
 meteoriteSize = 1.0
@@ -640,6 +643,7 @@ Config readConfig(Random &rnd)
         false, // celebration
         false, // hiveQueen
         false, // forTheWorthy
+        false, // dontDigUp
         0,     // meteorites
         1.0,   // meteoriteSize
         false, // trimEvilTendrils
@@ -719,6 +723,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, celebration, Boolean);
     READ_CONF_VALUE(variation, hiveQueen, Boolean);
     READ_CONF_VALUE(variation, forTheWorthy, Boolean);
+    READ_CONF_VALUE(variation, dontDigUp, Boolean);
     READ_CONF_VALUE(variation, meteorites, Integer);
     READ_CONF_AREA_VALUE(variation, meteoriteSize);
     READ_CONF_VALUE(variation, trimEvilTendrils, Boolean);

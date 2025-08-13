@@ -1,12 +1,12 @@
 #ifndef CORRUPTION_H
 #define CORRUPTION_H
 
-#include <utility>
+#include <vector>
 
 class World;
 class Random;
 
-std::pair<int, int> selectEvilLocations(Random &rnd, World &world);
+std::vector<std::pair<int, int>> selectEvilLocations(Random &rnd, World &world);
 
 void genCorruption(Random &rnd, World &world);
 void genCorruptionAt(int surfaceX, int undergroundX, Random &rnd, World &world);
