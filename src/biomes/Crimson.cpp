@@ -225,7 +225,10 @@ void genCrimsonAt(int surfaceX, int undergroundX, Random &rnd, World &world)
                         } else {
                             auto blockItr = crimsonBlocks.find(tile.blockID);
                             if (blockItr != crimsonBlocks.end()) {
-                                tile.blockID = blockItr->second;
+                                if (y > world.getUndergroundLevel() ||
+                                    blockItr->second != TileID::crimtane) {
+                                    tile.blockID = blockItr->second;
+                                }
                             } else if (
                                 tile.blockID == TileID::livingWood ||
                                 tile.blockID == TileID::livingMahogany) {

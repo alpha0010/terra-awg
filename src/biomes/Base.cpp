@@ -219,6 +219,46 @@ double computeStoneThreshold(int y, World &world)
         static_cast<double>(y - from.first) / (to.first - from.first));
 }
 
+std::vector<std::tuple<int, int, int, int>> getOreLayers(World &world)
+{
+    if (world.conf.dontDigUp) {
+        return {
+            {3,
+             (3 * world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 5,
+             world.getUnderworldLevel(),
+             world.copperVariant},
+            {4,
+             (world.getUndergroundLevel() + world.getCavernLevel()) / 2,
+             (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3,
+             world.ironVariant},
+            {5,
+             (4 * world.getUndergroundLevel() + world.getCavernLevel()) / 5,
+             (4 * world.getCavernLevel() + world.getUnderworldLevel()) / 5,
+             world.silverVariant},
+            {6,
+             0.6 * world.getUndergroundLevel(),
+             (3 * world.getUndergroundLevel() + 5 * world.getCavernLevel()) / 8,
+             world.goldVariant}};
+    }
+    return {
+        {3,
+         0.6 * world.getUndergroundLevel(),
+         (world.getUndergroundLevel() + world.getCavernLevel()) / 2,
+         world.copperVariant},
+        {4,
+         0.85 * world.getUndergroundLevel(),
+         (2 * world.getCavernLevel() + world.getUnderworldLevel()) / 3,
+         world.ironVariant},
+        {5,
+         (world.getUndergroundLevel() + world.getCavernLevel()) / 2,
+         (world.getCavernLevel() + world.getUnderworldLevel()) / 2,
+         world.silverVariant},
+        {6,
+         (2 * world.getCavernLevel() + world.getUnderworldLevel()) / 3,
+         world.getUnderworldLevel(),
+         world.goldVariant}};
+}
+
 void applyBaseTerrain(Random &rnd, World &world)
 {
     rnd.shuffleNoise();
@@ -374,32 +414,7 @@ void applyBaseTerrain(Random &rnd, World &world)
                     tile.blockID = TileID::marble;
                     tile.wallID = WallID::Unsafe::marble;
                 }
-                for (auto [idx, oreRoof, oreFloor, ore] :
-                     {std::tuple{
-                          3,
-                          0.6 * world.getUndergroundLevel(),
-                          (world.getUndergroundLevel() +
-                           world.getCavernLevel()) /
-                              2,
-                          world.copperVariant},
-                      {4,
-                       0.85 * world.getUndergroundLevel(),
-                       (2 * world.getCavernLevel() +
-                        world.getUnderworldLevel()) /
-                           3,
-                       world.ironVariant},
-                      {5,
-                       (world.getUndergroundLevel() + world.getCavernLevel()) /
-                           2,
-                       (world.getCavernLevel() + world.getUnderworldLevel()) /
-                           2,
-                       world.silverVariant},
-                      {6,
-                       (2 * world.getCavernLevel() +
-                        world.getUnderworldLevel()) /
-                           3,
-                       world.getUnderworldLevel(),
-                       world.goldVariant}}) {
+                for (auto [idx, oreRoof, oreFloor, ore] : getOreLayers(world)) {
                     if (y > oreRoof && y < oreFloor &&
                         rnd.getFineNoise(
                             x + depositNoise[idx].first,

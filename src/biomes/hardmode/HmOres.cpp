@@ -33,6 +33,70 @@ struct DepositDef {
     int noiseY;
 };
 
+std::array<DepositDef, 3> getHmOreLayers(Random &rnd, World &world)
+{
+    if (world.conf.dontDigUp) {
+        return {{
+            {world.cobaltVariant,
+             static_cast<int>(std::lerp(
+                 world.getUndergroundLevel(),
+                 world.getCavernLevel(),
+                 0.52)),
+             world.getHeight(),
+             rnd.getInt(0, world.getWidth()),
+             rnd.getInt(0, world.getHeight())},
+            {world.mythrilVariant,
+             static_cast<int>(std::lerp(
+                 world.getUndergroundLevel(),
+                 world.getCavernLevel(),
+                 0.31)),
+             static_cast<int>(std::lerp(
+                 world.getCavernLevel(),
+                 world.getUnderworldLevel(),
+                 0.15)),
+             rnd.getInt(0, world.getWidth()),
+             rnd.getInt(0, world.getHeight())},
+            {world.adamantiteVariant,
+             0,
+             static_cast<int>(std::lerp(
+                 world.getUndergroundLevel(),
+                 world.getCavernLevel(),
+                 0.44)),
+             rnd.getInt(0, world.getWidth()),
+             rnd.getInt(0, world.getHeight())},
+        }};
+    }
+    return {{
+        {world.cobaltVariant,
+         0,
+         static_cast<int>(std::lerp(
+             world.getCavernLevel(),
+             world.getUnderworldLevel(),
+             0.48)),
+         rnd.getInt(0, world.getWidth()),
+         rnd.getInt(0, world.getHeight())},
+        {world.mythrilVariant,
+         static_cast<int>(std::lerp(
+             world.getCavernLevel(),
+             world.getUnderworldLevel(),
+             0.12)),
+         static_cast<int>(std::lerp(
+             world.getCavernLevel(),
+             world.getUnderworldLevel(),
+             0.73)),
+         rnd.getInt(0, world.getWidth()),
+         rnd.getInt(0, world.getHeight())},
+        {world.adamantiteVariant,
+         static_cast<int>(std::lerp(
+             world.getCavernLevel(),
+             world.getUnderworldLevel(),
+             0.61)),
+         world.getHeight(),
+         rnd.getInt(0, world.getWidth()),
+         rnd.getInt(0, world.getHeight())},
+    }};
+}
+
 void genHardmodeOres(Random &rnd, World &world)
 {
     std::cout << "Blessing ore\n";
@@ -65,35 +129,7 @@ void genHardmodeOres(Random &rnd, World &world)
         TileID::snow,
         TileID::stone,
     });
-    std::array<DepositDef, 3> depositNoise({
-        {world.cobaltVariant,
-         0,
-         static_cast<int>(std::lerp(
-             world.getCavernLevel(),
-             world.getUnderworldLevel(),
-             0.48)),
-         rnd.getInt(0, world.getWidth()),
-         rnd.getInt(0, world.getHeight())},
-        {world.mythrilVariant,
-         static_cast<int>(std::lerp(
-             world.getCavernLevel(),
-             world.getUnderworldLevel(),
-             0.12)),
-         static_cast<int>(std::lerp(
-             world.getCavernLevel(),
-             world.getUnderworldLevel(),
-             0.73)),
-         rnd.getInt(0, world.getWidth()),
-         rnd.getInt(0, world.getHeight())},
-        {world.adamantiteVariant,
-         static_cast<int>(std::lerp(
-             world.getCavernLevel(),
-             world.getUnderworldLevel(),
-             0.61)),
-         world.getHeight(),
-         rnd.getInt(0, world.getWidth()),
-         rnd.getInt(0, world.getHeight())},
-    });
+    std::array<DepositDef, 3> depositNoise = getHmOreLayers(rnd, world);
     parallelFor(
         std::views::iota(0, world.getWidth()),
         [chlorophyteThreshold = computeOreThreshold(0.7 * world.conf.ore),
