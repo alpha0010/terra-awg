@@ -712,6 +712,7 @@ int main()
         if (conf.spawn == SpawnPoint::normal) {
             conf.spawn = SpawnPoint::underworld;
         }
+        conf.gems *= 0.65;
         conf.evilSize *= 1.5;
     }
     if (conf.spawn == SpawnPoint::normal) {

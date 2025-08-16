@@ -12,6 +12,23 @@ void genSecondaryCorruption(Random &rnd, World &world)
 {
     std::cout << "Corrupting the world\n";
     rnd.shuffleNoise();
+    if (world.conf.dontDigUp) {
+        int minX = 0;
+        int maxX = world.getWidth();
+        if (world.surfaceEvilCenter < world.getWidth() / 2) {
+            minX = world.getWidth() / 2;
+        } else {
+            maxX = world.getWidth() / 2;
+        }
+        for (auto [surfaceX, undergroundX] : selectEvilLocations(rnd, world)) {
+            if (surfaceX < minX || surfaceX > maxX) {
+                continue;
+            }
+            genCorruptionAt(surfaceX, undergroundX, rnd, world);
+        }
+        return;
+    }
+
     int scanDist = 0.08 * world.getWidth();
     int surfaceX = world.surfaceEvilCenter;
     while (std::abs(surfaceX - world.surfaceEvilCenter) < scanDist ||

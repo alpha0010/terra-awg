@@ -60,7 +60,19 @@ void genCrimson(Random &rnd, World &world)
 {
     std::cout << "Infecting the world\n";
     rnd.shuffleNoise();
+    int minX = 0;
+    int maxX = world.getWidth();
+    if (world.conf.dontDigUp && world.conf.doubleTrouble) {
+        if (rnd.getBool()) {
+            minX = world.getWidth() / 2;
+        } else {
+            maxX = world.getWidth() / 2;
+        }
+    }
     for (auto [surfaceX, undergroundX] : selectEvilLocations(rnd, world)) {
+        if (surfaceX < minX || surfaceX > maxX) {
+            continue;
+        }
         // Register location for use in other generators.
         world.surfaceEvilCenter = surfaceX;
         genCrimsonAt(surfaceX, undergroundX, rnd, world);
@@ -179,6 +191,9 @@ void genCrimsonAt(int surfaceX, int undergroundX, Random &rnd, World &world)
         }
     }
     auto applyCrimson = [&](int sourceX, int sourceY) {
+        if (sourceX == -1) {
+            return;
+        }
         parallelFor(
             std::views::iota(
                 std::max(sourceX - scanDist, 0),

@@ -55,7 +55,10 @@ bool isPlacementCandidate(int x, int y, World &world)
                ((tile.blockID != TileID::aetherium &&
                  tile.blockID != TileID::pearlstone &&
                  tile.flag != Flag::border) ||
-                y > world.getSurfaceLevel(x));
+                y > world.getSurfaceLevel(x)) &&
+               (y > 0.45 * world.getUndergroundLevel() ||
+                (tile.blockID != TileID::lesion &&
+                 tile.blockID != TileID::flesh));
     };
     return isFloorTile(world.getTile(x, y)) &&
            isFloorTile(world.getTile(x + 1, y)) &&
@@ -68,7 +71,9 @@ bool isPlacementCandidate(int x, int y, World &world)
 
 int testOrbHeartCandidate(int x, int y, World &world)
 {
-    if (y < world.getUndergroundLevel() || y > world.getUnderworldLevel()) {
+    if (y < world.getUndergroundLevel() ||
+        y > (world.conf.dontDigUp ? world.getCavernLevel()
+                                  : world.getUnderworldLevel())) {
         return TileID::empty;
     }
     int tendrilID = TileID::empty;
@@ -267,7 +272,7 @@ void placeFallenLogs(
 void placeAltars(int maxBin, LocationBins &locations, Random &rnd, World &world)
 {
     int altarCount = std::max(8, world.getWidth() / 200);
-    if (world.conf.doubleTrouble) {
+    if (world.conf.doubleTrouble || world.conf.dontDigUp) {
         altarCount *= 2;
     }
     constexpr auto corruptTiles = frozen::make_set<int>(
@@ -296,7 +301,8 @@ void placeAltars(int maxBin, LocationBins &locations, Random &rnd, World &world)
             continue;
         }
         auto [x, y] = rnd.select(locations[binId]);
-        if (y < 0.8 * world.getUndergroundLevel()) {
+        if (y < 0.8 * world.getUndergroundLevel() ||
+            (world.conf.dontDigUp && y > world.getCavernLevel())) {
             continue;
         }
         Variant type = corruptTiles.contains(world.getTile(x, y).blockID)
@@ -455,7 +461,9 @@ void placeOrbHearts(
     World &world)
 {
     int orbHeartCount = world.getWidth() * world.getHeight() / 240000;
-    if (world.conf.doubleTrouble) {
+    if (world.conf.dontDigUp) {
+        orbHeartCount *= 4;
+    } else if (world.conf.doubleTrouble) {
         orbHeartCount *= 2;
     }
     for (int tries = 500 * orbHeartCount; orbHeartCount > 0 && tries > 0;

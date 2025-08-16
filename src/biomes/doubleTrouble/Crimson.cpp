@@ -4,6 +4,7 @@
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
+#include "biomes/Corruption.h"
 #include "biomes/Crimson.h"
 #include "vendor/frozen/set.h"
 #include <iostream>
@@ -12,6 +13,23 @@ void genSecondaryCrimson(Random &rnd, World &world)
 {
     std::cout << "Infecting the world\n";
     rnd.shuffleNoise();
+    if (world.conf.dontDigUp) {
+        int minX = 0;
+        int maxX = world.getWidth();
+        if (world.surfaceEvilCenter < world.getWidth() / 2) {
+            minX = world.getWidth() / 2;
+        } else {
+            maxX = world.getWidth() / 2;
+        }
+        for (auto [surfaceX, undergroundX] : selectEvilLocations(rnd, world)) {
+            if (surfaceX < minX || surfaceX > maxX) {
+                continue;
+            }
+            genCrimsonAt(surfaceX, undergroundX, rnd, world);
+        }
+        return;
+    }
+
     int scanDist = 0.08 * world.getWidth();
     int surfaceX = world.surfaceEvilCenter;
     while (std::abs(surfaceX - world.surfaceEvilCenter) < scanDist ||
