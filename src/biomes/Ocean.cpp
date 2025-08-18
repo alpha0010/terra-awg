@@ -152,9 +152,9 @@ void addOceanCave(int waterTable, Random &rnd, World &world)
                     usedLocations.emplace_back(x, y);
                     Chest &chest = world.placeChest(x, y, Variant::reef);
                     if (y < world.getCavernLevel()) {
-                        fillUndergroundWaterChest(chest, rnd, world);
+                        fillWaterChest(chest, Depth::underground, rnd, world);
                     } else {
-                        fillCavernWaterChest(chest, rnd, world);
+                        fillWaterChest(chest, Depth::cavern, rnd, world);
                     }
                     --numChests;
                     if (numChests <= 0) {

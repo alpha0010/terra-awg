@@ -107,8 +107,9 @@ void genBuriedBoat(Random &rnd, World &world)
             }
             if (boatTile.blockID == TileID::chest &&
                 boatTile.frameX % 36 == 0 && boatTile.frameY == 0) {
-                fillCavernFrozenChest(
+                fillFrozenChest(
                     world.registerStorage(x + i, y + j),
+                    Depth::cavern,
                     rnd,
                     world);
             }

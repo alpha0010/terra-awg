@@ -344,7 +344,7 @@ void growTapRoot(double x, double y, int roomId, Random &rnd, World &world)
             }
         }
         for (auto [chestX, chestY] : world.placeBuffer(x, anchorY, room)) {
-            fillSurfaceLivingWoodChest(
+            fillLivingWoodChest(
                 world.registerStorage(chestX, chestY),
                 rnd,
                 world);

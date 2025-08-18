@@ -6,45 +6,33 @@ class Item;
 class World;
 class Random;
 
-void fillSurfaceChest(Chest &chest, int torchID, Random &rnd, World &world);
-void fillSurfaceAshWoodChest(Chest &chest, Random &rnd, World &world);
-void fillSurfaceFrozenChest(Chest &chest, Random &rnd, World &world);
-void fillSurfaceLivingWoodChest(Chest &chest, Random &rnd, World &world);
-void fillSurfacePalmWoodChest(Chest &chest, Random &rnd, World &world);
-void fillSurfacePearlwoodChest(Chest &chest, Random &rnd, World &world);
-void fillSurfaceRichMahoganyChest(Chest &chest, Random &rnd, World &world);
-void fillSurfaceWaterChest(Chest &chest, Random &rnd, World &world);
+enum class Depth { surface, underground, cavern };
 
-void fillUndergroundChest(
+bool fuzzyIsSurfaceChest(int x, int y, World &world);
+Depth getChestDepth(int x, int y, World &world);
+
+void fillChest(
     Chest &chest,
+    Depth depth,
     int torchID,
     bool isTrapped,
     Random &rnd,
     World &world);
-void fillUndergroundFrozenChest(Chest &chest, Random &rnd, World &world);
-void fillUndergroundHoneyChest(Chest &chest, Random &rnd, World &world);
-void fillUndergroundIvyChest(Chest &chest, Random &rnd, World &world);
-void fillUndergroundMushroomChest(Chest &chest, Random &rnd, World &world);
-void fillUndergroundSandstoneChest(Chest &chest, Random &rnd, World &world);
-void fillUndergroundPearlwoodChest(Chest &chest, Random &rnd, World &world);
-void fillUndergroundRichMahoganyChest(Chest &chest, Random &rnd, World &world);
-void fillUndergroundWaterChest(Chest &chest, Random &rnd, World &world);
-
-void fillCavernChest(
+void fillAshWoodChest(Chest &chest, Depth depth, Random &rnd, World &world);
+void fillFrozenChest(Chest &chest, Depth depth, Random &rnd, World &world);
+void fillHoneyChest(Chest &chest, Depth depth, Random &rnd, World &world);
+void fillIvyChest(Chest &chest, Depth depth, Random &rnd, World &world);
+void fillMushroomChest(Chest &chest, Depth depth, Random &rnd, World &world);
+void fillDesertChest(Chest &chest, Depth depth, Random &rnd, World &world);
+void fillPearlwoodChest(Chest &chest, Depth depth, Random &rnd, World &world);
+void fillRichMahoganyChest(
     Chest &chest,
-    int torchID,
-    bool isTrapped,
+    Depth depth,
     Random &rnd,
     World &world);
-void fillCavernFrozenChest(Chest &chest, Random &rnd, World &world);
-void fillCavernHoneyChest(Chest &chest, Random &rnd, World &world);
-void fillCavernIvyChest(Chest &chest, Random &rnd, World &world);
-void fillCavernMushroomChest(Chest &chest, Random &rnd, World &world);
-void fillCavernSandstoneChest(Chest &chest, Random &rnd, World &world);
-void fillCavernPearlwoodChest(Chest &chest, Random &rnd, World &world);
-void fillCavernRichMahoganyChest(Chest &chest, Random &rnd, World &world);
-void fillCavernWaterChest(Chest &chest, Random &rnd, World &world);
+void fillWaterChest(Chest &chest, Depth depth, Random &rnd, World &world);
 
+void fillLivingWoodChest(Chest &chest, Random &rnd, World &world);
 void fillSkywareChest(Chest &chest, Random &rnd, World &world);
 void fillShadowChest(Chest &chest, Random &rnd, World &world);
 void fillPyramidChest(Chest &chest, Random &rnd, World &world);

@@ -52,6 +52,42 @@ std::pair<int, int> makeHall(int x, int y, int steps, Point delta, World &world)
     return {x, y};
 }
 
+void placePyramidPainting(int x, int y, World &world)
+{
+    world.placePainting(x, y, Painting::ancientTablet);
+    int numCorrupt = 0;
+    int numCrimson = 0;
+    auto [width, height] = world.getPaintingDims(Painting::ancientTablet);
+    constexpr auto corruptWalls = frozen::make_set<int>(
+        {WallID::Safe::ebonstoneBrick,
+         WallID::Unsafe::ebonsandstone,
+         WallID::Safe::demoniteBrick});
+    constexpr auto crimsonWalls = frozen::make_set<int>(
+        {WallID::Safe::crimstoneBrick,
+         WallID::Unsafe::crimsandstone,
+         WallID::Safe::crimtaneBrick});
+    for (int i = 0; i < width; ++i) {
+        for (int j = 0; j < height; ++j) {
+            int wallId = world.getTile(x + i, y + j).wallID;
+            if (corruptWalls.contains(wallId)) {
+                ++numCorrupt;
+            } else if (crimsonWalls.contains(wallId)) {
+                ++numCrimson;
+            }
+        }
+    }
+    int paint = numCorrupt > width * height - 4   ? Paint::purple
+                : numCrimson > width * height - 4 ? Paint::red
+                                                  : Paint::none;
+    if (paint != Paint::none) {
+        for (int i = 0; i < width; ++i) {
+            for (int j = 0; j < height; ++j) {
+                world.getTile(x + i, y + j).blockPaint = paint;
+            }
+        }
+    }
+}
+
 std::pair<int, int> fillTreasureRoom(int x, int y, Random &rnd, World &world)
 {
     TileBuffer treasureRoom =
@@ -78,7 +114,8 @@ std::pair<int, int> fillTreasureRoom(int x, int y, Random &rnd, World &world)
             Tile &tile = world.getTile(x + i, y + j + align);
             std::map<int, int> blockMap{{roomTile.blockID, roomTile.blockID}};
             std::map<int, int> wallMap{{roomTile.wallID, roomTile.wallID}};
-            if (tile.blockID == TileID::ebonstoneBrick) {
+            if (tile.blockID == TileID::ebonstoneBrick ||
+                tile.blockID == TileID::lesion) {
                 blockMap[TileID::sand] = TileID::ebonsand;
                 blockMap[TileID::sandstoneBrick] = TileID::ebonstoneBrick;
                 wallMap[WallID::Safe::smoothSandstone] =
@@ -86,7 +123,9 @@ std::pair<int, int> fillTreasureRoom(int x, int y, Random &rnd, World &world)
                 wallMap[WallID::Safe::goldBrick] = WallID::Safe::demoniteBrick;
                 wallMap[WallID::Safe::sandstoneBrick] =
                     WallID::Safe::ebonstoneBrick;
-            } else if (tile.blockID == TileID::crimstoneBrick) {
+            } else if (
+                tile.blockID == TileID::crimstoneBrick ||
+                tile.blockID == TileID::flesh) {
                 blockMap[TileID::sand] = TileID::crimsand;
                 blockMap[TileID::sandstoneBrick] = TileID::crimstoneBrick;
                 wallMap[WallID::Safe::smoothSandstone] =
@@ -420,7 +459,7 @@ void genPyramid(Random &rnd, World &world)
     std::tie(x, y) = makeHall(x, y, 14, {-1, 1}, world);
     std::tie(x, y) = makeHall(x, y, 5, {-1, 0}, world);
     if (rnd.getBool()) {
-        world.placePainting(x + 11, y - 13, Painting::ancientTablet);
+        placePyramidPainting(x + 11, y - 13, world);
     }
     std::tie(x, y) = fillTreasureRoom(x, y, rnd, world);
     std::tie(x, y) = makeHall(x, y, 18, {-1, 0}, world);

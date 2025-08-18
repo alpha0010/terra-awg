@@ -189,8 +189,9 @@ void genDesertTomb(Random &rnd, World &world)
             tile.guarded = true;
             if (tile.blockID == TileID::chestGroup2 && tile.frameX % 36 == 0 &&
                 tile.frameY == 0) {
-                fillCavernSandstoneChest(
+                fillDesertChest(
                     world.registerStorage(x + i, y + j),
+                    Depth::cavern,
                     rnd,
                     world);
             }

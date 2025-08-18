@@ -611,8 +611,14 @@ Point selectShrineLocation(
                    : world.getWidth() - 350;
     for (int numTries = 0; numTries < 10000; ++numTries) {
         int x = rnd.getInt(minX, maxX);
-        int y =
-            rnd.getInt(world.getUndergroundLevel(), world.getUnderworldLevel());
+        int y = world.conf.dontDigUp ? rnd.getInt(
+                                           world.getSurfaceLevel(x),
+                                           std::midpoint(
+                                               world.getCavernLevel(),
+                                               world.getUnderworldLevel()))
+                                     : rnd.getInt(
+                                           world.getUndergroundLevel(),
+                                           world.getUnderworldLevel());
         if ((world.conf.biomes != BiomeLayout::columns &&
              !isInBiome(x, y, 10, Biome::jungle, world)) ||
             !world.regionPasses(
@@ -741,23 +747,11 @@ void placeJungleShrines(Random &rnd, World &world)
                 fillBarrel(world.registerStorage(chestX, chestY), rnd);
             } else {
                 Chest &chest = world.placeChest(chestX, chestY, Variant::ivy);
-                if (y < world.getCavernLevel()) {
-                    fillUndergroundIvyChest(chest, rnd, world);
-                } else {
-                    fillCavernIvyChest(chest, rnd, world);
-                }
+                fillIvyChest(chest, getChestDepth(x, y, world), rnd, world);
             }
         }
         --shrineCount;
     }
-}
-
-bool fuzzyIsSurfaceChest(int x, int y, World &world)
-{
-    return y < world.getUndergroundLevel() ||
-           (y < (2 * world.getUndergroundLevel() + world.getCavernLevel()) /
-                    3 &&
-            fnv1a32pt(x, y) % 2 == 0);
 }
 
 Variant getChestType(int x, int y, World &world)
@@ -896,7 +890,8 @@ Variant getChestType(int x, int y, World &world)
     for (auto [type, count] : zoneCounts) {
         if (count > radius * 4) {
             if (type == Variant::sandstone &&
-                fuzzyIsSurfaceChest(x, y, world)) {
+                (world.conf.dontDigUp ? y > world.getCavernLevel()
+                                      : fuzzyIsSurfaceChest(x, y, world))) {
                 return Variant::palmWood;
             } else if (type == Variant::pearlwood) {
                 for (auto altType :
@@ -917,7 +912,14 @@ Variant getChestType(int x, int y, World &world)
             return evil;
         }
     }
-    return fuzzyIsSurfaceChest(x, y, world) ? Variant::none : Variant::gold;
+    if (world.conf.dontDigUp) {
+        return y > world.getCavernLevel() ? fnv1a32pt(x, y) % 3 == 0
+                                                ? Variant::none
+                                                : Variant::livingWood
+                                          : Variant::gold;
+    } else {
+        return fuzzyIsSurfaceChest(x, y, world) ? Variant::none : Variant::gold;
+    }
 }
 
 int scanForSurface(int x, int y, World &world)
@@ -971,25 +973,17 @@ void placeChest(
                 maybeAddChestPressureTraps(x, y - 2, rnd, world);
             }
         });
+    Depth depth = getChestDepth(x, y, world);
     int torchID = ItemID::torch;
     switch (type) {
     case Variant::ashWood:
-        if (fuzzyIsSurfaceChest(x, y, world)) {
-            fillSurfaceAshWoodChest(chest, rnd, world);
-            return;
-        }
-        break;
+        fillAshWoodChest(chest, depth, rnd, world);
+        return;
     case Variant::flesh:
         torchID = ItemID::crimsonTorch;
         break;
     case Variant::frozen:
-        if (fuzzyIsSurfaceChest(x, y, world)) {
-            fillSurfaceFrozenChest(chest, rnd, world);
-        } else if (y < world.getCavernLevel()) {
-            fillUndergroundFrozenChest(chest, rnd, world);
-        } else {
-            fillCavernFrozenChest(chest, rnd, world);
-        }
+        fillFrozenChest(chest, depth, rnd, world);
         return;
     case Variant::goldLocked:
         fillDungeonChest(chest, rnd, world);
@@ -998,17 +992,16 @@ void placeChest(
         torchID = ItemID::blueTorch;
         break;
     case Variant::honey:
-        if (y < world.getCavernLevel()) {
-            fillUndergroundHoneyChest(chest, rnd, world);
-        } else {
-            fillCavernHoneyChest(chest, rnd, world);
-        }
+        fillHoneyChest(chest, depth, rnd, world);
         return;
     case Variant::lesion:
         torchID = ItemID::corruptTorch;
         break;
     case Variant::lihzahrd:
         fillLihzahrdChest(chest, rnd, world);
+        return;
+    case Variant::livingWood:
+        fillLivingWoodChest(chest, rnd, world);
         return;
     case Variant::marble:
         torchID = ItemID::whiteTorch;
@@ -1017,49 +1010,21 @@ void placeChest(
         torchID = ItemID::aetherTorch;
         break;
     case Variant::mushroom:
-        if (y < world.getCavernLevel()) {
-            fillUndergroundMushroomChest(chest, rnd, world);
-        } else {
-            fillCavernMushroomChest(chest, rnd, world);
-        }
+        fillMushroomChest(chest, depth, rnd, world);
         return;
     case Variant::palmWood:
-        fillSurfacePalmWoodChest(chest, rnd, world);
+    case Variant::sandstone:
+        fillDesertChest(chest, depth, rnd, world);
         return;
     case Variant::pearlwood:
-        if (fuzzyIsSurfaceChest(x, y, world)) {
-            fillSurfacePearlwoodChest(chest, rnd, world);
-        } else if (y < world.getCavernLevel()) {
-            fillUndergroundPearlwoodChest(chest, rnd, world);
-        } else {
-            fillCavernPearlwoodChest(chest, rnd, world);
-        }
+        fillPearlwoodChest(chest, depth, rnd, world);
         return;
     case Variant::reef:
     case Variant::water:
-        if (y < world.getUndergroundLevel()) {
-            fillSurfaceWaterChest(chest, rnd, world);
-        } else if (y < world.getCavernLevel()) {
-            fillUndergroundWaterChest(chest, rnd, world);
-        } else {
-            fillCavernWaterChest(chest, rnd, world);
-        }
+        fillWaterChest(chest, depth, rnd, world);
         return;
     case Variant::richMahogany:
-        if (fuzzyIsSurfaceChest(x, y, world)) {
-            fillSurfaceRichMahoganyChest(chest, rnd, world);
-        } else if (y < world.getCavernLevel()) {
-            fillUndergroundRichMahoganyChest(chest, rnd, world);
-        } else {
-            fillCavernRichMahoganyChest(chest, rnd, world);
-        }
-        return;
-    case Variant::sandstone:
-        if (y < world.getCavernLevel()) {
-            fillUndergroundSandstoneChest(chest, rnd, world);
-        } else {
-            fillCavernSandstoneChest(chest, rnd, world);
-        }
+        fillRichMahoganyChest(chest, depth, rnd, world);
         return;
     case Variant::shadow:
         fillShadowChest(chest, rnd, world);
@@ -1080,13 +1045,7 @@ void placeChest(
     if (isTrapped && origType == Variant::richMahogany) {
         torchID = ItemID::jungleTorch;
     }
-    if (fuzzyIsSurfaceChest(x, y, world)) {
-        fillSurfaceChest(chest, torchID, rnd, world);
-    } else if (y < world.getCavernLevel()) {
-        fillUndergroundChest(chest, torchID, isTrapped, rnd, world);
-    } else {
-        fillCavernChest(chest, torchID, isTrapped, rnd, world);
-    }
+    fillChest(chest, depth, torchID, isTrapped, rnd, world);
 }
 
 void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
@@ -1110,6 +1069,7 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
                 x,
                 y,
                 y > surface                              ? 20
+                : world.conf.dontDigUp                   ? 175
                 : y < 0.45 * world.getUndergroundLevel() ? 125
                                                          : 50,
                 usedLocations)) {
@@ -1123,10 +1083,13 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
         } else if (
             y < world.getUndergroundLevel() && type == Variant::goldLocked) {
             continue;
-        } else if (
-            type == Variant::shadow &&
-            world.getTile(x, y).blockID == TileID::ash) {
-            continue;
+        } else if (type == Variant::shadow) {
+            if (world.conf.dontDigUp && x > 0.39 * world.getWidth() &&
+                x < 0.61 * world.getWidth()) {
+                type = Variant::ashWood;
+            } else if (world.getTile(x, y).blockID == TileID::ash) {
+                continue;
+            }
         } else if (
             type == Variant::gold || (type == Variant::richMahogany &&
                                       y > std::midpoint(

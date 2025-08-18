@@ -237,11 +237,11 @@ void genMushroomCabin(Random &rnd, World &world)
             x + rnd.getDouble(0.25, 0.75) * cabinWidth,
             y - 2,
             Variant::mushroom);
-        if (y < world.getCavernLevel()) {
-            fillUndergroundMushroomChest(chest, rnd, world);
-        } else {
-            fillCavernMushroomChest(chest, rnd, world);
-        }
+        fillMushroomChest(
+            chest,
+            getChestDepth(chest.x, chest.y, world),
+            rnd,
+            world);
         int statueX = x + rnd.getDouble(0.1, 0.9) * cabinWidth;
         if (world.regionPasses(statueX, y - 3, 2, 3, [](Tile &tile) {
                 return tile.blockID == TileID::empty;

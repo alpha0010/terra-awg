@@ -1397,6 +1397,12 @@ public:
 
     void gen(int dungeonCenter)
     {
+        if (world.conf.dontDigUp && world.conf.doubleTrouble &&
+            (dungeonCenter < world.getWidth() / 2) !=
+                (world.surfaceEvilCenter < world.getWidth() / 2)) {
+            theme.paint = theme.paint == Paint::deepPurple ? Paint::deepRed
+                                                           : Paint::deepPurple;
+        }
         selectEntry(dungeonCenter);
         auto [dungeonWidth, dungeonHeight] = selectSize(dungeonCenter);
         int yMin =

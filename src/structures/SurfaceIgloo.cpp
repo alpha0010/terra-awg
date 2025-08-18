@@ -99,8 +99,9 @@ bool placeIgloo(Point pt, TileBuffer &igloo, Random &rnd, World &world)
                                 world.registerStorage(x + i, y + j),
                                 rnd);
                         } else {
-                            fillSurfaceFrozenChest(
+                            fillFrozenChest(
                                 world.registerStorage(x + i, y + j),
+                                getChestDepth(x + i, y + j, world),
                                 rnd,
                                 world);
                         }

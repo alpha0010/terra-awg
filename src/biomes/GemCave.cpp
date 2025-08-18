@@ -5,6 +5,7 @@
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
+#include <algorithm>
 #include <iostream>
 
 /**

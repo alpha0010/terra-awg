@@ -127,60 +127,56 @@ void fillHive(int hiveX, int hiveY, double size, Random &rnd, World &world)
             }
         }
     }
-    world.queuedTreasures.emplace_back(
-        [hiveX, hiveY, size](Random &rnd, World &world) {
-            std::vector<Point> usedLocations;
-            for (int x = hiveX - size; x < hiveX + size; ++x) {
-                for (int y = hiveY - size; y < hiveY + size; ++y) {
-                    Tile &tile = world.getTile(x, y);
-                    if (tile.blockID == TileID::larva && tile.frameX == 0 &&
-                        tile.frameY == 0) {
-                        usedLocations.emplace_back(x, y);
-                    }
-                }
-            }
-            double area = size * size;
-            for (int larvaCount = 1 + area / rnd.getInt(2500, 7000);
-                 larvaCount > 0;
-                 --larvaCount) {
-                auto [x, y] = selectLarvaeLocation(
-                    hiveX,
-                    hiveY,
-                    size,
-                    usedLocations,
-                    rnd,
-                    world);
-                if (x != -1) {
+    world.queuedTreasures.emplace_back([hiveX,
+                                        hiveY,
+                                        size](Random &rnd, World &world) {
+        std::vector<Point> usedLocations;
+        for (int x = hiveX - size; x < hiveX + size; ++x) {
+            for (int y = hiveY - size; y < hiveY + size; ++y) {
+                Tile &tile = world.getTile(x, y);
+                if (tile.blockID == TileID::larva && tile.frameX == 0 &&
+                    tile.frameY == 0) {
                     usedLocations.emplace_back(x, y);
-                    world.placeFramedTile(x, y - 2, TileID::larva);
                 }
             }
-            if (rnd.getDouble(0, 1) > std::min(0.4, 1 - area / 15000)) {
-                auto [x, y] = selectLarvaeLocation(
-                    hiveX,
-                    hiveY,
-                    size,
-                    usedLocations,
-                    rnd,
-                    world);
-                if (x != -1) {
-                    Chest &chest = world.placeChest(x, y - 1, Variant::honey);
-                    if (y < world.getCavernLevel()) {
-                        fillUndergroundHoneyChest(chest, rnd, world);
-                    } else {
-                        fillCavernHoneyChest(chest, rnd, world);
-                    }
-                }
-            }
-            embedWaterfalls(
-                {hiveX - size, hiveY - size / 2.5},
-                {hiveX + size, hiveY + size / 3.5},
-                {TileID::hive},
-                Liquid::honey,
-                35,
+        }
+        double area = size * size;
+        for (int larvaCount = 1 + area / rnd.getInt(2500, 7000); larvaCount > 0;
+             --larvaCount) {
+            auto [x, y] = selectLarvaeLocation(
+                hiveX,
+                hiveY,
+                size,
+                usedLocations,
                 rnd,
                 world);
-        });
+            if (x != -1) {
+                usedLocations.emplace_back(x, y);
+                world.placeFramedTile(x, y - 2, TileID::larva);
+            }
+        }
+        if (rnd.getDouble(0, 1) > std::min(0.4, 1 - area / 15000)) {
+            auto [x, y] = selectLarvaeLocation(
+                hiveX,
+                hiveY,
+                size,
+                usedLocations,
+                rnd,
+                world);
+            if (x != -1) {
+                Chest &chest = world.placeChest(x, y - 1, Variant::honey);
+                fillHoneyChest(chest, getChestDepth(x, y, world), rnd, world);
+            }
+        }
+        embedWaterfalls(
+            {hiveX - size, hiveY - size / 2.5},
+            {hiveX + size, hiveY + size / 3.5},
+            {TileID::hive},
+            Liquid::honey,
+            35,
+            rnd,
+            world);
+    });
 }
 
 Point selectHiveLocation(Random &rnd, World &world)

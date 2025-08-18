@@ -6,6 +6,29 @@
 #include "ids/ItemID.h"
 #include "ids/Prefix.h"
 
+bool fuzzyIsSurfaceChest(int x, int y, World &world)
+{
+    return y < world.getUndergroundLevel() ||
+           (y < (2 * world.getUndergroundLevel() + world.getCavernLevel()) /
+                    3 &&
+            fnv1a32pt(x, y) % 2 == 0);
+}
+
+Depth getChestDepth(int x, int y, World &world)
+{
+    Depth depth = fuzzyIsSurfaceChest(x, y, world) ? Depth::surface
+                  : y < world.getCavernLevel()     ? Depth::underground
+                                                   : Depth::cavern;
+    if (world.conf.dontDigUp) {
+        if (depth == Depth::surface) {
+            return Depth::cavern;
+        } else if (depth == Depth::cavern) {
+            return Depth::surface;
+        }
+    }
+    return depth;
+}
+
 int doFillLoot(
     Chest &chest,
     Random &rnd,
@@ -324,7 +347,7 @@ void fillSurfaceAshWoodChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(1, 2)}},
          {0.5,
-          {rnd.select<int>({ItemID::torch, ItemID::bottle}),
+          {rnd.select({ItemID::torch, ItemID::bottle}),
            Prefix::none,
            rnd.getInt(10, 20)}},
          {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
@@ -385,7 +408,7 @@ void fillSurfaceFrozenChest(Chest &chest, Random &rnd, World &world)
          {0.5, {ItemID::borealWood, Prefix::none, rnd.getInt(50, 99)}}});
 }
 
-void fillSurfaceLivingWoodChest(Chest &chest, Random &rnd, World &world)
+void fillLivingWoodChest(Chest &chest, Random &rnd, World &world)
 {
     fillLoot(
         chest,
@@ -457,6 +480,58 @@ void fillSurfaceLivingWoodChest(Chest &chest, Random &rnd, World &world)
            rnd.getInt(10, 20)}},
          {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
          {0.5, {ItemID::wood, Prefix::none, rnd.getInt(50, 99)}}});
+}
+
+void fillSurfaceMushroomChest(Chest &chest, Random &rnd, World &world)
+{
+    fillLoot(
+        chest,
+        rnd,
+        {{1, getSurfacePrimaryLoot(rnd, world)},
+         {0.1,
+          {rnd.select({ItemID::shroomMinecart, ItemID::mushroomHat}),
+           Prefix::none,
+           1}},
+         getGlobalItemPrimary(rnd, world),
+         {1.0 / 6, {ItemID::glowstick, Prefix::none, rnd.getInt(40, 75)}},
+         {1.0 / 6, {ItemID::throwingKnife, Prefix::none, rnd.getInt(150, 300)}},
+         {0.2,
+          {rnd.select({ItemID::herbBag, ItemID::canOfWorms}),
+           Prefix::none,
+           rnd.getInt(1, 4)}},
+         {1.0 / 3, {ItemID::grenade, Prefix::none, rnd.getInt(3, 5)}},
+         {0.5,
+          {rnd.select(
+               {world.copperVariant == TileID::copperOre ? ItemID::copperBar
+                                                         : ItemID::tinBar,
+                world.ironVariant == TileID::ironOre ? ItemID::ironBar
+                                                     : ItemID::leadBar}),
+           Prefix::none,
+           rnd.getInt(3, 10)}},
+         {0.5, {ItemID::rope, Prefix::none, rnd.getInt(50, 100)}},
+         {2.0 / 3,
+          {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
+           Prefix::none,
+           rnd.getInt(25, 50)}},
+         getGlobalItemPotion(world),
+         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {2.0 / 3,
+          {rnd.select(
+               {ItemID::ironskinPotion,
+                ItemID::shinePotion,
+                ItemID::nightOwlPotion,
+                ItemID::swiftnessPotion,
+                ItemID::miningPotion,
+                ItemID::builderPotion}),
+           Prefix::none,
+           rnd.getInt(1, 2)}},
+         {0.5,
+          {rnd.select({ItemID::mushroomTorch, ItemID::bottle}),
+           Prefix::none,
+           rnd.getInt(10, 20)}},
+         {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
+         {0.5, {ItemID::glowingMushroom, Prefix::none, rnd.getInt(50, 99)}}});
 }
 
 void fillSurfacePalmWoodChest(Chest &chest, Random &rnd, World &world)
@@ -569,7 +644,7 @@ void fillSurfacePearlwoodChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(1, 2)}},
          {0.5,
-          {rnd.select<int>({ItemID::hallowedTorch, ItemID::bottle}),
+          {rnd.select({ItemID::hallowedTorch, ItemID::bottle}),
            Prefix::none,
            rnd.getInt(10, 20)}},
          {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
@@ -1512,7 +1587,7 @@ void fillCavernPearlwoodChest(Chest &chest, Random &rnd, World &world)
               rnd.getInt(1, 2)}},
             {0.5, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
             {0.5,
-             {rnd.select<int>({ItemID::hallowedTorch, ItemID::bouncyGlowstick}),
+             {rnd.select({ItemID::hallowedTorch, ItemID::bouncyGlowstick}),
               Prefix::none,
               rnd.getInt(15, 29)}},
             {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}},
@@ -1759,7 +1834,14 @@ void fillSkywareChest(Chest &chest, Random &rnd, World &world)
                                                      : ItemID::leadBar}),
            Prefix::none,
            rnd.getInt(3, 10)}},
-         {0.5, {ItemID::rope, Prefix::none, rnd.getInt(50, 100)}},
+         {0.5,
+          {world.conf.celebration ? rnd.select(
+                                        {ItemID::blueStreamer,
+                                         ItemID::greenStreamer,
+                                         ItemID::pinkStreamer})
+                                  : ItemID::rope,
+           Prefix::none,
+           rnd.getInt(50, 100)}},
          {2.0 / 3,
           {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
            Prefix::none,
@@ -1964,7 +2046,7 @@ void fillWebCoveredChest(Chest &chest, Random &rnd, World &world)
               rnd.getInt(1, 2)}},
             {0.5, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
             {0.5,
-             {rnd.select<int>({ItemID::torch, ItemID::glowstick}),
+             {rnd.select({ItemID::torch, ItemID::glowstick}),
               Prefix::none,
               rnd.getInt(15, 29)}},
             {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}},
@@ -2401,3 +2483,92 @@ void fillDresser(Chest &chest, Random &rnd)
             {0.5, {ItemID::cobweb, Prefix::none, rnd.getInt(10, 29)}},
         });
 }
+
+void fillChest(
+    Chest &chest,
+    Depth depth,
+    int torchID,
+    bool isTrapped,
+    Random &rnd,
+    World &world)
+{
+    switch (depth) {
+    case Depth::surface:
+        fillSurfaceChest(chest, torchID, rnd, world);
+        break;
+    case Depth::underground:
+        fillUndergroundChest(chest, torchID, isTrapped, rnd, world);
+        break;
+    case Depth::cavern:
+        fillCavernChest(chest, torchID, isTrapped, rnd, world);
+        break;
+    }
+}
+
+void fillAshWoodChest(Chest &chest, Depth depth, Random &rnd, World &world)
+{
+    switch (depth) {
+    case Depth::surface:
+        fillSurfaceAshWoodChest(chest, rnd, world);
+        break;
+    case Depth::underground:
+        fillUndergroundChest(chest, ItemID::torch, false, rnd, world);
+        break;
+    case Depth::cavern:
+        fillCavernChest(chest, ItemID::torch, false, rnd, world);
+        break;
+    }
+}
+
+void fillDesertChest(Chest &chest, Depth depth, Random &rnd, World &world)
+{
+    switch (depth) {
+    case Depth::surface:
+        fillSurfacePalmWoodChest(chest, rnd, world);
+        break;
+    case Depth::underground:
+        fillUndergroundSandstoneChest(chest, rnd, world);
+        break;
+    case Depth::cavern:
+        fillCavernSandstoneChest(chest, rnd, world);
+        break;
+    }
+}
+
+void fillSurfaceHoneyChest(Chest &chest, Random &rnd, World &world)
+{
+    fillUndergroundHoneyChest(chest, rnd, world);
+}
+
+void fillSurfaceIvyChest(Chest &chest, Random &rnd, World &world)
+{
+    fillUndergroundIvyChest(chest, rnd, world);
+}
+
+#define REGISTER_FILL_CHEST(type)                                              \
+    void fill##type##Chest(                                                    \
+        Chest &chest,                                                          \
+        Depth depth,                                                           \
+        Random &rnd,                                                           \
+        World &world)                                                          \
+    {                                                                          \
+        switch (depth) {                                                       \
+        case Depth::surface:                                                   \
+            fillSurface##type##Chest(chest, rnd, world);                       \
+            break;                                                             \
+        case Depth::underground:                                               \
+            fillUnderground##type##Chest(chest, rnd, world);                   \
+            break;                                                             \
+        case Depth::cavern:                                                    \
+            fillCavern##type##Chest(chest, rnd, world);                        \
+            break;                                                             \
+        }                                                                      \
+    }
+
+REGISTER_FILL_CHEST(Frozen)
+REGISTER_FILL_CHEST(Honey)
+REGISTER_FILL_CHEST(Ivy)
+REGISTER_FILL_CHEST(Mushroom)
+REGISTER_FILL_CHEST(Pearlwood)
+REGISTER_FILL_CHEST(RichMahogany)
+REGISTER_FILL_CHEST(Water)
