@@ -1310,7 +1310,7 @@ private:
             dungeonCenter + dungeonWidth + roomSize);
         int yDivide =
             wallThickness +
-            (world.conf.dontDigUp
+            (world.conf.ascent
                  ? (4 * world.getUndergroundLevel() + world.getCavernLevel()) /
                        5
                  : (world.getUndergroundLevel() + 4 * world.getCavernLevel()) /
@@ -1406,7 +1406,7 @@ public:
         selectEntry(dungeonCenter);
         auto [dungeonWidth, dungeonHeight] = selectSize(dungeonCenter);
         int yMin =
-            world.conf.dontDigUp
+            world.conf.ascent
                 ? (4 * world.getUndergroundLevel() + world.getCavernLevel()) / 5
                 : (world.getUndergroundLevel() + 4 * world.getCavernLevel()) /
                       5;

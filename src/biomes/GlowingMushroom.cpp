@@ -180,7 +180,7 @@ void genGlowingMushroom(Random &rnd, World &world)
                           : world.conf.glowingMushroomSize) *
                      0.06 * world.getWidth();
         int centerX = world.getWidth() * rnd.getDouble(0.05, 0.95);
-        int fieldFloor = world.conf.dontDigUp
+        int fieldFloor = world.conf.ascent
                              ? rnd.getInt(
                                    world.getUndergroundLevel() + buffer,
                                    world.getCavernLevel())
@@ -201,7 +201,7 @@ void genGlowingMushroom(Random &rnd, World &world)
     if (world.conf.biomes == BiomeLayout::layers) {
         fillMushroomLayer(rnd, world);
     }
-    if (world.conf.dontDigUp) {
+    if (world.conf.ascent) {
         fillForestMushroomLayer(rnd, world);
     }
 }

@@ -29,10 +29,10 @@ void genSpiderNest(Random &rnd, World &world)
     rnd.shuffleNoise();
     int numNests = world.conf.spiderNestFreq * world.getWidth() *
                    world.getHeight() / 900000;
-    int minY = world.conf.dontDigUp ? world.getUndergroundLevel()
-                                    : world.getCavernLevel();
-    int maxY = world.conf.dontDigUp ? world.getCavernLevel()
-                                    : world.getUnderworldLevel() - 20;
+    int minY = world.conf.ascent ? world.getUndergroundLevel()
+                                 : world.getCavernLevel();
+    int maxY = world.conf.ascent ? world.getCavernLevel()
+                                 : world.getUnderworldLevel() - 20;
     for (int i = 0; i < numNests; ++i) {
         auto [x, y] = findStoneCave(minY, maxY, rnd, world);
         if (x != -1) {

@@ -20,10 +20,10 @@ Point selectBoatLocation(int width, int height, Random &rnd, World &world)
         world.conf.biomes == BiomeLayout::columns
             ? world.snowCenter + world.conf.snowSize * 0.06 * world.getWidth()
             : world.getWidth() - width - 350;
-    int minY = world.conf.dontDigUp ? world.getUndergroundLevel() + height
-                                    : world.getCavernLevel();
+    int minY = world.conf.ascent ? world.getUndergroundLevel() + height
+                                 : world.getCavernLevel();
     int maxY =
-        world.conf.dontDigUp
+        world.conf.ascent
             ? world.getCavernLevel()
             : (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3 -
                   height;

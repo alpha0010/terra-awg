@@ -306,7 +306,7 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
             case TileID::grass:
             case TileID::hallowedGrass:
             case TileID::snow:
-                if ((world.conf.dontDigUp ||
+                if ((world.conf.ascent ||
                      (y < world.getUndergroundLevel() &&
                       world.getTile(x, y - 1).wallID == WallID::empty)) &&
                     world.getTile(x, y - 1).liquid == Liquid::none &&
@@ -390,7 +390,7 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
                 break;
             case TileID::stone:
             case TileID::pearlstone:
-                if ((y > world.getCavernLevel() || world.conf.dontDigUp) &&
+                if ((y > world.getCavernLevel() || world.conf.ascent) &&
                     world.getTile(x, y - 1).liquid == Liquid::none &&
                     (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
                              std::max<int>(
@@ -701,7 +701,7 @@ bool placeSunflower(int x, int y, World &world)
     if (nextBase.blockID != TileID::grass || nextBase.slope != Slope::none ||
         !world.regionPasses(x, y - 4, 2, 4, [&world](Tile &tile) {
             return tile.blockID == TileID::empty &&
-                   (tile.wallID == WallID::empty || world.conf.dontDigUp);
+                   (tile.wallID == WallID::empty || world.conf.ascent);
         })) {
         return false;
     }
@@ -809,7 +809,7 @@ void growGrass(int x, int y, Random &rnd, World &world)
         return;
     }
     if (baseTile.blockID == TileID::grass &&
-        randInt % (world.conf.dontDigUp ? 11 : 3) == 0 &&
+        randInt % (world.conf.ascent ? 11 : 3) == 0 &&
         rnd.getCoarseNoise(x, y) < -0.3 && placeSunflower(x, y, world)) {
         return;
     }

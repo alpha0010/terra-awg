@@ -96,7 +96,7 @@ Point selectTempleCenter(
         minX = std::midpoint(minX, maxX);
         maxX = minX + 1;
     }
-    int minY = world.conf.dontDigUp
+    int minY = world.conf.ascent
                    ? world.getSurfaceLevel(world.jungleCenter) +
                          std::max(
                              world.conf.templeSize * 0.009 * world.getWidth(),
@@ -105,7 +105,11 @@ Point selectTempleCenter(
                    : std::midpoint(
                          world.getUndergroundLevel(),
                          world.getCavernLevel());
-    int maxY = world.conf.dontDigUp ? minY + 30 : world.getUnderworldLevel();
+    int maxY =
+        world.conf.dontDigUp ? minY + 30
+        : world.conf.ascent
+            ? std::midpoint(world.getUndergroundLevel(), world.getCavernLevel())
+            : world.getUnderworldLevel();
     for (int numTries = 0; numTries < 1000; ++numTries) {
         int x = rnd.getInt(minX, maxX);
         int y = rnd.getInt(minY, maxY);

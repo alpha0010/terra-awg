@@ -611,14 +611,14 @@ Point selectShrineLocation(
                    : world.getWidth() - 350;
     for (int numTries = 0; numTries < 10000; ++numTries) {
         int x = rnd.getInt(minX, maxX);
-        int y = world.conf.dontDigUp ? rnd.getInt(
-                                           world.getSurfaceLevel(x),
-                                           std::midpoint(
-                                               world.getCavernLevel(),
-                                               world.getUnderworldLevel()))
-                                     : rnd.getInt(
-                                           world.getUndergroundLevel(),
-                                           world.getUnderworldLevel());
+        int y = world.conf.ascent ? rnd.getInt(
+                                        world.getSurfaceLevel(x),
+                                        std::midpoint(
+                                            world.getCavernLevel(),
+                                            world.getUnderworldLevel()))
+                                  : rnd.getInt(
+                                        world.getUndergroundLevel(),
+                                        world.getUnderworldLevel());
         if ((world.conf.biomes != BiomeLayout::columns &&
              !isInBiome(x, y, 10, Biome::jungle, world)) ||
             !world.regionPasses(
@@ -890,8 +890,8 @@ Variant getChestType(int x, int y, World &world)
     for (auto [type, count] : zoneCounts) {
         if (count > radius * 4) {
             if (type == Variant::sandstone &&
-                (world.conf.dontDigUp ? y > world.getCavernLevel()
-                                      : fuzzyIsSurfaceChest(x, y, world))) {
+                (world.conf.ascent ? y > world.getCavernLevel()
+                                   : fuzzyIsSurfaceChest(x, y, world))) {
                 return Variant::palmWood;
             } else if (type == Variant::pearlwood) {
                 for (auto altType :
@@ -912,7 +912,7 @@ Variant getChestType(int x, int y, World &world)
             return evil;
         }
     }
-    if (world.conf.dontDigUp) {
+    if (world.conf.ascent) {
         return y > world.getCavernLevel() ? fnv1a32pt(x, y) % 3 == 0
                                                 ? Variant::none
                                                 : Variant::livingWood
@@ -1084,7 +1084,7 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
             y < world.getUndergroundLevel() && type == Variant::goldLocked) {
             continue;
         } else if (type == Variant::shadow) {
-            if (world.conf.dontDigUp && x > 0.39 * world.getWidth() &&
+            if (world.conf.ascent && x > 0.39 * world.getWidth() &&
                 x < 0.61 * world.getWidth()) {
                 type = Variant::ashWood;
             } else if (world.getTile(x, y).blockID == TileID::ash) {

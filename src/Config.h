@@ -46,6 +46,7 @@ struct Config {
     bool celebration;
     bool hiveQueen;
     bool forTheWorthy;
+    bool ascent;
     bool dontDigUp;
     int meteorites;
     double meteoriteSize;

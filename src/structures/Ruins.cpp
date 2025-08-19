@@ -202,16 +202,16 @@ public:
         int underworldHeight = world.getHeight() - world.getUnderworldLevel();
         int cityBase = world.getUnderworldLevel() + 0.47 * underworldHeight;
         int minX = makeCongruent(
-            world.conf.dontDigUp ? 100 : 0.15 * world.getWidth(),
+            world.conf.ascent ? 100 : 0.15 * world.getWidth(),
             step);
         int maxX = makeCongruent(
-            world.conf.dontDigUp ? world.getWidth() - 100
-                                 : 0.85 * world.getWidth(),
+            world.conf.ascent ? world.getWidth() - 100
+                              : 0.85 * world.getWidth(),
             step);
-        int skipFrom = world.conf.dontDigUp
+        int skipFrom = world.conf.ascent
                            ? makeCongruent(0.39 * world.getWidth(), step)
                            : -1;
-        int skipTo = world.conf.dontDigUp
+        int skipTo = world.conf.ascent
                          ? makeCongruent(0.61 * world.getWidth(), step)
                          : -1;
         int ruinStartX = -1;

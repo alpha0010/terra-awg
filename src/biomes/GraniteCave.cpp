@@ -80,7 +80,7 @@ void fillGraniteCave(int centerX, int centerY, Random &rnd, World &world)
         }
     }
     caveSize += 60;
-    if (centerY - caveSize < world.getCavernLevel() || world.conf.dontDigUp) {
+    if (centerY - caveSize < world.getCavernLevel() || world.conf.ascent) {
         return;
     }
     for (int x = std::max(centerX - caveSize, 0.0); x < centerX + caveSize;

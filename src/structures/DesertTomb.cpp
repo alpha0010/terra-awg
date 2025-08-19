@@ -33,11 +33,11 @@ Point selectTombLocation(TileBuffer &tomb, Random &rnd, World &world)
                          world.conf.desertSize * 0.06 * world.getWidth() -
                          tomb.getWidth()
                    : world.getWidth() - 350;
-    int minY = world.conf.dontDigUp
+    int minY = world.conf.ascent
                    ? world.getUndergroundLevel() + tomb.getHeight()
                    : world.getCavernLevel();
     int maxY =
-        world.conf.dontDigUp
+        world.conf.ascent
             ? world.getCavernLevel()
             : (world.getCavernLevel() + 4 * world.getUnderworldLevel()) / 5 -
                   tomb.getHeight();

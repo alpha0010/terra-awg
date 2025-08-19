@@ -103,7 +103,7 @@ int World::getUndergroundLevel() const
 
 int World::getCavernLevel() const
 {
-    return (conf.dontDigUp ? 0.61 : 0.41) * height;
+    return (conf.ascent ? 0.61 : 0.41) * height;
 }
 
 int World::getUnderworldLevel() const

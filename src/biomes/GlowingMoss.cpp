@@ -34,10 +34,9 @@ void fillGlowingMossCave(Random &rnd, World &world)
 {
     rnd.shuffleNoise();
     auto [centerX, centerY] = findSolidArea(
-        world.conf.dontDigUp ? world.getUndergroundLevel()
-                             : world.getCavernLevel(),
-        world.conf.dontDigUp ? world.getCavernLevel()
-                             : world.getUnderworldLevel(),
+        world.conf.ascent ? world.getUndergroundLevel()
+                          : world.getCavernLevel(),
+        world.conf.ascent ? world.getCavernLevel() : world.getUnderworldLevel(),
         rnd,
         world);
     if (centerX == -1) {

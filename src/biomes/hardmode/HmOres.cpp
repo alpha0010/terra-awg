@@ -35,7 +35,7 @@ struct DepositDef {
 
 std::array<DepositDef, 3> getHmOreLayers(Random &rnd, World &world)
 {
-    if (world.conf.dontDigUp) {
+    if (world.conf.ascent) {
         return {{
             {world.cobaltVariant,
              static_cast<int>(std::lerp(

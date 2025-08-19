@@ -68,11 +68,11 @@ void genGemCave(Random &rnd, World &world)
         {TileID::rubyStone, WallID::Unsafe::rubyStone},
         {TileID::diamondStone, WallID::Unsafe::diamondStone},
         {TileID::diamondStone, WallID::Unsafe::diamondStone}};
-    if (world.conf.dontDigUp) {
+    if (world.conf.ascent) {
         std::reverse(gemTypes.begin(), gemTypes.end());
     }
     int bandHeight =
-        ((world.conf.dontDigUp
+        ((world.conf.ascent
               ? (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3
               : world.getUnderworldLevel()) -
          world.getUndergroundLevel()) /

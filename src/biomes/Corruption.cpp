@@ -228,10 +228,10 @@ void genCorruptionAt(int surfaceX, int undergroundX, Random &rnd, World &world)
                               : 1);
     // Dig surface chasms, edged with ebonstone.
     if (!world.conf.dontDigUp || rnd.getInt(0, 4) == 0) {
-        int maxY = world.conf.dontDigUp ? std::midpoint(
-                                              world.getUndergroundLevel(),
-                                              world.getCavernLevel())
-                                        : world.getCavernLevel();
+        int maxY = world.conf.ascent ? std::midpoint(
+                                           world.getUndergroundLevel(),
+                                           world.getCavernLevel())
+                                     : world.getCavernLevel();
         for (int x = std::max(surfaceX - scanDist, 0);
              x < std::min(surfaceX + scanDist, world.getWidth());
              ++x) {
@@ -339,7 +339,7 @@ void genCorruptionAt(int surfaceX, int undergroundX, Random &rnd, World &world)
     applyCorruption(
         undergroundX,
         rnd.getInt(
-            world.conf.dontDigUp
+            world.conf.ascent
                 ? (world.getUndergroundLevel() + 2 * world.getCavernLevel()) / 3
                 : (2 * world.getCavernLevel() + world.getUnderworldLevel()) / 3,
             world.getUnderworldLevel()));

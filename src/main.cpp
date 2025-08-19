@@ -709,11 +709,14 @@ int main()
         conf.evilSize *= 1.58;
     }
     if (conf.dontDigUp) {
+        conf.ascent = true;
+        conf.gems *= 0.65;
+        conf.evilSize *= 1.5;
+    }
+    if (conf.ascent) {
         if (conf.spawn == SpawnPoint::normal) {
             conf.spawn = SpawnPoint::underworld;
         }
-        conf.gems *= 0.65;
-        conf.evilSize *= 1.5;
     }
     if (conf.spawn == SpawnPoint::normal) {
         conf.spawn = SpawnPoint::surface;

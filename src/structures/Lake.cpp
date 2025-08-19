@@ -371,7 +371,7 @@ void genLake(Random &rnd, World &world)
     if (world.conf.celebration) {
         spreadShimmer(world);
     }
-    if (world.conf.dontDigUp) {
+    if (world.conf.ascent) {
         parallelFor(std::views::iota(0, world.getWidth()), [&world](int x) {
             convertUndergroundLava(world, x);
         });

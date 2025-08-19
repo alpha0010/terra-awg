@@ -200,9 +200,9 @@ double computeStoneThreshold(int y, World &world)
         {0, -3},
         {world.getUndergroundLevel(), 0},
         {std::midpoint(world.getUndergroundLevel(), world.getCavernLevel()),
-         world.conf.dontDigUp ? 0.8225 : 0.0918},
-        {world.getCavernLevel(), world.conf.dontDigUp ? 0.1127 : 0.1836},
-        {world.getUnderworldLevel(), world.conf.dontDigUp ? -0.6413 : 0.8225},
+         world.conf.ascent ? 0.8225 : 0.0918},
+        {world.getCavernLevel(), world.conf.ascent ? 0.1127 : 0.1836},
+        {world.getUnderworldLevel(), world.conf.ascent ? -0.6413 : 0.8225},
     }};
     std::pair<int, double> from;
     std::pair<int, double> to;
@@ -221,7 +221,7 @@ double computeStoneThreshold(int y, World &world)
 
 std::vector<std::tuple<int, int, int, int>> getOreLayers(World &world)
 {
-    if (world.conf.dontDigUp) {
+    if (world.conf.ascent) {
         return {
             {3,
              (3 * world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 5,
@@ -342,8 +342,8 @@ void applyBaseTerrain(Random &rnd, World &world)
                 }
                 case Biome::desert:
                     tile.blockID = desertTiles[tileType];
-                    if (y > (world.conf.dontDigUp ? world.getUndergroundLevel()
-                                                  : world.getCavernLevel()) &&
+                    if (y > (world.conf.ascent ? world.getUndergroundLevel()
+                                               : world.getCavernLevel()) &&
                         tile.blockID == TileID::sandstone) {
                         if (std::abs(
                                 rnd.getCoarseNoise(
@@ -470,7 +470,7 @@ void applyBaseTerrain(Random &rnd, World &world)
                     threshold = std::max(
                         -0.1,
                         1 + 15.0 *
-                                ((world.conf.dontDigUp
+                                ((world.conf.ascent
                                       ? world.getUndergroundLevel()
                                       : world.getCavernLevel()) -
                                  y) /
@@ -530,7 +530,7 @@ void applyBaseTerrain(Random &rnd, World &world)
         int stalactiteLen = 0;
         int stalacIter = 0;
         int cavernGrassLevel =
-            world.conf.dontDigUp
+            world.conf.ascent
                 ? 25 * rnd.getCoarseNoise(x, world.getCavernLevel()) +
                       world.getCavernLevel()
                 : world.getHeight();

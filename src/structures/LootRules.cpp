@@ -19,7 +19,7 @@ Depth getChestDepth(int x, int y, World &world)
     Depth depth = fuzzyIsSurfaceChest(x, y, world) ? Depth::surface
                   : y < world.getCavernLevel()     ? Depth::underground
                                                    : Depth::cavern;
-    if (world.conf.dontDigUp) {
+    if (world.conf.ascent) {
         if (depth == Depth::surface) {
             return Depth::cavern;
         } else if (depth == Depth::cavern) {
@@ -1788,6 +1788,9 @@ void fillCavernWaterChest(Chest &chest, Random &rnd, World &world)
 
 void fillSkywareChest(Chest &chest, Random &rnd, World &world)
 {
+    bool betterLoot =
+        world.conf.forTheWorthy || (world.spawn.y > world.getCavernLevel() &&
+                                    chest.y < world.getUndergroundLevel());
     fillLoot(
         chest,
         rnd,
@@ -1828,10 +1831,18 @@ void fillSkywareChest(Chest &chest, Random &rnd, World &world)
            rnd.getInt(1, 4)}},
          {0.5,
           {rnd.select(
-               {world.copperVariant == TileID::copperOre ? ItemID::copperBar
-                                                         : ItemID::tinBar,
-                world.ironVariant == TileID::ironOre ? ItemID::ironBar
-                                                     : ItemID::leadBar}),
+               {betterLoot ? (world.silverVariant == TileID::silverOre
+                                  ? ItemID::silverBar
+                                  : ItemID::tungstenBar)
+                           : (world.copperVariant == TileID::copperOre
+                                  ? ItemID::copperBar
+                                  : ItemID::tinBar),
+                betterLoot ? (world.goldVariant == TileID::goldOre
+                                  ? ItemID::goldBar
+                                  : ItemID::platinumBar)
+                           : (world.ironVariant == TileID::ironOre
+                                  ? ItemID::ironBar
+                                  : ItemID::leadBar)}),
            Prefix::none,
            rnd.getInt(3, 10)}},
          {0.5,
@@ -1843,11 +1854,16 @@ void fillSkywareChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(50, 100)}},
          {2.0 / 3,
-          {rnd.select({ItemID::woodenArrow, ItemID::shuriken}),
+          {rnd.select(
+               {betterLoot ? ItemID::jestersArrow : ItemID::woodenArrow,
+                betterLoot ? ItemID::flamingArrow : ItemID::shuriken}),
            Prefix::none,
            rnd.getInt(25, 50)}},
          getGlobalItemPotion(world),
-         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {0.5,
+          {betterLoot ? ItemID::healingPotion : ItemID::lesserHealingPotion,
+           Prefix::none,
+           rnd.getInt(3, 5)}},
          {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
          {2.0 / 3,
           {rnd.select(
@@ -1858,7 +1874,10 @@ void fillSkywareChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(1, 2)}},
          {0.5, {ItemID::fairyGlowstick, Prefix::none, rnd.getInt(10, 20)}},
-         {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}}});
+         {betterLoot ? 0 : 0.5,
+          {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
+         {betterLoot ? 0.5 : 0,
+          {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}}});
 }
 
 void fillShadowChest(Chest &chest, Random &rnd, World &world)
