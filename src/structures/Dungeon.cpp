@@ -1300,7 +1300,7 @@ private:
         return !world.conf.unpainted &&
                (world.conf.doubleTrouble || world.conf.hiveQueen ||
                 world.conf.celebration || world.conf.forTheWorthy ||
-                world.conf.dontDigUp);
+                (world.conf.dontDigUp && !world.conf.purity));
     }
 
     void applyPaint(int dungeonCenter, int dungeonWidth)
@@ -1351,12 +1351,12 @@ private:
     {
         if (world.conf.hiveQueen) {
             Point centroid = getHexCentroid(x, y, 8);
-            if (static_cast<int>(
-                    99999 * (1 + rnd.getFineNoise(centroid.x, centroid.y))) %
-                    11 <
-                4) {
-                return theme.altPaint;
-            }
+            return static_cast<int>(
+                       99999 * (1 + rnd.getFineNoise(centroid.x, centroid.y))) %
+                               11 <
+                           4
+                       ? theme.altPaint
+                       : theme.paint;
         }
         return world.conf.dontDigUp ? theme.altPaint : theme.paint;
     }
@@ -1369,7 +1369,11 @@ public:
             rnd.select(
                 {TileID::blueBrick, TileID::greenBrick, TileID::pinkBrick}),
             rnd);
-        if (world.conf.hiveQueen) {
+        if (world.conf.dontDigUp && !world.conf.forTheWorthy &&
+            !world.conf.purity) {
+            theme.paint = world.isCrimson ? Paint::deepRed : Paint::deepPurple;
+            theme.altPaint = Paint::black;
+        } else if (world.conf.hiveQueen) {
             theme.paint = rnd.select(
                 {Paint::yellow,
                  Paint::orange,
@@ -1383,21 +1387,16 @@ public:
                      Paint::deepYellow,
                      Paint::deepOrange});
             }
-        } else if (!world.conf.forTheWorthy) {
-            if (world.conf.dontDigUp) {
-                theme.paint =
-                    world.isCrimson ? Paint::deepRed : Paint::deepPurple;
-                theme.altPaint = Paint::black;
-            } else if (world.conf.celebration) {
-                theme.paint = rnd.select({Paint::deepPink, Paint::deepViolet});
-                theme.altPaint = theme.paint;
-            }
+        } else if (world.conf.celebration && !world.conf.forTheWorthy) {
+            theme.paint = rnd.select({Paint::deepPink, Paint::deepViolet});
+            theme.altPaint = theme.paint;
         }
     }
 
     void gen(int dungeonCenter)
     {
         if (world.conf.dontDigUp && world.conf.doubleTrouble &&
+            !world.conf.forTheWorthy && !world.conf.purity &&
             (dungeonCenter < world.getWidth() / 2) !=
                 (world.surfaceEvilCenter < world.getWidth() / 2)) {
             theme.paint = theme.paint == Paint::deepPurple ? Paint::deepRed

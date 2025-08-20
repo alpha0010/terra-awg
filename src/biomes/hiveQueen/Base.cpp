@@ -226,11 +226,7 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                 if (y < world.getSurfaceLevel(x)) {
                     continue;
                 }
-                double threshold =
-                    y < world.getUndergroundLevel()
-                        ? 3.0 * y / world.getUndergroundLevel() - 3
-                        : static_cast<double>(y - world.getUndergroundLevel()) /
-                              (world.getHeight() - world.getUndergroundLevel());
+                double threshold = computeStoneThreshold(y, world);
                 int tileType = rnd.getFineNoise(
                                    x + depositNoise[0].first,
                                    y + depositNoise[1].second) > threshold
@@ -263,7 +259,8 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                 }
                 case Biome::desert:
                     tile.blockID = desertTiles[tileType];
-                    if (y > world.getCavernLevel() &&
+                    if (y > (world.conf.ascent ? world.getUndergroundLevel()
+                                               : world.getCavernLevel()) &&
                         tile.blockID == TileID::sandstone) {
                         if (std::abs(
                                 rnd.getCoarseNoise(
@@ -286,7 +283,10 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                     break;
                 case Biome::jungle:
                     tile.blockID = jungleTiles
-                        [y > lavaLevel && tileType == 0 ? 3 : tileType];
+                        [y > lavaLevel &&
+                                 tileType == (world.conf.ascent ? 1 : 0)
+                             ? 3
+                             : tileType];
                     if (y < world.getUndergroundLevel()) {
                         tile.wallID = WallID::Unsafe::mud;
                     } else {
@@ -328,32 +328,7 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                     tile.blockID = TileID::marble;
                     tile.wallID = WallID::Unsafe::marble;
                 }
-                for (auto [idx, oreRoof, oreFloor, ore] :
-                     {std::tuple{
-                          3,
-                          0.6 * world.getUndergroundLevel(),
-                          (world.getUndergroundLevel() +
-                           world.getCavernLevel()) /
-                              2,
-                          world.copperVariant},
-                      {4,
-                       0.85 * world.getUndergroundLevel(),
-                       (2 * world.getCavernLevel() +
-                        world.getUnderworldLevel()) /
-                           3,
-                       world.ironVariant},
-                      {5,
-                       (world.getUndergroundLevel() + world.getCavernLevel()) /
-                           2,
-                       (world.getCavernLevel() + world.getUnderworldLevel()) /
-                           2,
-                       world.silverVariant},
-                      {6,
-                       (2 * world.getCavernLevel() +
-                        world.getUnderworldLevel()) /
-                           3,
-                       world.getUnderworldLevel(),
-                       world.goldVariant}}) {
+                for (auto [idx, oreRoof, oreFloor, ore] : getOreLayers(world)) {
                     if (y > oreRoof && y < oreFloor &&
                         rnd.getFineNoise(
                             x + depositNoise[idx].first,
@@ -405,7 +380,11 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                 if (biome.snow > 0.01) {
                     threshold = std::max(
                         -0.1,
-                        1 + 15.0 * (world.getCavernLevel() - y) /
+                        1 + 15.0 *
+                                ((world.conf.ascent
+                                      ? world.getUndergroundLevel()
+                                      : world.getCavernLevel()) -
+                                 y) /
                                 world.getHeight());
                     threshold = std::lerp(1.0, threshold, biome.snow);
                     if (std::abs(rnd.getCoarseNoise(2 * x, y) + 0.1) < 0.12 &&
@@ -560,15 +539,26 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                 .y +
             1;
         world.getSurfaceLevel(x) = surfaceLevel;
+        int cavernGrassLevel =
+            world.conf.ascent
+                ? 25 * rnd.getCoarseNoise(x, world.getCavernLevel()) +
+                      world.getCavernLevel()
+                : world.getHeight();
         for (int y = 0; y < world.getHeight(); ++y) {
             Tile &tile = world.getTile(x, y);
             if (y <= surfaceLevel) {
                 tile.wallID = WallID::empty;
             }
             BiomeData &biome = world.getBiome(x, y);
+            if (tile.blockID == TileID::empty && y > cavernGrassLevel &&
+                biome.active != Biome::underworld) {
+                Point centroid = getHexCentroid(x, y, 10);
+                if (rnd.getCoarseNoise(centroid.x, centroid.y) > 0) {
+                    tile.wallID = WallID::empty;
+                }
+            }
             tile.wireBlue = false;
             if (!world.isExposed(x, y)) {
-
                 if (y < world.getUndergroundLevel() &&
                     ((biome.active == Biome::forest &&
                       tile.blockID == TileID::dirt) ||
@@ -581,11 +571,10 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                                        ? TileID::grass
                                        : TileID::jungleGrass;
                 }
-
                 continue;
             }
             if (biome.active == Biome::forest &&
-                y < world.getUndergroundLevel()) {
+                (y < world.getUndergroundLevel() || y > cavernGrassLevel)) {
                 if (tile.blockID == TileID::dirt) {
                     tile.blockID = TileID::grass;
                 }

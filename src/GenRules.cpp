@@ -61,6 +61,7 @@
 #include "structures/Traps.h"
 #include "structures/Treasure.h"
 #include "structures/Vines.h"
+#include "structures/dontDigUp/LootRules.h"
 #include "structures/hardmode/LootRules.h"
 #include "structures/hiveQueen/GlobalHive.h"
 #include "structures/hiveQueen/Temple.h"
@@ -145,6 +146,8 @@ enum class Step {
     genGemGroveHiveQueen,
     genTempleHiveQueen,
     genGlobalHive,
+    // Dont dig up.
+    applyDontDigUpLoot,
 };
 
 inline std::array baseBiomeRules{
@@ -188,10 +191,11 @@ inline std::array baseStructureRules{
     Step::genBuriedBoat,  Step::genSpiderHall,     Step::genRuins,
     Step::genTorchArena,  Step::genOceanWreck,     Step::genLake,
     Step::genStarterHome, Step::genIgloo,          Step::genMushroomCabin,
-    Step::genTreasure,    Step::applyHardmodeLoot, Step::genGlobalHive,
-    Step::genPlants,      Step::genTraps,          Step::genTracks,
-    Step::genFlood,       Step::smoothSurfaces,    Step::finalizeWalls,
-    Step::genVines,       Step::genGrasses,        Step::genGlobalEcho,
+    Step::genTreasure,    Step::applyHardmodeLoot, Step::applyDontDigUpLoot,
+    Step::genGlobalHive,  Step::genPlants,         Step::genTraps,
+    Step::genTracks,      Step::genFlood,          Step::smoothSurfaces,
+    Step::finalizeWalls,  Step::genVines,          Step::genGrasses,
+    Step::genGlobalEcho,
 };
 
 inline std::array hiveQueenBiomeRules{
@@ -323,6 +327,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genGemGroveHiveQueen)
         GEN_STEP(genTempleHiveQueen)
         GEN_STEP_WORLD(genGlobalHive)
+        GEN_STEP_WORLD(applyDontDigUpLoot)
     }
 }
 
@@ -382,6 +387,9 @@ void doWorldGen(Random &rnd, World &world)
         excludes.insert(Step::genTemple);
     } else {
         excludes.insert({Step::genTempleHiveQueen, Step::genGlobalHive});
+    }
+    if (world.conf.forTheWorthy || !world.conf.dontDigUp) {
+        excludes.insert(Step::applyDontDigUpLoot);
     }
     LocationBins locations;
     std::vector<Step> steps;

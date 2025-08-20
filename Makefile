@@ -12,6 +12,7 @@ SRCS := $(wildcard src/*.cpp) $(wildcard src/biomes/*.cpp) \
     $(wildcard src/biomes/shattered/*.cpp) \
     $(wildcard src/ids/*.cpp) \
     $(wildcard src/map/*.cpp) $(wildcard src/structures/*.cpp) \
+    $(wildcard src/structures/dontDigUp/*.cpp) \
     $(wildcard src/structures/hardmode/*.cpp) \
     $(wildcard src/structures/hiveQueen/*.cpp) \
     $(wildcard src/structures/sunken/*.cpp) \

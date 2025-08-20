@@ -276,6 +276,9 @@ void convertExtraLava(Random &rnd, World &world, int x)
             static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
                     static_cast<int>(17.5 * lavaHeight / (y + 1 - lavaLevel)) ==
                 0) {
+            if (hypot(world.spawn, {x, y}) < 40) {
+                continue;
+            }
             tile.blockID = TileID::empty;
             tile.liquid = Liquid::lava;
         }

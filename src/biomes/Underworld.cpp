@@ -143,11 +143,15 @@ void makeIslandMoats(int lavaLevel, Random &rnd, World &world)
     for (int centerX : {0.392 * world.getWidth(), 0.608 * world.getWidth()}) {
         for (int i = -scanDist; i < scanDist; ++i) {
             for (int j = std::max(-scanDist, -30); j < scanDist; ++j) {
+                Tile &tile = world.getTile(centerX + i, lavaLevel + j);
+                if (tile.blockID != TileID::ash &&
+                    tile.blockID != TileID::hellstone) {
+                    continue;
+                }
                 double threshold = std::hypot(i, j) / scanDist;
                 if (rnd.getFineNoise(centerX + i, lavaLevel + j) >
                     6 * threshold - 5) {
-                    world.getTile(centerX + i, lavaLevel + j).blockID =
-                        TileID::empty;
+                    tile.blockID = TileID::empty;
                 }
             }
         }

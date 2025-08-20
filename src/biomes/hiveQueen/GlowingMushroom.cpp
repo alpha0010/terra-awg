@@ -85,8 +85,13 @@ void genGlowingMushroomHiveQueen(Random &rnd, World &world)
         2);
     for (int tries = 100 * numFields; numFields > 0 && tries > 0; --tries) {
         int centerX = world.getWidth() * rnd.getDouble(0.05, 0.95);
-        int fieldFloor =
-            rnd.getInt(world.getCavernLevel(), world.getUnderworldLevel() - 50);
+        int fieldFloor = world.conf.ascent
+                             ? rnd.getInt(
+                                   world.getUndergroundLevel() + 50,
+                                   world.getCavernLevel())
+                             : rnd.getInt(
+                                   world.getCavernLevel(),
+                                   world.getUnderworldLevel() - 50);
         if (world.getBiome(centerX, fieldFloor).active != Biome::forest ||
             !world.regionPasses(
                 centerX - 25,
@@ -107,8 +112,10 @@ void genGlowingMushroomHiveQueen(Random &rnd, World &world)
     for (int x = 0; x < world.getWidth(); x += 50) {
         for (int y = mushroomLevel; y < world.getUnderworldLevel() + 20;
              y += 50) {
-            if (world.getBiome(x, y).active == Biome::jungle &&
-                rnd.getInt(0, 5) == 0 &&
+            if (((world.getBiome(x, y).active == Biome::jungle &&
+                  rnd.getInt(0, 5) == 0) ||
+                 (world.conf.ascent &&
+                  world.getBiome(x, y).active == Biome::forest)) &&
                 world.regionPasses(x - 8, y - 8, 16, 16, [](Tile &tile) {
                     return tile.wallID != WallID::Unsafe::mushroom;
                 })) {
@@ -121,12 +128,18 @@ void genGlowingMushroomHiveQueen(Random &rnd, World &world)
                     [&](Point pt) {
                         Tile &tile = world.getTile(pt);
                         switch (tile.blockID) {
+                        case TileID::stone:
+                            tile.blockID = TileID::silt;
+                            break;
+                        case TileID::dirt:
+                        case TileID::grass:
                         case TileID::jungleGrass:
                         case TileID::mud:
                             tile.blockID =
                                 tile.flag == Flag::crispyHoney
                                     ? TileID::crispyHoney
                                 : tile.blockID == TileID::jungleGrass ||
+                                        tile.blockID == TileID::grass ||
                                         rnd.getInt(0, 35) == 0
                                     ? TileID::mushroomGrass
                                     : TileID::mud;

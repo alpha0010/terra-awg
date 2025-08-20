@@ -16,8 +16,12 @@ Point selectGlowingMossLocation(
     for (int tries = 0; tries < 500; ++tries) {
         int x = rnd.getInt(75, world.getWidth() - 75);
         int y = rnd.getInt(
-            std::midpoint(world.getUndergroundLevel(), world.getCavernLevel()),
-            world.getUnderworldLevel());
+            world.conf.ascent ? world.getUndergroundLevel()
+                              : std::midpoint(
+                                    world.getUndergroundLevel(),
+                                    world.getCavernLevel()),
+            world.conf.ascent ? world.getCavernLevel()
+                              : world.getUnderworldLevel());
         if (!visited.contains({x, y}) &&
             world.getBiome(x, y).active == Biome::forest &&
             world.regionPasses(x - 4, y - 4, 8, 8, [](Tile &tile) {
