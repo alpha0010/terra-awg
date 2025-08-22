@@ -149,6 +149,26 @@ void makeGraveCloud(
     });
 }
 
+std::pair<std::map<int, int>, std::map<int, int>>
+getSkyBoxTileSwap(World &world)
+{
+    if (!world.conf.dontDigUp || world.conf.purity) {
+        return {};
+    }
+    int evilBlock = world.isCrimson ? TileID::flesh : TileID::lesion;
+    int evilWall = world.isCrimson ? WallID::Safe::flesh : WallID::Safe::lesion;
+    return {
+        {{TileID::sunplate, evilBlock},
+         {TileID::martianConduitPlating, evilBlock},
+         {TileID::dynastyWood, evilBlock},
+         {TileID::redDynastyShingles, evilBlock},
+         {TileID::blueDynastyShingles, evilBlock}},
+        {{WallID::Safe::disc, evilWall},
+         {WallID::Safe::martianConduit, evilWall},
+         {WallID::Safe::whiteDynasty, evilWall},
+         {WallID::Safe::blueDynasty, evilWall}}};
+}
+
 void addCloudStructure(
     int startX,
     int startY,
@@ -195,44 +215,61 @@ void addCloudStructure(
             }
         }
     }
-    world.queuedTreasures.emplace_back(
-        [x, y, roomId](Random &rnd, World &world) {
-            TileBuffer room = Data::getSkyBox(roomId, world.getFramedTiles());
-            std::vector<Point> chests;
-            for (int i = 0; i < room.getWidth(); ++i) {
-                for (int j = 0; j < room.getHeight(); ++j) {
-                    Tile &roomTile = room.getTile(i, j);
-                    if (roomTile.blockID == TileID::cloud) {
-                        continue;
+    world.queuedTreasures.emplace_back([x,
+                                        y,
+                                        roomId](Random &rnd, World &world) {
+        TileBuffer room = Data::getSkyBox(roomId, world.getFramedTiles());
+        auto [blockSwap, wallSwap] = getSkyBoxTileSwap(world);
+        std::vector<Point> chests;
+        for (int i = 0; i < room.getWidth(); ++i) {
+            for (int j = 0; j < room.getHeight(); ++j) {
+                Tile &roomTile = room.getTile(i, j);
+                if (roomTile.blockID == TileID::cloud) {
+                    continue;
+                }
+                if (rnd.getFineNoise(x + 2 * i, y + 2 * j) > 0.1) {
+                    auto blockItr = blockSwap.find(roomTile.blockID);
+                    if (blockItr != blockSwap.end()) {
+                        roomTile.blockID = blockItr->second;
                     }
-                    roomTile.guarded = roomTile.blockID != TileID::empty ||
-                                       roomTile.wallID != WallID::empty;
-                    Tile &tile = world.getTile(x + i, y + j);
-                    if (!roomTile.guarded &&
-                        (tile.blockID == TileID::livingMahogany ||
-                         tile.blockID == TileID::mahoganyLeaf)) {
-                        roomTile.blockID = tile.blockID;
-                    }
-                    tile = roomTile;
-                    if (tile.blockID == TileID::chest &&
-                        tile.frameX % 36 == 0 && tile.frameY == 0) {
-                        chests.emplace_back(x + i, y + j);
-                    } else if (
-                        tile.blockID == TileID::dresser &&
-                        tile.frameX % 54 == 0 && tile.frameY == 0) {
-                        fillDresser(world.registerStorage(x + i, y + j), rnd);
+                    auto wallItr = wallSwap.find(roomTile.wallID);
+                    if (wallItr != wallSwap.end()) {
+                        roomTile.wallID = wallItr->second;
                     }
                 }
+                roomTile.guarded = roomTile.blockID != TileID::empty ||
+                                   roomTile.wallID != WallID::empty;
+                Tile &tile = world.getTile(x + i, y + j);
+                if (!roomTile.guarded &&
+                    (tile.blockID == TileID::livingMahogany ||
+                     tile.blockID == TileID::mahoganyLeaf)) {
+                    roomTile.blockID = tile.blockID;
+                }
+                tile = roomTile;
+                if (tile.blockID == TileID::chest && tile.frameX % 36 == 0 &&
+                    tile.frameY == 0) {
+                    chests.emplace_back(x + i, y + j);
+                } else if (
+                    tile.blockID == TileID::dresser && tile.frameX % 54 == 0 &&
+                    tile.frameY == 0) {
+                    fillDresser(world.registerStorage(x + i, y + j), rnd);
+                }
             }
-            for (auto [chestX, chestY] : chests) {
-                fillSkywareChest(
-                    world.conf.forTheWorthy
-                        ? world.placeChest(chestX, chestY, Variant::goldLocked)
-                        : world.registerStorage(chestX, chestY),
-                    rnd,
-                    world);
-            }
-        });
+        }
+        for (auto [chestX, chestY] : chests) {
+            fillSkywareChest(
+                world.conf.forTheWorthy
+                    ? world.placeChest(chestX, chestY, Variant::goldLocked)
+                : world.conf.dontDigUp && !world.conf.purity
+                    ? world.placeChest(
+                          chestX,
+                          chestY,
+                          world.isCrimson ? Variant::flesh : Variant::lesion)
+                    : world.registerStorage(chestX, chestY),
+                rnd,
+                world);
+        }
+    });
 }
 
 Point selectCloudSpawn(int width, int height, Random &rnd, World &world)

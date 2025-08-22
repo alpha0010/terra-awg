@@ -318,7 +318,10 @@ int getRepColorTile(int x, int y, World &world)
             return itr->second;
         }
     }
-    return y < world.getUndergroundLevel()  ? TileID::offlineSapphireGemspark
+    return y < world.getUndergroundLevel()
+               ? (world.conf.dontDigUp && !world.conf.forTheWorthy
+                      ? TileID::goldStarry
+                      : TileID::offlineSapphireGemspark)
            : y < world.getCavernLevel()     ? TileID::redStucco
            : y < world.getUnderworldLevel() ? TileID::grayStucco
                                             : TileID::offlineRubyGemspark;
