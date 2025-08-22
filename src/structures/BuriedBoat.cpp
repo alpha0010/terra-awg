@@ -5,6 +5,7 @@
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
+#include "structures/Lake.h"
 #include "structures/LootRules.h"
 #include "structures/data/Boats.h"
 #include "vendor/frozen/set.h"
@@ -120,4 +121,21 @@ void genBuriedBoat(Random &rnd, World &world)
             tile.guarded = true;
         }
     }
+    world.queuedDeco.emplace_back(
+        [x, y, bW = boat.getWidth(), bH = boat.getHeight()](
+            Random &,
+            World &world) {
+            for (int i = 0; i < bW; ++i) {
+                for (int j = 0; j < bH; ++j) {
+                    if (world.getTile(x + i, y + j).liquid == Liquid::lava) {
+                        convertLiquid(
+                            x + i,
+                            y + j,
+                            Liquid::lava,
+                            Liquid::water,
+                            world);
+                    }
+                }
+            }
+        });
 }
