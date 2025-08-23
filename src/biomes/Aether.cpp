@@ -52,9 +52,17 @@ void genAether(Random &rnd, World &world)
     if (rnd.getBool()) {
         centerX = world.getWidth() - centerX;
     }
-    int centerY = rnd.getInt(
-        (world.getUndergroundLevel() + 2 * world.getCavernLevel()) / 3,
-        (world.getCavernLevel() + 5 * world.getUnderworldLevel()) / 6);
+    int centerY =
+        world.conf.ascent
+            ? rnd.getInt(
+                  (4 * world.getUndergroundLevel() + world.getCavernLevel()) /
+                      5,
+                  (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3)
+            : rnd.getInt(
+                  (world.getUndergroundLevel() + 2 * world.getCavernLevel()) /
+                      3,
+                  (world.getCavernLevel() + 5 * world.getUnderworldLevel()) /
+                      6);
     double size =
         world.conf.aetherSize * (25 + world.getWidth() * world.getHeight() /
                                           rnd.getDouble(274000, 384000));
