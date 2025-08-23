@@ -110,6 +110,18 @@ std::pair<int, int> fillTreasureRoom(int x, int y, Random &rnd, World &world)
                     world.registerStorage(x + i, y + j + align),
                     rnd,
                     world);
+            } else if (roomTile.blockID == TileID::pressurePlate) {
+                switch (world.getTile(x + i, y + j + align + 1).blockID) {
+                case TileID::ebonstoneBrick:
+                case TileID::lesion:
+                case TileID::pearlstoneBrick:
+                    roomTile.blockPaint = Paint::gray;
+                    break;
+                case TileID::crimstoneBrick:
+                case TileID::flesh:
+                    roomTile.blockPaint = Paint::none;
+                    break;
+                }
             }
             Tile &tile = world.getTile(x + i, y + j + align);
             std::map<int, int> blockMap{{roomTile.blockID, roomTile.blockID}};
