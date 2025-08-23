@@ -231,10 +231,12 @@ void addCloudStructure(
                     auto blockItr = blockSwap.find(roomTile.blockID);
                     if (blockItr != blockSwap.end()) {
                         roomTile.blockID = blockItr->second;
+                        roomTile.blockPaint = Paint::none;
                     }
                     auto wallItr = wallSwap.find(roomTile.wallID);
                     if (wallItr != wallSwap.end()) {
                         roomTile.wallID = wallItr->second;
+                        roomTile.wallPaint = Paint::none;
                     }
                 }
                 roomTile.guarded = roomTile.blockID != TileID::empty ||
