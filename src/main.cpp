@@ -86,10 +86,10 @@ enum class Seed {
 
 Seed determineSeed(Config &conf)
 {
-    if (conf.forTheWorthy) {
-        return Seed::forTheWorthy;
-    } else if (conf.dontDigUp) {
+    if (conf.dontDigUp) {
         return Seed::dontDigUp;
+    } else if (conf.forTheWorthy) {
+        return Seed::forTheWorthy;
     } else if (conf.hiveQueen) {
         return Seed::notTheBees;
     } else if (conf.celebration) {
@@ -717,6 +717,7 @@ int main()
         if (conf.spawn == SpawnPoint::normal) {
             conf.spawn = SpawnPoint::underworld;
         }
+        conf.minecartTracks *= 1.5;
     }
     if (conf.spawn == SpawnPoint::normal) {
         conf.spawn = SpawnPoint::surface;

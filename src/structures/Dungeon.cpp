@@ -1369,8 +1369,7 @@ public:
             rnd.select(
                 {TileID::blueBrick, TileID::greenBrick, TileID::pinkBrick}),
             rnd);
-        if (world.conf.dontDigUp && !world.conf.forTheWorthy &&
-            !world.conf.purity) {
+        if (world.conf.dontDigUp && !world.conf.purity) {
             theme.paint = world.isCrimson ? Paint::deepRed : Paint::deepPurple;
             theme.altPaint = Paint::black;
         } else if (world.conf.hiveQueen) {
@@ -1396,7 +1395,7 @@ public:
     void gen(int dungeonCenter)
     {
         if (world.conf.dontDigUp && world.conf.doubleTrouble &&
-            !world.conf.forTheWorthy && !world.conf.purity &&
+            !world.conf.purity &&
             (dungeonCenter < world.getWidth() / 2) !=
                 (world.surfaceEvilCenter < world.getWidth() / 2)) {
             theme.paint = theme.paint == Paint::deepPurple ? Paint::deepRed

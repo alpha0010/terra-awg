@@ -235,7 +235,7 @@ void applyCelebrationFinalize(int x, int y, int rainbowOffset, World &world)
         case TileID::cloud:
         case TileID::rainCloud:
         case TileID::snowCloud:
-            if (world.conf.forTheWorthy) {
+            if (world.conf.forTheWorthy || world.conf.dontDigUp) {
                 break;
             }
             [[fallthrough]];
@@ -260,7 +260,7 @@ void applyCelebrationFinalize(int x, int y, int rainbowOffset, World &world)
     if (tile.wallPaint == Paint::none) {
         switch (tile.wallID) {
         case WallID::Safe::cloud:
-            if (world.conf.forTheWorthy) {
+            if (world.conf.forTheWorthy || world.conf.dontDigUp) {
                 break;
             }
             [[fallthrough]];

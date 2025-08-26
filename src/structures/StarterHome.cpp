@@ -436,8 +436,8 @@ void genStarterHome(Random &rnd, World &world)
         theme = Data::Variant::honey;
     }
     Data::Variant origTheme = theme;
-    if (world.conf.celebration && !world.conf.forTheWorthy &&
-        !world.conf.hiveQueen) {
+    if (world.conf.celebration && !world.conf.dontDigUp &&
+        !world.conf.forTheWorthy && !world.conf.hiveQueen) {
         theme = Data::Variant::balloon;
     } else if (y < 0.45 * world.getUndergroundLevel()) {
         theme = Data::Variant::skyware;

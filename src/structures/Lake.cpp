@@ -270,15 +270,18 @@ void convertExtraLava(Random &rnd, World &world, int x)
     }
     lavaLevel = std::midpoint(lavaLevel, world.getUnderworldLevel());
     int lavaHeight = world.getHeight() - lavaLevel;
+    double spawnClear = world.spawn.y > world.getUnderworldLevel()
+                            ? 0.008 * (1 + std::abs(x - world.spawn.x))
+                            : 999;
+    spawnClear *= spawnClear;
     for (int y = lavaLevel; y < world.getHeight(); ++y) {
         Tile &tile = world.getTile(x, y);
         if (tile.blockID == TileID::ash &&
             static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
-                    static_cast<int>(17.5 * lavaHeight / (y + 1 - lavaLevel)) ==
+                    static_cast<int>(
+                        17.5 * lavaHeight /
+                        std::min(y + 1.0 - lavaLevel, spawnClear)) ==
                 0) {
-            if (hypot(world.spawn, {x, y}) < 40) {
-                continue;
-            }
             tile.blockID = TileID::empty;
             tile.liquid = Liquid::lava;
         }

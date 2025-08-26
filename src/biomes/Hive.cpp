@@ -7,6 +7,7 @@
 #include "ids/WallID.h"
 #include "structures/LootRules.h"
 #include "structures/StructureUtil.h"
+#include "vendor/frozen/set.h"
 #include <iostream>
 
 bool isHiveEdge(int x, int y, World &world)
@@ -29,7 +30,9 @@ Point selectLarvaeLocation(
     Random &rnd,
     World &world)
 {
-    for (int numTries = 0; numTries < 100; ++numTries) {
+    constexpr auto evilTiles = frozen::make_set<int>(
+        {TileID::ebonstone, TileID::lesion, TileID::crimstone, TileID::flesh});
+    for (int numTries = 0; numTries < 200; ++numTries) {
         int x = rnd.getInt(hiveX - size, hiveX + size);
         int y = rnd.getInt(hiveY - size, hiveY + size);
         if (world.getTile(x, y).blockID == TileID::empty) {
@@ -50,7 +53,10 @@ Point selectLarvaeLocation(
                 y + 1,
                 3,
                 1,
-                [](Tile &tile) { return tile.blockID == TileID::hive; }) &&
+                [numTries, &evilTiles](Tile &tile) {
+                    return tile.blockID == TileID::hive ||
+                           (numTries > 100 && evilTiles.contains(tile.blockID));
+                }) &&
             !isLocationUsed(x, y, 35, usedLocations)) {
             return {x, y};
         }

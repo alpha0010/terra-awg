@@ -388,7 +388,7 @@ void doWorldGen(Random &rnd, World &world)
     } else {
         excludes.insert({Step::genTempleHiveQueen, Step::genGlobalHive});
     }
-    if (world.conf.forTheWorthy || !world.conf.dontDigUp) {
+    if (!world.conf.dontDigUp) {
         excludes.insert(Step::applyDontDigUpLoot);
     }
     LocationBins locations;

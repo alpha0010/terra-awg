@@ -333,9 +333,7 @@ void Color::hueBlend(Color tint)
 Color getLayerColor(int y, World &world)
 {
     if (y < world.getUndergroundLevel()) {
-        return world.conf.dontDigUp && !world.conf.forTheWorthy
-                   ? Colors::black
-                   : Colors::surface;
+        return world.conf.dontDigUp ? Colors::black : Colors::surface;
     } else if (y < world.getCavernLevel()) {
         return Colors::underground;
     } else if (y < world.getUnderworldLevel()) {

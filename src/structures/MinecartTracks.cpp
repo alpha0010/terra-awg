@@ -108,10 +108,14 @@ inline constexpr auto trackClearTiles = frozen::make_set<int>({
     TileID::chlorophyteOre,
 });
 
-bool canTrackClearTile(Tile &tile)
+inline constexpr auto trackEvilTiles = frozen::make_set<int>(
+    {TileID::ebonstone, TileID::lesion, TileID::crimstone, TileID::flesh});
+
+bool canTrackClearTile(Tile &tile, World &world)
 {
     return trackClearTiles.contains(tile.blockID) ||
-           (tile.blockID == TileID::hive && tile.flag != Flag::none);
+           (tile.blockID == TileID::hive && tile.flag != Flag::none) ||
+           (world.conf.dontDigUp && trackEvilTiles.contains(tile.blockID));
 }
 
 inline std::array gemsparkRainbow{
@@ -151,10 +155,10 @@ bool isValidTrackSegment(int x, int y, World &world)
                y - 10,
                1,
                12,
-               [](Tile &tile) {
+               [&world](Tile &tile) {
                    return !tile.guarded &&
                           (!tile.actuator || tile.blockID != TileID::sand) &&
-                          canTrackClearTile(tile);
+                          canTrackClearTile(tile, world);
                }) &&
            world.regionPasses(x, y + 1, 1, 20, [](Tile &tile) {
                return tile.blockID != TileID::minecartTrack;
@@ -341,7 +345,7 @@ void applyTrackSupport(int x, int y, World &world)
     int supFloor = scanWhileEmpty({x, y + 1}, {0, 1}, world).y;
     ++supFloor;
     if (supFloor - y < 4 || supFloor - y > 24 ||
-        !canTrackClearTile(world.getTile(x, supFloor))) {
+        !canTrackClearTile(world.getTile(x, supFloor), world)) {
         return;
     }
     tile.blockPaint = Paint::none;
@@ -364,13 +368,13 @@ void clearTrackHex(Point centroid, World &world)
         [centroid](Point pt) { return getHexCentroid(pt, 10) == centroid; },
         [&world](Point pt) {
             Tile &prevTile = world.getTile(pt.x, pt.y - 1);
-            if (!canTrackClearTile(prevTile) &&
+            if (!canTrackClearTile(prevTile, world) &&
                 prevTile.blockID != TileID::minecartTrack &&
                 prevTile.blockID != TileID::platform) {
                 return;
             }
             Tile &tile = world.getTile(pt);
-            if (!tile.guarded && canTrackClearTile(tile)) {
+            if (!tile.guarded && canTrackClearTile(tile, world)) {
                 tile.blockID = TileID::empty;
                 tile.actuator = false;
             }
