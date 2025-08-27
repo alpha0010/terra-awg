@@ -84,6 +84,9 @@ shattered = false
 # has poor performance when settling large bodies of water.
 sunken = false
 
+# Frozen themed world.
+tundra = false
+
 # Only generate non-spreading biomes.
 purity = false
 
@@ -636,6 +639,7 @@ Config readConfig(Random &rnd)
         false, // doubleTrouble
         false, // shattered
         false, // sunken
+        false, // tundra
         false, // purity
         false, // hardmode
         false, // hardmodeLoot
@@ -716,6 +720,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, doubleTrouble, Boolean);
     READ_CONF_VALUE(variation, shattered, Boolean);
     READ_CONF_VALUE(variation, sunken, Boolean);
+    READ_CONF_VALUE(variation, tundra, Boolean);
     READ_CONF_VALUE(variation, purity, Boolean);
     READ_CONF_VALUE(variation, hardmode, Boolean);
     READ_CONF_VALUE(variation, hardmodeLoot, Boolean);

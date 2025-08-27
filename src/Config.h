@@ -36,6 +36,7 @@ struct Config {
     bool doubleTrouble;
     bool shattered;
     bool sunken;
+    bool tundra;
     bool purity;
     bool hardmode;
     bool hardmodeLoot;

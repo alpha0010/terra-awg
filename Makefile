@@ -16,6 +16,7 @@ SRCS := $(wildcard src/*.cpp) $(wildcard src/biomes/*.cpp) \
     $(wildcard src/structures/hardmode/*.cpp) \
     $(wildcard src/structures/hiveQueen/*.cpp) \
     $(wildcard src/structures/sunken/*.cpp) \
+    $(wildcard src/structures/tundra/*.cpp) \
     $(wildcard src/structures/data/*.cpp) $(wildcard src/vendor/*.c) \
     $(wildcard src/vendor/*.cpp)
 OUT := terra-awg

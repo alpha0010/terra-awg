@@ -673,6 +673,12 @@ int main()
         world.mythrilVariant = TileID::empty;
         world.adamantiteVariant = TileID::empty;
     }
+    if (conf.tundra) {
+        conf.patchesTemperature -= 0.5;
+        conf.snowSize *= 1.5;
+        conf.jungleSize *= 0.8;
+        conf.surfaceAmplitude *= 1.25;
+    }
     if (conf.celebration) {
         if (conf.spawn == SpawnPoint::normal) {
             conf.spawn = SpawnPoint::ocean;

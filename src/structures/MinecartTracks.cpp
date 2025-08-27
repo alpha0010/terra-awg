@@ -59,6 +59,8 @@ inline constexpr auto trackClearTiles = frozen::make_set<int>({
     TileID::pearlsand,
     TileID::pearlstone,
     TileID::silt,
+    TileID::candyCane,
+    TileID::greenCandyCane,
     TileID::snow,
     TileID::ice,
     TileID::thinIce,

@@ -20,6 +20,8 @@ enum {
     iridescentBrick = 23,
     mudstoneBrick = 24,
     planked = 27,
+    candyCane = 29,
+    greenCandyCane = 30,
     snowBrick = 31,
     demoniteBrick = 33,
     sandstoneBrick = 34,

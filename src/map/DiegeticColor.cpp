@@ -121,6 +121,7 @@ inline constexpr auto tileToRepTile = frozen::make_map<int, int>({
     {TileID::pearlsand, TileID::pearlstoneBrick},
     {TileID::pearlsandstone, TileID::pearlstoneBrick},
     {TileID::pearlstone, TileID::pearlstoneBrick},
+    {TileID::pineTree, TileID::leaf},
     {TileID::pinkBrick, TileID::pinkBrick},
     {TileID::platinumOre, TileID::platinumOre},
     {TileID::purpleMossStone, TileID::stone},

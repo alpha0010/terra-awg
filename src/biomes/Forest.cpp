@@ -369,6 +369,17 @@ void expireLivingTree(
     std::vector<Point> &&treeTiles,
     World &world)
 {
+    if (world.conf.tundra) {
+        // Not actually a trap, but this is the correct stage.
+        world.queuedTraps.emplace_back([treeTiles](Random &, World &world) {
+            for (auto point : treeTiles) {
+                Tile &tile = world.getTile(point);
+                if (tile.blockID == TileID::leaf) {
+                    tile.blockID = TileID::pineTree;
+                }
+            }
+        });
+    }
     int baseScan = weight * 5;
     std::partial_sort(
         treeTiles.begin(),

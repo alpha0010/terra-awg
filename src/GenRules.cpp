@@ -66,6 +66,7 @@
 #include "structures/hiveQueen/GlobalHive.h"
 #include "structures/hiveQueen/Temple.h"
 #include "structures/sunken/Flood.h"
+#include "structures/tundra/Glaciation.h"
 #include <ranges>
 #include <set>
 
@@ -124,6 +125,8 @@ enum class Step {
     genShatteredLand,
     // Sunken.
     genFlood,
+    // Tundra
+    genGlaciation,
     // Hardmode.
     genHardmodeOres,
     genHallow,
@@ -192,10 +195,10 @@ inline std::array baseStructureRules{
     Step::genTorchArena,  Step::genOceanWreck,     Step::genLake,
     Step::genStarterHome, Step::genIgloo,          Step::genMushroomCabin,
     Step::genTreasure,    Step::applyHardmodeLoot, Step::applyDontDigUpLoot,
-    Step::genGlobalHive,  Step::genPlants,         Step::genTraps,
-    Step::genTracks,      Step::genFlood,          Step::smoothSurfaces,
-    Step::finalizeWalls,  Step::genVines,          Step::genGrasses,
-    Step::genGlobalEcho,
+    Step::genGlobalHive,  Step::genGlaciation,     Step::genPlants,
+    Step::genTraps,       Step::genTracks,         Step::genFlood,
+    Step::smoothSurfaces, Step::finalizeWalls,     Step::genVines,
+    Step::genGrasses,     Step::genGlobalEcho,
 };
 
 inline std::array hiveQueenBiomeRules{
@@ -308,6 +311,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genSecondaryCorruption)
         GEN_STEP(genShatteredLand)
         GEN_STEP_WORLD(genFlood)
+        GEN_STEP(genGlaciation)
         GEN_STEP(genHardmodeOres)
         GEN_STEP(genHallow)
         GEN_STEP_WORLD(applyHardmodeLoot)
@@ -359,6 +363,9 @@ void doWorldGen(Random &rnd, World &world)
     }
     if (!world.conf.sunken) {
         excludes.insert(Step::genFlood);
+    }
+    if (!world.conf.tundra) {
+        excludes.insert(Step::genGlaciation);
     }
     if (world.conf.purity) {
         world.surfaceEvilCenter = 0;
