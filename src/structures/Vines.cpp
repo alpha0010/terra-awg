@@ -162,6 +162,37 @@ void placeStalagmite(int x, int y, World &world)
     }
 }
 
+void embedGem(int x, int y, int randInt, World &world)
+{
+    if (!world.regionPasses(x - 2, y - 2, 5, 5, [](Tile &tile) {
+            return tile.blockID == TileID::stone && tile.slope == Slope::none &&
+                   !tile.guarded;
+        })) {
+        return;
+    }
+    Tile &tile = world.getTile(x, y);
+    switch (randInt % 6) {
+    case 0:
+        tile.blockID = TileID::amethystStone;
+        break;
+    case 1:
+        tile.blockID = TileID::topazStone;
+        break;
+    case 2:
+        tile.blockID = TileID::sapphireStone;
+        break;
+    case 3:
+        tile.blockID = TileID::emeraldStone;
+        break;
+    case 4:
+        tile.blockID = TileID::rubyStone;
+        break;
+    case 5:
+        tile.blockID = TileID::diamondStone;
+        break;
+    }
+}
+
 void genVines(Random &rnd, World &world)
 {
     std::cout << "Growing vines\n";
@@ -247,6 +278,8 @@ void genVines(Random &rnd, World &world)
                 state = ScanState::e;
             } else if (state == ScanState::eees && randInt % 11 == 0) {
                 placeStalagmite(x, y, world);
+            } else if (state == ScanState::s && randInt % 4999 == 0) {
+                embedGem(x, y, randInt, world);
             }
             dropper = TileID::empty;
             if (tile.slope != Slope::none || tile.actuated) {
