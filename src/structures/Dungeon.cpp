@@ -1502,7 +1502,9 @@ int computeDungeonCenter(World &world)
 {
     std::vector avoidPoints{
         0,
+        static_cast<int>(0.44 * world.getWidth()),
         world.spawn.x,
+        static_cast<int>(0.56 * world.getWidth()),
         world.getWidth(),
         world.surfaceEvilCenter,
         static_cast<int>(world.desertCenter),
