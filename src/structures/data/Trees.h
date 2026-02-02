@@ -2,14 +2,13 @@
 #define TREES_H
 
 #include "TileBuffer.h"
-#include <ranges>
+
+class Random;
 
 namespace Data
 {
 
-inline auto trees = std::views::iota(0, 25);
-
-TileBuffer getTree(int treeId, const std::vector<bool> &framedTiles);
+TileBuffer getTree(int height, Random &rnd);
 
 } // namespace Data
 

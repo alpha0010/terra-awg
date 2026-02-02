@@ -215,7 +215,8 @@ void growTree(
         return;
     }
     for (int i = 0; i < 3; ++i) {
-        if (world.getTile(x + i, y).blockID != groundTile) {
+        Tile &tile = world.getTile(x + i, y);
+        if (tile.blockID != groundTile || tile.slope != Slope::none) {
             return;
         }
     }
@@ -255,16 +256,12 @@ void growTree(
     int paint = gemTrees.contains(treeTile) ? Paint::none
                 : world.conf.celebration    ? getRainbowPaint(x / 6, y / 6)
                                          : world.getTile(x + 1, y).blockPaint;
+    TileBuffer tree = Data::getTree(height, rnd);
     for (int j = 0; j < height; ++j) {
-        TileBuffer tree =
-            Data::getTree(rnd.select(Data::trees), world.getFramedTiles());
-        int treeRow = j > height - 3 ? j - height + tree.getHeight()
-                      : j < 2        ? j
-                                     : rnd.getInt(2, tree.getHeight() - 3);
         for (int i = 0; i < tree.getWidth(); ++i) {
             Tile &tile = world.getTile(x + i, y + j - height);
             int curWall = tile.wallID;
-            tile = tree.getTile(i, treeRow);
+            tile = tree.getTile(i, j);
             if (tile.blockID != TileID::empty) {
                 tile.blockID = treeTile;
                 tile.blockPaint = paint;
