@@ -135,7 +135,7 @@ void genCorruption(Random &rnd, World &world)
     rnd.shuffleNoise();
     int minX = 0;
     int maxX = world.getWidth();
-    if (world.conf.dontDigUp && world.conf.doubleTrouble) {
+    if (world.conf.dontDigUp && world.conf.bothEvils) {
         if (rnd.getBool()) {
             minX = world.getWidth() / 2;
         } else {

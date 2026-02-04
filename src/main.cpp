@@ -661,6 +661,10 @@ int main()
     world.ironVariant = rnd.select({TileID::ironOre, TileID::leadOre});
     world.silverVariant = rnd.select({TileID::silverOre, TileID::tungstenOre});
     world.goldVariant = rnd.select({TileID::goldOre, TileID::platinumOre});
+    if (conf.doubleTrouble) {
+        conf.bothEvils = true;
+        conf.allOres = true;
+    }
     if (conf.hardmode) {
         world.cobaltVariant =
             rnd.select({TileID::cobaltOre, TileID::palladiumOre});

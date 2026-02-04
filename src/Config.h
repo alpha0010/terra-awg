@@ -33,6 +33,8 @@ struct Config {
     SpawnPoint spawn;
     bool unpainted;
     double fadedMemories;
+    bool bothEvils;
+    bool allOres;
     bool doubleTrouble;
     bool shattered;
     bool sunken;

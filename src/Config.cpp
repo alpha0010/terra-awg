@@ -71,8 +71,14 @@ unpainted = false
 # the tiles, 1.0 means apply to everything.
 fadedMemories = 0.0
 
-# Include both evil biomes and all ore variants.
+# Include both evil biomes.
+bothEvils = false
+
+# Include all ore variants.
+allOres = false
+
 # Activates "drunk world" secret seed.
+# (Also enables "bothEvils" and "allOres".)
 doubleTrouble = false
 
 # Break up the world into floating islands.
@@ -636,6 +642,8 @@ Config readConfig(Random &rnd)
         SpawnPoint::normal,
         false, // unpainted
         0.0,   // fadedMemories
+        false, // bothEvils
+        false, // allOres
         false, // doubleTrouble
         false, // shattered
         false, // sunken
@@ -717,6 +725,8 @@ Config readConfig(Random &rnd)
     conf.spawn = parseSpawn(reader.Get("variation", "spawn", "normal"));
     READ_CONF_VALUE(variation, unpainted, Boolean);
     READ_CONF_VALUE(variation, fadedMemories, Real);
+    READ_CONF_VALUE(variation, bothEvils, Boolean);
+    READ_CONF_VALUE(variation, allOres, Boolean);
     READ_CONF_VALUE(variation, doubleTrouble, Boolean);
     READ_CONF_VALUE(variation, shattered, Boolean);
     READ_CONF_VALUE(variation, sunken, Boolean);

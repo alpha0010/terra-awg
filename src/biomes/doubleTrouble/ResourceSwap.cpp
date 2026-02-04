@@ -1,5 +1,6 @@
 #include "biomes/doubleTrouble/ResourceSwap.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
@@ -40,14 +41,18 @@ void swapResources(Random &rnd, World &world)
     parallelFor(std::views::iota(0, world.getWidth()), [&](int x) {
         for (int y = 0; y < world.getHeight(); ++y) {
             Tile &tile = world.getTile(x, y);
-            auto blockItr = blockSwap.find(tile.blockID);
-            if (blockItr != blockSwap.end()) {
-                tile.blockID = blockItr->second;
-            } else if (rnd.getCoarseNoise(x, y) > 0) {
+            if (rnd.getCoarseNoise(x, y) > 0) {
                 auto oreItr = oreSwap.find(tile.blockID);
                 if (oreItr != oreSwap.end()) {
                     tile.blockID = oreItr->second;
                 }
+            }
+            if (!world.conf.doubleTrouble) {
+                continue;
+            }
+            auto blockItr = blockSwap.find(tile.blockID);
+            if (blockItr != blockSwap.end()) {
+                tile.blockID = blockItr->second;
             }
             auto wallItr = wallSwap.find(tile.wallID);
             if (wallItr != wallSwap.end()) {

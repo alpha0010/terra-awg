@@ -272,7 +272,7 @@ void placeFallenLogs(
 void placeAltars(int maxBin, LocationBins &locations, Random &rnd, World &world)
 {
     int altarCount = std::max(8, world.getWidth() / 200);
-    if (world.conf.doubleTrouble || world.conf.dontDigUp) {
+    if (world.conf.bothEvils || world.conf.dontDigUp) {
         altarCount *= 2;
     }
     constexpr auto corruptTiles = frozen::make_set<int>(
@@ -373,7 +373,7 @@ Point scanForAltarOffset(TileBuffer &altar)
 void placePurityAltars(Random &rnd, World &world)
 {
     std::vector<int> altars;
-    if (world.conf.doubleTrouble) {
+    if (world.conf.bothEvils) {
         altars.insert(
             altars.end(),
             Data::corruptAltars.begin(),
@@ -463,7 +463,7 @@ void placeOrbHearts(
     int orbHeartCount = world.getWidth() * world.getHeight() / 240000;
     if (world.conf.dontDigUp) {
         orbHeartCount *= 4;
-    } else if (world.conf.doubleTrouble) {
+    } else if (world.conf.bothEvils) {
         orbHeartCount *= 2;
     }
     for (int tries = 500 * orbHeartCount; orbHeartCount > 0 && tries > 0;

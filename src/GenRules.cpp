@@ -348,15 +348,16 @@ void doWorldGen(Random &rnd, World &world)
     if (world.conf.fadedMemories < 0.001) {
         excludes.insert(Step::genGlobalEcho);
     }
-    if (world.conf.doubleTrouble) {
+    if (world.conf.bothEvils) {
         excludes.insert(
             world.isCrimson ? Step::genSecondaryCrimson
                             : Step::genSecondaryCorruption);
     } else {
         excludes.insert(
-            {Step::swapResources,
-             Step::genSecondaryCrimson,
-             Step::genSecondaryCorruption});
+            {Step::genSecondaryCrimson, Step::genSecondaryCorruption});
+    }
+    if (!world.conf.allOres) {
+        excludes.insert(Step::swapResources);
     }
     if (!world.conf.shattered) {
         excludes.insert(Step::genShatteredLand);
