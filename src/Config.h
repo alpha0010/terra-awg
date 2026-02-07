@@ -90,6 +90,12 @@ struct Config {
     double desertSize;
     double jungleSize;
     double surfaceAmplitude;
+    bool theConstant;
+    bool getFixedBoi;
+    bool skyblock;
+    bool endlessHalloween;
+    bool endlessChristmas;
+    bool vampirism;
     bool map;
 
     std::string getFilename() const;

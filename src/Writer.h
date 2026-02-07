@@ -2,9 +2,9 @@
 #define WRITER_H
 
 #include "vendor/ieee754_types.hpp"
+#include <bitset>
 #include <cstdint>
 #include <fstream>
-#include <vector>
 
 typedef IEEE_754::_2008::Binary<32> float32_t;
 typedef IEEE_754::_2008::Binary<64> float64_t;
@@ -17,7 +17,15 @@ private:
 public:
     Writer(const std::string &filename);
 
-    void putBitVec(const std::vector<bool> &vec);
+    template <size_t N> void putBitVec(std::bitset<N> vec)
+    {
+        std::bitset<N> mask(0xff);
+        for (int i = (vec.size() + 7) / 8; i > 0; --i) {
+            out.put((vec & mask).to_ulong());
+            vec >>= 8;
+        }
+    }
+
     void putBool(bool val);
     void putFloat32(float32_t val);
     void putFloat64(float64_t val);

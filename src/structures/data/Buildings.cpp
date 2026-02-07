@@ -966,8 +966,7 @@ std::vector<std::vector<uint16_t>> buildingData{
 namespace Data
 {
 
-TileBuffer
-getBuilding(Building buildingId, const std::vector<bool> &framedTiles)
+TileBuffer getBuilding(Building buildingId, const FramedBitset &framedTiles)
 {
     return {buildingData[static_cast<int>(buildingId)].data(), framedTiles};
 }

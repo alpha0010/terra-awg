@@ -15,8 +15,7 @@ enum class Building {
     spiderHall2
 };
 
-TileBuffer
-getBuilding(Building buildingId, const std::vector<bool> &framedTiles);
+TileBuffer getBuilding(Building buildingId, const FramedBitset &framedTiles);
 
 } // namespace Data
 

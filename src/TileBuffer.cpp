@@ -1,8 +1,6 @@
 #include "TileBuffer.h"
 
-TileBuffer::TileBuffer(
-    const uint16_t *data,
-    const std::vector<bool> &framedTiles)
+TileBuffer::TileBuffer(const uint16_t *data, const FramedBitset &framedTiles)
     : width(*data >> 8), height(*data & 0xff), tiles(width * height)
 {
     ++data;

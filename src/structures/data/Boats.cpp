@@ -172,7 +172,7 @@ std::vector<std::vector<uint16_t>> boatData{
 namespace Data
 {
 
-TileBuffer getBoat(Boat boatId, const std::vector<bool> &framedTiles)
+TileBuffer getBoat(Boat boatId, const FramedBitset &framedTiles)
 {
     return {boatData[static_cast<int>(boatId)].data(), framedTiles};
 }

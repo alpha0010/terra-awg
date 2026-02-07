@@ -109,7 +109,7 @@ std::vector<std::vector<uint16_t>> mushroomData{
 namespace Data
 {
 
-TileBuffer getMushroom(int mushroomId, const std::vector<bool> &framedTiles)
+TileBuffer getMushroom(int mushroomId, const FramedBitset &framedTiles)
 {
     return {mushroomData[mushroomId].data(), framedTiles};
 }

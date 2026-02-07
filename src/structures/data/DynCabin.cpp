@@ -100,7 +100,7 @@ namespace Data
 {
 
 TileBuffer
-getCabin(int cabinId, int targetWidth, const std::vector<bool> &framedTiles)
+getCabin(int cabinId, int targetWidth, const FramedBitset &framedTiles)
 {
     TileBuffer left = {cabinLeftData[cabinId].data(), framedTiles};
     TileBuffer center = {cabinCenterData[cabinId].data(), framedTiles};

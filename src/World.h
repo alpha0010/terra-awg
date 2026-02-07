@@ -5,6 +5,7 @@
 #include "Point.h"
 #include "Tile.h"
 #include "ids/Biome.h"
+#include "ids/FramedTiles.h"
 #include "ids/TileVariant.h"
 #include <cstdint>
 #include <functional>
@@ -35,7 +36,7 @@ private:
     Tile scratchTile;
     std::vector<Tile> tiles;
     std::vector<Chest> chests;
-    std::vector<bool> framedTiles;
+    FramedBitset framedTiles;
     std::vector<int> surface;
     std::vector<BiomeData> biomeMap;
 
@@ -75,7 +76,7 @@ public:
         return chests;
     }
 
-    const std::vector<bool> &getFramedTiles() const
+    const FramedBitset &getFramedTiles() const
     {
         return framedTiles;
     }

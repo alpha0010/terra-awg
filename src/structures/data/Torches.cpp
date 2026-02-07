@@ -142,7 +142,7 @@ std::vector<std::vector<uint16_t>> torchData{
 namespace Data
 {
 
-TileBuffer getTorch(Torch torchId, const std::vector<bool> &framedTiles)
+TileBuffer getTorch(Torch torchId, const FramedBitset &framedTiles)
 {
     return {torchData[static_cast<int>(torchId)].data(), framedTiles};
 }

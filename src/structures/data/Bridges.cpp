@@ -38,7 +38,7 @@ std::vector<std::vector<uint16_t>> bridgeData{
 namespace Data
 {
 
-TileBuffer getBridge(const std::vector<bool> &framedTiles)
+TileBuffer getBridge(const FramedBitset &framedTiles)
 {
     return {bridgeData[0].data(), framedTiles};
 }

@@ -73,7 +73,7 @@ namespace Data
 {
 
 TileBuffer
-getBalloon(int id, int tileId, int paint, const std::vector<bool> &framedTiles)
+getBalloon(int id, int tileId, int paint, const FramedBitset &framedTiles)
 {
     TileBuffer data{balloonData[id].data(), framedTiles};
     for (int i = 0; i < data.getWidth(); ++i) {

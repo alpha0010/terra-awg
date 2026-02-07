@@ -1031,7 +1031,7 @@ std::vector<std::vector<uint16_t>> shrineData{
 namespace Data
 {
 
-TileBuffer getShrine(int shrineId, const std::vector<bool> &framedTiles)
+TileBuffer getShrine(int shrineId, const FramedBitset &framedTiles)
 {
     return {shrineData[shrineId].data(), framedTiles};
 }

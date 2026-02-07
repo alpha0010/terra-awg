@@ -18,26 +18,6 @@ void writeLittleEndian(std::ostream &out, NumberType val)
 
 Writer::Writer(const std::string &filename) : out(filename, std::ios::binary) {}
 
-void Writer::putBitVec(const std::vector<bool> &vec)
-{
-    uint8_t buf = 0;
-    int offset = 0;
-    for (bool val : vec) {
-        if (val) {
-            buf |= (1 << offset);
-        }
-        ++offset;
-        if (offset >= 8) {
-            out.put(buf);
-            buf = 0;
-            offset = 0;
-        }
-    }
-    if (offset != 0) {
-        out.put(buf);
-    }
-}
-
 void Writer::putBool(bool val)
 {
     out.put(val ? 1 : 0);

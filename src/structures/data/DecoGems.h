@@ -9,7 +9,7 @@ namespace Data
 
 inline auto gems = std::views::iota(0, 6);
 
-TileBuffer getDecoGem(int gemId, const std::vector<bool> &framedTiles);
+TileBuffer getDecoGem(int gemId, const FramedBitset &framedTiles);
 
 } // namespace Data
 

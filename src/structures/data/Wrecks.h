@@ -9,7 +9,7 @@ namespace Data
 
 inline auto wrecks = std::views::iota(0, 11);
 
-TileBuffer getWreck(int wreckId, const std::vector<bool> &framedTiles);
+TileBuffer getWreck(int wreckId, const FramedBitset &framedTiles);
 
 } // namespace Data
 

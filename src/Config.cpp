@@ -180,6 +180,15 @@ jungleSize = 1.0
 # Controls how flat/mountainous to generate surface terrain.
 surfaceAmplitude = 1.0
 
+# The following settings currently have no impact on worldgen. They can
+# be used to activate alternate gameplay rules.
+theConstant = false
+getFixedBoi = false
+skyblock = false
+endlessHalloween = false
+endlessChristmas = false
+vampirism = false
+
 [extra]
 # Output a map preview image.
 map = true
@@ -699,6 +708,12 @@ Config readConfig(Random &rnd)
         1.0,   // desertSize
         1.0,   // jungleSize
         1.0,   // surfaceAmplitude
+        false, // theConstant
+        false, // getFixedBoi
+        false, // skyblock
+        false, // endlessHalloween
+        false, // endlessChristmas
+        false, // vampirism
         true}; // map
     if (!std::filesystem::exists(confName)) {
         std::ofstream out(confName, std::ios::out);
@@ -783,6 +798,12 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, desertSize, Real);
     READ_CONF_VALUE(variation, jungleSize, Real);
     READ_CONF_VALUE(variation, surfaceAmplitude, Real);
+    READ_CONF_VALUE(variation, theConstant, Boolean);
+    READ_CONF_VALUE(variation, getFixedBoi, Boolean);
+    READ_CONF_VALUE(variation, skyblock, Boolean);
+    READ_CONF_VALUE(variation, endlessHalloween, Boolean);
+    READ_CONF_VALUE(variation, endlessChristmas, Boolean);
+    READ_CONF_VALUE(variation, vampirism, Boolean);
     READ_CONF_VALUE(extra, map, Boolean);
     return conf;
 }

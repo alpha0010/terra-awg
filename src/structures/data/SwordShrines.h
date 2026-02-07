@@ -6,7 +6,7 @@
 namespace Data
 {
 
-TileBuffer getSwordShrine(const std::vector<bool> &framedTiles);
+TileBuffer getSwordShrine(const FramedBitset &framedTiles);
 
 } // namespace Data
 

@@ -492,7 +492,7 @@ bool convertFurniture(Tile &tile, Variant furnitureSet)
 }
 
 TileBuffer
-getFurniture(int id, Variant furnitureSet, const std::vector<bool> &framedTiles)
+getFurniture(int id, Variant furnitureSet, const FramedBitset &framedTiles)
 {
     TileBuffer data{furnitureData[id].data(), framedTiles};
     for (int i = 0; i < data.getWidth(); ++i) {
@@ -512,7 +512,7 @@ getFurniture(int id, Variant furnitureSet, const std::vector<bool> &framedTiles)
 }
 
 TileBuffer
-getChainLantern(::Variant lanternStyle, const std::vector<bool> &framedTiles)
+getChainLantern(::Variant lanternStyle, const FramedBitset &framedTiles)
 {
     switch (lanternStyle) {
     case ::Variant::alchemy:

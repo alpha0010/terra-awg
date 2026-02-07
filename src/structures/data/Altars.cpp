@@ -231,7 +231,7 @@ std::vector<std::vector<uint16_t>> altarData{
 namespace Data
 {
 
-TileBuffer getAltar(int altarId, const std::vector<bool> &framedTiles)
+TileBuffer getAltar(int altarId, const FramedBitset &framedTiles)
 {
     return {altarData[altarId].data(), framedTiles};
 }

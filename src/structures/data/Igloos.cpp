@@ -737,7 +737,7 @@ std::vector<std::vector<uint16_t>> iglooData{
 namespace Data
 {
 
-TileBuffer getIgloo(int iglooId, const std::vector<bool> &framedTiles)
+TileBuffer getIgloo(int iglooId, const FramedBitset &framedTiles)
 {
     return {iglooData[iglooId].data(), framedTiles};
 }

@@ -10,7 +10,7 @@ namespace Data
 inline auto balloons = std::views::iota(0, 11);
 
 TileBuffer
-getBalloon(int id, int tileId, int paint, const std::vector<bool> &framedTiles);
+getBalloon(int id, int tileId, int paint, const FramedBitset &framedTiles);
 
 } // namespace Data
 

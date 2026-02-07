@@ -1549,7 +1549,7 @@ std::vector<std::vector<uint16_t>> skyBoxData{
 namespace Data
 {
 
-TileBuffer getSkyBox(int skyBoxId, const std::vector<bool> &framedTiles)
+TileBuffer getSkyBox(int skyBoxId, const FramedBitset &framedTiles)
 {
     return {skyBoxData[skyBoxId].data(), framedTiles};
 }

@@ -629,7 +629,7 @@ std::vector<std::vector<uint16_t>> roomData{
 namespace Data
 {
 
-TileBuffer getRoom(int roomId, const std::vector<bool> &framedTiles)
+TileBuffer getRoom(int roomId, const FramedBitset &framedTiles)
 {
     return {roomData[roomId].data(), framedTiles};
 }

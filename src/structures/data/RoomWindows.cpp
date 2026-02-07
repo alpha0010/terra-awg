@@ -29,7 +29,7 @@ TileBuffer getWindow(
     Window windowId,
     int frameBlockId,
     int paneWallId,
-    const std::vector<bool> &framedTiles)
+    const FramedBitset &framedTiles)
 {
     TileBuffer data{windowData[static_cast<int>(windowId)].data(), framedTiles};
     for (int i = 0; i < data.getWidth(); ++i) {

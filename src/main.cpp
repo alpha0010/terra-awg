@@ -140,6 +140,7 @@ void writeNPC(
     w.putUint32(pos.y);             // NPC home Y.
     w.putBool(true);                // Has variation field.
     w.putUint32(npcVariation);      // NPC variation.
+    w.putBool(false);               // Despawn if homeless.
 }
 
 void saveWorldFile(Config &conf, Random &rnd, World &world)
@@ -147,7 +148,7 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     Seed special = determineSeed(conf);
 
     Writer w(conf.getFilename() + ".wld");
-    w.putUint32(279); // File format version.
+    w.putUint32(317); // File format version.
     w.write("relogic", 7);
     w.putUint8(2);    // File type "world".
     w.putUint32(1);   // Save revision.
@@ -162,7 +163,7 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
 
     w.putString(conf.name);     // Map name.
     w.putString(conf.seed);     // Seed.
-    w.putUint64(1198295875585); // Generator version.
+    w.putUint64(1361504632833); // Generator version.
     for (int i = 0; i < 16; ++i) {
         w.putUint8(rnd.getByte()); // GUID.
     }
@@ -175,15 +176,17 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     w.putUint32(world.getHeight());                // Vertical tiles.
     w.putUint32(world.getWidth());                 // Horizontal tiles.
     w.putUint32(static_cast<uint32_t>(conf.mode)); // Game mode.
-    w.putBool(special == Seed::drunkWorld);        // Drunk world.
-    w.putBool(special == Seed::forTheWorthy);      // For the worthy.
-    w.putBool(special == Seed::celebrationmk10);   // Celebrationmk10.
-    w.putBool(special == Seed::theConstant);       // The constant.
-    w.putBool(special == Seed::notTheBees);        // Not the bees.
-    w.putBool(special == Seed::dontDigUp);         // Don't dig up.
-    w.putBool(special == Seed::noTraps);           // No traps.
-    w.putBool(special == Seed::getFixedBoi);       // Get fixed boi.
+    w.putBool(conf.doubleTrouble);                 // Drunk world.
+    w.putBool(conf.forTheWorthy);                  // For the worthy.
+    w.putBool(conf.celebration);                   // Celebrationmk10.
+    w.putBool(conf.theConstant);                   // The constant.
+    w.putBool(conf.hiveQueen);                     // Not the bees.
+    w.putBool(conf.dontDigUp);                     // Don't dig up.
+    w.putBool(conf.traps > 14);                    // No traps.
+    w.putBool(conf.getFixedBoi);                   // Get fixed boi.
+    w.putBool(conf.skyblock);                      // Skyblock.
     w.putUint64(getBinaryTime());                  // Creation time.
+    w.putUint64(getBinaryTime());                  // Last played time.
     w.putUint8(rnd.getInt(0, 8));                  // Moon type.
     for (auto part : rnd.partitionRange(4, world.getWidth())) {
         w.putUint32(part); // Tree style change locations.
@@ -251,9 +254,13 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     w.putBool(false);                      // Saved golfer.
     w.putUint32(0);                        // Invasion start size.
     w.putUint32(0);                        // Cultist delay.
-    w.putUint16(688);                      // Mob types.
-    for (int i = 0; i < 688; ++i) {
+    w.putUint16(293);                      // Mob types.
+    for (int i = 0; i < 293; ++i) {
         w.putUint32(0); // Mob kill tally.
+    }
+    w.putUint16(293);
+    for (int i = 0; i < 293; ++i) {
+        w.putUint16(0); // Claimable banners.
     }
     for (int i = 0; i < 19; ++i) {
         w.putBool(false); // Bosses.
@@ -314,7 +321,17 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     for (bool unlock : unlocks) {
         w.putBool(unlock); // Bosses and npc saves.
     }
-    w.putUint8(0); // Moondial cooldown.
+    w.putUint8(0);                    // Moondial cooldown.
+    w.putBool(conf.endlessHalloween); // Endless halloween.
+    w.putBool(conf.endlessChristmas); // Endless christmas.
+    w.putBool(conf.vampirism);        // Vampirism.
+    w.putBool(false);                 // Infected world.
+    w.putUint32(0);                   // Meteor shower count.
+    w.putUint32(0);                   // Coin rain.
+    w.putBool(false);                 // Team based spawns.
+    w.putUint8(0);                    // Num extra spawn points.
+    w.putBool(false);                 // Dual dungeons.
+    w.putString("");                  // Worldgen manifest.
     sectionPointers.push_back(w.tellp());
 
     std::vector<std::pair<int, int>> sensors;
@@ -452,11 +469,11 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     sectionPointers.push_back(w.tellp());
 
     w.putUint16(world.getChests().size()); // Number of chests.
-    w.putUint16(40);                       // Slots per chest.
     for (auto &chest : world.getChests()) {
-        w.putUint32(chest.x); // Chest position X.
-        w.putUint32(chest.y); // Chest position Y.
-        w.putString("");      // Chest name.
+        w.putUint32(chest.x);            // Chest position X.
+        w.putUint32(chest.y);            // Chest position Y.
+        w.putString("");                 // Chest name.
+        w.putUint32(chest.items.size()); // Chest slots.
         for (auto &item : chest.items) {
             w.putUint16(item.stack); // Item stack count.
             if (item.stack > 0) {

@@ -8,7 +8,7 @@ namespace Data
 
 enum class Boat { frozen = 0 };
 
-TileBuffer getBoat(Boat boatId, const std::vector<bool> &framedTiles);
+TileBuffer getBoat(Boat boatId, const FramedBitset &framedTiles);
 
 } // namespace Data
 

@@ -31,13 +31,11 @@ inline auto furnitureLayouts = std::views::iota(0, 29);
 
 bool convertFurniture(Tile &tile, Variant furnitureSet);
 
-TileBuffer getFurniture(
-    int id,
-    Variant furnitureSet,
-    const std::vector<bool> &framedTiles);
+TileBuffer
+getFurniture(int id, Variant furnitureSet, const FramedBitset &framedTiles);
 
 TileBuffer
-getChainLantern(::Variant lanternStyle, const std::vector<bool> &framedTiles);
+getChainLantern(::Variant lanternStyle, const FramedBitset &framedTiles);
 
 } // namespace Data
 

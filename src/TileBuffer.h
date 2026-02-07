@@ -2,6 +2,7 @@
 #define TILEBUFFER_H
 
 #include "Tile.h"
+#include "ids/FramedTiles.h"
 #include <cstdint>
 #include <vector>
 
@@ -17,7 +18,7 @@ public:
     /**
      * Max dimensions supported by data format are 255x255 tiles.
      */
-    TileBuffer(const uint16_t *data, const std::vector<bool> &framedTiles);
+    TileBuffer(const uint16_t *data, const FramedBitset &framedTiles);
 
     Tile &getTile(int x, int y);
 

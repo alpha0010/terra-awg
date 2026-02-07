@@ -10,7 +10,7 @@ namespace Data
 inline auto corruptAltars = std::views::iota(0, 6);
 inline auto crimsonAltars = std::views::iota(6, 12);
 
-TileBuffer getAltar(int altarId, const std::vector<bool> &framedTiles);
+TileBuffer getAltar(int altarId, const FramedBitset &framedTiles);
 
 } // namespace Data
 

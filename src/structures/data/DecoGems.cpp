@@ -37,7 +37,7 @@ std::vector<std::vector<uint16_t>> gemData{
 namespace Data
 {
 
-TileBuffer getDecoGem(int gemId, const std::vector<bool> &framedTiles)
+TileBuffer getDecoGem(int gemId, const FramedBitset &framedTiles)
 {
     return {gemData[gemId].data(), framedTiles};
 }

@@ -168,7 +168,7 @@ namespace Data
 TileBuffer getDungeonRoom(
     Room roomId,
     Variant furnitureSet,
-    const std::vector<bool> &framedTiles)
+    const FramedBitset &framedTiles)
 {
     TileBuffer data{roomData[static_cast<int>(roomId)].data(), framedTiles};
     int themeBrick = TileID::blueBrick;

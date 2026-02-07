@@ -115,7 +115,7 @@ std::vector<std::vector<uint16_t>> wreckData{
 namespace Data
 {
 
-TileBuffer getWreck(int wreckId, const std::vector<bool> &framedTiles)
+TileBuffer getWreck(int wreckId, const FramedBitset &framedTiles)
 {
     return {wreckData[wreckId].data(), framedTiles};
 }

@@ -9,7 +9,7 @@ namespace Data
 
 inline auto mushrooms = std::views::iota(0, 14);
 
-TileBuffer getMushroom(int mushroomId, const std::vector<bool> &framedTiles);
+TileBuffer getMushroom(int mushroomId, const FramedBitset &framedTiles);
 
 } // namespace Data
 

@@ -6,7 +6,7 @@
 namespace Data
 {
 
-TileBuffer getBridge(const std::vector<bool> &framedTiles);
+TileBuffer getBridge(const FramedBitset &framedTiles);
 
 } // namespace Data
 

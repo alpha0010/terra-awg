@@ -9,7 +9,7 @@ namespace Data
 
 inline auto skyBoxes = std::views::iota(0, 51);
 
-TileBuffer getSkyBox(int skyBoxId, const std::vector<bool> &framedTiles);
+TileBuffer getSkyBox(int skyBoxId, const FramedBitset &framedTiles);
 
 } // namespace Data
 

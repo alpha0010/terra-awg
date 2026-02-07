@@ -327,7 +327,7 @@ std::vector<std::vector<uint16_t>> homeData{
 namespace Data
 {
 
-TileBuffer getHome(int homeId, const std::vector<bool> &framedTiles)
+TileBuffer getHome(int homeId, const FramedBitset &framedTiles)
 {
     return {homeData[homeId].data(), framedTiles};
 }

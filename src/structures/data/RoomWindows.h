@@ -12,7 +12,7 @@ TileBuffer getWindow(
     Window windowId,
     int frameBlockId,
     int paneWallId,
-    const std::vector<bool> &framedTiles);
+    const FramedBitset &framedTiles);
 
 } // namespace Data
 
