@@ -1178,6 +1178,114 @@ void placeDirtiestBlocks(Random &rnd, World &world)
     }
 }
 
+void placePals(int maxBin, LocationBins &locations, Random &rnd, World &world)
+{
+    int digtoiseCount =
+        world.getWidth() * world.getHeight() / rnd.getInt(1646000, 2304000);
+    std::vector<Point> usedLocations;
+    while (digtoiseCount > 0) {
+        int binId = rnd.getInt(0, maxBin);
+        if (locations[binId].empty()) {
+            continue;
+        }
+        auto [x, y] = rnd.select(locations[binId]);
+        if (y < world.getUndergroundLevel() ||
+            !world.regionPasses(
+                x,
+                y - 2,
+                2,
+                3,
+                [](Tile &tile) {
+                    return tile.liquid == Liquid::none &&
+                           (tile.wallID == WallID::Unsafe::sandstone ||
+                            tile.wallID == WallID::Unsafe::hardenedSand);
+                }) ||
+            isLocationUsed(x, y, 20, usedLocations)) {
+            continue;
+        }
+        usedLocations.emplace_back(x, y);
+        if (isPlacementCandidate(x, y, world)) {
+            world.placeFramedTile(x, y - 2, TileID::sleepingDigtoise);
+            --digtoiseCount;
+        }
+    }
+
+    int eggCount =
+        world.getWidth() * world.getHeight() / rnd.getInt(1212000, 1772000);
+    constexpr auto allowedTiles = frozen::make_set<int>(
+        {TileID::dirt,
+         TileID::stone,
+         TileID::ebonstone,
+         TileID::crimstone,
+         TileID::pearlstone,
+         TileID::grass,
+         TileID::corruptGrass,
+         TileID::crimsonGrass,
+         TileID::hallowedGrass,
+         TileID::mushroomGrass,
+         TileID::ashGrass,
+         TileID::mud});
+    while (eggCount > 0) {
+        int binId = rnd.getInt(0, maxBin);
+        if (locations[binId].empty()) {
+            continue;
+        }
+        auto [x, y] = rnd.select(locations[binId]);
+        if (y < world.getCavernLevel() ||
+            y > world.getUnderworldLevel() - (world.conf.ascent ? 150 : 0) ||
+            world.getTile(x, y - 1).liquid != Liquid::none ||
+            !world.regionPasses(
+                x - 1,
+                y,
+                4,
+                1,
+                [&allowedTiles](Tile &tile) {
+                    return allowedTiles.contains(tile.blockID);
+                }) ||
+            isLocationUsed(x, y, 40, usedLocations)) {
+            continue;
+        }
+        usedLocations.emplace_back(x, y);
+        if (isPlacementCandidate(x, y, world)) {
+            world.placeFramedTile(x, y - 2, TileID::hugeDragonEgg);
+            for (int i = -5; i < 7; ++i) {
+                for (int j = -2; j < 2; ++j) {
+                    if (!allowedTiles.contains(
+                            world.getTile(x + i, y + j + 1).blockID)) {
+                        continue;
+                    }
+                    Tile &tile = world.getTile(x + i, y + j);
+                    if (tile.blockID != TileID::empty) {
+                        continue;
+                    }
+                    if (!attachGemTo(
+                            rnd.select(
+                                {Gem::sapphire,
+                                 Gem::emerald,
+                                 Gem::ruby,
+                                 Gem::diamond}),
+                            x + i,
+                            y + j + 1,
+                            rnd,
+                            world)) {
+                        switch (rnd.getInt(0, 5)) {
+                        case 0:
+                            tile.blockID = TileID::silverCoin;
+                            break;
+                        case 1:
+                            tile.blockID = TileID::goldCoin;
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                }
+            }
+            --eggCount;
+        }
+    }
+}
+
 LocationBins genTreasure(Random &rnd, World &world)
 {
     std::cout << "Cataloging ground\n";
@@ -1237,5 +1345,6 @@ LocationBins genTreasure(Random &rnd, World &world)
     placePots(maxBin, flatLocations, rnd, world);
     placeGems(rnd, world);
     placeDirtiestBlocks(rnd, world);
+    placePals(maxBin, flatLocations, rnd, world);
     return flatLocations;
 }
