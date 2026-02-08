@@ -69,7 +69,16 @@ enum {
     violent = 80,
     legendary = 81,
     unreal = 82,
-    mythical = 83
+    mythical = 83,
+    fabled = 85,
+    loyal = 86,
+    worthy = 87,
+    focused = 88,
+    patient = 89,
+    illTempered = 91,
+    eager = 95,
+    ballistic = 96,
+    scraggling = 97
 };
 }
 
@@ -84,6 +93,7 @@ extern std::vector<int> melee;
 extern std::vector<int> ranged;
 extern std::vector<int> magic;
 extern std::vector<int> magiclownokb;
+extern std::vector<int> summon;
 } // namespace PrefixSet
 
 #endif // PREFIX_H

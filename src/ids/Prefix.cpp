@@ -108,6 +108,18 @@ std::vector<int> magiclownokb{
     Prefix::murderous,
 };
 
+std::vector<int> summon{
+    Prefix::none,          Prefix::keen,        Prefix::superior,
+    Prefix::forceful,      Prefix::hurtful,     Prefix::strong,
+    Prefix::unpleasant,    Prefix::ruthless,    Prefix::godly,
+    Prefix::demonic,       Prefix::zealous,     Prefix::quick_common,
+    Prefix::deadly_common, Prefix::agile,       Prefix::nimble,
+    Prefix::murderous,     Prefix::nasty,       Prefix::fabled,
+    Prefix::loyal,         Prefix::worthy,      Prefix::focused,
+    Prefix::patient,       Prefix::illTempered, Prefix::eager,
+    Prefix::ballistic,     Prefix::scraggling,
+};
+
 void initCelebration()
 {
     accessory = {
@@ -128,5 +140,6 @@ void initCelebration()
     ranged = {Prefix::godly, Prefix::deadly_ranged, Prefix::unreal};
     magic = {Prefix::godly, Prefix::masterful, Prefix::mythical};
     magiclownokb = {Prefix::demonic, Prefix::deadly_common, Prefix::murderous};
+    summon = {Prefix::godly, Prefix::eager, Prefix::fabled};
 }
 } // namespace PrefixSet

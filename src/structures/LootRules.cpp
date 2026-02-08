@@ -123,6 +123,29 @@ std::pair<double, Item> getGlobalItemPotion(World &world)
         {ItemID::redPotion, Prefix::none, 1}};
 }
 
+std::pair<double, Item> getGlobalItemVanitySound(Random &rnd)
+{
+    return {
+        1.0 / 12,
+        {rnd.select(
+             {ItemID::balloonyBeads,
+              ItemID::catChime,
+              ItemID::chickenCharm,
+              ItemID::cowBell,
+              ItemID::crowsBeak,
+              ItemID::dogCollar,
+              ItemID::fairyChoker,
+              ItemID::froggyNeckband,
+              ItemID::goatsTuft,
+              ItemID::grimOldBarb,
+              ItemID::meanGoblinsSpikes,
+              ItemID::oldCompanionLocket,
+              ItemID::turkeyWattleNecklace,
+              ItemID::vampirePendant}),
+         Prefix::none,
+         1}};
+}
+
 std::pair<double, Item> getCavernBonusItem(int y, Random &rnd, World &world)
 {
     if (y < (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3) {
@@ -303,7 +326,8 @@ void fillSurfaceChest(Chest &chest, int torchID, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(10, 20)}},
          {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
-         {0.5, {ItemID::wood, Prefix::none, rnd.getInt(50, 99)}}});
+         {0.5, {ItemID::wood, Prefix::none, rnd.getInt(50, 99)}},
+         getGlobalItemVanitySound(rnd)});
 }
 
 void fillSurfaceAshWoodChest(Chest &chest, Random &rnd, World &world)
@@ -351,7 +375,8 @@ void fillSurfaceAshWoodChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(10, 20)}},
          {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
-         {0.5, {ItemID::ashWood, Prefix::none, rnd.getInt(50, 99)}}});
+         {0.5, {ItemID::ashWood, Prefix::none, rnd.getInt(50, 99)}},
+         getGlobalItemVanitySound(rnd)});
 }
 
 void fillSurfaceFrozenChest(Chest &chest, Random &rnd, World &world)
@@ -405,7 +430,8 @@ void fillSurfaceFrozenChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(10, 20)}},
          {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
-         {0.5, {ItemID::borealWood, Prefix::none, rnd.getInt(50, 99)}}});
+         {0.5, {ItemID::borealWood, Prefix::none, rnd.getInt(50, 99)}},
+         getGlobalItemVanitySound(rnd)});
 }
 
 void fillLivingWoodChest(Chest &chest, Random &rnd, World &world)
@@ -434,13 +460,14 @@ void fillLivingWoodChest(Chest &chest, Random &rnd, World &world)
                          1},
                     }),
                     {ItemID::livingWoodWand, Prefix::none, 1},
-                    {ItemID::finchStaff, rnd.select(PrefixSet::magic), 1},
+                    {ItemID::finchStaff, rnd.select(PrefixSet::summon), 1},
                 })},
          getGlobalItemPrimary(rnd, world),
-         {0.1,
+         {1.0 / 6,
           {rnd.select({ItemID::sunflowerMinecart, ItemID::ladybugMinecart}),
            Prefix::none,
            1}},
+         {1.0 / 6, {ItemID::acornSlingshot, rnd.select(PrefixSet::ranged), 1}},
          {1.0 / 6, {ItemID::glowstick, Prefix::none, rnd.getInt(40, 75)}},
          {1.0 / 6, {ItemID::throwingKnife, Prefix::none, rnd.getInt(150, 300)}},
          {0.4,
@@ -479,7 +506,8 @@ void fillLivingWoodChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(10, 20)}},
          {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
-         {0.5, {ItemID::wood, Prefix::none, rnd.getInt(50, 99)}}});
+         {0.5, {ItemID::wood, Prefix::none, rnd.getInt(50, 99)}},
+         getGlobalItemVanitySound(rnd)});
 }
 
 void fillSurfaceMushroomChest(Chest &chest, Random &rnd, World &world)
@@ -531,7 +559,8 @@ void fillSurfaceMushroomChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(10, 20)}},
          {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
-         {0.5, {ItemID::glowingMushroom, Prefix::none, rnd.getInt(50, 99)}}});
+         {0.5, {ItemID::glowingMushroom, Prefix::none, rnd.getInt(50, 99)}},
+         getGlobalItemVanitySound(rnd)});
 }
 
 void fillSurfacePalmWoodChest(Chest &chest, Random &rnd, World &world)
@@ -600,7 +629,8 @@ void fillSurfacePalmWoodChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(10, 20)}},
          {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
-         {0.5, {ItemID::palmWood, Prefix::none, rnd.getInt(50, 99)}}});
+         {0.5, {ItemID::palmWood, Prefix::none, rnd.getInt(50, 99)}},
+         getGlobalItemVanitySound(rnd)});
 }
 
 void fillSurfacePearlwoodChest(Chest &chest, Random &rnd, World &world)
@@ -648,7 +678,8 @@ void fillSurfacePearlwoodChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(10, 20)}},
          {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
-         {0.5, {ItemID::pearlwood, Prefix::none, rnd.getInt(50, 99)}}});
+         {0.5, {ItemID::pearlwood, Prefix::none, rnd.getInt(50, 99)}},
+         getGlobalItemVanitySound(rnd)});
 }
 
 void fillSurfaceRichMahoganyChest(Chest &chest, Random &rnd, World &world)
@@ -697,7 +728,8 @@ void fillSurfaceRichMahoganyChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(10, 20)}},
          {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
-         {0.5, {ItemID::richMahogany, Prefix::none, rnd.getInt(50, 99)}}});
+         {0.5, {ItemID::richMahogany, Prefix::none, rnd.getInt(50, 99)}},
+         getGlobalItemVanitySound(rnd)});
 }
 
 void fillSurfaceWaterChest(Chest &chest, Random &rnd, World &world)
@@ -751,8 +783,8 @@ void fillSurfaceWaterChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(10, 20)}},
          {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(10, 29)}},
-         {nearEdge ? 0.5 : 0,
-          {ItemID::coral, Prefix::none, rnd.getInt(3, 5)}}});
+         {nearEdge ? 0.5 : 0, {ItemID::coral, Prefix::none, rnd.getInt(3, 5)}},
+         getGlobalItemVanitySound(rnd)});
 }
 
 void fillUndergroundChest(
@@ -807,6 +839,7 @@ void fillUndergroundChest(
             {0.5, {torchID, Prefix::none, rnd.getInt(10, 20)}},
             {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
             {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(50, 89)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -859,6 +892,7 @@ void fillUndergroundFrozenChest(Chest &chest, Random &rnd, World &world)
             {0.5, {ItemID::iceTorch, Prefix::none, rnd.getInt(10, 20)}},
             {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
             {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(50, 89)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -908,6 +942,7 @@ void fillUndergroundHoneyChest(Chest &chest, Random &rnd, World &world)
             {0.5, {ItemID::jungleTorch, Prefix::none, rnd.getInt(10, 20)}},
             {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
             {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(50, 89)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -922,6 +957,7 @@ void fillUndergroundIvyChest(Chest &chest, Random &rnd, World &world)
             {1.0 / 6, {ItemID::livingMahoganyWand, Prefix::none, 1}},
             {0.1, {ItemID::beeMinecart, Prefix::none, 1}},
             {0.2, {ItemID::honeyDispenser, Prefix::none, 1}},
+            {0.1, {ItemID::cursedPiperFlute, Prefix::none, 1}},
             {0.05, {ItemID::extractinator, Prefix::none, 1}},
             {0.05, {ItemID::flareGun, Prefix::none, 1}},
             {1.0 / 3, {ItemID::bomb, Prefix::none, rnd.getInt(10, 19)}},
@@ -960,6 +996,7 @@ void fillUndergroundIvyChest(Chest &chest, Random &rnd, World &world)
             {0.5, {ItemID::jungleTorch, Prefix::none, rnd.getInt(10, 20)}},
             {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
             {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(50, 89)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -1012,6 +1049,7 @@ void fillUndergroundMushroomChest(Chest &chest, Random &rnd, World &world)
             {0.5, {ItemID::mushroomTorch, Prefix::none, rnd.getInt(10, 20)}},
             {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
             {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(50, 89)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -1060,6 +1098,7 @@ void fillUndergroundPearlwoodChest(Chest &chest, Random &rnd, World &world)
             {0.5, {ItemID::hallowedTorch, Prefix::none, rnd.getInt(10, 20)}},
             {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
             {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(50, 89)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -1126,6 +1165,7 @@ void fillUndergroundSandstoneChest(Chest &chest, Random &rnd, World &world)
             {0.5, {ItemID::desertTorch, Prefix::none, rnd.getInt(10, 20)}},
             {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
             {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(50, 89)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -1175,6 +1215,7 @@ void fillUndergroundRichMahoganyChest(Chest &chest, Random &rnd, World &world)
             {0.5, {ItemID::jungleTorch, Prefix::none, rnd.getInt(10, 20)}},
             {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
             {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(50, 89)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -1233,6 +1274,7 @@ void fillUndergroundWaterChest(Chest &chest, Random &rnd, World &world)
              {ItemID::coral, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(1, 2)}},
             {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(50, 89)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -1296,6 +1338,7 @@ void fillCavernChest(
               Prefix::none,
               rnd.getInt(15, 29)}},
             {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -1311,7 +1354,7 @@ void fillCavernFrozenChest(Chest &chest, Random &rnd, World &world)
             {0.02, {ItemID::fish, Prefix::none, 1}},
             {1.0 / 7, {ItemID::iceMachine, Prefix::none, 1}},
             {0.2, {ItemID::iceMirror, Prefix::none, 1}},
-            {0.2, {ItemID::suspiciousLookingEye, Prefix::none, 1}},
+            {0.2, {ItemID::deerThing, Prefix::none, 1}},
             {1.0 / 3, {ItemID::dynamite, Prefix::none, 1}},
             {0.25, {ItemID::jestersArrow, Prefix::none, rnd.getInt(25, 50)}},
             {0.5,
@@ -1356,6 +1399,7 @@ void fillCavernFrozenChest(Chest &chest, Random &rnd, World &world)
               Prefix::none,
               rnd.getInt(15, 29)}},
             {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -1414,6 +1458,7 @@ void fillCavernHoneyChest(Chest &chest, Random &rnd, World &world)
               Prefix::none,
               rnd.getInt(15, 29)}},
             {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -1428,6 +1473,7 @@ void fillCavernIvyChest(Chest &chest, Random &rnd, World &world)
             {1.0 / 6, {ItemID::livingMahoganyWand, Prefix::none, 1}},
             {0.1, {ItemID::beeMinecart, Prefix::none, 1}},
             {0.2, {ItemID::honeyDispenser, Prefix::none, 1}},
+            {0.1, {ItemID::cursedPiperFlute, Prefix::none, 1}},
             getCavernBonusItem(chest.y, rnd, world),
             {0.2, {ItemID::suspiciousLookingEye, Prefix::none, 1}},
             {1.0 / 3, {ItemID::dynamite, Prefix::none, 1}},
@@ -1475,6 +1521,7 @@ void fillCavernIvyChest(Chest &chest, Random &rnd, World &world)
               Prefix::none,
               rnd.getInt(15, 29)}},
             {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -1535,6 +1582,7 @@ void fillCavernMushroomChest(Chest &chest, Random &rnd, World &world)
               Prefix::none,
               rnd.getInt(15, 29)}},
             {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -1591,6 +1639,7 @@ void fillCavernPearlwoodChest(Chest &chest, Random &rnd, World &world)
               Prefix::none,
               rnd.getInt(15, 29)}},
             {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -1662,6 +1711,7 @@ void fillCavernSandstoneChest(Chest &chest, Random &rnd, World &world)
               Prefix::none,
               rnd.getInt(15, 29)}},
             {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -1673,6 +1723,7 @@ void fillCavernRichMahoganyChest(Chest &chest, Random &rnd, World &world)
         {
             {1, getCavernPrimaryLoot(rnd, world)},
             getGlobalItemPrimary(rnd, world),
+            {0.1, {ItemID::cursedPiperFlute, Prefix::none, 1}},
             getCavernBonusItem(chest.y, rnd, world),
             {0.2, {ItemID::suspiciousLookingEye, Prefix::none, 1}},
             {1.0 / 3, {ItemID::dynamite, Prefix::none, 1}},
@@ -1720,6 +1771,7 @@ void fillCavernRichMahoganyChest(Chest &chest, Random &rnd, World &world)
               Prefix::none,
               rnd.getInt(15, 29)}},
             {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -1783,6 +1835,7 @@ void fillCavernWaterChest(Chest &chest, Random &rnd, World &world)
               Prefix::none,
               rnd.getInt(15, 29)}},
             {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -1953,6 +2006,7 @@ void fillShadowChest(Chest &chest, Random &rnd, World &world)
               Prefix::none,
               rnd.getInt(15, 29)}},
             {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(2, 4)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -2069,6 +2123,7 @@ void fillWebCoveredChest(Chest &chest, Random &rnd, World &world)
               Prefix::none,
               rnd.getInt(15, 29)}},
             {0.5, {ItemID::goldCoin, Prefix::none, rnd.getInt(1, 2)}},
+            getGlobalItemVanitySound(rnd),
         });
 }
 
@@ -2153,6 +2208,9 @@ void fillDungeonChest(Chest &chest, Random &rnd, World &world)
              })},
             getGlobalItemPrimary(rnd, world),
             {1.0 / 3, {ItemID::shadowKey, Prefix::none, 1}},
+            {0.125, {ItemID::ramRune, rnd.select(PrefixSet::accessory), 1}},
+            {world.conf.forTheWorthy || world.conf.getFixedBoi ? 0.2 : 0,
+             {ItemID::moonLordTorso, Prefix::none, 1}},
             {0.125, {ItemID::boneWelder, Prefix::none, 1}},
             {0.2,
              {rnd.select({ItemID::suspiciousLookingEye, ItemID::slimeCrown}),
@@ -2215,6 +2273,8 @@ void fillDungeonBiomeChest(
         rnd,
         {{1, primaryItem},
          getGlobalItemPrimary(rnd, world),
+         {world.conf.forTheWorthy || world.conf.getFixedBoi ? 0.2 : 0,
+          {ItemID::moonLordTorso, Prefix::none, 1}},
          {1, {dye, Prefix::none, rnd.getInt(3, 6)}},
          {0.5, {ItemID::remnantsOfDevotion, Prefix::none, 1}},
          {1,
@@ -2415,20 +2475,13 @@ void fillStarterChestDebug(Chest &chest, Random &rnd, World &world)
         chest,
         rnd,
         {
-            {1, {ItemID::zenith, Prefix::legendary, 1}},
-            {1, {ItemID::zenith, Prefix::legendary, 1}},
-            {1, {ItemID::picksaw, Prefix::legendary, 1}},
-            {1, {ItemID::picksaw, Prefix::legendary, 1}},
-            {1, {ItemID::valhallaKnightsHelm, Prefix::none, 1}},
-            {1, {ItemID::valhallaKnightsBreastplate, Prefix::none, 1}},
-            {1, {ItemID::valhallaKnightsGreaves, Prefix::none, 1}},
-            {1, {ItemID::valhallaKnightsHelm, Prefix::none, 1}},
-            {1, {ItemID::valhallaKnightsBreastplate, Prefix::none, 1}},
-            {1, {ItemID::valhallaKnightsGreaves, Prefix::none, 1}},
-            {1, {ItemID::witchsBroom, Prefix::none, 1}},
-            {1, {ItemID::witchsBroom, Prefix::none, 1}},
-            {1, {ItemID::theGrandDesign, Prefix::none, 1}},
-            {1, {ItemID::theGrandDesign, Prefix::none, 1}},
+            {1, {ItemID::zenith, Prefix::legendary, 2}},
+            {1, {ItemID::picksaw, Prefix::legendary, 2}},
+            {1, {ItemID::valhallaKnightsHelm, Prefix::none, 2}},
+            {1, {ItemID::valhallaKnightsBreastplate, Prefix::none, 2}},
+            {1, {ItemID::valhallaKnightsGreaves, Prefix::none, 2}},
+            {1, {ItemID::witchsBroom, Prefix::none, 2}},
+            {1, {ItemID::theGrandDesign, Prefix::none, 2}},
             {1,
              {world.ironVariant == TileID::ironOre ? ItemID::ironBar
                                                    : ItemID::leadBar,
@@ -2498,6 +2551,7 @@ void fillDresser(Chest &chest, Random &rnd)
               Prefix::none,
               1}},
             {1, {ItemID::book, Prefix::none, rnd.getInt(3, 5)}},
+            {0.3, {ItemID::prettyMirror, Prefix::none, 1}},
             {0.5, {ItemID::silverCoin, Prefix::none, rnd.getInt(1, 2)}},
             {0.5, {ItemID::cobweb, Prefix::none, rnd.getInt(10, 29)}},
         });
