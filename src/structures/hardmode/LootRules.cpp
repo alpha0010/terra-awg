@@ -31,6 +31,22 @@ void swapEvilArrows(int x, int y, Item &item, World &world)
     }
 }
 
+void boostCoins(Item &item)
+{
+    if (item.id == ItemID::silverCoin) {
+        if (item.stack > 65) {
+            item.id = ItemID::goldCoin;
+            item.stack = 1;
+        } else if (item.stack > 8) {
+            item.stack *= 1.5;
+        } else if (item.stack > 3) {
+            item.stack += 1;
+        }
+    } else if (item.id == ItemID::goldCoin && item.stack < 5) {
+        item.stack += 1;
+    }
+}
+
 void applyHardmodeLoot(World &world)
 {
     std::cout << "Compounding interest\n";
@@ -111,6 +127,7 @@ void applyHardmodeLoot(World &world)
             }
             swapBottledHoney(chest.x, chest.y, item, world);
             swapEvilArrows(chest.x, chest.y, item, world);
+            boostCoins(item);
         }
     }
 }

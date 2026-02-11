@@ -271,6 +271,7 @@ enum {
     radar = 3084,
     herbBag = 3093,
     bouncyGlowstick = 3112,
+    bombFish = 3196,
     frostDaggerfish = 3197,
     iceMirror = 3199,
     spectreBar = 3261,
@@ -335,6 +336,7 @@ enum {
     mushroomHat = 4779,
     mushroomVest = 4780,
     mushroomPants = 4781,
+    wetBomb = 4824,
     honeyBomb = 4826,
     topazGemcorn = 4851,
     amethystGemcorn = 4852,
@@ -380,8 +382,11 @@ enum {
     vampirePendant = 5509,
     moonLordTorso = 5515,
     cursedPiperFlute = 5525,
+    theRunicPixie = 5528,
     fairyChoker = 5534,
+    freezeBomb = 5542,
     prettyMirror = 5577,
+    powerBomb = 5594,
     acornSlingshot = 5629,
 };
 }

@@ -63,6 +63,8 @@ void addCabinPainting(std::vector<Point> &locations, Random &rnd, World &world)
          Painting::findingGold,
          Painting::forestTroll,
          Painting::aHorribleNightForAlchemy,
+         Painting::bannerOfTheBeast,
+         Painting::bouldAndBash,
          Painting::catSword,
          Painting::crownoDevoursHisLunch,
          Painting::fairyGuides,
@@ -71,6 +73,7 @@ void addCabinPainting(std::vector<Point> &locations, Random &rnd, World &world)
          Painting::nurseLisa,
          Painting::outcast,
          Painting::rareEnchantment,
+         Painting::remix,
          Painting::terrarianGothic});
     auto [pWidth, pHeight] = world.getPaintingDims(painting);
     for (auto [x, y] : locations) {

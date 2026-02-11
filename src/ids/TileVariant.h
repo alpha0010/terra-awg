@@ -93,8 +93,10 @@ enum class Painting {
     wildflowers,
     // 3x3
     aHorribleNightForAlchemy,
+    bannerOfTheBeast,
     bloodMoonRising,
     boneWarp,
+    bouldAndBash,
     catSword,
     crownoDevoursHisLunch,
     discover,
@@ -111,6 +113,7 @@ enum class Painting {
     ominousPresence,
     outcast,
     rareEnchantment,
+    remix,
     shiningMoon,
     skelehead,
     skellingtonJSkellingsworth,
