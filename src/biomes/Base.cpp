@@ -360,6 +360,16 @@ void applyBaseTerrain(Random &rnd, World &world)
                             tile.blockID = TileID::hardenedSand;
                         }
                     }
+                    if (tile.blockID == TileID::sandstone &&
+                        std::abs(rnd.getCoarseNoise(x, 2 * y) + 0.1) > 0.51) {
+                        tile.blockID =
+                            static_cast<int>(
+                                99999 * (1 + rnd.getFineNoise(x, y))) %
+                                        7 <
+                                    5
+                                ? TileID::sand
+                                : TileID::hardenedSand;
+                    }
                     tile.wallID = tile.blockID == TileID::sandstone
                                       ? WallID::Unsafe::sandstone
                                       : WallID::Unsafe::hardenedSand;
