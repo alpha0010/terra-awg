@@ -289,6 +289,11 @@ enum {
     argonMossBrick = 688,
     kryptonMossBrick = 689,
     neonMossBrick = 691,
+    rainbowBoulder = 711,
+    lavaBoulder = 713,
+    spiderBoulder = 714,
+    ghoulder = 715,
+    friendlyBoulder = 716,
     sleepingDigtoise = 751,
     hugeDragonEgg = 752,
 };

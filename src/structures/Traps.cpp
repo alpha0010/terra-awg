@@ -283,11 +283,51 @@ Point selectBoulderLocation(Random &rnd, World &world)
     return {-1, -1};
 }
 
+int selectBoulderType(
+    int x,
+    int y,
+    int &remainingFriendly,
+    Random &rnd,
+    World &world)
+{
+    Tile &tile = world.getTile(x, y);
+    if (tile.blockID == TileID::sandstone) {
+        return TileID::rollingCactus;
+    } else if (
+        tile.blockID == TileID::slime || tile.blockID == TileID::pinkSlime ||
+        tile.wallID == WallID::Unsafe::mushroom) {
+        return TileID::bouncyBoulder;
+    } else if (!world.regionPasses(x - 12, y - 6, 26, 20, [](Tile &tile) {
+                   return tile.wallID != WallID::Unsafe::spider;
+               })) {
+        return TileID::spiderBoulder;
+    } else if (remainingFriendly > 0) {
+        --remainingFriendly;
+        return TileID::friendlyBoulder;
+    } else if (
+        makeSaferTraps(world) &&
+        rnd.getDouble(0, 1) < 0.1 / std::max(world.conf.traps, 1.0)) {
+        return rnd.getDouble(0, 1) < 0.3 ? TileID::rainbowBoulder
+                                         : TileID::lifeCrystalBoulder;
+    } else if (!world.regionPasses(x - 12, y - 8, 26, 26, [](Tile &tile) {
+                   return tile.liquid != Liquid::lava;
+               })) {
+        return TileID::lavaBoulder;
+    } else if (rnd.getDouble(0, 1) < 0.0124) {
+        return TileID::ghoulder;
+    } else if (rnd.getDouble(0, 1) < 0.02) {
+        return TileID::rainbowBoulder;
+    }
+    return TileID::boulder;
+}
+
 void placeBoulderTraps(Random &rnd, World &world)
 {
     int numBoulders = world.conf.traps * (world.conf.hiveQueen ? 0.65 : 1) *
                       world.getWidth() * world.getHeight() /
                       rnd.getInt(57600, 64000);
+    int numFriendly =
+        (2000000 + world.getWidth() * world.getHeight()) / 3300000;
     std::vector<Point> usedLocations;
     for (int tries = 5 * numBoulders; numBoulders > 0 && tries > 0; --tries) {
         auto [x, y] = selectBoulderLocation(rnd, world);
@@ -315,20 +355,10 @@ void placeBoulderTraps(Random &rnd, World &world)
             continue;
         }
         usedLocations.emplace_back(x, y);
-        int probeTileId = world.getTile(x, y).blockID;
-        int probeWallId = world.getTile(x, y).wallID;
         world.placeFramedTile(
             x,
             y,
-            probeTileId == TileID::sandstone ? TileID::rollingCactus
-            : probeTileId == TileID::slime ||
-                    probeTileId == TileID::pinkSlime ||
-                    probeWallId == WallID::Unsafe::mushroom
-                ? TileID::bouncyBoulder
-            : makeSaferTraps(world) &&
-                    rnd.getDouble(0, 1) < 0.1 / std::max(world.conf.traps, 1.0)
-                ? TileID::lifeCrystalBoulder
-                : TileID::boulder);
+            selectBoulderType(x, y, numFriendly, rnd, world));
         for (int i = -2; i < 4; ++i) {
             for (int j = -2; j < 4; ++j) {
                 world.getTile(x + i, y + j).guarded = true;
@@ -552,6 +582,9 @@ bool addChestBoulderTraps(int x, int y, Random &rnd, World &world)
         std::shuffle(traps.begin(), traps.end(), rnd.getPRNG());
         traps.resize(traps.size() / 2);
     }
+
+    int lavaLevel =
+        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     for (auto trap : traps) {
         placeWire({trap.x, trap.y + 2}, {x, y}, Wire::red, world);
         for (int i = 0; i < 2; ++i) {
@@ -572,7 +605,8 @@ bool addChestBoulderTraps(int x, int y, Random &rnd, World &world)
             trap.y,
             world.getTile(trap).blockID == TileID::sandstone
                 ? TileID::rollingCactus
-                : TileID::boulder);
+            : trap.y > lavaLevel ? TileID::lavaBoulder
+                                 : TileID::boulder);
     }
     return true;
 }
