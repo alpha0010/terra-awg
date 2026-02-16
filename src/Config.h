@@ -33,6 +33,7 @@ struct Config {
     SpawnPoint spawn;
     bool unpainted;
     double fadedMemories;
+    bool sonar;
     bool bothEvils;
     bool allOres;
     bool doubleTrouble;

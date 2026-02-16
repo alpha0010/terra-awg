@@ -34,6 +34,7 @@ enum {
     gray = 27,
     brown = 28,
     shadow = 29,
+    negative = 30,
 };
 }
 

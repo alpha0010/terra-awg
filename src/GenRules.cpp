@@ -50,6 +50,7 @@
 #include "structures/MinecartTracks.h"
 #include "structures/MushroomCabin.h"
 #include "structures/OceanWreck.h"
+#include "structures/Outline.h"
 #include "structures/Plants.h"
 #include "structures/Pyramid.h"
 #include "structures/Ruins.h"
@@ -117,6 +118,7 @@ enum class Step {
     genVines,
     genGrasses,
     genGlobalEcho,
+    genGlobalOutline,
     // Double Trouble.
     swapResources,
     genSecondaryCrimson,
@@ -198,7 +200,7 @@ inline std::array baseStructureRules{
     Step::genGlobalHive,  Step::genGlaciation,     Step::genPlants,
     Step::genTraps,       Step::genTracks,         Step::genFlood,
     Step::smoothSurfaces, Step::finalizeWalls,     Step::genVines,
-    Step::genGrasses,     Step::genGlobalEcho,
+    Step::genGrasses,     Step::genGlobalEcho,     Step::genGlobalOutline,
 };
 
 inline std::array hiveQueenBiomeRules{
@@ -306,6 +308,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         genGrasses(locations, rnd, world);
         break;
         GEN_STEP(genGlobalEcho)
+        GEN_STEP_WORLD(genGlobalOutline)
         GEN_STEP(swapResources)
         GEN_STEP(genSecondaryCrimson)
         GEN_STEP(genSecondaryCorruption)
@@ -347,6 +350,9 @@ void doWorldGen(Random &rnd, World &world)
     }
     if (world.conf.fadedMemories < 0.001) {
         excludes.insert(Step::genGlobalEcho);
+    }
+    if (!world.conf.sonar) {
+        excludes.insert(Step::genGlobalOutline);
     }
     if (world.conf.bothEvils) {
         excludes.insert(

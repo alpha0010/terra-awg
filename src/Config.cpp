@@ -71,6 +71,9 @@ unpainted = false
 # the tiles, 1.0 means apply to everything.
 fadedMemories = 0.0
 
+# Glimpse the obscured.
+sonar = false
+
 # Include both evil biomes.
 bothEvils = false
 
@@ -651,6 +654,7 @@ Config readConfig(Random &rnd)
         SpawnPoint::normal,
         false, // unpainted
         0.0,   // fadedMemories
+        false, // sonar
         false, // bothEvils
         false, // allOres
         false, // doubleTrouble
@@ -740,6 +744,7 @@ Config readConfig(Random &rnd)
     conf.spawn = parseSpawn(reader.Get("variation", "spawn", "normal"));
     READ_CONF_VALUE(variation, unpainted, Boolean);
     READ_CONF_VALUE(variation, fadedMemories, Real);
+    READ_CONF_VALUE(variation, sonar, Boolean);
     READ_CONF_VALUE(variation, bothEvils, Boolean);
     READ_CONF_VALUE(variation, allOres, Boolean);
     READ_CONF_VALUE(variation, doubleTrouble, Boolean);
