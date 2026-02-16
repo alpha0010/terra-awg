@@ -369,6 +369,7 @@ enum {
     ramRune = 5465,
     cowBell = 5484,
     chickenCharm = 5485,
+    jungleJuice = 5496,
     froggyNeckband = 5499,
     goatsTuft = 5500,
     oldCompanionLocket = 5501,

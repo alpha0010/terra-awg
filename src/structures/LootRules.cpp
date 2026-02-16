@@ -2334,8 +2334,7 @@ void fillLihzahrdChest(Chest &chest, Random &rnd, World &world)
             {0.5,
              {ItemID::chlorophyteBullet, Prefix::none, rnd.getInt(25, 50)}},
             getGlobalItemPotion(world),
-            {0.5,
-             {ItemID::greaterHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
+            {0.5, {ItemID::jungleJuice, Prefix::none, rnd.getInt(3, 5)}},
             {2.0 / 3,
              {rnd.select(
                   {ItemID::lesserLuckPotion,

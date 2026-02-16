@@ -201,7 +201,7 @@ void genVines(Random &rnd, World &world)
          {TileID::leaf, TileID::vines},
          {TileID::jungleGrass, TileID::jungleVines},
          {TileID::mahoganyLeaf, TileID::vineRope},
-         {TileID::lihzahrdBrick, TileID::vineRope},
+         {TileID::lihzahrdBrick, TileID::jungleVines},
          {TileID::corruptGrass, TileID::corruptVines},
          {TileID::corruptJungleGrass, TileID::corruptVines},
          {TileID::crimsonGrass, TileID::crimsonVines},
@@ -298,6 +298,9 @@ void genVines(Random &rnd, World &world)
             vine = vineItr->second;
             if (vine == TileID::vines && rnd.getCoarseNoise(x, y) > 0.12) {
                 vine = TileID::flowerVines;
+            } else if (
+                vine == TileID::vineRope && y > world.getUndergroundLevel()) {
+                vine = TileID::jungleVines;
             }
             vinePaint =
                 vine == TileID::vineRope ? Paint::lime : tile.blockPaint;
