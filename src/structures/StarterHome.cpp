@@ -198,6 +198,21 @@ void placeHomeAt(
               rnd.select(
                   {WallID::Safe::hardenedSand, WallID::Safe::sandstone})}});
         break;
+    case Data::Variant::pine:
+        themeTiles.insert(
+            {{TileID::wood, TileID::pineWood},
+             {TileID::woodenBeam, TileID::borealBeam},
+             {TileID::grayBrick,
+              rnd.select({TileID::snowBrick, TileID::redBrick})},
+             {TileID::dirt, themeToDirtVariant(origTheme)}});
+        themeWalls.insert(
+            {{WallID::Safe::wood, WallID::Safe::pineWood},
+             {WallID::Safe::planked,
+              rnd.select({WallID::Safe::pineTree, WallID::Safe::planked})},
+             {WallID::Safe::stone,
+              rnd.select(
+                  {WallID::Safe::oldStone, WallID::Safe::mudstoneBrick})}});
+        break;
     case Data::Variant::skyware:
         themeTiles.insert(
             {{TileID::wood, TileID::sunplate},
@@ -389,6 +404,23 @@ void clearSpawnHive(bool isNearSurface, World &world)
     }
 }
 
+Data::Variant
+determineSpecialTheme(Data::Variant biomeTheme, int y, World &world)
+{
+    if (!world.conf.dontDigUp && !world.conf.forTheWorthy &&
+        !world.conf.hiveQueen) {
+        if (world.conf.celebration) {
+            return Data::Variant::balloon;
+        } else if (world.conf.tundra) {
+            return Data::Variant::pine;
+        }
+    }
+    if (y < 0.45 * world.getUndergroundLevel()) {
+        return Data::Variant::skyware;
+    }
+    return biomeTheme;
+}
+
 void genStarterHome(Random &rnd, World &world)
 {
     std::cout << "Purchasing property\n";
@@ -436,12 +468,7 @@ void genStarterHome(Random &rnd, World &world)
         theme = Data::Variant::honey;
     }
     Data::Variant origTheme = theme;
-    if (world.conf.celebration && !world.conf.dontDigUp &&
-        !world.conf.forTheWorthy && !world.conf.hiveQueen) {
-        theme = Data::Variant::balloon;
-    } else if (y < 0.45 * world.getUndergroundLevel()) {
-        theme = Data::Variant::skyware;
-    }
+    theme = determineSpecialTheme(origTheme, y, world);
     TileBuffer home =
         Data::getHome(rnd.select(Data::homes), world.getFramedTiles());
     x -= home.getWidth() / 2;

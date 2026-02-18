@@ -278,6 +278,7 @@ inline constexpr auto frameDetail =
         {{TileID::candelabra, Variant::mahogany}, {0, 252}},
         {{TileID::candelabra, Variant::marble}, {0, 1080}},
         {{TileID::candelabra, Variant::palm}, {0, 648}},
+        {{TileID::candelabra, Variant::pine}, {0, 1872}},
         {{TileID::candelabra, Variant::skyware}, {0, 396}},
         // Base: Candle
         {{TileID::candle, Variant::blueDungeon}, {0, 22}},
@@ -295,6 +296,7 @@ inline constexpr auto frameDetail =
         {{TileID::candle, Variant::mahogany}, {0, 198}},
         {{TileID::candle, Variant::marble}, {0, 638}},
         {{TileID::candle, Variant::palm}, {0, 396}},
+        {{TileID::candle, Variant::pine}, {0, 1122}},
         {{TileID::candle, Variant::skyware}, {0, 264}},
         // Base: Wooden Chair
         {{TileID::chair, Variant::blueDungeon}, {0, 520}},
@@ -312,6 +314,7 @@ inline constexpr auto frameDetail =
         {{TileID::chair, Variant::mahogany}, {0, 120}},
         {{TileID::chair, Variant::marble}, {0, 1400}},
         {{TileID::chair, Variant::palm}, {0, 1160}},
+        {{TileID::chair, Variant::pine}, {0, 1040}},
         {{TileID::chair, Variant::skyware}, {0, 400}},
         // Base: Copper Chandelier
         {{TileID::chandelier, Variant::blueDungeon}, {0, 1458}},
@@ -329,6 +332,7 @@ inline constexpr auto frameDetail =
         {{TileID::chandelier, Variant::mahogany}, {0, 648}},
         {{TileID::chandelier, Variant::marble}, {0, 1944}},
         {{TileID::chandelier, Variant::palm}, {0, 1242}},
+        {{TileID::chandelier, Variant::pine}, {108, 1134}},
         {{TileID::chandelier, Variant::skyware}, {0, 810}},
         // Base: Wooden Chest
         {{TileID::chest, Variant::blueDungeon}, {1404, 0}},
@@ -345,6 +349,7 @@ inline constexpr auto frameDetail =
         {{TileID::chest, Variant::mahogany}, {288, 0}},
         {{TileID::chest, Variant::marble}, {1836, 0}},
         {{TileID::chest, Variant::palm}, {1116, 0}},
+        {{TileID::chest, Variant::pine}, {936, 0}},
         {{TileID::chest, Variant::skyware}, {468, 0}},
         // Base: Grandfather Clock
         {{TileID::clock, Variant::blueDungeon}, {1080, 0}},
@@ -366,6 +371,7 @@ inline constexpr auto frameDetail =
         {{TileID::door, Variant::mahogany}, {0, 108}},
         {{TileID::door, Variant::marble}, {0, 1890}},
         {{TileID::door, Variant::palm}, {0, 1566}},
+        {{TileID::door, Variant::pine}, {0, 1404}},
         {{TileID::door, Variant::skyware}, {0, 486}},
         // Base: Wooden Dresser
         {{TileID::dresser, Variant::blueDungeon}, {270, 0}},
@@ -389,6 +395,7 @@ inline constexpr auto frameDetail =
         {{TileID::lamp, Variant::mahogany}, {0, 324}},
         {{TileID::lamp, Variant::marble}, {0, 1620}},
         {{TileID::lamp, Variant::palm}, {0, 972}},
+        {{TileID::lamp, Variant::pine}, {0, 2808}},
         {{TileID::lamp, Variant::skyware}, {0, 486}},
         // Base: Chain Lantern
         {{TileID::lantern, Variant::blueDungeon}, {0, 36}},
@@ -406,6 +413,7 @@ inline constexpr auto frameDetail =
         {{TileID::lantern, Variant::mahogany}, {0, 576}},
         {{TileID::lantern, Variant::marble}, {0, 1296}},
         {{TileID::lantern, Variant::palm}, {0, 972}},
+        {{TileID::lantern, Variant::pine}, {0, 2088}},
         {{TileID::lantern, Variant::skyware}, {0, 720}},
         // Base: Wooden Piano
         {{TileID::piano, Variant::blueDungeon}, {594, 0}},
@@ -429,6 +437,7 @@ inline constexpr auto frameDetail =
         {{TileID::platform, Variant::mahogany}, {0, 36}},
         {{TileID::platform, Variant::marble}, {0, 522}},
         {{TileID::platform, Variant::palm}, {0, 306}},
+        {{TileID::platform, Variant::pine}, {0, 1062}},
         {{TileID::platform, Variant::skyware}, {0, 396}},
         // Base: Wooden Sink
         {{TileID::sink, Variant::blueDungeon}, {0, 380}},
@@ -457,6 +466,7 @@ inline constexpr auto frameDetail =
         {{TileID::table, Variant::mahogany}, {108, 0}},
         {{TileID::table, Variant::marble}, {1836, 0}},
         {{TileID::table, Variant::palm}, {1404, 0}},
+        {{TileID::table, Variant::pine}, {1242, 0}},
         {{TileID::table, Variant::skyware}, {378, 0}},
         // Base: Ebonwood Toilet
         {{TileID::toilet, Variant::blueDungeon}, {0, 440}},
@@ -487,6 +497,8 @@ bool convertFurniture(Tile &tile, Variant furnitureSet)
         } else if (tile.blockID == TileID::table) {
             tile.blockID = TileID::tableGroup2;
         }
+    } else if (furnitureSet == Variant::pine && tile.blockID == TileID::chest) {
+        tile.blockID = TileID::chestGroup2;
     }
     return true;
 }

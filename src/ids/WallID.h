@@ -75,6 +75,7 @@ enum {
     crimstoneBrick = 234,
     smoothSandstone = 235,
     snow = 249,
+    oldStone = 262,
     ice = 266,
     obsidian = 267,
     sandstone = 275,
@@ -97,6 +98,8 @@ enum {
     argonMossBrick = 342,
     kryptonMossBrick = 343,
     neonMossBrick = 345,
+    pineTree = 353,
+    pineWood = 358,
 };
 }
 

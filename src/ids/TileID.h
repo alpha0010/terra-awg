@@ -294,6 +294,7 @@ enum {
     spiderBoulder = 714,
     ghoulder = 715,
     friendlyBoulder = 716,
+    pineWood = 741,
     sleepingDigtoise = 751,
     hugeDragonEgg = 752,
 };

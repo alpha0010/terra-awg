@@ -81,6 +81,28 @@ void genGlaciation(Random &rnd, World &world)
         int liquidDepth = 0;
         for (int y = 0; y < world.getHeight(); ++y) {
             Tile &tile = world.getTile(x, y);
+            double candyCaneNoise = rnd.getFineNoise(x / 3, y / 3);
+            if (tile.blockID == TileID::ice) {
+                if (candyCaneNoise > 0.37) {
+                    tile.blockID = TileID::candyCane;
+                } else if (candyCaneNoise < -0.37) {
+                    tile.blockID = TileID::greenCandyCane;
+                }
+            }
+            if (tile.wallID == WallID::Unsafe::ice) {
+                if (candyCaneNoise > 0.37) {
+                    tile.wallID = WallID::Safe::candyCane;
+                } else if (candyCaneNoise < -0.37) {
+                    tile.wallID = WallID::Safe::greenCandyCane;
+                }
+            }
+            if ((tile.blockID == TileID::stone || tile.blockID == TileID::mud ||
+                 tile.blockID == TileID::jungleGrass ||
+                 tile.blockID == TileID::mushroomGrass) &&
+                rnd.getFineNoise(x, 2 * y) < -0.38 &&
+                rnd.getCoarseNoise(x, y) < -0.25) {
+                tile.blockID = TileID::ice;
+            }
             if (!world.conf.unpainted) {
                 if (tile.blockPaint == Paint::none) {
                     if (whiteBlocks.contains(tile.blockID)) {
@@ -101,21 +123,6 @@ void genGlaciation(Random &rnd, World &world)
                     } else if (skyBlueWalls.contains(tile.wallID)) {
                         tile.wallPaint = Paint::skyBlue;
                     }
-                }
-            }
-            double candyCaneNoise = rnd.getFineNoise(x / 3, y / 3);
-            if (tile.blockID == TileID::ice) {
-                if (candyCaneNoise > 0.37) {
-                    tile.blockID = TileID::candyCane;
-                } else if (candyCaneNoise < -0.37) {
-                    tile.blockID = TileID::greenCandyCane;
-                }
-            }
-            if (tile.wallID == WallID::Unsafe::ice) {
-                if (candyCaneNoise > 0.37) {
-                    tile.wallID = WallID::Safe::candyCane;
-                } else if (candyCaneNoise < -0.37) {
-                    tile.wallID = WallID::Safe::greenCandyCane;
                 }
             }
             if (tile.blockID != TileID::empty || y > lavaLevel) {

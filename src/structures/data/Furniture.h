@@ -24,6 +24,7 @@ enum class Variant {
     mahogany,
     marble,
     palm,
+    pine,
     skyware,
 };
 

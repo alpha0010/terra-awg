@@ -810,22 +810,35 @@ void growGrass(int x, int y, Random &rnd, World &world)
         rnd.getCoarseNoise(x, y) < -0.3 && placeSunflower(x, y, world)) {
         return;
     }
+    int paint = baseTile.blockPaint;
     switch (baseTile.blockID) {
     case TileID::ashGrass:
-        world.placeFramedTile(x, y - 1, TileID::ashPlant);
+        world.placeFramedTile(x, y - 1, TileID::ashPlant, Variant::none, paint);
         break;
     case TileID::corruptGrass:
-        world.placeFramedTile(x, y - 1, TileID::corruptPlant);
+        world.placeFramedTile(
+            x,
+            y - 1,
+            TileID::corruptPlant,
+            Variant::none,
+            paint);
         break;
     case TileID::crimsonGrass:
-        world.placeFramedTile(x, y - 1, TileID::crimsonPlant);
+        world.placeFramedTile(
+            x,
+            y - 1,
+            TileID::crimsonPlant,
+            Variant::none,
+            paint);
         break;
     case TileID::grass:
         world.placeFramedTile(
             x,
             y - 1,
             rnd.getCoarseNoise(x, y) > 0 ? TileID::tallGrassPlant
-                                         : TileID::grassPlant);
+                                         : TileID::grassPlant,
+            Variant::none,
+            paint);
         break;
     case TileID::jungleGrass:
         if (isRegionEmpty(x, y - 2, 3, 2, world) &&
@@ -839,19 +852,29 @@ void growGrass(int x, int y, Random &rnd, World &world)
                            tile.slope == Slope::none;
                 }) &&
             randInt % 3 != 0) {
-            world.placeFramedTile(x, y - 2, TileID::largeJunglePlant);
+            world.placeFramedTile(
+                x,
+                y - 2,
+                TileID::largeJunglePlant,
+                Variant::none,
+                paint);
             break;
         }
         world.placeFramedTile(
             x,
             y - 1,
             rnd.getCoarseNoise(x, y) > 0 ? TileID::tallJunglePlant
-                                         : TileID::junglePlant);
-        world.getTile(x, y - 1).blockPaint = world.getTile(x, y).blockPaint;
+                                         : TileID::junglePlant,
+            Variant::none,
+            paint);
         break;
     case TileID::mushroomGrass:
-        world.placeFramedTile(x, y - 1, TileID::mushroomPlant);
-        world.getTile(x, y - 1).blockPaint = world.getTile(x, y).blockPaint;
+        world.placeFramedTile(
+            x,
+            y - 1,
+            TileID::mushroomPlant,
+            Variant::none,
+            paint);
         break;
     }
 }
