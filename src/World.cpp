@@ -695,12 +695,17 @@ bool World::isIsolated(int x, int y) const
 void World::planBiomes(Random &rnd)
 {
     std::cout << "Planning biomes\n";
+    double totalConfSize = std::max(conf.snowSize, 0.1) +
+                           std::max(conf.desertSize, 0.1) +
+                           std::max(conf.jungleSize, 0.1);
     for (int tries = 0; tries < 1000; ++tries) {
         if (conf.spawn == SpawnPoint::ashen) {
             desertCenter = rnd.getDouble(0.09, 0.41);
             if (rnd.getBool()) {
                 desertCenter = 1 - desertCenter;
             }
+        } else if (conf.desertSize > 0.6 * totalConfSize) {
+            desertCenter = rnd.getDouble(0.39, 0.61);
         } else {
             desertCenter = rnd.getDouble(0.09, 0.91);
         }
@@ -717,6 +722,8 @@ void World::planBiomes(Random &rnd)
             if (rnd.getBool()) {
                 snowCenter = 1 - snowCenter;
             }
+        } else if (conf.snowSize > 0.6 * totalConfSize) {
+            snowCenter = rnd.getDouble(0.39, 0.61);
         } else {
             snowCenter = rnd.getDouble(0.12, 0.88);
         }
