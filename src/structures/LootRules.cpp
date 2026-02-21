@@ -467,7 +467,7 @@ void fillLivingWoodChest(Chest &chest, Random &rnd, World &world)
           {rnd.select({ItemID::sunflowerMinecart, ItemID::ladybugMinecart}),
            Prefix::none,
            1}},
-         {1.0 / 6, {ItemID::acornSlingshot, rnd.select(PrefixSet::ranged), 1}},
+         {1.0 / 6, {ItemID::acornSlingshot, Prefix::none, 1}},
          {0.3, {ItemID::theRunicPixie, Prefix::none, 1}},
          {1.0 / 6, {ItemID::glowstick, Prefix::none, rnd.getInt(40, 75)}},
          {1.0 / 6, {ItemID::throwingKnife, Prefix::none, rnd.getInt(150, 300)}},
