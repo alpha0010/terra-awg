@@ -188,6 +188,7 @@ surfaceAmplitude = 1.0
 theConstant = false
 getFixedBoi = false
 skyblock = false
+endlessRain = false
 endlessHalloween = false
 endlessChristmas = false
 vampirism = false
@@ -715,6 +716,7 @@ Config readConfig(Random &rnd)
         false, // theConstant
         false, // getFixedBoi
         false, // skyblock
+        false, // endlessRain
         false, // endlessHalloween
         false, // endlessChristmas
         false, // vampirism
@@ -806,6 +808,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, theConstant, Boolean);
     READ_CONF_VALUE(variation, getFixedBoi, Boolean);
     READ_CONF_VALUE(variation, skyblock, Boolean);
+    READ_CONF_VALUE(variation, endlessRain, Boolean);
     READ_CONF_VALUE(variation, endlessHalloween, Boolean);
     READ_CONF_VALUE(variation, endlessChristmas, Boolean);
     READ_CONF_VALUE(variation, vampirism, Boolean);

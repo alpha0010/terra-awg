@@ -94,6 +94,7 @@ struct Config {
     bool theConstant;
     bool getFixedBoi;
     bool skyblock;
+    bool endlessRain;
     bool endlessHalloween;
     bool endlessChristmas;
     bool vampirism;

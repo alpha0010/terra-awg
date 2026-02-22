@@ -387,9 +387,9 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     w.putFloat64(0);                                     // Invasion X.
     w.putFloat64(0);                                     // Slime rain time.
     w.putUint8(0);                                       // Sundial cooldown.
-    w.putBool(false);                                    // Raining.
-    w.putUint32(0);                                      // Rain time left.
-    w.putFloat32(0);                                     // Max rain.
+    w.putBool(conf.endlessRain);                         // Raining.
+    w.putUint32(conf.endlessRain ? 1892160000 : 0);      // Rain time left.
+    w.putFloat32(conf.endlessRain ? 0.46 : 0);           // Max rain.
     w.putUint32(world.cobaltVariant);                    // Cobalt ore variant.
     w.putUint32(world.mythrilVariant);                   // Mythril ore variant.
     w.putUint32(world.adamantiteVariant);         // Adamantite ore variant.
