@@ -237,7 +237,8 @@ uint8_t lava[] = {255, 30, 0};
 uint8_t honey[] = {255, 172, 0};
 uint8_t shimmer[] = {155, 112, 233};
 
-uint8_t surface[] = {155, 209, 255};
+uint8_t space[] = {55, 58, 248};
+uint8_t surface[] = {150, 180, 251};
 uint8_t underground[] = {84, 57, 42};
 uint8_t cavern[] = {72, 64, 57};
 uint8_t underworld[] = {51, 0, 0};
@@ -348,7 +349,14 @@ void Color::hueBlend(Color tint)
 Color getLayerColor(int y, World &world)
 {
     if (y < world.getUndergroundLevel()) {
-        return world.conf.dontDigUp ? Colors::black : Colors::surface;
+        if (world.conf.dontDigUp) {
+            return Colors::black;
+        }
+        Color color{Colors::space};
+        color.blend(
+            Colors::surface,
+            static_cast<double>(y) / world.getUndergroundLevel());
+        return color;
     } else if (y < world.getCavernLevel()) {
         return Colors::underground;
     } else if (y < world.getUnderworldLevel()) {
