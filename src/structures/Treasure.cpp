@@ -301,7 +301,9 @@ void placeAltars(int maxBin, LocationBins &locations, Random &rnd, World &world)
             continue;
         }
         auto [x, y] = rnd.select(locations[binId]);
-        if (y < 0.8 * world.getUndergroundLevel() ||
+        if (y < std::midpoint(
+                    world.getSurfaceLevel(x),
+                    world.getUndergroundLevel()) ||
             (world.conf.dontDigUp && y > world.getCavernLevel())) {
             continue;
         }
