@@ -172,6 +172,7 @@ glowingMushroomFreq = 1.0
 glowingMushroomSize = 1.0
 hiveFreq = 1.0
 hiveSize = 1.0
+cobwebs = 1.0
 spiderNestFreq = 1.0
 spiderNestSize = 1.0
 glowingMossFreq = 1.0
@@ -705,6 +706,7 @@ Config readConfig(Random &rnd)
         1.0,   // glowingMushroomSize
         1.0,   // hiveFreq
         1.0,   // hiveSize
+        1.0,   // cobwebs,
         1.0,   // spiderNestFreq
         1.0,   // spiderNestSize
         1.0,   // glowingMossFreq
@@ -797,6 +799,7 @@ Config readConfig(Random &rnd)
     READ_CONF_AREA_VALUE(variation, glowingMushroomSize);
     READ_CONF_VALUE(variation, hiveFreq, Real);
     READ_CONF_AREA_VALUE(variation, hiveSize);
+    READ_CONF_VALUE(variation, cobwebs, Real);
     READ_CONF_VALUE(variation, spiderNestFreq, Real);
     READ_CONF_AREA_VALUE(variation, spiderNestSize);
     READ_CONF_VALUE(variation, glowingMossFreq, Real);

@@ -83,6 +83,7 @@ struct Config {
     double glowingMushroomSize;
     double hiveFreq;
     double hiveSize;
+    double cobwebs;
     double spiderNestFreq;
     double spiderNestSize;
     double glowingMossFreq;

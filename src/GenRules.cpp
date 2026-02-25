@@ -62,6 +62,7 @@
 #include "structures/Traps.h"
 #include "structures/Treasure.h"
 #include "structures/Vines.h"
+#include "structures/Webs.h"
 #include "structures/dontDigUp/LootRules.h"
 #include "structures/hardmode/LootRules.h"
 #include "structures/hiveQueen/GlobalHive.h"
@@ -117,6 +118,7 @@ enum class Step {
     finalizeWalls,
     genVines,
     genGrasses,
+    genWebs,
     genGlobalEcho,
     genGlobalOutline,
     // Double Trouble.
@@ -191,16 +193,17 @@ inline std::array baseBiomeRules{
 };
 
 inline std::array baseStructureRules{
-    Step::genDungeon,     Step::genTemple,         Step::genTempleHiveQueen,
-    Step::genCavernSpawn, Step::genPyramid,        Step::genDesertTomb,
-    Step::genBuriedBoat,  Step::genSpiderHall,     Step::genRuins,
-    Step::genTorchArena,  Step::genOceanWreck,     Step::genLake,
-    Step::genStarterHome, Step::genIgloo,          Step::genMushroomCabin,
-    Step::genTreasure,    Step::applyHardmodeLoot, Step::applyDontDigUpLoot,
-    Step::genGlobalHive,  Step::genGlaciation,     Step::genPlants,
-    Step::genTraps,       Step::genTracks,         Step::genFlood,
-    Step::smoothSurfaces, Step::finalizeWalls,     Step::genVines,
-    Step::genGrasses,     Step::genGlobalEcho,     Step::genGlobalOutline,
+    Step::genDungeon,       Step::genTemple,         Step::genTempleHiveQueen,
+    Step::genCavernSpawn,   Step::genPyramid,        Step::genDesertTomb,
+    Step::genBuriedBoat,    Step::genSpiderHall,     Step::genRuins,
+    Step::genTorchArena,    Step::genOceanWreck,     Step::genLake,
+    Step::genStarterHome,   Step::genIgloo,          Step::genMushroomCabin,
+    Step::genTreasure,      Step::applyHardmodeLoot, Step::applyDontDigUpLoot,
+    Step::genGlobalHive,    Step::genGlaciation,     Step::genPlants,
+    Step::genTraps,         Step::genTracks,         Step::genFlood,
+    Step::smoothSurfaces,   Step::finalizeWalls,     Step::genVines,
+    Step::genGrasses,       Step::genWebs,           Step::genGlobalEcho,
+    Step::genGlobalOutline,
 };
 
 inline std::array hiveQueenBiomeRules{
@@ -307,6 +310,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
     case Step::genGrasses:
         genGrasses(locations, rnd, world);
         break;
+        GEN_STEP(genWebs)
         GEN_STEP(genGlobalEcho)
         GEN_STEP_WORLD(genGlobalOutline)
         GEN_STEP(swapResources)
