@@ -55,6 +55,7 @@ enum {
     palmWoodFence = 152,
     amberGemspark = 153,
     amethystGemspark = 154,
+    diamondGemspark = 155,
     emeraldGemspark = 156,
     rubyGemspark = 164,
     sapphireGemspark = 165,
