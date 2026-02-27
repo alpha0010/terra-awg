@@ -297,6 +297,35 @@ void writeNPC(
     w.putBool(false);               // Despawn if homeless.
 }
 
+inline std::string maybeFlag(bool keep, const std::string &flag)
+{
+    return keep ? flag + '|' : "";
+}
+
+std::string assembleSeedFlags(Config &conf)
+{
+    std::string seed;
+    seed += maybeFlag(conf.spiderNestFreq <= 0, "Arachnophobia");
+    seed += maybeFlag(conf.endlessRain, "Bring a Towel");
+    seed += maybeFlag(conf.purity, "Fish Mox");
+    seed += maybeFlag(conf.endlessHalloween, "Hocus Pocus");
+    seed += maybeFlag(conf.spawn == SpawnPoint::cavern, "How Did I Get Here");
+    seed += maybeFlag(conf.fadedMemories > 0.005, "Invisible Plane");
+    seed += maybeFlag(conf.endlessChristmas, "Jingle All the Way");
+    seed += maybeFlag(conf.traps <= 0, "More Traps Please");
+    seed += maybeFlag(conf.shattered, "Planetoids");
+    seed += maybeFlag(conf.evilSize > 3.1, "Purify This");
+    seed += maybeFlag(conf.livingTrees > 3, "Save the Rainforest");
+    seed += maybeFlag(conf.clouds > 3.2, "The Care Bears Movie");
+    seed += maybeFlag(conf.hardmode, "Too Easy");
+    seed += maybeFlag(conf.sunken, "Waterpark");
+    seed += maybeFlag(conf.vampirism, "What a Horrible Night to Have a Curse");
+    seed += maybeFlag(conf.tundra, "Winter is Coming");
+    seed += maybeFlag(conf.sonar, "X-ray Vision");
+    seed += conf.seed;
+    return seed;
+}
+
 void saveWorldFile(Config &conf, Random &rnd, World &world)
 {
     auto npcs = determineNPCs(conf, rnd);
@@ -315,9 +344,9 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     w.putBitVec(world.getFramedTiles());
     std::vector<uint32_t> sectionPointers{w.tellp()};
 
-    w.putString(conf.name);     // Map name.
-    w.putString(conf.seed);     // Seed.
-    w.putUint64(1361504632833); // Generator version.
+    w.putString(conf.name);               // Map name.
+    w.putString(assembleSeedFlags(conf)); // Seed.
+    w.putUint64(1361504632833);           // Generator version.
     for (int i = 0; i < 16; ++i) {
         w.putUint8(rnd.getByte()); // GUID.
     }
@@ -385,13 +414,14 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     w.putUint32(0);                                      // Invasion size.
     w.putUint32(0);                                      // Invasion type.
     w.putFloat64(0);                                     // Invasion X.
-    w.putFloat64(0);                                     // Slime rain time.
-    w.putUint8(0);                                       // Sundial cooldown.
-    w.putBool(conf.endlessRain);                         // Raining.
-    w.putUint32(conf.endlessRain ? 1892160000 : 0);      // Rain time left.
-    w.putFloat32(conf.endlessRain ? 0.46 : 0);           // Max rain.
-    w.putUint32(world.cobaltVariant);                    // Cobalt ore variant.
-    w.putUint32(world.mythrilVariant);                   // Mythril ore variant.
+    w.putFloat64(
+        conf.skyblock ? 0 : rnd.getInt(-259200, -172800)); // Slime rain time.
+    w.putUint8(0);                                         // Sundial cooldown.
+    w.putBool(conf.endlessRain);                           // Raining.
+    w.putUint32(conf.endlessRain ? 1892160000 : 0);        // Rain time left.
+    w.putFloat32(conf.endlessRain ? 0.01 * rnd.getInt(40, 90) : 0); // Max rain.
+    w.putUint32(world.cobaltVariant);             // Cobalt ore variant.
+    w.putUint32(world.mythrilVariant);            // Mythril ore variant.
     w.putUint32(world.adamantiteVariant);         // Adamantite ore variant.
     w.putUint8(rnd.select({FOREST_BACKGROUNDS})); // Forest style.
     w.putUint8(rnd.getInt(0, 4));                 // Corruption style.
@@ -401,7 +431,7 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     w.putUint8(rnd.getInt(0, 5));                 // Crimson style.
     w.putUint8(rnd.getInt(0, 4));                 // Desert style.
     w.putUint8(rnd.getInt(0, 5));                 // Ocean style.
-    w.putUint32(0);                               // Cloud background.
+    w.putUint32(rnd.getInt(-86400, -8640));       // Cloud background.
     w.putUint16(rnd.getInt(50, 150));             // Number of clouds.
     w.putFloat32(rnd.getDouble(-0.2, 0.2));       // Wind speed.
     w.putUint32(0);                 // Players finished angler quest.
