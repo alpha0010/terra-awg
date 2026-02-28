@@ -57,6 +57,7 @@ void genGlobalOutline(World &world)
                                oreBacklights.contains(tile.blockID);
                     })) {
                     tile.wallID = oreBacklights.at(tile.blockID);
+                    tile.wallPaint = Paint::none;
                     continue;
                 }
                 if (!isSolidBlock(tile.blockID) || tile.actuated ||
