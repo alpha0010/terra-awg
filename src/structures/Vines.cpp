@@ -200,8 +200,9 @@ void genVines(Random &rnd, World &world)
         {{TileID::grass, TileID::vines},
          {TileID::leaf, TileID::vines},
          {TileID::jungleGrass, TileID::jungleVines},
-         {TileID::mahoganyLeaf, TileID::vineRope},
+         {TileID::mahoganyLeaf, TileID::jungleVines},
          {TileID::lihzahrdBrick, TileID::jungleVines},
+         {TileID::livingMahogany, TileID::vineRope},
          {TileID::corruptGrass, TileID::corruptVines},
          {TileID::corruptJungleGrass, TileID::corruptVines},
          {TileID::crimsonGrass, TileID::crimsonVines},
@@ -299,11 +300,15 @@ void genVines(Random &rnd, World &world)
             if (vine == TileID::vines && rnd.getCoarseNoise(x, y) > 0.12) {
                 vine = TileID::flowerVines;
             } else if (
-                vine == TileID::vineRope && y > world.getUndergroundLevel()) {
-                vine = TileID::jungleVines;
+                vine == TileID::vineRope &&
+                (randInt % 1009 < 650 ||
+                 world.getTile(x - 1, y + 2).blockID != TileID::empty)) {
+                continue;
             }
             vinePaint =
-                vine == TileID::vineRope ? Paint::lime : tile.blockPaint;
+                vine == TileID::vineRope && tile.blockPaint == Paint::none
+                    ? Paint::lime
+                    : tile.blockPaint;
             vineLen = 4 + randInt % 7;
         }
     });
