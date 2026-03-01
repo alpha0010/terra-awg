@@ -183,6 +183,8 @@ enum {
     stoneSlab = 273,
     sandstoneSlab = 274,
     boneWelder = 300,
+    livingLoom = 304,
+    skyMill = 305,
     dynastyWood = 311,
     redDynastyShingles = 312,
     blueDynastyShingles = 313,
