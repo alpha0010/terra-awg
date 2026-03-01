@@ -259,9 +259,8 @@ Color::Color(uint8_t *data)
 
 void Color::blend(Color tint, double strength)
 {
-    double base = 1 - strength;
     for (int i = 0; i < 3; ++i) {
-        rgb[i] = base * rgb[i] + strength * tint.rgb[i];
+        rgb[i] += std::lround(strength * (tint.rgb[i] - rgb[i]));
     }
 }
 
