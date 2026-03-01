@@ -782,8 +782,8 @@ int main()
     }
     if (conf.tundra) {
         conf.patchesTemperature -= 0.5;
-        conf.snowSize *= 1.5;
-        conf.jungleSize *= 0.8;
+        conf.snowSize *= 1.95;
+        conf.jungleSize *= 0.75;
         conf.surfaceAmplitude *= 1.25;
     }
     if (conf.celebration) {

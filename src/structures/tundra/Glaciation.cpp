@@ -13,6 +13,8 @@ void genGlaciation(Random &rnd, World &world)
 {
     std::cout << "Glaciation\n";
     rnd.shuffleNoise();
+    int snowFloor =
+        (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     int underworldHeight = world.getHeight() - world.getUnderworldLevel();
     int lavaLevel = world.getUnderworldLevel() + 0.46 * underworldHeight + 1;
     constexpr auto whiteBlocks = frozen::make_set<int>({
@@ -79,6 +81,7 @@ void genGlaciation(Random &rnd, World &world)
          WallID::Unsafe::smoulderingStone});
     parallelFor(std::views::iota(0, world.getWidth()), [&](int x) {
         int liquidDepth = 0;
+        bool nearEdge = x < 350 || x > world.getWidth() - 350;
         for (int y = 0; y < world.getHeight(); ++y) {
             Tile &tile = world.getTile(x, y);
             double candyCaneNoise = rnd.getFineNoise(x / 3, y / 3);
@@ -102,6 +105,19 @@ void genGlaciation(Random &rnd, World &world)
                 rnd.getFineNoise(x, 2 * y) < -0.38 &&
                 rnd.getCoarseNoise(x, y) < -0.25) {
                 tile.blockID = TileID::ice;
+            }
+            if (whiteBlocks.contains(tile.blockID)) {
+                double snowRoof = std::midpoint(0, world.getSurfaceLevel(x));
+                if (y > snowRoof || tile.blockPaint == Paint::none) {
+                    double threshold = std::lerp(
+                        0.1,
+                        -1,
+                        (y - snowRoof) / (snowFloor - snowRoof));
+                    if (rnd.getFineNoise(x, y) < threshold) {
+                        tile.blockID = TileID::snow;
+                        tile.blockPaint = Paint::none;
+                    }
+                }
             }
             if (!world.conf.unpainted) {
                 if (tile.blockPaint == Paint::none) {
@@ -130,7 +146,8 @@ void genGlaciation(Random &rnd, World &world)
             }
             if (tile.liquid != Liquid::none) {
                 ++liquidDepth;
-                if (liquidDepth > 5 + 2 * rnd.getFineNoise(x, y)) {
+                if (liquidDepth >
+                    (nearEdge ? 4.5 : 3.1) + 1.9 * rnd.getFineNoise(x, y)) {
                     continue;
                 }
             }

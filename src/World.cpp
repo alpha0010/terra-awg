@@ -722,7 +722,9 @@ void World::planBiomes(Random &rnd)
             if (rnd.getBool()) {
                 snowCenter = 1 - snowCenter;
             }
-        } else if (conf.snowSize > 0.6 * totalConfSize) {
+        } else if (
+            conf.snowSize > 0.6 * totalConfSize ||
+            (conf.tundra && !conf.hiveQueen)) {
             snowCenter = rnd.getDouble(0.39, 0.61);
         } else {
             snowCenter = rnd.getDouble(0.12, 0.88);

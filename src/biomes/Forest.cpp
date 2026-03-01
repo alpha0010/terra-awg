@@ -371,11 +371,16 @@ void expireLivingTree(
 {
     if (world.conf.tundra) {
         // Not actually a trap, but this is the correct stage.
-        world.queuedTraps.emplace_back([treeTiles](Random &, World &world) {
+        world.queuedTraps.emplace_back([treeTiles](Random &rnd, World &world) {
             for (auto point : treeTiles) {
                 Tile &tile = world.getTile(point);
                 if (tile.blockID == TileID::leaf) {
-                    tile.blockID = TileID::pineTree;
+                    Tile &prevTile = world.getTile(point.x, point.y - 1);
+                    tile.blockID =
+                        prevTile.blockID == TileID::empty &&
+                                rnd.getFineNoise(point.x, point.y) > 0
+                            ? TileID::snow
+                            : TileID::pineTree;
                 }
             }
         });
