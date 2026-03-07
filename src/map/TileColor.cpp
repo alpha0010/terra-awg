@@ -382,7 +382,7 @@ Color getTileColor(int x, int y, World &world)
     }
     switch (tile.liquid) {
     case Liquid::water:
-        color.blend(Colors::water, 0.7);
+        color.blend(Colors::water, 0.85);
         break;
     case Liquid::lava:
         color = Colors::lava;

@@ -129,7 +129,7 @@ forTheWorthy = false
 # Organize biomes and loot for an underworld spawn.
 ascent = false
 
-# Activates "dont dig up" secret seed. (Also enables "ascent".)
+# Activates "remix" secret seed. (Also enables "ascent".)
 dontDigUp = false
 
 # Number of meteorites to place.
@@ -187,7 +187,7 @@ surfaceAmplitude = 1.0
 # The following settings currently have no impact on worldgen. They can
 # be used to activate alternate gameplay rules.
 theConstant = false
-getFixedBoi = false
+zenith = false
 skyblock = false
 endlessRain = false
 endlessHalloween = false
@@ -716,7 +716,7 @@ Config readConfig(Random &rnd)
         1.0,   // jungleSize
         1.0,   // surfaceAmplitude
         false, // theConstant
-        false, // getFixedBoi
+        false, // zenith
         false, // skyblock
         false, // endlessRain
         false, // endlessHalloween
@@ -809,7 +809,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, jungleSize, Real);
     READ_CONF_VALUE(variation, surfaceAmplitude, Real);
     READ_CONF_VALUE(variation, theConstant, Boolean);
-    READ_CONF_VALUE(variation, getFixedBoi, Boolean);
+    READ_CONF_VALUE(variation, zenith, Boolean);
     READ_CONF_VALUE(variation, skyblock, Boolean);
     READ_CONF_VALUE(variation, endlessRain, Boolean);
     READ_CONF_VALUE(variation, endlessHalloween, Boolean);

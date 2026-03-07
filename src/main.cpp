@@ -91,7 +91,7 @@ std::map<int, NPCDetails> determineNPCs(Config &conf, Random &rnd)
         if (conf.evilSize > 3.1) {
             npcs[NPC::dryad] = {"Lilith", 1};
         } else if (conf.dontDigUp) {
-            npcs[NPC::taxCollector] = {"Andrew", 1};
+            npcs[NPC::taxCollector] = {"Andrew", conf.zenith ? 0 : 1};
         } else if (conf.hiveQueen) {
             npcs[NPC::witchDoctor] = {"Victor", 1};
         } else if (isWinter && conf.endlessChristmas && !conf.skyblock) {
@@ -103,15 +103,15 @@ std::map<int, NPCDetails> determineNPCs(Config &conf, Random &rnd)
             if (conf.theConstant && !conf.dontDigUp) {
                 npcs[NPC::mechanic] = {"Korrie", 1};
             } else {
-                npcs[NPC::steampunker] = {"Whitney", 1};
+                npcs[NPC::steampunker] = {"Whitney", conf.zenith ? 0 : 1};
             }
             if (conf.hiveQueen && !conf.dontDigUp) {
                 npcs[NPC::merchant] = {"Charles", 1};
             } else {
-                npcs[NPC::princess] = {"Yorai", 1};
+                npcs[NPC::princess] = {"Yorai", conf.zenith ? 0 : 1};
             }
             if (conf.doubleTrouble) {
-                npcs[NPC::painter] = {"Jim", 1};
+                npcs[NPC::painter] = {"Jim", conf.zenith ? 0 : 1};
             } else {
                 npcs[NPC::partyGirl] = {"Amanda", 1};
             }
@@ -133,7 +133,7 @@ std::map<int, NPCDetails> determineNPCs(Config &conf, Random &rnd)
         npcs[NPC::mechanic] = {};
     } else if (conf.hiveQueen && !conf.theConstant) {
         npcs[NPC::merchant] = {};
-    } else if (conf.getFixedBoi) {
+    } else if (conf.forTheWorthy) {
         npcs[NPC::demolitionist] = {};
     } else if (conf.doubleTrouble) {
         npcs[NPC::partyGirl] = {};
@@ -364,9 +364,9 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     w.putBool(conf.celebration);                   // Celebrationmk10.
     w.putBool(conf.theConstant);                   // The constant.
     w.putBool(conf.hiveQueen);                     // Not the bees.
-    w.putBool(conf.dontDigUp);                     // Don't dig up.
-    w.putBool(conf.traps > 14);                    // No traps.
-    w.putBool(conf.getFixedBoi);                   // Get fixed boi.
+    w.putBool(conf.dontDigUp);                     // Remix.
+    w.putBool(conf.traps > 14 || conf.zenith);     // No traps.
+    w.putBool(conf.zenith);                        // Zenith.
     w.putBool(conf.skyblock);                      // Skyblock.
     w.putUint64(getBinaryTime());                  // Creation time.
     w.putUint64(getBinaryTime());                  // Last played time.
@@ -409,7 +409,7 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     w.putUint32(
         conf.hardmode ? conf.doubleTrouble ? 6 : 3 : 0); // Altars smashed.
     w.putBool(conf.hardmode);                            // Hard mode.
-    w.putBool(false);                                    // After party of doom.
+    w.putBool(conf.zenith);                              // Is party of doom.
     w.putUint32(0);                                      // Invasion delay.
     w.putUint32(0);                                      // Invasion size.
     w.putUint32(0);                                      // Invasion type.
@@ -675,7 +675,7 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
 
     std::vector<int> shimmeredNPCs;
     for (auto npcId : townNPCs) {
-        if (conf.celebration ||
+        if ((conf.celebration && !conf.zenith) ||
             (npcs.contains(npcId) && npcs[npcId].variation == 1)) {
             shimmeredNPCs.push_back(npcId);
         }
@@ -837,6 +837,16 @@ int main()
     }
 
     doWorldGen(rnd, world);
+
+    if (conf.zenith) {
+        conf.celebration = true;
+        conf.doubleTrouble = true;
+        conf.forTheWorthy = true;
+        conf.hiveQueen = true;
+        conf.dontDigUp = true;
+        conf.theConstant = true;
+    }
+
     saveWorldFile(conf, rnd, world);
 
     auto mainEnd = std::chrono::high_resolution_clock::now();

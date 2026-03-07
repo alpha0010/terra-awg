@@ -93,7 +93,7 @@ struct Config {
     double jungleSize;
     double surfaceAmplitude;
     bool theConstant;
-    bool getFixedBoi;
+    bool zenith;
     bool skyblock;
     bool endlessRain;
     bool endlessHalloween;
