@@ -59,6 +59,12 @@ followRainFrom(World &world, int x, int y, Func isPathable)
     }
 }
 
+double computeRainMultiplier(double baseMult)
+{
+    return 1.21579552909392 * std::sqrt(std::max(baseMult, 0.01928)) -
+           0.168732168623038;
+}
+
 void simulateRain(Random &rnd, World &world, int x)
 {
     if (x % 4 != 0) {
@@ -66,6 +72,9 @@ void simulateRain(Random &rnd, World &world, int x)
     }
     int lavaLevel =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
+    double waterMult = computeRainMultiplier(world.conf.lakeSize);
+    double lavaMult =
+        computeRainMultiplier(std::midpoint(world.conf.lakeSize, 1.0));
     constexpr auto surfaceDryBlocks = frozen::make_set<int>(
         {TileID::ebonstone,
          TileID::ebonsand,
@@ -119,10 +128,11 @@ void simulateRain(Random &rnd, World &world, int x)
             continue;
         }
         pendingWater +=
-            world.getTile(x, y).wallID == WallID::Unsafe::hive ? 2.4
-            : world.conf.biomes != BiomeLayout::columns && y < lavaLevel
-                ? 1.25 + 1.08 * rnd.getHumidity(x, y)
-                : 1.65;
+            (y < lavaLevel ? waterMult : lavaMult) *
+            (world.getTile(x, y).wallID == WallID::Unsafe::hive ? 2.4
+             : world.conf.biomes != BiomeLayout::columns && y < lavaLevel
+                 ? 1.25 + 1.08 * rnd.getHumidity(x, y)
+                 : 1.65);
         if (world.conf.celebration && hypot(world.aether, {x, y}) < 200) {
             pendingWater += 1.5;
         }

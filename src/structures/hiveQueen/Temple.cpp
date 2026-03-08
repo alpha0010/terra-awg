@@ -314,6 +314,14 @@ public:
                      Paint::deepYellow,
                      Paint::deepOrange}));
         }
+        embedWaterfalls(
+            {center.x - 0.75 * size, center.y - 0.7 * size},
+            {center.x + 0.75 * size, center.y + 0.7 * size},
+            {TileID::lihzahrdBrick},
+            Liquid::honey,
+            45,
+            rnd,
+            world);
     }
 };
 

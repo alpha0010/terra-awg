@@ -73,6 +73,7 @@ struct Config {
     double dungeonSize;
     double templeSize;
     double evilSize;
+    double lakeSize;
     double oceanSize;
     double oceanCaveSize;
     double marbleFreq;

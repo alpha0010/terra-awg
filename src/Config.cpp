@@ -162,6 +162,7 @@ aetherSize = 1.0
 dungeonSize = 1.0
 templeSize = 1.0
 evilSize = 1.0
+lakeSize = 1.0
 oceanSize = 1.0
 oceanCaveSize = 1.0
 marbleFreq = 1.0
@@ -696,6 +697,7 @@ Config readConfig(Random &rnd)
         1.0,   // dungeonSize
         1.0,   // templeSize
         1.0,   // evilSize
+        1.0,   // lakeSize
         1.0,   // oceanSize
         1.0,   // oceanCaveSize
         1.0,   // marbleFreq
@@ -789,6 +791,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, dungeonSize, Real);
     READ_CONF_AREA_VALUE(variation, templeSize);
     READ_CONF_AREA_VALUE(variation, evilSize);
+    READ_CONF_VALUE(variation, lakeSize, Real);
     READ_CONF_VALUE(variation, oceanSize, Real);
     READ_CONF_VALUE(variation, oceanCaveSize, Real);
     READ_CONF_VALUE(variation, marbleFreq, Real);
