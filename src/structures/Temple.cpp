@@ -526,6 +526,29 @@ void paintTemple(Point center, int blockPaint, int wallPaint, World &world)
     });
 }
 
+std::pair<int, int> markGolemArena(
+    std::set<Point> &rooms,
+    int centerRoomX,
+    int maxRoomY,
+    int roomStep,
+    Random &rnd)
+{
+    double arenaScale = std::sqrt(rooms.size());
+    int arenaWidth = std::min<int>(std::lround(arenaScale / 6.17707285), 4);
+    int arenaHeight = std::min<int>(std::lround(arenaScale / 5.52116466), 4);
+    for (int i = -arenaWidth; i <= arenaWidth; ++i) {
+        for (int j = -arenaHeight; j < 1; ++j) {
+            rooms.erase({centerRoomX + i * roomStep, maxRoomY + j * roomStep});
+        }
+    }
+    rooms.emplace(
+        rnd.select(
+            {centerRoomX - arenaWidth * roomStep,
+             centerRoomX + arenaWidth * roomStep}),
+        maxRoomY);
+    return {arenaWidth, arenaHeight};
+}
+
 void genTemple(Random &rnd, World &world)
 {
     if (world.conf.templeSize < 0.01) {
@@ -588,14 +611,8 @@ void genTemple(Random &rnd, World &world)
         }
         return true;
     });
-    for (int i = -2; i < 3; ++i) {
-        for (int j = -2; j < 1; ++j) {
-            rooms.erase({centerRoomX + i * roomStep, maxRoomY + j * roomStep});
-        }
-    }
-    rooms.emplace(
-        rnd.select({centerRoomX - 2 * roomStep, centerRoomX + 2 * roomStep}),
-        maxRoomY);
+    auto [arenaWidth, arenaHeight] =
+        markGolemArena(rooms, centerRoomX, maxRoomY, roomStep, rnd);
     Point agent = *rooms.begin();
     std::set<Point> connectedRooms{agent};
     std::set<Point> connections;
@@ -640,10 +657,11 @@ void genTemple(Random &rnd, World &world)
             }
         }
     }
-    for (int x = centerRoomX - 2 * roomStep;
-         x < centerRoomX + 2 * roomStep + roomSize;
+    for (int x = centerRoomX - arenaWidth * roomStep;
+         x < centerRoomX + arenaWidth * roomStep + roomSize;
          ++x) {
-        for (int y = maxRoomY - 2 * roomStep; y < maxRoomY + roomSize; ++y) {
+        for (int y = maxRoomY - arenaHeight * roomStep; y < maxRoomY + roomSize;
+             ++y) {
             world.getTile(x, y).blockID = TileID::empty;
         }
     }
