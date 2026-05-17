@@ -468,6 +468,7 @@ void placeOrbHearts(
     } else if (world.conf.bothEvils) {
         orbHeartCount *= 2;
     }
+    std::vector<std::tuple<int, int, int>> usedLocations;
     for (int tries = 500 * orbHeartCount; orbHeartCount > 0 && tries > 0;
          --tries) {
         int binId = rnd.getInt(0, maxBin);
@@ -499,7 +500,56 @@ void placeOrbHearts(
             TileID::orbHeart,
             tendrilID == TileID::lesion ? Variant::corruption
                                         : Variant::crimson);
+        usedLocations.emplace_back(x + 3, y + 3, tendrilID);
         --orbHeartCount;
+    }
+    constexpr auto clearableTiles = frozen::make_set<int>(
+        {TileID::dirt,
+         TileID::stone,
+         TileID::clay,
+         TileID::snow,
+         TileID::ice,
+         TileID::sand,
+         TileID::hardenedSand,
+         TileID::sandstone,
+         TileID::mud,
+         TileID::ebonstone,
+         TileID::ebonsand,
+         TileID::corruptIce,
+         TileID::ebonsandstone,
+         TileID::hardenedEbonsand,
+         TileID::corruptJungleGrass,
+         TileID::crimstone,
+         TileID::crimsand,
+         TileID::crimsonIce,
+         TileID::crimsandstone,
+         TileID::hardenedCrimsand,
+         TileID::crimsonJungleGrass});
+    for (auto [x, y, tendrilID] : usedLocations) {
+        for (int i = -12; i < 14; ++i) {
+            for (int j = -12; j < 14; ++j) {
+                Tile &tile = world.getTile(x + i, y + j);
+                if (!clearableTiles.contains(tile.blockID)) {
+                    continue;
+                }
+                Tile &prev = world.getTile(x + i, y + j - 1);
+                if (prev.blockID != TileID::empty &&
+                    !isSolidBlock(prev.blockID)) {
+                    continue;
+                }
+                double threshold =
+                    std::max(std::hypot(i - 0.5, j - 0.5) / 8.5 - 1, 0.13);
+                if (rnd.getFineNoise(10 * (x + i), 10 * (y + j)) > threshold) {
+                    tile.blockID = TileID::empty;
+                    if (prev.blockID == TileID::mud &&
+                        world.getBiome(x + i, y + j).active == Biome::jungle) {
+                        prev.blockID = tendrilID == TileID::lesion
+                                           ? TileID::corruptJungleGrass
+                                           : TileID::crimsonJungleGrass;
+                    }
+                }
+            }
+        }
     }
 }
 
