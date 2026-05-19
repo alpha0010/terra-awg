@@ -167,11 +167,16 @@ bool isValidTrackSegment(int x, int y, World &world)
            });
 }
 
-std::vector<Point>
-planStandardTrackAt(int x, int y, double lengthScale, Random &rnd, World &world)
+std::vector<Point> planStandardTrackAt(
+    int x,
+    int y,
+    int direction,
+    double lengthScale,
+    Random &rnd,
+    World &world)
 {
     Point pos{x, y};
-    Point delta{rnd.select({-1, 1}), 0};
+    Point delta{direction, 0};
     auto [minLen, maxLen] = computeTrackBounds(lengthScale, rnd, world);
     std::vector<Point> track;
     for (int i = 0; i < maxLen; ++i) {
@@ -193,11 +198,15 @@ planStandardTrackAt(int x, int y, double lengthScale, Random &rnd, World &world)
     return track;
 }
 
-std::vector<Point>
-planWavyTrackAt(int x, int y, double lengthScale, Random &rnd, World &world)
+std::vector<Point> planWavyTrackAt(
+    int x,
+    int y,
+    int delta,
+    double lengthScale,
+    Random &rnd,
+    World &world)
 {
     Pointf pos{x, y};
-    int delta = rnd.select({-1, 1});
     auto [minLen, maxLen] = computeTrackBounds(lengthScale, rnd, world);
     double noiseScale = rnd.getDouble(1.2, 3.8);
     double angle = std::numbers::pi *
@@ -239,14 +248,33 @@ planWavyTrackAt(int x, int y, double lengthScale, Random &rnd, World &world)
 std::vector<Point>
 planTrackAt(int x, int y, double lengthScale, Random &rnd, World &world)
 {
-    return world.conf.celebration ||
-                   (!world.conf.hiveQueen &&
-                    hypot(world.aether, {x, y}) <
-                        world.conf.aetherSize *
-                            (80 +
-                             world.getWidth() * world.getHeight() / 115200))
-               ? planWavyTrackAt(x, y, lengthScale, rnd, world)
-               : planStandardTrackAt(x, y, lengthScale, rnd, world);
+    int direction = rnd.select({-1, 1});
+    double distortionThreshold =
+        world.conf.hiveQueen
+            ? -1
+            : world.conf.aetherSize *
+                  (80 + world.getWidth() * world.getHeight() / 115200);
+    if (rnd.getDouble(0, 1) < world.conf.rollerCoasterChance ||
+        hypot(world.aether, {x, y}) < distortionThreshold) {
+        return planWavyTrackAt(x, y, direction, lengthScale, rnd, world);
+    }
+    auto track = planStandardTrackAt(x, y, direction, lengthScale, rnd, world);
+    if (!track.empty()) {
+        Point endPos = direction == 1 ? track.back() : track.front();
+        if (hypot(world.aether, endPos) < distortionThreshold) {
+            auto wavyTrack = planWavyTrackAt(
+                endPos.x,
+                endPos.y,
+                -direction,
+                lengthScale,
+                rnd,
+                world);
+            if (!wavyTrack.empty()) {
+                return wavyTrack;
+            }
+        }
+    }
+    return track;
 }
 
 std::vector<Point> planTrack(double lengthScale, Random &rnd, World &world)

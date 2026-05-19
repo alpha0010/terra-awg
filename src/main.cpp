@@ -795,6 +795,7 @@ int main()
         conf.gems *= 1.15;
         conf.trees *= 1.1;
         conf.livingTrees *= 1.5;
+        conf.rollerCoasterChance += 1;
         conf.minecartTracks *= 1.1;
         conf.minecartLength *= 1.35;
         PrefixSet::initCelebration();

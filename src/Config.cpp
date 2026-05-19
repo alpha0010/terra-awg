@@ -120,6 +120,9 @@ patchesSize = 1.0
 # Activates "celebrationmk10" secret seed.
 celebration = false
 
+# Chance for wavy minecart tracks. Proportion from 0.0 to 1.0.
+rollerCoasterChance = 0.0
+
 # Activates "not the bees" secret seed.
 hiveQueen = false
 
@@ -672,6 +675,7 @@ Config readConfig(Random &rnd)
         0.0,   // patchesTemperature
         1.0,   // patchesSize
         false, // celebration
+        0.0,   // rollerCoasterChance
         false, // hiveQueen
         false, // forTheWorthy
         false, // ascent
@@ -766,6 +770,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, patchesTemperature, Real);
     READ_CONF_AREA_VALUE(variation, patchesSize);
     READ_CONF_VALUE(variation, celebration, Boolean);
+    READ_CONF_VALUE(variation, rollerCoasterChance, Real);
     READ_CONF_VALUE(variation, hiveQueen, Boolean);
     READ_CONF_VALUE(variation, forTheWorthy, Boolean);
     READ_CONF_VALUE(variation, ascent, Boolean);

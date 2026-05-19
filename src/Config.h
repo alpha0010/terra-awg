@@ -48,6 +48,7 @@ struct Config {
     double patchesTemperature;
     double patchesSize;
     bool celebration;
+    double rollerCoasterChance;
     bool hiveQueen;
     bool forTheWorthy;
     bool ascent;
