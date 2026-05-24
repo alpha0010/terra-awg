@@ -51,6 +51,11 @@ void growMossOn(int x, int y, World &world);
 
 bool isInBiome(int x, int y, int scanDist, Biome biome, World &world);
 
+void iterateDiamond(
+    int topHeight,
+    int centerHeight,
+    std::function<void(int, int)> f);
+
 void iterateZone(
     Point start,
     World &world,

@@ -9,6 +9,8 @@ enum class GameMode { journey = 3, classic = 0, expert = 1, master = 2 };
 
 enum class EvilBiome { random, corruption, crimson };
 
+enum class AetherBiome { random, rift, crystalline, grove };
+
 enum class SpawnPoint {
     normal,
     surface,
@@ -55,6 +57,8 @@ struct Config {
     bool dontDigUp;
     int meteorites;
     double meteoriteSize;
+    AetherBiome aether;
+    double aetherSize;
     bool trimEvilTendrils;
     bool avoidantEvil;
     double ore;
@@ -70,7 +74,6 @@ struct Config {
     double asteroids;
     double minecartTracks;
     double minecartLength;
-    double aetherSize;
     double dungeonSize;
     double templeSize;
     double evilSize;

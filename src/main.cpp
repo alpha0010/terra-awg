@@ -780,6 +780,10 @@ int main()
         world.mythrilVariant = TileID::empty;
         world.adamantiteVariant = TileID::empty;
     }
+    if (conf.aether == AetherBiome::random) {
+        conf.aether = rnd.select(
+            {AetherBiome::rift, AetherBiome::crystalline, AetherBiome::grove});
+    }
     if (conf.tundra) {
         conf.patchesTemperature -= 0.5;
         conf.snowSize *= 1.95;

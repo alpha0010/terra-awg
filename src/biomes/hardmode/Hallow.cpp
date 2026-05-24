@@ -4,29 +4,13 @@
 #include "Config.h"
 #include "Random.h"
 #include "World.h"
+#include "biomes/BiomeUtil.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/Dungeon.h"
 #include "vendor/frozen/map.h"
 #include "vendor/frozen/set.h"
 #include <iostream>
-
-template <typename Func>
-void iterateDiamond(int topHeight, int centerHeight, Func f)
-{
-    for (int i = 0; i < 2 * topHeight; ++i) {
-        for (int j = std::abs(topHeight - i - 0.5); j < topHeight; ++j) {
-            f(i, j);
-        }
-        for (int j = 0; j < centerHeight; ++j) {
-            f(i, j + topHeight);
-        }
-        int maxJ = topHeight - std::abs(topHeight - i - 0.5);
-        for (int j = 0; j < maxJ; ++j) {
-            f(i, j + topHeight + centerHeight);
-        }
-    }
-}
 
 int selectHallowLocation(Random &rnd, World &world)
 {

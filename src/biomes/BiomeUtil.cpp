@@ -280,6 +280,25 @@ bool isInBiome(int x, int y, int scanDist, Biome biome, World &world)
     return true;
 }
 
+void iterateDiamond(
+    int topHeight,
+    int centerHeight,
+    std::function<void(int, int)> f)
+{
+    for (int i = 0; i < 2 * topHeight; ++i) {
+        for (int j = std::abs(topHeight - i - 0.5); j < topHeight; ++j) {
+            f(i, j);
+        }
+        for (int j = 0; j < centerHeight; ++j) {
+            f(i, j + topHeight);
+        }
+        int maxJ = topHeight - std::abs(topHeight - i - 0.5);
+        for (int j = 0; j < maxJ; ++j) {
+            f(i, j + topHeight + centerHeight);
+        }
+    }
+}
+
 void iterateZone(
     Point start,
     World &world,

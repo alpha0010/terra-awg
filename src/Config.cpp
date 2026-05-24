@@ -139,6 +139,10 @@ dontDigUp = false
 meteorites = 0
 meteoriteSize = 1.0
 
+# Aether microbiome: RANDOM/rift/crystalline/grove
+aether = RANDOM
+aetherSize = 1.0
+
 # Prevent corruption/crimson tendrils from extending into the sky.
 trimEvilTendrils = false
 
@@ -161,7 +165,6 @@ clouds = 1.0
 asteroids = 1.0
 minecartTracks = 1.0
 minecartLength = 1.0
-aetherSize = 1.0
 dungeonSize = 1.0
 templeSize = 1.0
 evilSize = 1.0
@@ -584,6 +587,20 @@ BiomeLayout parseBiomeLayout(const std::string &biomes)
     return BiomeLayout::columns;
 }
 
+AetherBiome parseAetherBiome(const std::string &aether)
+{
+    if (aether == "rift") {
+        return AetherBiome::rift;
+    } else if (aether == "crystalline") {
+        return AetherBiome::crystalline;
+    } else if (aether == "grove") {
+        return AetherBiome::grove;
+    } else if (aether != "RANDOM") {
+        std::cout << "Unknown aether '" << aether << "'\n";
+    }
+    return AetherBiome::random;
+}
+
 std::string genRandomName(Random &rnd)
 {
     switch (rnd.getInt(0, 7)) {
@@ -682,6 +699,8 @@ Config readConfig(Random &rnd)
         false, // dontDigUp
         0,     // meteorites
         1.0,   // meteoriteSize
+        AetherBiome::random,
+        1.0,   // aetherSize
         false, // trimEvilTendrils
         false, // avoidantEvil
         1.0,   // ore
@@ -697,7 +716,6 @@ Config readConfig(Random &rnd)
         1.0,   // asteroids
         1.0,   // minecartTracks
         1.0,   // minecartLength
-        1.0,   // aetherSize
         1.0,   // dungeonSize
         1.0,   // templeSize
         1.0,   // evilSize
@@ -777,6 +795,8 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, dontDigUp, Boolean);
     READ_CONF_VALUE(variation, meteorites, Integer);
     READ_CONF_AREA_VALUE(variation, meteoriteSize);
+    conf.aether = parseAetherBiome(reader.Get("variation", "aether", "RANDOM"));
+    READ_CONF_AREA_VALUE(variation, aetherSize);
     READ_CONF_VALUE(variation, trimEvilTendrils, Boolean);
     READ_CONF_VALUE(variation, avoidantEvil, Boolean);
     READ_CONF_VALUE(variation, ore, Real);
@@ -792,7 +812,6 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, asteroids, Real);
     READ_CONF_VALUE(variation, minecartTracks, Real);
     READ_CONF_VALUE(variation, minecartLength, Real);
-    READ_CONF_AREA_VALUE(variation, aetherSize);
     READ_CONF_VALUE(variation, dungeonSize, Real);
     READ_CONF_AREA_VALUE(variation, templeSize);
     READ_CONF_AREA_VALUE(variation, evilSize);
