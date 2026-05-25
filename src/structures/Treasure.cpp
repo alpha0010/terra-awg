@@ -271,7 +271,8 @@ void placeFallenLogs(
 
 void placeAltars(int maxBin, LocationBins &locations, Random &rnd, World &world)
 {
-    int altarCount = std::max(8, world.getWidth() / 200);
+    int altarCount =
+        std::max<int>(8, world.conf.evilSize * world.getWidth() / 200);
     if (world.conf.bothEvils || world.conf.dontDigUp) {
         altarCount *= 2;
     }
@@ -295,6 +296,7 @@ void placeAltars(int maxBin, LocationBins &locations, Random &rnd, World &world)
          TileID::crimsandstone,
          TileID::hardenedCrimsand,
          TileID::flesh});
+    std::vector<Point> usedLocations;
     for (int tries = 400 * altarCount; altarCount > 0 && tries > 0; --tries) {
         int binId = rnd.getInt(0, maxBin);
         if (locations[binId].empty()) {
@@ -313,8 +315,10 @@ void placeAltars(int maxBin, LocationBins &locations, Random &rnd, World &world)
                            ? Variant::crimson
                            : Variant::none;
         if (type != Variant::none && isPlacementCandidate(x, y, world) &&
-            isPlacementCandidate(x - 1, y, world)) {
+            isPlacementCandidate(x - 1, y, world) &&
+            !isLocationUsed(x, y, 5, usedLocations)) {
             world.placeFramedTile(x - 1, y - 2, TileID::altar, type);
+            usedLocations.emplace_back(x, y);
             --altarCount;
         }
     }
@@ -462,12 +466,19 @@ void placeOrbHearts(
     Random &rnd,
     World &world)
 {
-    int orbHeartCount = world.getWidth() * world.getHeight() / 240000;
+    double sizeMult = world.conf.evilSize;
     if (world.conf.dontDigUp) {
-        orbHeartCount *= 4;
-    } else if (world.conf.bothEvils) {
-        orbHeartCount *= 2;
+        sizeMult = 4;
+    } else {
+        if (sizeMult > 1) {
+            sizeMult *= sizeMult;
+        }
+        if (world.conf.bothEvils) {
+            sizeMult *= 2;
+        }
     }
+    int orbHeartCount =
+        sizeMult * world.getWidth() * world.getHeight() / 240000;
     std::vector<std::tuple<int, int, int>> usedLocations;
     for (int tries = 500 * orbHeartCount; orbHeartCount > 0 && tries > 0;
          --tries) {
