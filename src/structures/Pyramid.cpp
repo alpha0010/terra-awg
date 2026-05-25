@@ -104,7 +104,8 @@ std::pair<int, int> fillTreasureRoom(int x, int y, Random &rnd, World &world)
     for (int i = 0; i < treasureRoom.getWidth(); ++i) {
         for (int j = 0; j < treasureRoom.getHeight(); ++j) {
             Tile &roomTile = treasureRoom.getTile(i, j);
-            if (roomTile.blockID == TileID::chest &&
+            if ((roomTile.blockID == TileID::chest ||
+                 roomTile.blockID == TileID::chestGroup2) &&
                 roomTile.frameX % 36 == 0 && roomTile.frameY == 0) {
                 fillPyramidChest(
                     world.registerStorage(x + i, y + j + align),

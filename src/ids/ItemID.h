@@ -390,6 +390,7 @@ enum {
     prettyMirror = 5577,
     powerBomb = 5594,
     acornSlingshot = 5629,
+    forbiddenBlock = 6088,
 };
 }
 

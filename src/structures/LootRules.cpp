@@ -1646,6 +1646,7 @@ void fillCavernPearlwoodChest(Chest &chest, Random &rnd, World &world)
 
 void fillCavernSandstoneChest(Chest &chest, Random &rnd, World &world)
 {
+    bool isForbidden = world.getTile(chest.x, chest.y).frameX == 1296;
     fillLoot(
         chest,
         rnd,
@@ -1661,6 +1662,8 @@ void fillCavernSandstoneChest(Chest &chest, Random &rnd, World &world)
                        {ItemID::bastStatue, Prefix::none, 1},
                    })},
             getGlobalItemPrimary(rnd, world),
+            {isForbidden ? 1.0 : 0,
+             {ItemID::forbiddenBlock, Prefix::none, rnd.getInt(30, 60)}},
             {0.05,
              {rnd.select({ItemID::blackPearl, ItemID::pinkPearl}),
               Prefix::none,
