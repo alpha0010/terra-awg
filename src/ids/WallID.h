@@ -101,6 +101,7 @@ enum {
     neonMossBrick = 345,
     pineTree = 353,
     pineWood = 358,
+    forbidden = 364,
 };
 }
 
