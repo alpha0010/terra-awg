@@ -97,7 +97,7 @@ std::pair<int, int> applyAetherCrystalline(
                 if (world.getTile(x, y).blockID == TileID::empty) {
                     iterateDiamond(
                         rnd.getInt(3, 5),
-                        0,
+                        1,
                         [x, y, &world](int i, int j) {
                             Tile &tile = world.getTile(x + i - 4, y + j - 4);
                             if (tile.blockID == TileID::empty) {
@@ -117,7 +117,7 @@ std::pair<int, int> applyAetherCrystalline(
             }
             iterateDiamond(
                 radius,
-                0,
+                1,
                 [x, y, &maxEditPos, &world](int i, int j) {
                     Tile &tile = world.getTile(x + i, y + j);
                     if (tile.blockID != TileID::bubble &&
@@ -132,7 +132,7 @@ std::pair<int, int> applyAetherCrystalline(
             }
             iterateDiamond(
                 radius - offset,
-                0,
+                1,
                 [x, y, offset, &maxBubblePos, &world](int i, int j) {
                     world.getTile(x + offset + i, y + offset + j).blockID =
                         TileID::bubble;
