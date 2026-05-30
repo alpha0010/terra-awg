@@ -99,6 +99,7 @@ enum {
     argonMossBrick = 342,
     kryptonMossBrick = 343,
     neonMossBrick = 345,
+    feywood = 351,
     pineTree = 353,
     pineWood = 358,
     forbidden = 364,

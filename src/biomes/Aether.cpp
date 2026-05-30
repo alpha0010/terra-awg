@@ -4,6 +4,7 @@
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
+#include "ids/Paint.h"
 #include "ids/WallID.h"
 #include <iostream>
 
@@ -183,6 +184,151 @@ std::pair<int, int> applyAetherCrystalline(
     return {maxBubblePos, maxEditPos};
 }
 
+void doAetherFoliage(int x, int y, Random &rnd, World &world)
+{
+    double radius = rnd.getDouble(4, 8);
+    for (int i = -radius; i < radius; ++i) {
+        for (int j = -radius; j < radius; ++j) {
+            if (std::hypot(i, j) / radius <
+                0.6 + 0.6 * rnd.getFineNoise(x + i, y + j)) {
+                Tile &tile = world.getTile(x + i, y + j);
+                tile.blockID = TileID::mahoganyLeaf;
+                tile.wallID = WallID::Safe::aetherium;
+            }
+        }
+    }
+}
+
+std::pair<int, int> applyAetherGrove(
+    Point center,
+    double size,
+    std::vector<Point> &mossLocations,
+    Random &rnd,
+    World &world)
+{
+    int maxEditPos = center.y;
+    int maxBubblePos = center.y + 0.5 * size;
+    for (int i = -size; i < size; ++i) {
+        for (int j = -size; j < size; ++j) {
+            double centralPropo = std::hypot(i, j) / size;
+            double noiseVal = 2 * centralPropo - 0.32 -
+                              std::abs(rnd.getCoarseNoise(
+                                  2 * (center.x + i + size),
+                                  2 * (center.y + j + size)));
+            Tile &tile = world.getTile(center.x + i, center.y + j);
+            if (noiseVal < 0.87) {
+                tile.blockID = TileID::empty;
+                tile.wallID = WallID::empty;
+                maxEditPos = std::max(maxEditPos, center.y + j);
+                double threshold = 0.04 - 0.1 * j / size;
+                if (std::abs(rnd.getBlurNoise(
+                        5 * (center.x + i + size),
+                        3 * (center.y + j + size))) < threshold) {
+                    tile.blockID =
+                        rnd.getFineNoise(center.x + i, center.y + j) > 0
+                            ? TileID::heliumMossStone
+                            : TileID::aetherium;
+                    mossLocations.emplace_back(center.x + i, center.y + j);
+                }
+            } else if (std::midpoint(noiseVal, centralPropo - 0.1) < 1) {
+                tile.blockID = tile.blockID == TileID::empty ? TileID::aetherium
+                                                             : TileID::stone;
+            } else if (
+                centralPropo < 1 && center.y + j > maxBubblePos &&
+                tile.blockID == TileID::empty) {
+                tile.guarded = true;
+            }
+        }
+    }
+    maxBubblePos = (2 * maxEditPos + center.y) / 3;
+
+    double trunkRadius = std::max(2.5, size / 22);
+    int leafCenter = (maxEditPos + 4 * center.y) / 5;
+    for (int y = leafCenter; y <= maxEditPos; ++y) {
+        int iMin = 2.5 * rnd.getFineNoise(center.x, y) - trunkRadius;
+        int iMax = 2.5 * rnd.getFineNoise(center.x + 100, y) + trunkRadius;
+        for (int i = iMin; i <= iMax; ++i) {
+            Tile &tile = world.getTile(center.x + i, y);
+            if (tile.blockID != TileID::empty) {
+                continue;
+            }
+            if (i > iMin && i < iMax) {
+                tile.wallID = WallID::Safe::feywood;
+            }
+            if (rnd.getFineNoise(4 * (center.x + i), 4 * y) < 0.4) {
+                tile.blockID = TileID::livingMahogany;
+            }
+        }
+    }
+    double scaleX = 3;
+    double scaleY = 5.3;
+    for (int i = -size / scaleX; i < size / scaleX; ++i) {
+        for (int j = -size / scaleY; j < size / scaleY; ++j) {
+            double centralPropo = std::hypot(i * scaleX, j * scaleY) / size;
+            if (centralPropo > 1) {
+                continue;
+            }
+            int threshold = 7 * (1 - centralPropo) + 4.5;
+            if (static_cast<int>(
+                    99999 *
+                    (1 + rnd.getFineNoise(center.x + i, leafCenter + j))) %
+                    107 <
+                threshold) {
+                doAetherFoliage(center.x + i, leafCenter + j, rnd, world);
+            }
+            if (centralPropo < 0.9 && std::abs(rnd.getFineNoise(
+                                          2 * (center.x + i),
+                                          2 * (leafCenter + j))) > 0.1) {
+                Tile &tile = world.getTile(center.x + i, leafCenter + j);
+                if (tile.wallID == WallID::empty) {
+                    tile.wallID = WallID::Safe::aetherium;
+                }
+            }
+        }
+    }
+
+    // Not a trap.
+    world.queuedTraps.emplace_back(
+        [x = center.x,
+         width = 6 + size / scaleX,
+         minY = leafCenter - 6 - size / scaleY,
+         maxY = maxEditPos + 1](Random &rnd, World &world) {
+            for (int i = -width; i < width; ++i) {
+                for (int y = minY; y < maxY; ++y) {
+                    Tile &tile = world.getTile(x + i, y);
+                    if (tile.liquid != Liquid::shimmer) {
+                        tile.liquid = Liquid::none;
+                    }
+                    if (tile.blockID == TileID::mahoganyLeaf) {
+                        switch (static_cast<int>(
+                                    99999 * (1 + rnd.getFineNoise(x + i, y))) %
+                                31) {
+                        case 0:
+                            tile.blockID = TileID::aetherium;
+                            break;
+                        case 1:
+                            if (!world.isExposed(x + i, y)) {
+                                tile.blockID = TileID::sillyPinkBalloon;
+                                break;
+                            }
+                            [[fallthrough]];
+                        default:
+                            tile.blockPaint = Paint::negative;
+                            if (rnd.getFineNoise(x + 3 * i, 4 * y) > 0.45) {
+                                tile.actuated = true;
+                            }
+                            break;
+                        }
+                    } else if (tile.blockID == TileID::livingMahogany) {
+                        tile.blockPaint = Paint::brown;
+                    }
+                }
+            }
+        });
+
+    return {maxBubblePos, maxEditPos};
+}
+
 void genAether(Random &rnd, World &world)
 {
     std::cout << "Bridging realities\n";
@@ -214,6 +360,10 @@ void genAether(Random &rnd, World &world)
     case AetherBiome::crystalline:
         std::tie(maxBubblePos, maxEditPos) =
             applyAetherCrystalline(center, size, mossLocations, rnd, world);
+        break;
+    case AetherBiome::grove:
+        std::tie(maxBubblePos, maxEditPos) =
+            applyAetherGrove(center, size, mossLocations, rnd, world);
         break;
     default: // AetherBiome::rift
         std::tie(maxBubblePos, maxEditPos) =
@@ -267,11 +417,18 @@ void fillAetherShimmer(
                 tile.blockID = TileID::empty;
                 tile.liquid = Liquid::shimmer;
             }
+            if (y > maxEditPos) {
+                tile.guarded = false;
+            }
         }
     }
     for (int x = centerX - size; x < centerX + size; ++x) {
         for (int y = maxBubblePos + 1; y < maxEditPos + 1; ++y) {
             Tile &tile = world.getTile(x, y);
+            if (tile.guarded) {
+                tile.guarded = false;
+                continue;
+            }
             if (tile.blockID == TileID::empty) {
                 if (std::hypot(x - centerX, y - centerY) < size - 2) {
                     // Shimmer pool adjacent to the lowest bubble.
