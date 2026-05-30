@@ -5,6 +5,7 @@
 #include "ids/Paint.h"
 #include "ids/WallID.h"
 #include <algorithm>
+#include <map>
 
 namespace
 {
@@ -266,6 +267,22 @@ void Color::blend(Color tint, double strength)
 
 void Color::hueBlend(Color tint)
 {
+    uint64_t cacheKey = 0;
+    for (uint8_t val : rgb) {
+        cacheKey <<= 8;
+        cacheKey |= val;
+    }
+    for (uint8_t val : tint.rgb) {
+        cacheKey <<= 8;
+        cacheKey |= val;
+    }
+    thread_local std::map<uint64_t, Color> blendCache;
+    auto cacheItr = blendCache.find(cacheKey);
+    if (cacheItr != blendCache.end()) {
+        *this = cacheItr->second;
+        return;
+    }
+
     uint8_t rgbMax = *std::max_element(rgb, rgb + 3);
     uint8_t rgbMin = *std::min_element(rgb, rgb + 3);
     double v = rgbMax / 255.0;
@@ -343,6 +360,8 @@ void Color::hueBlend(Color tint)
         break;
     }
     blend(tint);
+
+    blendCache.emplace(cacheKey, rgb);
 }
 
 Color getLayerColor(int y, World &world)
