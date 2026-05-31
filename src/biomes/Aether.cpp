@@ -288,43 +288,56 @@ std::pair<int, int> applyAetherGrove(
     }
 
     // Not a trap.
-    world.queuedTraps.emplace_back(
-        [x = center.x,
-         width = 6 + size / scaleX,
-         minY = leafCenter - 6 - size / scaleY,
-         maxY = maxEditPos + 1](Random &rnd, World &world) {
-            for (int i = -width; i < width; ++i) {
-                for (int y = minY; y < maxY; ++y) {
-                    Tile &tile = world.getTile(x + i, y);
-                    if (tile.liquid != Liquid::shimmer) {
-                        tile.liquid = Liquid::none;
-                    }
-                    if (tile.blockID == TileID::mahoganyLeaf) {
-                        switch (static_cast<int>(
-                                    99999 * (1 + rnd.getFineNoise(x + i, y))) %
-                                31) {
-                        case 0:
-                            tile.blockID = TileID::aetherium;
-                            break;
-                        case 1:
-                            if (!world.isExposed(x + i, y)) {
-                                tile.blockID = TileID::sillyPinkBalloon;
-                                break;
-                            }
-                            [[fallthrough]];
-                        default:
-                            tile.blockPaint = Paint::negative;
-                            if (rnd.getFineNoise(x + 3 * i, 4 * y) > 0.45) {
-                                tile.actuated = true;
-                            }
+    world.queuedTraps.emplace_back([center,
+                                    size,
+                                    width = 6 + size / scaleX,
+                                    minY = leafCenter - 6 - size / scaleY,
+                                    maxY = maxEditPos +
+                                           1](Random &rnd, World &world) {
+        for (int i = -width; i < width; ++i) {
+            for (int y = minY; y < maxY; ++y) {
+                Tile &tile = world.getTile(center.x + i, y);
+                if (tile.liquid != Liquid::shimmer) {
+                    tile.liquid = Liquid::none;
+                }
+                if (tile.blockID == TileID::mahoganyLeaf) {
+                    switch (
+                        static_cast<int>(
+                            99999 * (1 + rnd.getFineNoise(center.x + i, y))) %
+                        31) {
+                    case 0:
+                        tile.blockID = TileID::aetherium;
+                        break;
+                    case 1:
+                        if (!world.isExposed(center.x + i, y)) {
+                            tile.blockID = TileID::sillyPinkBalloon;
                             break;
                         }
-                    } else if (tile.blockID == TileID::livingMahogany) {
-                        tile.blockPaint = Paint::brown;
+                        [[fallthrough]];
+                    default:
+                        tile.blockPaint = Paint::negative;
+                        if (rnd.getFineNoise(center.x + 3 * i, 4 * y) > 0.45) {
+                            tile.actuated = true;
+                        }
+                        break;
+                    }
+                } else if (tile.blockID == TileID::livingMahogany) {
+                    tile.blockPaint = Paint::brown;
+                }
+            }
+        }
+        for (int i = -size; i < size; ++i) {
+            for (int j = -size; j < 0; ++j) {
+                if (std::hypot(i, j) < size) {
+                    Tile &tile = world.getTile(center.x + i, center.y + j);
+                    if (tile.liquid == Liquid::water ||
+                        tile.liquid == Liquid::lava) {
+                        tile.liquid = Liquid::shimmer;
                     }
                 }
             }
-        });
+        }
+    });
 
     return {maxBubblePos, maxEditPos};
 }

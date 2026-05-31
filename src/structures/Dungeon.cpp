@@ -1510,6 +1510,9 @@ int computeDungeonCenter(World &world)
         static_cast<int>(world.desertCenter),
         static_cast<int>(world.jungleCenter),
         static_cast<int>(world.snowCenter)};
+    if (world.conf.aether == AetherBiome::grove) {
+        avoidPoints.push_back(world.aether.x);
+    }
     std::sort(avoidPoints.begin(), avoidPoints.end());
     int maxSpan = 0;
     int dungeonCenter = world.getWidth() / 4;

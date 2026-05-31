@@ -301,7 +301,7 @@ void genVines(Random &rnd, World &world)
                 vine = TileID::flowerVines;
             } else if (
                 vine == TileID::vineRope &&
-                (randInt % 1009 < 650 ||
+                (randInt % 1009 < 650 || tile.blockPaint == Paint::brown ||
                  world.getTile(x - 1, y + 2).blockID != TileID::empty)) {
                 continue;
             }
