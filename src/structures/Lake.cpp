@@ -133,6 +133,9 @@ void simulateRain(Random &rnd, World &world, int x)
              : world.conf.biomes != BiomeLayout::columns && y < lavaLevel
                  ? 1.25 + 1.08 * rnd.getHumidity(x, y)
                  : 1.65);
+        if (world.getTile(x, y).flag == Flag::lake) {
+            pendingWater += waterMult * 15;
+        }
         if (world.conf.celebration && hypot(world.aether, {x, y}) < 200) {
             pendingWater += 1.5;
         }

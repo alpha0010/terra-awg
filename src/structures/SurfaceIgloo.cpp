@@ -44,7 +44,8 @@ bool canPlaceIglooAt(int x, int y, TileBuffer &igloo, World &world)
         igloo.getWidth(),
         igloo.getHeight(),
         [&clearableTiles](Tile &tile) {
-            return clearableTiles.contains(tile.blockID);
+            return clearableTiles.contains(tile.blockID) &&
+                   tile.flag != Flag::lake;
         });
 }
 

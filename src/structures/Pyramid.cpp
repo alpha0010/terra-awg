@@ -321,7 +321,8 @@ Point selectPyramidLocation(int size, Random &rnd, World &world)
                2 * size,
                size,
                [&avoidTiles](Tile &tile) {
-                   return !avoidTiles.contains(tile.blockID);
+                   return !avoidTiles.contains(tile.blockID) &&
+                          tile.flag != Flag::lake;
                })) {
         x = rnd.select(desertSurface);
         ++numTries;

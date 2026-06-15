@@ -8,6 +8,7 @@
 #include "biomes/AshenField.h"
 #include "biomes/AsteroidField.h"
 #include "biomes/Base.h"
+#include "biomes/Basins.h"
 #include "biomes/Cloud.h"
 #include "biomes/Corruption.h"
 #include "biomes/Crimson.h"
@@ -77,6 +78,7 @@ enum class Step {
     initNoise,
     genWorldBase,
     genOceans,
+    genBasins,
     genCloud,
     genMarbleCave,
     genJungle,
@@ -164,6 +166,7 @@ inline std::array baseBiomeRules{
     Step::genWorldBase,
     Step::genWorldBasePatches,
     Step::genOceans,
+    Step::genBasins,
     Step::genShatteredLand,
     Step::genCloud,
     Step::genMarbleCave,
@@ -259,6 +262,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         break;
         GEN_STEP(genWorldBase)
         GEN_STEP(genOceans)
+        GEN_STEP(genBasins)
         GEN_STEP(genCloud)
         GEN_STEP(genMarbleCave)
         GEN_STEP(genJungle)
