@@ -2,6 +2,7 @@
 
 #include "Random.h"
 #include "ids/ItemID.h"
+#include "ids/TileID.h"
 #include "vendor/INIReader.h"
 #include <cstring>
 #include <filesystem>
@@ -148,6 +149,24 @@ trimEvilTendrils = false
 
 # Reduce corruption/crimson overlap with major biomes.
 avoidantEvil = false
+
+# Set ore tier variants.
+# (oreT4, oreT5, and oreT6 selections are ignored if "hardmode" is disabled.)
+#
+# RANDOM/copper/tin
+oreT0 = RANDOM
+# RANDOM/iron/lead
+oreT1 = RANDOM
+# RANDOM/silver/tungsten
+oreT2 = RANDOM
+# RANDOM/gold/platinum
+oreT3 = RANDOM
+# RANDOM/cobalt/palladium
+oreT4 = RANDOM
+# RANDOM/mythril/orichalcum
+oreT5 = RANDOM
+# RANDOM/adamantite/titanium
+oreT6 = RANDOM
 
 # Placement frequency multipliers. 0.5 means half the
 # normal amount, 2.0 means double the normal amount.
@@ -663,6 +682,18 @@ std::string Config::getFilename() const
     conf.KEY =                                                                 \
         std::sqrt(std::max(reader.GetReal(#SECTION, #KEY, conf.KEY), 0.0))
 
+#define READ_CONF_ORE_TIER(SECTION, KEY, OPT1, OPT2)                           \
+    do {                                                                       \
+        std::string ore(reader.Get(#SECTION, #KEY, "RANDOM"));                 \
+        if (ore == #OPT1) {                                                    \
+            conf.KEY = TileID::OPT1##Ore;                                      \
+        } else if (ore == #OPT2) {                                             \
+            conf.KEY = TileID::OPT2##Ore;                                      \
+        } else if (ore != "RANDOM") {                                          \
+            std::cout << "Unknown " #KEY " '" << ore << "'\n";                 \
+        }                                                                      \
+    } while (0)
+
 Config readConfig(Random &rnd)
 {
     Config conf{
@@ -703,6 +734,13 @@ Config readConfig(Random &rnd)
         1.0,   // aetherSize
         false, // trimEvilTendrils
         false, // avoidantEvil
+        -1,    // oreT0
+        -1,    // oreT1
+        -1,    // oreT2
+        -1,    // oreT3
+        -1,    // oreT4
+        -1,    // oreT5
+        -1,    // oreT6
         1.0,   // ore
         1.0,   // lifeCrystals
         1.0,   // manaCrystals
@@ -799,6 +837,13 @@ Config readConfig(Random &rnd)
     READ_CONF_AREA_VALUE(variation, aetherSize);
     READ_CONF_VALUE(variation, trimEvilTendrils, Boolean);
     READ_CONF_VALUE(variation, avoidantEvil, Boolean);
+    READ_CONF_ORE_TIER(variation, oreT0, copper, tin);
+    READ_CONF_ORE_TIER(variation, oreT1, iron, lead);
+    READ_CONF_ORE_TIER(variation, oreT2, silver, tungsten);
+    READ_CONF_ORE_TIER(variation, oreT3, gold, platinum);
+    READ_CONF_ORE_TIER(variation, oreT4, cobalt, palladium);
+    READ_CONF_ORE_TIER(variation, oreT5, mythril, orichalcum);
+    READ_CONF_ORE_TIER(variation, oreT6, adamantite, titanium);
     READ_CONF_VALUE(variation, ore, Real);
     READ_CONF_VALUE(variation, lifeCrystals, Real);
     READ_CONF_VALUE(variation, manaCrystals, Real);

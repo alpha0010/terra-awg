@@ -760,21 +760,35 @@ int main()
     world.isCrimson = conf.evil == EvilBiome::random
                           ? rnd.getBool()
                           : conf.evil == EvilBiome::crimson;
-    world.copperVariant = rnd.select({TileID::copperOre, TileID::tinOre});
-    world.ironVariant = rnd.select({TileID::ironOre, TileID::leadOre});
-    world.silverVariant = rnd.select({TileID::silverOre, TileID::tungstenOre});
-    world.goldVariant = rnd.select({TileID::goldOre, TileID::platinumOre});
+    world.copperVariant = conf.oreT0 == -1
+                              ? rnd.select({TileID::copperOre, TileID::tinOre})
+                              : conf.oreT0;
+    world.ironVariant = conf.oreT1 == -1
+                            ? rnd.select({TileID::ironOre, TileID::leadOre})
+                            : conf.oreT1;
+    world.silverVariant =
+        conf.oreT2 == -1 ? rnd.select({TileID::silverOre, TileID::tungstenOre})
+                         : conf.oreT2;
+    world.goldVariant = conf.oreT3 == -1
+                            ? rnd.select({TileID::goldOre, TileID::platinumOre})
+                            : conf.oreT3;
     if (conf.doubleTrouble) {
         conf.bothEvils = true;
         conf.allOres = true;
     }
     if (conf.hardmode) {
         world.cobaltVariant =
-            rnd.select({TileID::cobaltOre, TileID::palladiumOre});
+            conf.oreT4 == -1
+                ? rnd.select({TileID::cobaltOre, TileID::palladiumOre})
+                : conf.oreT4;
         world.mythrilVariant =
-            rnd.select({TileID::mythrilOre, TileID::orichalcumOre});
+            conf.oreT5 == -1
+                ? rnd.select({TileID::mythrilOre, TileID::orichalcumOre})
+                : conf.oreT5;
         world.adamantiteVariant =
-            rnd.select({TileID::adamantiteOre, TileID::titaniumOre});
+            conf.oreT6 == -1
+                ? rnd.select({TileID::adamantiteOre, TileID::titaniumOre})
+                : conf.oreT6;
     } else {
         world.cobaltVariant = TileID::empty;
         world.mythrilVariant = TileID::empty;

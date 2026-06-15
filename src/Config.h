@@ -61,6 +61,13 @@ struct Config {
     double aetherSize;
     bool trimEvilTendrils;
     bool avoidantEvil;
+    int oreT0;
+    int oreT1;
+    int oreT2;
+    int oreT3;
+    int oreT4;
+    int oreT5;
+    int oreT6;
     double ore;
     double lifeCrystals;
     double manaCrystals;
