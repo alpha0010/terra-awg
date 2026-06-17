@@ -1,5 +1,6 @@
 #include "biomes/hiveQueen/Aether.h"
 
+#include "Config.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/Aether.h"
@@ -10,6 +11,7 @@
 
 Point selectAetherLocation(Random &rnd, World &world)
 {
+    int buffer = 107 - world.conf.hiveQueenBorderWidth;
     while (true) {
         int x = world.getWidth() * rnd.getDouble(0.08, 0.30);
         if (rnd.getBool()) {
@@ -18,9 +20,12 @@ Point selectAetherLocation(Random &rnd, World &world)
         int y = rnd.getInt(
             (world.getUndergroundLevel() + 2 * world.getCavernLevel()) / 3,
             (world.getCavernLevel() + 5 * world.getUnderworldLevel()) / 6);
-        if (world.regionPasses(x - 50, y - 50, 100, 100, [](Tile &tile) {
-                return tile.flag != Flag::border;
-            })) {
+        if (world.regionPasses(
+                x - buffer / 2,
+                y - buffer / 2,
+                buffer,
+                buffer,
+                [](Tile &tile) { return tile.flag != Flag::border; })) {
             return {x, y};
         }
     }

@@ -606,9 +606,11 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
         world.getWidth() / 2,
         world.getSurfaceLevel(world.getWidth() / 2) - 1};
 
-    parallelFor(hexBorders, [&world](Point pt) {
-        for (int i = -3; i < 3; ++i) {
-            for (int j = -3; j < 3; ++j) {
+    int borderMin = -((world.conf.hiveQueenBorderWidth - 1) / 2);
+    int borderMax = world.conf.hiveQueenBorderWidth / 2;
+    parallelFor(hexBorders, [borderMin, borderMax, &world](Point pt) {
+        for (int i = borderMin; i < borderMax; ++i) {
+            for (int j = borderMin; j < borderMax; ++j) {
                 Tile &tile = world.getTile(pt + Point{i, j});
                 tile.blockID = TileID::hive;
                 tile.wallID = WallID::Unsafe::hive;

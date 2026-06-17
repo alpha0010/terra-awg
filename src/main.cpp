@@ -819,6 +819,8 @@ int main()
         PrefixSet::initCelebration();
     }
     if (conf.hiveQueen) {
+        conf.hiveQueenBorderWidth =
+            std::clamp(conf.hiveQueenBorderWidth, 2, 25);
         if (conf.biomes == BiomeLayout::columns) {
             conf.jungleSize *= 2;
         } else if (conf.biomes == BiomeLayout::layers) {

@@ -126,6 +126,7 @@ rollerCoasterChance = 0.0
 
 # Activates "not the bees" secret seed.
 hiveQueen = false
+hiveQueenBorderWidth = 7
 
 # Activates "for the worthy" secret seed.
 forTheWorthy = false
@@ -725,6 +726,7 @@ Config readConfig(Random &rnd)
         false, // celebration
         0.0,   // rollerCoasterChance
         false, // hiveQueen
+        7,     // hiveQueenBorderWidth
         false, // forTheWorthy
         false, // ascent
         false, // dontDigUp
@@ -828,6 +830,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, celebration, Boolean);
     READ_CONF_VALUE(variation, rollerCoasterChance, Real);
     READ_CONF_VALUE(variation, hiveQueen, Boolean);
+    READ_CONF_VALUE(variation, hiveQueenBorderWidth, Integer);
     READ_CONF_VALUE(variation, forTheWorthy, Boolean);
     READ_CONF_VALUE(variation, ascent, Boolean);
     READ_CONF_VALUE(variation, dontDigUp, Boolean);

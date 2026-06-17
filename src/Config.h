@@ -52,6 +52,7 @@ struct Config {
     bool celebration;
     double rollerCoasterChance;
     bool hiveQueen;
+    int hiveQueenBorderWidth;
     bool forTheWorthy;
     bool ascent;
     bool dontDigUp;
