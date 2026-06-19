@@ -56,6 +56,7 @@ struct Config {
     bool forTheWorthy;
     bool ascent;
     bool dontDigUp;
+    double lootRandomizer;
     int meteorites;
     double meteoriteSize;
     AetherBiome aether;

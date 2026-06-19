@@ -65,6 +65,7 @@
 #include "structures/Vines.h"
 #include "structures/Webs.h"
 #include "structures/dontDigUp/LootRules.h"
+#include "structures/glitched/LootRules.h"
 #include "structures/hardmode/LootRules.h"
 #include "structures/hiveQueen/GlobalHive.h"
 #include "structures/hiveQueen/Temple.h"
@@ -157,6 +158,8 @@ enum class Step {
     genGlobalHive,
     // Dont dig up.
     applyDontDigUpLoot,
+    // Glitched.
+    randomizeLoot,
 };
 
 inline std::array baseBiomeRules{
@@ -196,17 +199,17 @@ inline std::array baseBiomeRules{
 };
 
 inline std::array baseStructureRules{
-    Step::genDungeon,       Step::genTemple,         Step::genTempleHiveQueen,
-    Step::genCavernSpawn,   Step::genPyramid,        Step::genDesertTomb,
-    Step::genBuriedBoat,    Step::genSpiderHall,     Step::genRuins,
-    Step::genTorchArena,    Step::genOceanWreck,     Step::genLake,
-    Step::genStarterHome,   Step::genIgloo,          Step::genMushroomCabin,
-    Step::genTreasure,      Step::applyHardmodeLoot, Step::applyDontDigUpLoot,
-    Step::genGlobalHive,    Step::genGlaciation,     Step::genPlants,
-    Step::genTraps,         Step::genTracks,         Step::genFlood,
-    Step::smoothSurfaces,   Step::finalizeWalls,     Step::genVines,
-    Step::genGrasses,       Step::genWebs,           Step::genGlobalEcho,
-    Step::genGlobalOutline,
+    Step::genDungeon,     Step::genTemple,         Step::genTempleHiveQueen,
+    Step::genCavernSpawn, Step::genPyramid,        Step::genDesertTomb,
+    Step::genBuriedBoat,  Step::genSpiderHall,     Step::genRuins,
+    Step::genTorchArena,  Step::genOceanWreck,     Step::genLake,
+    Step::genStarterHome, Step::genIgloo,          Step::genMushroomCabin,
+    Step::genTreasure,    Step::applyHardmodeLoot, Step::applyDontDigUpLoot,
+    Step::randomizeLoot,  Step::genGlobalHive,     Step::genGlaciation,
+    Step::genPlants,      Step::genTraps,          Step::genTracks,
+    Step::genFlood,       Step::smoothSurfaces,    Step::finalizeWalls,
+    Step::genVines,       Step::genGrasses,        Step::genWebs,
+    Step::genGlobalEcho,  Step::genGlobalOutline,
 };
 
 inline std::array hiveQueenBiomeRules{
@@ -343,6 +346,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genTempleHiveQueen)
         GEN_STEP_WORLD(genGlobalHive)
         GEN_STEP_WORLD(applyDontDigUpLoot)
+        GEN_STEP(randomizeLoot)
     }
 }
 
@@ -412,6 +416,9 @@ void doWorldGen(Random &rnd, World &world)
     }
     if (!world.conf.dontDigUp) {
         excludes.insert(Step::applyDontDigUpLoot);
+    }
+    if (world.conf.lootRandomizer < 0.001) {
+        excludes.insert(Step::randomizeLoot);
     }
     LocationBins locations;
     std::vector<Step> steps;
