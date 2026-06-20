@@ -237,6 +237,18 @@ void growTree(
         return;
     }
     int height = rnd.getInt(7, 15);
+    if (world.conf.glitched) {
+        switch (rnd.getInt(0, 4)) {
+        case 0:
+            height += rnd.getInt(1, 100);
+            break;
+        case 1:
+            height += rnd.getInt(1, 20);
+            break;
+        default:
+            break;
+        }
+    }
     if (!isRegionEmpty(x, y - 4 - height, 3, height + 4, world)) {
         return;
     }

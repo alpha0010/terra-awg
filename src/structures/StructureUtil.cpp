@@ -199,6 +199,27 @@ Point scanWhileNotSolid(Point from, Point delta, World &world)
     return from;
 }
 
+Point findNearestAnchor(Point origin, World &world)
+{
+    if (world.getTile(origin).flag == Flag::anchor) {
+        return origin;
+    }
+    Point anchor = origin;
+    double dist = 99;
+    for (int i = -50; i < 50; ++i) {
+        for (int j = -50; j < 50; ++j) {
+            if (world.getTile(origin + Point{i, j}).flag == Flag::anchor) {
+                double curDist = std::hypot(i, j);
+                if (curDist < dist) {
+                    dist = curDist;
+                    anchor = origin + Point{i, j};
+                }
+            }
+        }
+    }
+    return anchor;
+}
+
 inline std::array paintRainbow{
     Paint::red,     Paint::orange, Paint::yellow,  Paint::lime,   Paint::green,
     Paint::teal,    Paint::cyan,   Paint::skyBlue, Paint::blue,   Paint::purple,

@@ -9,7 +9,16 @@ enum class Liquid { none, water, lava, honey, shimmer };
 // space.
 enum class Slope { none = 0, half, topRight, topLeft, bottomRight, bottomLeft };
 
-enum class Flag { none, border, hive, crispyHoney, yellow, orange, lake };
+enum class Flag {
+    none,
+    border,
+    hive,
+    crispyHoney,
+    yellow,
+    orange,
+    lake,
+    anchor,
+};
 
 class Tile
 {

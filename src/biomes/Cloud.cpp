@@ -215,10 +215,15 @@ void addCloudStructure(
             }
         }
     }
-    world.queuedTreasures.emplace_back([x,
-                                        y,
+    Point anchor{x + room.getWidth() / 2, y + room.getHeight() / 2};
+    world.getTile(anchor).flag = Flag::anchor;
+    world.queuedTreasures.emplace_back([anchor,
                                         roomId](Random &rnd, World &world) {
+        auto [x, y] = findNearestAnchor(anchor, world);
+        world.getTile(x, y).flag = Flag::none;
         TileBuffer room = Data::getSkyBox(roomId, world.getFramedTiles());
+        x -= room.getWidth() / 2;
+        y -= room.getHeight() / 2;
         auto [blockSwap, wallSwap] = getSkyBoxTileSwap(world);
         std::vector<Point> chests;
         for (int i = 0; i < room.getWidth(); ++i) {

@@ -485,7 +485,13 @@ void growLivingTrees(Random &rnd, World &world)
                    y < world.getUndergroundLevel()) {
                 ++y;
             }
-            if (world.getTile(x, y).blockID == TileID::grass) {
+            int glitchedRand =
+                static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 11;
+            if (world.getTile(x, y).blockID == TileID::grass ||
+                (world.conf.glitched && glitchedRand < 2)) {
+                if (world.conf.glitched && glitchedRand == 0) {
+                    y = rnd.getInt(y, world.getUnderworldLevel());
+                }
                 growLivingTree(x, y, rnd.pool(rooms), rnd, world);
             }
         }
@@ -544,7 +550,12 @@ void buryEnchantedSwords(Random &rnd, World &world)
                 }
             }
         }
-        world.queuedTreasures.emplace_back([x, y](Random &, World &world) {
+
+        Point anchor{x, y};
+        world.getTile(anchor).flag = Flag::anchor;
+        world.queuedTreasures.emplace_back([anchor](Random &, World &world) {
+            auto [x, y] = findNearestAnchor(anchor, world);
+            world.getTile(x, y).flag = Flag::none;
             TileBuffer shrine = Data::getSwordShrine(world.getFramedTiles());
             if (!world.regionPasses(
                     x - shrine.getWidth() / 2,

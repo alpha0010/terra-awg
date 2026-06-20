@@ -6,6 +6,7 @@
 #include "biomes/BiomeUtil.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
+#include "structures/StructureUtil.h"
 #include <iostream>
 
 /**
@@ -288,12 +289,15 @@ std::pair<int, int> applyAetherGrove(
     }
 
     // Not a trap.
-    world.queuedTraps.emplace_back([center,
+    world.getTile(center).flag = Flag::anchor;
+    world.queuedTraps.emplace_back([anchor = center,
                                     size,
                                     width = 6 + size / scaleX,
                                     minY = leafCenter - 6 - size / scaleY,
                                     maxY = maxEditPos +
                                            1](Random &rnd, World &world) {
+        Point center = findNearestAnchor(anchor, world);
+        world.getTile(center).flag = Flag::none;
         for (int i = -width; i < width; ++i) {
             for (int y = minY; y < maxY; ++y) {
                 Tile &tile = world.getTile(center.x + i, y);

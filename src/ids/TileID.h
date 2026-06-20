@@ -292,6 +292,7 @@ enum {
     kryptonMossBrick = 689,
     neonMossBrick = 691,
     decorativeCobweb = 697,
+    shimmerDrip = 709,
     rainbowBoulder = 711,
     lavaBoulder = 713,
     spiderBoulder = 714,

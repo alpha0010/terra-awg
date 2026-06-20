@@ -237,6 +237,7 @@ void genVines(Random &rnd, World &world)
          {TileID::pearlsand, TileID::sandDrip},
          {TileID::hardenedPearlsand, TileID::sandDrip},
          {TileID::pearlsandstone, TileID::sandDrip},
+         {TileID::aetherium, TileID::shimmerDrip},
          {TileID::hive, TileID::honeyDrip}});
     int lavaLevel =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;

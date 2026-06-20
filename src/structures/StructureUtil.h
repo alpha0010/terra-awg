@@ -28,6 +28,8 @@ Point scanWhileEmpty(Point from, Point delta, World &world);
 
 Point scanWhileNotSolid(Point from, Point delta, World &world);
 
+Point findNearestAnchor(Point origin, World &world);
+
 int getRainbowPaint(int x, int y);
 
 int getDeepRainbowPaint(int x, int y);

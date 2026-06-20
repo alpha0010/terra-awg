@@ -137,6 +137,9 @@ ascent = false
 # Activates "remix" secret seed. (Also enables "ascent".)
 dontDigUp = false
 
+# Activates "I am error" secret seed. (Also adds 2.5 to "lootRandomizer".)
+glitched = false
+
 # Randomize chest contents. Strength from 0.0 (normal loot
 # pools) to 4.0 (maximum scramble).
 lootRandomizer = 0.0
@@ -734,6 +737,7 @@ Config readConfig(Random &rnd)
         false, // forTheWorthy
         false, // ascent
         false, // dontDigUp
+        false, // glitched
         0.0,   // lootRandomizer
         0,     // meteorites
         1.0,   // meteoriteSize
@@ -839,6 +843,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, forTheWorthy, Boolean);
     READ_CONF_VALUE(variation, ascent, Boolean);
     READ_CONF_VALUE(variation, dontDigUp, Boolean);
+    READ_CONF_VALUE(variation, glitched, Boolean);
     READ_CONF_VALUE(variation, lootRandomizer, Real);
     READ_CONF_VALUE(variation, meteorites, Integer);
     READ_CONF_AREA_VALUE(variation, meteoriteSize);

@@ -257,33 +257,34 @@ std::map<int, NPCDetails> determineNPCs(Config &conf, Random &rnd)
 }
 
 void writeNPC(
+    Point anchor,
     int npcId,
     const std::string &npcName,
     Writer &w,
     Random &rnd,
     World &world,
-    int npcVariation = 0)
+    int npcVariation)
 {
     std::vector<Point> options;
     for (int i = -6; i < 6; ++i) {
         for (int j = -3; j < 3; ++j) {
             if (world.regionPasses(
-                    world.spawn.x + i,
-                    world.spawn.y - 2 + j,
+                    anchor.x + i,
+                    anchor.y - 2 + j,
                     2,
                     3,
                     [](Tile &tile) { return !isSolidBlock(tile.blockID); }) &&
                 !world.regionPasses(
-                    world.spawn.x + i,
-                    world.spawn.y + 1 + j,
+                    anchor.x + i,
+                    anchor.y + 1 + j,
                     2,
                     1,
                     [](Tile &tile) { return !isSolidBlock(tile.blockID); })) {
-                options.emplace_back(world.spawn.x + i, world.spawn.y + j);
+                options.emplace_back(anchor.x + i, anchor.y + j);
             }
         }
     }
-    Point pos = options.empty() ? world.spawn : rnd.select(options);
+    Point pos = options.empty() ? anchor : rnd.select(options);
     w.putBool(true);                // Begin town NPC record.
     w.putUint32(npcId);             // NPC ID.
     w.putString(npcName);           // NPC name.
@@ -310,6 +311,7 @@ std::string assembleSeedFlags(Config &conf)
     seed += maybeFlag(conf.purity, "Fish Mox");
     seed += maybeFlag(conf.endlessHalloween, "Hocus Pocus");
     seed += maybeFlag(conf.spawn == SpawnPoint::cavern, "How Did I Get Here");
+    seed += maybeFlag(conf.glitched, "I am Error");
     seed += maybeFlag(conf.fadedMemories > 0.005, "Invisible Plane");
     seed += maybeFlag(conf.endlessChristmas, "Jingle All the Way");
     seed += maybeFlag(conf.traps <= 0, "More Traps Please");
@@ -685,9 +687,35 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     for (auto npc : shimmeredNPCs) {
         w.putUint32(npc);
     }
-    for (const auto &[npcId, details] : npcs) {
-        writeNPC(npcId, details.name, w, rnd, world, details.variation);
+    if (!conf.glitched || conf.vampirism || conf.evilSize > 3.1) {
+        for (const auto &[npcId, details] : npcs) {
+            writeNPC(
+                world.spawn,
+                npcId,
+                details.name,
+                w,
+                rnd,
+                world,
+                details.variation);
+        }
+    } else {
+        for (size_t i = 0; i < npcs.size(); ++i) {
+            writeNPC(world.spawn, NPC::oldMan, "", w, rnd, world, 0);
+        }
     }
+    writeNPC(
+        world.dungeon,
+        NPC::oldMan,
+        "",
+        w,
+        rnd,
+        world,
+        std::binary_search(
+            shimmeredNPCs.begin(),
+            shimmeredNPCs.end(),
+            NPC::oldMan)
+            ? 1
+            : 0);
     w.putBool(false); // End town NPC records.
     w.putBool(false); // End pillar records.
     sectionPointers.push_back(w.tellp());
@@ -852,6 +880,9 @@ int main()
             conf.spawn = SpawnPoint::underworld;
         }
         conf.minecartTracks *= 1.5;
+    }
+    if (conf.glitched) {
+        conf.lootRandomizer += 2.5;
     }
     if (conf.spawn == SpawnPoint::normal) {
         conf.spawn = SpawnPoint::surface;

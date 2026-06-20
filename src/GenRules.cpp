@@ -29,6 +29,7 @@
 #include "biomes/doubleTrouble/Corruption.h"
 #include "biomes/doubleTrouble/Crimson.h"
 #include "biomes/doubleTrouble/ResourceSwap.h"
+#include "biomes/glitched/TerrainGlitch.h"
 #include "biomes/hardmode/Hallow.h"
 #include "biomes/hardmode/HmOres.h"
 #include "biomes/hiveQueen/Aether.h"
@@ -159,6 +160,7 @@ enum class Step {
     // Dont dig up.
     applyDontDigUpLoot,
     // Glitched.
+    terrainGlitch,
     randomizeLoot,
 };
 
@@ -196,6 +198,7 @@ inline std::array baseBiomeRules{
     Step::genSpiderNest,
     Step::genGlowingMoss,
     Step::genGemGrove,
+    Step::terrainGlitch,
 };
 
 inline std::array baseStructureRules{
@@ -242,6 +245,7 @@ inline std::array hiveQueenBiomeRules{
     Step::genSpiderNest,
     Step::genGlowingMossHiveQueen,
     Step::genGemGroveHiveQueen,
+    Step::terrainGlitch,
 };
 
 #define GEN_STEP(step)                                                         \
@@ -346,6 +350,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genTempleHiveQueen)
         GEN_STEP_WORLD(genGlobalHive)
         GEN_STEP_WORLD(applyDontDigUpLoot)
+        GEN_STEP(terrainGlitch)
         GEN_STEP(randomizeLoot)
     }
 }
@@ -416,6 +421,9 @@ void doWorldGen(Random &rnd, World &world)
     }
     if (!world.conf.dontDigUp) {
         excludes.insert(Step::applyDontDigUpLoot);
+    }
+    if (!world.conf.glitched) {
+        excludes.insert(Step::terrainGlitch);
     }
     if (world.conf.lootRandomizer < 0.001) {
         excludes.insert(Step::randomizeLoot);

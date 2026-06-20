@@ -8,6 +8,7 @@
 #include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
+#include "structures/glitched/Cleanup.h"
 #include "vendor/frozen/map.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
@@ -350,6 +351,7 @@ void finalizeWalls(Random &rnd, World &world)
          &world](int x) {
             for (int y = 0; y < world.getHeight(); ++y) {
                 applyCelebrationFinalize(x, y, rainbowOffset, world);
+                applyGlitchedFinalize(x, y, rnd, world);
                 if (y < world.getUndergroundLevel()) {
                     continue;
                 }
