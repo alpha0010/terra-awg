@@ -71,7 +71,7 @@ void fillGlowingMossHex(
         {x, y},
         world,
         [&world](Point pt) { return world.getTile(pt).flag != Flag::border; },
-        [mossType, &wallRepl, &mossLocations, &world](Point pt) {
+        [mossType, &wallRepl, &mossLocations, &rnd, &world](Point pt) {
             Tile &tile = world.getTile(pt);
             auto itr = wallRepl.find(tile.wallID);
             if (itr != wallRepl.end()) {
@@ -80,6 +80,27 @@ void fillGlowingMossHex(
             if (tile.blockID == TileID::stone && tile.flag != Flag::hive &&
                 tile.flag != Flag::crispyHoney && world.isExposed(pt.x, pt.y)) {
                 tile.blockID = mossType;
+                if (world.conf.glitched) {
+                    switch (rnd.getStableUint(pt.x, pt.y) % 41) {
+                    case 0:
+                        tile.blockID = TileID::argonMossStone;
+                        break;
+                    case 1:
+                        tile.blockID = TileID::kryptonMossStone;
+                        break;
+                    case 2:
+                        tile.blockID = TileID::lavaMossStone;
+                        break;
+                    case 3:
+                        tile.blockID = TileID::neonMossStone;
+                        break;
+                    case 4:
+                        tile.blockID = TileID::xenonMossStone;
+                        break;
+                    default:
+                        break;
+                    }
+                }
                 mossLocations.push_back(pt);
             }
         });

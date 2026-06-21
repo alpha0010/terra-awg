@@ -4,6 +4,7 @@
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
+#include "ids/WallID.h"
 #include "structures/StructureUtil.h"
 #include "vendor/frozen/set.h"
 
@@ -278,5 +279,11 @@ void applyGlitchedFinalize(int x, int y, Random &rnd, World &world)
         if (tile.blockPaint == Paint::none && randInt % 1327 == 0) {
             tile.blockPaint = glitchedPaints[randInt % glitchedPaints.size()];
         }
+    }
+
+    if (tile.blockID == TileID::obsidianBrick &&
+        world.getTile(x, y - 1).wallID == WallID::Safe::wroughtIronFence) {
+        tile.blockID = rnd.getCoarseNoise(x, y) > 0 ? TileID::conveyorBeltCW
+                                                    : TileID::conveyorBeltCCW;
     }
 }

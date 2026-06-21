@@ -518,7 +518,16 @@ void paintTemple(Point center, int blockPaint, int wallPaint, World &world)
             tile.blockPaint = blockPaint;
         }
         if (tile.wallID == WallID::Unsafe::lihzahrdBrick) {
-            tile.wallPaint = wallPaint;
+            if (world.conf.glitched) {
+                uint32_t curZone = hash32pt(x / 4, y / 4) % 2;
+                if (curZone != hash32pt((x + 1) / 4, y / 4) % 2 ||
+                    curZone != hash32pt(x / 4, (y + 1) / 4) % 2 ||
+                    curZone != hash32pt((x + 1) / 4, (y + 1) / 4) % 2) {
+                    tile.wallPaint = wallPaint;
+                }
+            } else {
+                tile.wallPaint = wallPaint;
+            }
         }
         return true;
     });
@@ -690,6 +699,8 @@ void genTemple(Random &rnd, World &world)
             paintTemple(center, Paint::purple, Paint::cyan, world);
         } else if (world.conf.doubleTrouble) {
             paintTemple(center, Paint::deepLime, Paint::deepLime, world);
+        } else if (world.conf.glitched) {
+            paintTemple(center, Paint::none, Paint::deepGreen, world);
         }
     }
 }

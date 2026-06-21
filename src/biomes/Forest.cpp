@@ -267,9 +267,12 @@ void growTapRoot(double x, double y, int roomId, Random &rnd, World &world)
             }
         }
     }
-    world.queuedTreasures.emplace_back([anchorX,
-                                        anchorY,
+
+    world.getTile(anchorX, anchorY).flag = Flag::anchor;
+    world.queuedTreasures.emplace_back([anchor = Point{anchorX, anchorY},
                                         roomId](Random &rnd, World &world) {
+        auto [anchorX, anchorY] = findNearestAnchor(anchor, world);
+        world.getTile(anchorX, anchorY).flag = Flag::none;
         if (world.getTile(anchorX, anchorY).wallID !=
             WallID::Unsafe::livingWood) {
             return;

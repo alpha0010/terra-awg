@@ -229,6 +229,8 @@ enum {
     fireplace = 405,
     chimney = 406,
     detonator = 411,
+    conveyorBeltCW = 421,
+    conveyorBeltCCW = 422,
     sensor = 423,
     geyser = 443,
     sillyPinkBalloon = 446,

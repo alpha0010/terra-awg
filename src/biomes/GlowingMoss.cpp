@@ -89,6 +89,27 @@ void fillGlowingMossCave(Random &rnd, World &world)
                 if (tile.blockID == TileID::stone && world.isExposed(x, y)) {
                     // Coat edges in moss.
                     tile.blockID = mossType;
+                    if (world.conf.glitched) {
+                        switch (rnd.getStableUint(x, y) % 41) {
+                        case 0:
+                            tile.blockID = TileID::argonMossStone;
+                            break;
+                        case 1:
+                            tile.blockID = TileID::kryptonMossStone;
+                            break;
+                        case 2:
+                            tile.blockID = TileID::lavaMossStone;
+                            break;
+                        case 3:
+                            tile.blockID = TileID::neonMossStone;
+                            break;
+                        case 4:
+                            tile.blockID = TileID::xenonMossStone;
+                            break;
+                        default:
+                            break;
+                        }
+                    }
                     mossLocations.emplace_back(x, y);
                 }
             }
