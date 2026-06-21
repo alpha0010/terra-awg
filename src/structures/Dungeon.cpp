@@ -1351,10 +1351,7 @@ private:
     {
         if (world.conf.hiveQueen) {
             Point centroid = getHexCentroid(x, y, 8);
-            return static_cast<int>(
-                       99999 * (1 + rnd.getFineNoise(centroid.x, centroid.y))) %
-                               11 <
-                           4
+            return rnd.getStableUint(centroid.x, centroid.y) % 11 < 4
                        ? theme.altPaint
                        : theme.paint;
         }

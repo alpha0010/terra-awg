@@ -102,8 +102,7 @@ void growMahoganyVine(
         return;
     }
     growMahoganyVine(to, rnd.getDouble(0.97, 0.98) * weight, angle, rnd, world);
-    switch (static_cast<int>(99999 * (1 + rnd.getFineNoise(from.x, from.y))) %
-            11) {
+    switch (rnd.getStableUint(from.x, from.y) % 11) {
     case 0:
         growMahoganyVine(
             to,
@@ -222,8 +221,7 @@ void levitateIslands(int lb, int ub, Random &rnd, World &world)
         for (int y = yMin - 100; y < yMax + 100; ++y) {
             Tile &tile = world.getTile(x, y);
             if (tile.blockID != TileID::livingMahogany ||
-                static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 7 !=
-                    0) {
+                rnd.getStableUint(x, y) % 7 != 0) {
                 continue;
             }
             std::map<int, int> neighbors;

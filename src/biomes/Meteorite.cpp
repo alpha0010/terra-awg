@@ -29,7 +29,7 @@ void placeMeteorite(int x, int y, Random &rnd, World &world)
             if ((std::abs(i) > 4 || j > 0) &&
                 std::abs(rnd.getFineNoise(x + 2 * i, y + 2 * j)) < threshold) {
                 if (tile.blockID != TileID::empty &&
-                    (dist < 0.7 || fnv1a32pt(x + i, y + j) % 13 < 4)) {
+                    (dist < 0.7 || hash32pt(x + i, y + j) % 13 < 4)) {
                     if (j < 2 && emptyBlocks.contains(tile.blockID)) {
                         tile = {};
                     } else {
@@ -39,7 +39,7 @@ void placeMeteorite(int x, int y, Random &rnd, World &world)
                 }
             } else if (dist < 0.6) {
                 if (tile.blockID != TileID::empty &&
-                    (dist < 0.35 || fnv1a32pt(x + i, y + j) % 13 < 8)) {
+                    (dist < 0.35 || hash32pt(x + i, y + j) % 13 < 8)) {
                     tile.blockID = TileID::empty;
                     if (j > size / 4) {
                         tile.liquid = Liquid::lava;

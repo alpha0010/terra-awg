@@ -76,6 +76,10 @@ public:
      */
     int getInt(int min, int max);
     /**
+     * Get a noise sampled random uint at the specified location.
+     */
+    uint32_t getStableUint(int x, int y) const;
+    /**
      * Get a sample of the blurred noise at the specified location.
      */
     double getBlurNoise(int x, int y) const;

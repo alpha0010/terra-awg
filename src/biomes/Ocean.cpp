@@ -107,16 +107,16 @@ void addOceanCave(int waterTable, Random &rnd, World &world)
                 tile.blockID == TileID::sandstone ||
                 tile.blockID == TileID::ice || tile.blockID == TileID::clay ||
                 tile.blockID == TileID::silt) {
-                tile.blockID = fnv1a32pt(x, y) % 7 == 0 ? TileID::sand
-                                                        : TileID::coralstone;
+                tile.blockID =
+                    hash32pt(x, y) % 7 == 0 ? TileID::sand : TileID::coralstone;
             } else if (
                 tile.blockID == TileID::dirt || tile.blockID == TileID::grass ||
                 tile.blockID == TileID::mud ||
                 tile.blockID == TileID::jungleGrass ||
                 (tile.blockID == TileID::empty &&
                  tile.liquid == Liquid::none)) {
-                tile.blockID = fnv1a32pt(x, y) % 5 == 0 ? TileID::hardenedSand
-                                                        : TileID::sand;
+                tile.blockID = hash32pt(x, y) % 5 == 0 ? TileID::hardenedSand
+                                                       : TileID::sand;
             }
             if (std::abs(rnd.getBlurNoise(2 * x, 2 * y)) < 0.18 &&
                 (rnd.getFineNoise(x, y) > std::max(threshold, -0.14) ||

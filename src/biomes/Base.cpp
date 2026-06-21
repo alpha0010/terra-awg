@@ -318,9 +318,7 @@ void applyBaseTerrain(Random &rnd, World &world)
                     }
                 }
                 if (tileType == 0 && y < world.getUndergroundLevel() &&
-                    static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
-                            100 ==
-                        0) {
+                    rnd.getStableUint(x, y) % 100 == 0) {
                     tileType = 1;
                 }
                 Tile &tile = world.getTile(x, y);
@@ -329,7 +327,7 @@ void applyBaseTerrain(Random &rnd, World &world)
                     tile.blockID = snowTiles[tileType];
                     int index = getWallVarIndex(x, y, wallVarNoise, rnd);
                     if (index != -1 &&
-                        fnv1a32pt(index, wallVarNoise[0].second) % 5 == 0) {
+                        hash32pt(index, wallVarNoise[0].second) % 5 == 0) {
                         tile.wallID = WallVariants::stone
                             [wallVarNoise[0].first %
                              WallVariants::stone.size()];
@@ -362,13 +360,9 @@ void applyBaseTerrain(Random &rnd, World &world)
                     }
                     if (tile.blockID == TileID::sandstone &&
                         std::abs(rnd.getCoarseNoise(x, 2 * y) + 0.1) > 0.51) {
-                        tile.blockID =
-                            static_cast<int>(
-                                99999 * (1 + rnd.getFineNoise(x, y))) %
-                                        7 <
-                                    5
-                                ? TileID::sand
-                                : TileID::hardenedSand;
+                        tile.blockID = rnd.getStableUint(x, y) % 7 < 5
+                                           ? TileID::sand
+                                           : TileID::hardenedSand;
                     }
                     tile.wallID = tile.blockID == TileID::sandstone
                                       ? WallID::Unsafe::sandstone
@@ -382,7 +376,7 @@ void applyBaseTerrain(Random &rnd, World &world)
                         int index = getWallVarIndex(x, y, wallVarNoise, rnd);
                         if (index != -1) {
                             tile.wallID = WallVariants::jungle
-                                [fnv1a32pt(index, wallVarNoise[1].first) %
+                                [hash32pt(index, wallVarNoise[1].first) %
                                  WallVariants::jungle.size()];
                         }
                     }
@@ -411,7 +405,7 @@ void applyBaseTerrain(Random &rnd, World &world)
                     int index = getWallVarIndex(x, y, wallVarNoise, rnd);
                     if (index != -1) {
                         tile.wallID = WallVariants::underworld
-                            [fnv1a32pt(index, wallVarNoise[2].first) %
+                            [hash32pt(index, wallVarNoise[2].first) %
                              WallVariants::underworld.size()];
                     }
                     break;
@@ -516,9 +510,9 @@ void applyBaseTerrain(Random &rnd, World &world)
                     y < world.getUndergroundLevel()) {
                     if (biome.active == Biome::jungle) {
                         int index = getWallVarIndex(x, y, wallVarNoise, rnd);
-                        if (fnv1a32pt(index, wallVarNoise[3].second) % 3 == 0) {
+                        if (hash32pt(index, wallVarNoise[3].second) % 3 == 0) {
                             tile.wallID = WallVariants::stone
-                                [fnv1a32pt(index, wallVarNoise[3].first) %
+                                [hash32pt(index, wallVarNoise[3].first) %
                                  WallVariants::stone.size()];
                         } else {
                             tile.wallID = WallID::Unsafe::jungle;

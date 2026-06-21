@@ -104,9 +104,7 @@ private:
             return;
         }
         auto isRoomWall = [maxY, this](int x) {
-            return static_cast<int>(99999 * (1 + rnd.getFineNoise(x, maxY))) %
-                       23 ==
-                   0;
+            return rnd.getStableUint(x, maxY) % 23 == 0;
         };
         for (int x = minX; x < maxX; ++x) {
             for (int y = minY; y < maxY; ++y) {
@@ -126,9 +124,7 @@ private:
                 tile.liquid = Liquid::none;
                 locations.emplace_back(x, y);
                 if (y == maxY - 3 && tile.blockID == TileID::obsidianBrick &&
-                    static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
-                            3 ==
-                        0) {
+                    rnd.getStableUint(x, y) % 3 == 0) {
                     queuedDoors.emplace_back(x, y);
                 }
             }
@@ -174,12 +170,11 @@ private:
             tile.blockID = TileID::obsidianBrick;
             structLocs.emplace_back(x, cityBase);
             for (int j = 1; j < 20; ++j) {
-                double noise = rnd.getFineNoise(x, cityBase + j);
-                if (noise > j / 10.0 - 1) {
+                if (rnd.getFineNoise(x, cityBase + j) > j / 10.0 - 1) {
                     Tile &baseTile = world.getTile(x, cityBase + j);
                     if (baseTile.blockID == TileID::empty) {
                         baseTile.blockID =
-                            static_cast<int>(99999 * (1 + noise)) % 5 == 0
+                            rnd.getStableUint(x, cityBase + j) % 5 == 0
                                 ? TileID::obsidianBrick
                                 : TileID::ash;
                         baseTile.liquid = Liquid::none;

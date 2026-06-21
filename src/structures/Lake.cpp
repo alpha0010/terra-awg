@@ -290,7 +290,7 @@ void convertExtraLava(Random &rnd, World &world, int x)
     for (int y = lavaLevel; y < world.getHeight(); ++y) {
         Tile &tile = world.getTile(x, y);
         if (tile.blockID == TileID::ash &&
-            static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
+            rnd.getStableUint(x, y) %
                     static_cast<int>(
                         17.5 * lavaHeight /
                         std::min(y + 1.0 - lavaLevel, spawnClear)) ==

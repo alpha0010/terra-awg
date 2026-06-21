@@ -60,9 +60,7 @@ void placeSpiderDeco(
                 locations.emplace_back(x + i, y + j);
             }
             prevIsSolid = curIsSolid;
-            switch (
-                static_cast<int>(99999 * (1 + rnd.getFineNoise(x + i, y + j))) %
-                11) {
+            switch (rnd.getStableUint(x + i, y + j) % 11) {
             case 0:
                 if (canPlaceSpiderDecoAt(x + i, y + j, 2, 2, world)) {
                     world.placeFramedTile(
@@ -271,10 +269,7 @@ void genSpiderHall(Random &rnd, World &world)
                 bool shouldConvertWall =
                     hallTile.wallID != WallID::Safe::grayBrick &&
                     hallTile.wallID != WallID::empty;
-                if (static_cast<int>(
-                        99999 * (1 + rnd.getFineNoise(x + i, y + j))) %
-                        5 ==
-                    0) {
+                if (rnd.getStableUint(x + i, y + j) % 5 == 0) {
                     if (hallTile.blockID == TileID::grayBrick ||
                         hallTile.blockID == TileID::stoneSlab) {
                         hallTile.blockID = TileID::stone;

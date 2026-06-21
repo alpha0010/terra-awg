@@ -108,8 +108,7 @@ std::pair<int, int> applyAetherCrystalline(
                         });
                 }
             }
-            if (static_cast<int>(999999 * (1 + rnd.getFineNoise(x, y))) % 2131 >
-                18) {
+            if (rnd.getStableUint(x, y) % 2131 > 18) {
                 continue;
             }
             int radius = std::min(20 * (1 - centerDist / size), 9.5) *
@@ -269,11 +268,8 @@ std::pair<int, int> applyAetherGrove(
             if (centralPropo > 1) {
                 continue;
             }
-            int threshold = 7 * (1 - centralPropo) + 4.5;
-            if (static_cast<int>(
-                    99999 *
-                    (1 + rnd.getFineNoise(center.x + i, leafCenter + j))) %
-                    107 <
+            uint32_t threshold = 7 * (1 - centralPropo) + 4.5;
+            if (rnd.getStableUint(center.x + i, leafCenter + j) % 107 <
                 threshold) {
                 doAetherFoliage(center.x + i, leafCenter + j, rnd, world);
             }
@@ -305,10 +301,7 @@ std::pair<int, int> applyAetherGrove(
                     tile.liquid = Liquid::none;
                 }
                 if (tile.blockID == TileID::mahoganyLeaf) {
-                    switch (
-                        static_cast<int>(
-                            99999 * (1 + rnd.getFineNoise(center.x + i, y))) %
-                        31) {
+                    switch (rnd.getStableUint(center.x + i, y) % 31) {
                     case 0:
                         tile.blockID = TileID::aetherium;
                         break;

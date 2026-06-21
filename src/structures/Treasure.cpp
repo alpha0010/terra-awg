@@ -126,7 +126,7 @@ bool attachGemTo(Gem gem, int x, int y, Random &rnd, World &world)
     }
     tile.blockID = TileID::gem;
     tile.frameX = static_cast<int>(gem);
-    tile.frameY = frameY + 18 * (fnv1a32pt(x, y) % 3);
+    tile.frameY = frameY + 18 * (hash32pt(x, y) % 3);
     return true;
 }
 
@@ -420,7 +420,7 @@ void placePurityAltars(Random &rnd, World &world)
                 Tile &tile = world.getTile(x + i, y + j);
                 if ((tile.blockID == TileID::ebonstoneBrick ||
                      tile.blockID == TileID::crimstoneBrick) &&
-                    fnv1a32pt(x + i, y + j) % 11 == 0) {
+                    hash32pt(x + i, y + j) % 11 == 0) {
                     tile.blockID = TileID::hellstoneBrick;
                 }
             }
@@ -432,7 +432,7 @@ void placePurityAltars(Random &rnd, World &world)
             for (int j = altar.getHeight() - 1; j < maxJ; ++j) {
                 Tile &tile = world.getTile(x + i, y + j);
                 if (tile.blockID == TileID::empty) {
-                    tile.blockID = fnv1a32pt(x + i, y + j) % 7 == 0
+                    tile.blockID = hash32pt(x + i, y + j) % 7 == 0
                                        ? TileID::hellstoneBrick
                                        : fillTile;
                     if (y + j == lavaLevel + 1) {
@@ -589,7 +589,7 @@ void placeLarvae(int maxBin, LocationBins &locations, Random &rnd, World &world)
         }
         auto [x, y] = rnd.select(locations[binId]);
         Tile &tile = world.getTile(x, y - 1);
-        if ((!avoidWalls.contains(tile.wallID) || fnv1a32pt(x, y) % 31 < 15) &&
+        if ((!avoidWalls.contains(tile.wallID) || hash32pt(x, y) % 31 < 15) &&
             tile.liquid == Liquid::none &&
             isPlacementCandidate(x - 1, y, world) &&
             isPlacementCandidate(x + 2, y, world) &&
@@ -976,7 +976,7 @@ Variant getChestType(int x, int y, World &world)
         }
     }
     if (world.conf.ascent) {
-        return y > world.getCavernLevel() ? fnv1a32pt(x, y) % 3 == 0
+        return y > world.getCavernLevel() ? hash32pt(x, y) % 3 == 0
                                                 ? Variant::none
                                                 : Variant::livingWood
                                           : Variant::gold;
@@ -1162,8 +1162,7 @@ void placeChests(int maxBin, LocationBins &locations, Random &rnd, World &world)
             if (type == Variant::richMahogany) {
                 threshold = std::min(300, threshold);
             }
-            if (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 907 <
-                threshold) {
+            if (static_cast<int>(rnd.getStableUint(x, y) % 907) < threshold) {
                 origType = type;
                 type = Variant::deadMans;
             }

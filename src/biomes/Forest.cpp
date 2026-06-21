@@ -485,8 +485,7 @@ void growLivingTrees(Random &rnd, World &world)
                    y < world.getUndergroundLevel()) {
                 ++y;
             }
-            int glitchedRand =
-                static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 11;
+            int glitchedRand = rnd.getStableUint(x, y) % 11;
             if (world.getTile(x, y).blockID == TileID::grass ||
                 (world.conf.glitched && glitchedRand < 2)) {
                 if (world.conf.glitched && glitchedRand == 0) {

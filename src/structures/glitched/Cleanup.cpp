@@ -267,7 +267,7 @@ void applyGlitchedFinalize(int x, int y, Random &rnd, World &world)
             tile.liquid == Liquid::honey ? Liquid::shimmer : Liquid::honey;
     }
 
-    int randInt = 99999 * (2 + rnd.getFineNoise(x, y));
+    uint32_t randInt = rnd.getStableUint(x, y);
     if (glitchedSprites.contains(tile.blockID) && randInt % 13 == 0) {
         tile.echoCoatBlock = true;
     }

@@ -431,8 +431,7 @@ void addTempleTraps(
     World &world)
 {
     for (auto [x, y] : locations) {
-        switch (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
-                freqCtrl) {
+        switch (rnd.getStableUint(x, y) % freqCtrl) {
         case 0:
             if (canPlaceTempleTreasureAt(x, y, world)) {
                 world.placeFramedTile(x, y - 2, TileID::TNTBarrel);
@@ -470,8 +469,7 @@ void addTempleTraps(
 
 void addTempleSpikesAt(Point pos, Random &rnd, World &world)
 {
-    if (static_cast<int>(99999 * (1 + rnd.getFineNoise(pos.x, pos.y))) % 150 !=
-        0) {
+    if (rnd.getStableUint(pos.x, pos.y) % 150 != 0) {
         return;
     }
     Point delta = rnd.select({Point{1, 0}, {-1, 0}, {0, 1}, {0, -1}});

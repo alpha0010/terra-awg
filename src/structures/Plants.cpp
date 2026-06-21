@@ -62,7 +62,7 @@ void growCactus(int x, int y, Random &rnd, World &world)
 {
     if (rnd.getDouble(0, 1) > 0.07 ||
         !isRegionEmpty(x - 1, y - 8, 3, 8, world)) {
-        if (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 13 == 0) {
+        if (rnd.getStableUint(x, y) % 13 == 0) {
             world.queuedDeco.emplace_back([x, y](Random &, World &world) {
                 if (isRegionEmpty(x, y - 2, 3, 2, world) &&
                     world.regionPasses(x, y, 3, 1, [](Tile &tile) {
@@ -389,7 +389,7 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
                 [[fallthrough]];
             case TileID::hardenedSand:
             case TileID::sandstone:
-                if (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
+                if (rnd.getStableUint(x, y) %
                         std::max<int>(
                             11 / std::max(world.conf.traps, 0.1),
                             2) ==
@@ -401,7 +401,7 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
             case TileID::pearlstone:
                 if ((y > world.getCavernLevel() || world.conf.ascent) &&
                     world.getTile(x, y - 1).liquid == Liquid::none &&
-                    (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
+                    (rnd.getStableUint(x, y) %
                              std::max<int>(
                                  (world.conf.celebration ? 75 : 100) /
                                      std::max(world.conf.trees, 0.1),
@@ -448,7 +448,7 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
 void placeLivingTreeDecoAt(int x, Random &rnd, World &world)
 {
     int y = world.getSurfaceLevel(x);
-    switch (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 5) {
+    switch (rnd.getStableUint(x, y) % 5) {
     case 0:
         for (int j = -10; j < 10; ++j) {
             if (world.regionPasses(
@@ -622,7 +622,7 @@ bool placeLargePile(int x, int y, World &world)
     case TileID::hellstone:
     case TileID::hellstoneBrick:
     case TileID::obsidianBrick:
-        if (y > world.getUnderworldLevel() && fnv1a32pt(x, y) % 5 == 0) {
+        if (y > world.getUnderworldLevel() && hash32pt(x, y) % 5 == 0) {
             world.placeFramedTile(x, y - 2, TileID::largePile, Variant::bone);
         } else {
             world.placeFramedTile(
@@ -635,7 +635,7 @@ bool placeLargePile(int x, int y, World &world)
     case TileID::blueBrick:
     case TileID::greenBrick:
     case TileID::pinkBrick:
-        if (y > world.getUndergroundLevel() && fnv1a32pt(x, y) % 5 == 0) {
+        if (y > world.getUndergroundLevel() && hash32pt(x, y) % 5 == 0) {
             world.placeFramedTile(x, y - 2, TileID::largePile, Variant::bone);
             return true;
         }
@@ -745,13 +745,13 @@ void growGrass(int x, int y, Random &rnd, World &world)
     if (baseTile.slope != Slope::none || probeTile.blockID != TileID::empty) {
         return;
     }
-    int randInt = 99999 * (1 + rnd.getFineNoise(x, y));
+    uint32_t randInt = rnd.getStableUint(x, y);
     if (probeTile.liquid == Liquid::water &&
         (baseTile.blockID == TileID::sand ||
          baseTile.blockID == TileID::coralstone) &&
         (x < 200 || x > world.getWidth() - 200) && randInt % 7 == 0) {
         probeTile.blockID = TileID::coral;
-        probeTile.frameX = 26 * (fnv1a32pt(x, y) % 6);
+        probeTile.frameX = 26 * (hash32pt(x, y) % 6);
         return;
     }
     if (probeTile.liquid != Liquid::none) {

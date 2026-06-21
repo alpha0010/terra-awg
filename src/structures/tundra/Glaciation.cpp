@@ -165,7 +165,7 @@ void genGlaciation(Random &rnd, World &world)
                 break;
             case Liquid::honey:
             case Liquid::shimmer: {
-                int rndInt = 99999 * (1 + rnd.getFineNoise(x, y));
+                uint32_t rndInt = rnd.getStableUint(x, y);
                 if (rndInt % 1523 < 507) {
                     tile.blockID = tile.liquid == Liquid::shimmer
                                        ? TileID::aetherium

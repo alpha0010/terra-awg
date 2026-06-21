@@ -44,14 +44,14 @@ void fillMushroomField(
                     Tile &prevTile = world.getTile(x + i, y + j);
                     if (prevTile.blockID == TileID::mud ||
                         (prevTile.blockID == TileID::marble &&
-                         fnv1a32pt(x + i, y + j) % 11 > 4)) {
+                         hash32pt(x + i, y + j) % 11 > 4)) {
                         prevTile.blockID = TileID::mushroomGrass;
                     }
                 }
             } else {
                 switch (tile.blockID) {
                 case TileID::marble:
-                    if (world.isExposed(x, y) && fnv1a32pt(x, y) % 11 > 4) {
+                    if (world.isExposed(x, y) && hash32pt(x, y) % 11 > 4) {
                         tile.blockID = TileID::mushroomGrass;
                         tile.wallID = WallID::Unsafe::mushroom;
                     }
@@ -104,11 +104,7 @@ void fillMushroomLayer(Random &rnd, World &world)
             case TileID::mud:
             case TileID::jungleGrass:
                 tile.blockID =
-                    world.isExposed(x, y) ||
-                            static_cast<int>(
-                                99999 * (1 + rnd.getFineNoise(x, y))) %
-                                    35 ==
-                                0
+                    world.isExposed(x, y) || rnd.getStableUint(x, y) % 35 == 0
                         ? TileID::mushroomGrass
                         : TileID::mud;
                 [[fallthrough]];
@@ -145,11 +141,7 @@ void fillForestMushroomLayer(Random &rnd, World &world)
             case TileID::dirt:
             case TileID::grass:
                 tile.blockID =
-                    world.isExposed(x, y) ||
-                            static_cast<int>(
-                                99999 * (1 + rnd.getFineNoise(x, y))) %
-                                    35 ==
-                                0
+                    world.isExposed(x, y) || rnd.getStableUint(x, y) % 35 == 0
                         ? TileID::mushroomGrass
                         : TileID::mud;
                 [[fallthrough]];

@@ -2,6 +2,7 @@
 
 #include "Config.h"
 #include "Util.h"
+#include "vendor/HashProspector.h"
 #include "vendor/OpenSimplexNoise.hpp"
 #include <algorithm>
 #include <iostream>
@@ -232,6 +233,11 @@ int Random::getInt(int min, int max)
 {
     std::uniform_int_distribution<> dist(min, max);
     return dist(rnd);
+}
+
+uint32_t Random::getStableUint(int x, int y) const
+{
+    return lowbias32(static_cast<int>(999999999 * getFineNoise(x, y)));
 }
 
 double Random::getBlurNoise(int x, int y) const

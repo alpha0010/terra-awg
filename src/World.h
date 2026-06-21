@@ -17,7 +17,10 @@ class TileBuffer;
 
 enum class Blend { normal, blockOnly };
 
-uint32_t fnv1a32pt(uint32_t x, uint32_t y);
+/**
+ * Compute a hash code of the coordinates.
+ */
+uint32_t hash32pt(uint32_t x, uint32_t y);
 
 struct BiomeData {
     Biome active;

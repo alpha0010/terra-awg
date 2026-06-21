@@ -124,7 +124,7 @@ void addTombTreasure(std::vector<Point> &locations, Random &rnd, World &world)
 {
     std::shuffle(locations.begin(), locations.end(), rnd.getPRNG());
     for (auto [x, y] : locations) {
-        if (static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 9 == 0) {
+        if (rnd.getStableUint(x, y) % 9 == 0) {
             if (world.regionPasses(
                     x,
                     y,
@@ -177,7 +177,7 @@ void genDesertTomb(Random &rnd, World &world)
             }
             Tile &tile = world.getTile(x + i, y + j);
             if (tombTile.blockID == TileID::sandstoneSlab &&
-                fnv1a32pt(x + i, y + j) % 11 == 0) {
+                hash32pt(x + i, y + j) % 11 == 0) {
                 tombTile.blockID = TileID::sandstoneBrick;
             }
             if (tombTile.wallID == WallID::empty) {

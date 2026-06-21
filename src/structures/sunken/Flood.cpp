@@ -68,7 +68,7 @@ void floodFill(int startX, int startY, int minY, World &world)
                     }
                 }
                 tile.blockID =
-                    fnv1a32pt(x, y) % 7 < 2 ? mixBlock : TileID::obsidian;
+                    hash32pt(x, y) % 7 < 2 ? mixBlock : TileID::obsidian;
                 tile.frameX = 0;
                 tile.frameY = 0;
                 tile.blockPaint = Paint::none;

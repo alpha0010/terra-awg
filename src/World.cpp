@@ -5,6 +5,7 @@
 #include "TileBuffer.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
+#include "vendor/HashProspector.h"
 #include <iostream>
 
 constexpr FramedBitset genFramedTileLookup()
@@ -48,15 +49,9 @@ Point framedTileToDims(int tileID)
     }
 }
 
-uint32_t fnv1a32pt(uint32_t x, uint32_t y)
+uint32_t hash32pt(uint32_t x, uint32_t y)
 {
-    const uint32_t prime = 16777619;
-    uint32_t hash = 2166136261;
-    hash ^= x;
-    hash *= prime;
-    hash ^= y;
-    hash *= prime;
-    return hash;
+    return lowbias32(x ^ std::rotl(y, 16));
 }
 
 World::World(const Config &c)
@@ -315,7 +310,7 @@ void World::placeFramedTile(int x, int y, int blockID, Variant type, int paint)
         frameWidth = data.width;
         frameHeight = data.height;
     }
-    uint32_t coordHash = fnv1a32pt(x, y);
+    uint32_t coordHash = hash32pt(x, y);
     if (blockID == TileID::pot) {
         // Cycle pot variations based on world coordinates.
         switch (type) {
@@ -626,7 +621,7 @@ void World::placePainting(int x, int y, Painting painting)
     auto [blockID, offsetX, offsetY] = itr->second;
     auto [frameWidth, frameHeight] = framedTileToDims(blockID);
     if (painting == Painting::strangeGrowth) {
-        offsetX += 36 * (fnv1a32pt(x, y) % 4);
+        offsetX += 36 * (hash32pt(x, y) % 4);
     }
     for (int i = 0; i < frameWidth; ++i) {
         for (int j = 0; j < frameHeight; ++j) {

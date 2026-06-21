@@ -82,7 +82,7 @@ inline constexpr auto stalactiteTypes = frozen::make_map<int, int>(
 
 void placeStalactite(int x, int y, World &world)
 {
-    int variation = fnv1a32pt(x, y) % 6;
+    int variation = hash32pt(x, y) % 6;
     int frameX = 18 * variation;
     int frameY = 0;
     int height = 2;
@@ -141,7 +141,7 @@ void placeStalagmite(int x, int y, World &world)
         (itr->first == TileID::hive && probeTile.flag == Flag::border)) {
         return;
     }
-    int variation = fnv1a32pt(x, y) % 6;
+    int variation = hash32pt(x, y) % 6;
     int frameX = 18 * variation + itr->second;
     int frameY = 36;
     int height = 2;
@@ -162,7 +162,7 @@ void placeStalagmite(int x, int y, World &world)
     }
 }
 
-void embedGem(int x, int y, int randInt, World &world)
+void embedGem(int x, int y, uint32_t randInt, World &world)
 {
     if (!world.regionPasses(x - 2, y - 2, 5, 5, [](Tile &tile) {
             return tile.blockID == TileID::stone && tile.slope == Slope::none &&
@@ -250,7 +250,7 @@ void genVines(Random &rnd, World &world)
         for (int y = 0; y < world.getHeight(); ++y) {
             Tile &tile = world.getTile(x, y);
             state = scanTransition(tile, state);
-            int randInt = 99999 * (1 + rnd.getFineNoise(x, y));
+            uint32_t randInt = rnd.getStableUint(x, y);
             if (vineLen > 0) {
                 if (tile.blockID == TileID::empty &&
                     (tile.liquid == Liquid::none ||

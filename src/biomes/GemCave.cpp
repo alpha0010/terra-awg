@@ -28,9 +28,7 @@ void fillGemCave(
             double threshold = std::max(std::hypot(i, j) / caveSize, 0.35);
             Tile &tile = world.getTile(x + i, y + j);
             // Intermix regular stone within gem deposits.
-            int dispersal =
-                static_cast<int>(99999 * (1 + rnd.getFineNoise(x + i, y + j))) %
-                5;
+            int dispersal = rnd.getStableUint(x + i, y + j) % 5;
             if (rnd.getFineNoise(x + i, y + j) > threshold) {
                 if (dispersal > 1 && tile.blockID == TileID::stone) {
                     tile.blockID = world.conf.hiveQueen && dispersal < 4

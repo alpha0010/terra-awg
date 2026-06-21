@@ -11,7 +11,7 @@ bool fuzzyIsSurfaceChest(int x, int y, World &world)
     return y < world.getUndergroundLevel() ||
            (y < (2 * world.getUndergroundLevel() + world.getCavernLevel()) /
                     3 &&
-            fnv1a32pt(x, y) % 2 == 0);
+            hash32pt(x, y) % 2 == 0);
 }
 
 Depth getChestDepth(int x, int y, World &world)

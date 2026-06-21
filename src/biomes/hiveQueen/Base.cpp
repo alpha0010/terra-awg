@@ -46,7 +46,7 @@ inline std::array const underworldTiles{
     TileID::ash,
     TileID::ash};
 
-inline auto hashPoint = [](const Point &pt) { return fnv1a32pt(pt.x, pt.y); };
+inline auto hashPoint = [](const Point &pt) { return hash32pt(pt.x, pt.y); };
 
 std::vector<Point>
 iterateHex(Point start, int scale, std::function<void(Point)> f)
@@ -246,7 +246,7 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                     tile.blockID = snowTiles[tileType];
                     int index = getWallVarIndex(x, y, wallVarNoise, rnd);
                     if (index != -1 &&
-                        fnv1a32pt(index, wallVarNoise[0].second) % 5 == 0) {
+                        hash32pt(index, wallVarNoise[0].second) % 5 == 0) {
                         tile.wallID = WallVariants::stone
                             [wallVarNoise[0].first %
                              WallVariants::stone.size()];
@@ -279,13 +279,9 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                     }
                     if (tile.blockID == TileID::sandstone &&
                         std::abs(rnd.getCoarseNoise(x, 2 * y) + 0.1) > 0.56) {
-                        tile.blockID =
-                            static_cast<int>(
-                                99999 * (1 + rnd.getFineNoise(x, y))) %
-                                        7 <
-                                    5
-                                ? TileID::sand
-                                : TileID::hardenedSand;
+                        tile.blockID = rnd.getStableUint(x, y) % 7 < 5
+                                           ? TileID::sand
+                                           : TileID::hardenedSand;
                     }
                     tile.wallID = tile.blockID == TileID::sandstone
                                       ? WallID::Unsafe::sandstone
@@ -303,7 +299,7 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                         int index = getWallVarIndex(x, y, wallVarNoise, rnd);
                         if (index != -1) {
                             tile.wallID = WallVariants::jungle
-                                [fnv1a32pt(index, wallVarNoise[1].first) %
+                                [hash32pt(index, wallVarNoise[1].first) %
                                  WallVariants::jungle.size()];
                         }
                     }
@@ -325,7 +321,7 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                     int index = getWallVarIndex(x, y, wallVarNoise, rnd);
                     if (index != -1) {
                         tile.wallID = WallVariants::underworld
-                            [fnv1a32pt(index, wallVarNoise[2].first) %
+                            [hash32pt(index, wallVarNoise[2].first) %
                              WallVariants::underworld.size()];
                     }
                     break;
@@ -409,9 +405,9 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                 if (tile.wireRed && y < world.getUndergroundLevel()) {
                     if (biome.active == Biome::jungle) {
                         int index = getWallVarIndex(x, y, wallVarNoise, rnd);
-                        if (fnv1a32pt(index, wallVarNoise[3].second) % 3 == 0) {
+                        if (hash32pt(index, wallVarNoise[3].second) % 3 == 0) {
                             tile.wallID = WallVariants::stone
-                                [fnv1a32pt(index, wallVarNoise[3].first) %
+                                [hash32pt(index, wallVarNoise[3].first) %
                                  WallVariants::stone.size()];
                         } else {
                             tile.wallID = WallID::Unsafe::jungle;
@@ -519,11 +515,7 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                     targWall->second = -1;
                 }
                 Point centroid = getHexCentroid(x, y, 10);
-                int rndFlag =
-                    static_cast<int>(
-                        99999 *
-                        (1 + rnd.getFineNoise(centroid.x, centroid.y))) %
-                    13;
+                int rndFlag = rnd.getStableUint(centroid.x, centroid.y) % 13;
                 Flag hexFlag = rndFlag > 5              ? Flag::orange
                                : rndFlag > 1            ? Flag::yellow
                                : centroid.y > lavaLevel ? Flag::crispyHoney
@@ -574,9 +566,7 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
                       tile.blockID == TileID::dirt) ||
                      (biome.active == Biome::jungle &&
                       tile.blockID == TileID::mud)) &&
-                    static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
-                            100 ==
-                        0) {
+                    rnd.getStableUint(x, y) % 100 == 0) {
                     tile.blockID = biome.active == Biome::forest
                                        ? TileID::grass
                                        : TileID::jungleGrass;

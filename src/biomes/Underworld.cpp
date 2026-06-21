@@ -22,7 +22,7 @@ void copyTemplateTile(const Tile &from, Tile &to, int x, int y, Random &rnd)
     if (from.blockID != TileID::empty) {
         to.blockID = from.blockID;
         if (to.blockID == TileID::obsidianBrick &&
-            static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) % 7 == 0) {
+            rnd.getStableUint(x, y) % 7 == 0) {
             to.blockID = TileID::hellstoneBrick;
         }
         to.blockPaint = from.blockPaint;
@@ -232,9 +232,7 @@ void genUnderworld(Random &rnd, World &world)
                                        ? (centerLevel - y) / upperDist
                                        : (y - centerLevel) / lowerDist);
                 if (tile.blockID == TileID::hive &&
-                    static_cast<int>(99999 * (1 + rnd.getFineNoise(x, y))) %
-                            7 ==
-                        0) {
+                    rnd.getStableUint(x, y) % 7 == 0) {
                     tile.blockID = TileID::crispyHoney;
                 }
                 if (std::abs(rnd.getCoarseNoise(2 * x, y + aspectRatio * x)) <

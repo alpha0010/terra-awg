@@ -47,7 +47,7 @@ void genAsteroidFieldCelebration(Random &rnd, World &world)
         double centerDist = std::hypot(
             (fieldX + 0.5 * width - x) / width,
             (fieldY + 0.5 * height - y) / height);
-        if ((centerDist > 0.48 && fnv1a32pt(x, y) % 11 != 0) ||
+        if ((centerDist > 0.48 && hash32pt(x, y) % 11 != 0) ||
             !world.regionPasses(
                 x - 1,
                 y - 1,

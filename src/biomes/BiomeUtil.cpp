@@ -242,7 +242,7 @@ void growMossOn(int x, int y, World &world)
         if (tile.blockID == TileID::empty && tile.liquid != Liquid::lava) {
             tile.blockID = TileID::mossPlant;
             tile.frameX = itr->second;
-            tile.frameY = frameY + 18 * (fnv1a32pt(x + i, y + j) % 3);
+            tile.frameY = frameY + 18 * (hash32pt(x + i, y + j) % 3);
         }
     }
 }

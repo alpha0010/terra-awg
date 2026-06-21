@@ -146,7 +146,7 @@ void addCabinDebris(std::vector<Point> &locations, World &world)
     }
     for (auto [x, y] : locations) {
         Tile &tile = world.getTile(x, y);
-        if (tile.blockID == TileID::empty && fnv1a32pt(x, y) % 19 == 0) {
+        if (tile.blockID == TileID::empty && hash32pt(x, y) % 19 == 0) {
             tile.blockID = TileID::cobweb;
         }
     }
@@ -213,7 +213,7 @@ void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
             Tile &tile = world.getTile(x + i, y + j);
             if (std::abs(rnd.getFineNoise(x + 3 * i, y + 3 * j)) > 0.34) {
                 if (tile.blockID == TileID::empty &&
-                    fnv1a32pt(x + i, y + j) % 5 != 0) {
+                    hash32pt(x + i, y + j) % 5 != 0) {
                     tile = {};
                 } else {
                     tile.liquid = Liquid::none;

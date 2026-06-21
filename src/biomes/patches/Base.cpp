@@ -54,7 +54,7 @@ BiomeData computeBiomeData(int x, int y, Random &rnd)
         {underworld, Biome::underworld},
     });
     std::vector<std::pair<double, Biome>> activeBiomes;
-    if (fnv1a32pt(x, y) % 37 > 4) {
+    if (hash32pt(x, y) % 37 > 4) {
         std::vector<std::pair<double, Biome>> looseActiveBiomes;
         for (auto [prob, biome] : biomes) {
             if (prob > 0.02) {
@@ -70,8 +70,7 @@ BiomeData computeBiomeData(int x, int y, Random &rnd)
     }
     Biome active = Biome::forest;
     if (activeBiomes.size() == 2) {
-        int offset =
-            static_cast<int>(99999 * (1 + rnd.getFineNoise(0, 0))) % 997;
+        int offset = rnd.getStableUint(0, 0) % 997;
         active = activeBiomes[0].first +
                              0.6 * rnd.getFineNoise(x + offset, y + offset) >
                          0.5
@@ -79,7 +78,7 @@ BiomeData computeBiomeData(int x, int y, Random &rnd)
                      : activeBiomes[1].second;
     } else {
         int quantFactor = 1400;
-        int target = fnv1a32pt(x, y) % (quantFactor - 1);
+        int target = hash32pt(x, y) % (quantFactor - 1);
         int accu = 0;
         for (auto [prob, biome] : biomes) {
             accu += prob * quantFactor;
