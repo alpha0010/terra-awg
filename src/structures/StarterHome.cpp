@@ -215,13 +215,21 @@ void placeHomeAt(
         break;
     case Data::Variant::skyware:
         themeTiles.insert(
-            {{TileID::wood, TileID::sunplate},
+            {{TileID::wood,
+              rnd.select(
+                  {TileID::sunplate,
+                   TileID::fallenStar,
+                   TileID::hallowedBrick})},
              {TileID::woodenBeam, TileID::sandstoneColumn},
              {TileID::grayBrick,
               rnd.select({TileID::ironBrick, TileID::tinBrick})},
              {TileID::dirt, themeToDirtVariant(origTheme)}});
         themeWalls.insert(
-            {{WallID::Safe::wood, WallID::Safe::disc},
+            {{WallID::Safe::wood,
+              rnd.select(
+                  {WallID::Safe::disc,
+                   WallID::Safe::fallenStar,
+                   WallID::Safe::hallowedBrick})},
              {WallID::Safe::planked,
               rnd.select(
                   {WallID::Safe::whiteDynasty, WallID::Safe::blueDynasty})},
@@ -302,6 +310,12 @@ void placeHomeAt(
                     homeTile.blockID == TileID::marbleColumn) {
                     homeTile.blockPaint =
                         getDeepRainbowPaint(x + i + rainbowOffset, y + j);
+                }
+                if (world.conf.glitched &&
+                    (tileItr->first == TileID::wood ||
+                     tileItr->first == TileID::grayBrick) &&
+                    rnd.getStableUint(x + i, y + j) % 13 == 0) {
+                    homeTile.echoCoatBlock = true;
                 }
             }
             auto wallItr = themeWalls.find(homeTile.wallID);
