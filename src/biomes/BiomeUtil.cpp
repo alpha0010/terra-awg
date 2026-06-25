@@ -43,16 +43,15 @@ Point getEmbeddedPos(
     return {-1, -1};
 }
 
-void embedWaterfalls(
+void doEmbedWaterfalls(
     Point from,
     Point to,
-    std::initializer_list<int> allowedBlocks,
+    std::set<int> blocks,
     Liquid liquid,
     int proximity,
     Random &rnd,
     World &world)
 {
-    std::set<int> blocks{allowedBlocks.begin(), allowedBlocks.end()};
     std::vector<std::tuple<int, int, int>> waterSources;
     for (int y = from.y; y < to.y; ++y) {
         int state = 0;
@@ -87,18 +86,56 @@ void embedWaterfalls(
             waterStream.emplace_back(x + i, y);
         }
     }
-    world.queuedDeco.emplace_back(
-        [blocks, waterStream](Random &, World &world) {
-            for (auto [x, y] : waterStream) {
-                Tile &tile = world.getTile(x, y);
-                Tile &aboveTile = world.getTile(x, y - 1);
-                if (blocks.contains(tile.blockID) &&
-                    (aboveTile.blockID == TileID::empty ||
-                     isSolidBlock(aboveTile.blockID))) {
-                    tile.slope = Slope::half;
-                }
+    world.queuedDeco.addTask([blocks, waterStream](Random &, World &world) {
+        for (auto [x, y] : waterStream) {
+            Tile &tile = world.getTile(x, y);
+            Tile &aboveTile = world.getTile(x, y - 1);
+            if (blocks.contains(tile.blockID) &&
+                (aboveTile.blockID == TileID::empty ||
+                 isSolidBlock(aboveTile.blockID))) {
+                tile.slope = Slope::half;
             }
-        });
+        }
+    });
+}
+
+void queuedEmbedWaterfalls(
+    Point from,
+    Point to,
+    std::initializer_list<int> allowedBlocks,
+    Liquid liquid,
+    int proximity,
+    World &world)
+{
+    world.getTile(from).flag = Flag::anchor;
+    world.getTile(to).flag = Flag::anchor;
+    world.queuedPostBiome.addTask([anchFrom = from,
+                                   anchTo = to,
+                                   blocks = std::set<int>{allowedBlocks},
+                                   liquid,
+                                   proximity](Random &rnd, World &world) {
+        Point from = findNearestAnchor(anchFrom, world);
+        Point to = findNearestAnchor(anchTo, world);
+        world.getTile(from).flag = Flag::none;
+        world.getTile(to).flag = Flag::none;
+        from.x = std::min(from.x, anchFrom.x);
+        from.y = std::min(from.y, anchFrom.y);
+        to.x = std::max(to.x, anchTo.x);
+        to.y = std::max(to.y, anchTo.y);
+        doEmbedWaterfalls(from, to, blocks, liquid, proximity, rnd, world);
+    });
+}
+
+void embedWaterfalls(
+    Point from,
+    Point to,
+    std::initializer_list<int> allowedBlocks,
+    Liquid liquid,
+    int proximity,
+    Random &rnd,
+    World &world)
+{
+    doEmbedWaterfalls(from, to, allowedBlocks, liquid, proximity, rnd, world);
 }
 
 void fillLargeWallGaps(Point from, Point to, Random &rnd, World &world)

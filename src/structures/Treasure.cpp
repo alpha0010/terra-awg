@@ -1028,14 +1028,13 @@ void placeChest(
 {
     Chest &chest = world.placeChest(x, y - 2, type);
     bool isTrapped = type == Variant::deadMans;
-    world.queuedTraps.emplace_back(
-        [x, y, isTrapped](Random &rnd, World &world) {
-            if (isTrapped) {
-                addChestTraps(x, y - 2, rnd, world);
-            } else {
-                maybeAddChestPressureTraps(x, y - 2, rnd, world);
-            }
-        });
+    world.queuedTraps.addTask([x, y, isTrapped](Random &rnd, World &world) {
+        if (isTrapped) {
+            addChestTraps(x, y - 2, rnd, world);
+        } else {
+            maybeAddChestPressureTraps(x, y - 2, rnd, world);
+        }
+    });
     Depth depth = getChestDepth(x, y, world);
     int torchID = ItemID::torch;
     switch (type) {
@@ -1381,13 +1380,7 @@ LocationBins genTreasure(Random &rnd, World &world)
     if (!world.conf.home && world.conf.equipment != 0) {
         placeStarterChest(rnd, world);
     }
-    std::shuffle(
-        world.queuedTreasures.begin(),
-        world.queuedTreasures.end(),
-        rnd.getPRNG());
-    for (const auto &applyQueuedTreasure : world.queuedTreasures) {
-        applyQueuedTreasure(rnd, world);
-    }
+    world.queuedTreasures.runTasks(rnd, world);
     int maxBin =
         binLocation(world.getWidth(), world.getHeight(), world.getHeight());
     placeJungleShrines(rnd, world);

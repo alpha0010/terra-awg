@@ -11,7 +11,6 @@ void fillAetherShimmer(
     double size,
     int maxBubblePos,
     int maxEditPos,
-    Random &rnd,
     World &world);
 
 #endif // AETHER_H

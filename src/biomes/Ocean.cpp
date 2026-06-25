@@ -59,7 +59,7 @@ void addGlowRocks(std::vector<Point> &locations, Random &rnd, World &world)
                 }
             }
         }
-        world.queuedDeco.emplace_back([mossLocations](Random &, World &world) {
+        world.queuedDeco.addTask([mossLocations](Random &, World &world) {
             for (auto [x, y] : mossLocations) {
                 growMossOn(x, y, world);
             }
@@ -142,7 +142,7 @@ void addOceanCave(int waterTable, Random &rnd, World &world)
         }
     }
     std::shuffle(locations.begin(), locations.end(), rnd.getPRNG());
-    world.queuedTreasures.emplace_back(
+    world.queuedTreasures.addTask(
         [locs = std::move(locations)](Random &rnd, World &world) {
             int numChests = std::max<int>(locs.size() / 100, 2);
             std::vector<Point> usedLocations;

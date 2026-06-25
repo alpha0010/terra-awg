@@ -63,7 +63,7 @@ void growCactus(int x, int y, Random &rnd, World &world)
     if (rnd.getDouble(0, 1) > 0.07 ||
         !isRegionEmpty(x - 1, y - 8, 3, 8, world)) {
         if (rnd.getStableUint(x, y) % 13 == 0) {
-            world.queuedDeco.emplace_back([x, y](Random &, World &world) {
+            world.queuedDeco.addTask([x, y](Random &, World &world) {
                 if (isRegionEmpty(x, y - 2, 3, 2, world) &&
                     world.regionPasses(x, y, 3, 1, [](Tile &tile) {
                         return tile.blockID == TileID::sand &&
@@ -196,7 +196,7 @@ void growRollingCactus(int x, int y, World &world)
         probeTile.liquid != Liquid::none) {
         return;
     }
-    world.queuedTraps.emplace_back([x, y](Random &, World &world) {
+    world.queuedTraps.addTask([x, y](Random &, World &world) {
         if (isRegionEmpty(x - 1, y - 3, 4, 3, world)) {
             world.placeFramedTile(x, y - 2, TileID::rollingCactus);
         }
@@ -439,7 +439,7 @@ void genPlants(const LocationBins &locations, Random &rnd, World &world)
             }
         }
     }
-    world.queuedTraps.emplace_back(
+    world.queuedTraps.addTask(
         [locs = std::move(oreLocations)](Random &rnd, World &world) mutable {
             addOreTraps(std::move(locs), rnd, world);
         });
@@ -895,9 +895,7 @@ void genGrasses(const LocationBins &locations, Random &rnd, World &world)
 {
     std::cout << "Growing plants\n";
     rnd.shuffleNoise();
-    for (const auto &applyQueuedDeco : world.queuedDeco) {
-        applyQueuedDeco(rnd, world);
-    }
+    world.queuedDeco.runTasks(rnd, world);
     growLivingTreeDeco(rnd, world);
     for (const auto &bin : locations) {
         for (auto [x, y] : bin.second) {

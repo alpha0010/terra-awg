@@ -11,6 +11,14 @@ class Random;
 
 double computeOreThreshold(double oreMultiplier);
 
+void queuedEmbedWaterfalls(
+    Point from,
+    Point to,
+    std::initializer_list<int> allowedBlocks,
+    Liquid liquid,
+    int proximity,
+    World &world);
+
 void embedWaterfalls(
     Point from,
     Point to,

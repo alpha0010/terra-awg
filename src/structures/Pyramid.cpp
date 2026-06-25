@@ -471,7 +471,7 @@ void genPyramid(Random &rnd, World &world)
     }
     std::tie(x, y) = makeHall(x + size - 16, y + 10, 10, {1, 0}, world);
     applyGravity(x - 12, y - 20, 12, 30, world);
-    world.queuedTreasures.emplace_back([x, y](Random &, World &world) {
+    world.queuedTreasures.addTask([x, y](Random &, World &world) {
         for (int i = -12; i < 12; ++i) {
             for (int j = -20; j < 10; ++j) {
                 world.getTile(x + i, y + j).liquid = Liquid::none;

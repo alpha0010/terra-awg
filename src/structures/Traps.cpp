@@ -548,9 +548,7 @@ void genTraps(Random &rnd, World &world)
     placeBoulderTraps(rnd, world);
     placeLavaTraps(rnd, world);
     placeDartTraps(rnd, world);
-    for (const auto &applyQueuedTrap : world.queuedTraps) {
-        applyQueuedTrap(rnd, world);
-    }
+    world.queuedTraps.runTasks(rnd, world);
 }
 
 bool addChestBoulderTraps(int x, int y, Random &rnd, World &world)

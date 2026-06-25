@@ -27,7 +27,6 @@ void makeFishingCloud(
     int startY,
     int width,
     int height,
-    Random &rnd,
     World &world)
 {
     int minX = startX + 0.2 * width;
@@ -55,7 +54,7 @@ void makeFishingCloud(
             ++y;
         }
     }
-    embedWaterfalls(
+    queuedEmbedWaterfalls(
         {startX, startY},
         {startX + width, startY + height},
         {TileID::cloud,
@@ -65,7 +64,6 @@ void makeFishingCloud(
          TileID::flesh},
         Liquid::water,
         14,
-        rnd,
         world);
 }
 
@@ -132,7 +130,7 @@ void makeGraveCloud(
             centerX + radius * std::cos(t + offset),
             centerY + radius * std::sin(t + offset));
     }
-    world.queuedDeco.emplace_back([locations](Random &, World &world) {
+    world.queuedDeco.addTask([locations](Random &, World &world) {
         for (auto [x, y] : locations) {
             if (world.regionPasses(x - 2, y - 2, 6, 6, [](Tile &tile) {
                     return tile.blockID == TileID::empty &&
@@ -217,8 +215,7 @@ void addCloudStructure(
     }
     Point anchor{x + room.getWidth() / 2, y + room.getHeight() / 2};
     world.getTile(anchor).flag = Flag::anchor;
-    world.queuedTreasures.emplace_back([anchor,
-                                        roomId](Random &rnd, World &world) {
+    world.queuedTreasures.addTask([anchor, roomId](Random &rnd, World &world) {
         auto [x, y] = findNearestAnchor(anchor, world);
         world.getTile(x, y).flag = Flag::none;
         TileBuffer room = Data::getSkyBox(roomId, world.getFramedTiles());
@@ -402,7 +399,7 @@ void genCloud(Random &rnd, World &world)
         }
         switch (numClouds % 3) {
         case 1:
-            makeFishingCloud(x, y, width, height, rnd, world);
+            makeFishingCloud(x, y, width, height, world);
             break;
         case 2:
             makeResourceCloud(x, y, width, height, rnd, world);

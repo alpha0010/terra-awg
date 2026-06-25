@@ -115,7 +115,7 @@ void fillGlowingMossCave(Random &rnd, World &world)
             }
         }
     }
-    world.queuedDeco.emplace_back([mossLocations](Random &, World &world) {
+    world.queuedDeco.addTask([mossLocations](Random &, World &world) {
         for (auto [x, y] : mossLocations) {
             growMossOn(x, y, world);
         }

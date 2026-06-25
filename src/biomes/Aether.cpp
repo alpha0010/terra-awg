@@ -170,7 +170,7 @@ std::pair<int, int> applyAetherCrystalline(
         }
     }
     // Not a trap.
-    world.queuedTraps.emplace_back([center, size](Random &, World &world) {
+    world.queuedTraps.addTask([center, size](Random &, World &world) {
         for (int x = center.x - size; x < center.x + size; ++x) {
             for (int y = center.y - size; y < center.y + size; ++y) {
                 Tile &tile = world.getTile(x, y);
@@ -286,12 +286,12 @@ std::pair<int, int> applyAetherGrove(
 
     // Not a trap.
     world.getTile(center).flag = Flag::anchor;
-    world.queuedTraps.emplace_back([anchor = center,
-                                    size,
-                                    width = 6 + size / scaleX,
-                                    minY = leafCenter - 6 - size / scaleY,
-                                    maxY = maxEditPos +
-                                           1](Random &rnd, World &world) {
+    world.queuedTraps.addTask([anchor = center,
+                               size,
+                               width = 6 + size / scaleX,
+                               minY = leafCenter - 6 - size / scaleY,
+                               maxY =
+                                   maxEditPos + 1](Random &rnd, World &world) {
         Point center = findNearestAnchor(anchor, world);
         world.getTile(center).flag = Flag::none;
         for (int i = -width; i < width; ++i) {
@@ -380,7 +380,7 @@ void genAether(Random &rnd, World &world)
             applyAetherRift(center, size, mossLocations, rnd, world);
         break;
     }
-    world.queuedDeco.emplace_back([mossLocations](Random &, World &world) {
+    world.queuedDeco.addTask([mossLocations](Random &, World &world) {
         for (auto [x, y] : mossLocations) {
             growMossOn(x, y, world);
         }
@@ -391,7 +391,6 @@ void genAether(Random &rnd, World &world)
         size,
         maxBubblePos,
         maxEditPos,
-        rnd,
         world);
 }
 
@@ -401,7 +400,6 @@ void fillAetherShimmer(
     double size,
     int maxBubblePos,
     int maxEditPos,
-    Random &rnd,
     World &world)
 {
     world.aether = {centerX, centerY};
@@ -453,12 +451,11 @@ void fillAetherShimmer(
             }
         }
     }
-    embedWaterfalls(
+    queuedEmbedWaterfalls(
         {centerX - size, centerY - size},
         {centerX + size, centerY + size},
         {TileID::aetherium},
         Liquid::shimmer,
         16,
-        rnd,
         world);
 }

@@ -269,8 +269,8 @@ void growTapRoot(double x, double y, int roomId, Random &rnd, World &world)
     }
 
     world.getTile(anchorX, anchorY).flag = Flag::anchor;
-    world.queuedTreasures.emplace_back([anchor = Point{anchorX, anchorY},
-                                        roomId](Random &rnd, World &world) {
+    world.queuedTreasures.addTask([anchor = Point{anchorX, anchorY},
+                                   roomId](Random &rnd, World &world) {
         auto [anchorX, anchorY] = findNearestAnchor(anchor, world);
         world.getTile(anchorX, anchorY).flag = Flag::none;
         if (world.getTile(anchorX, anchorY).wallID !=
@@ -374,7 +374,7 @@ void expireLivingTree(
 {
     if (world.conf.tundra) {
         // Not actually a trap, but this is the correct stage.
-        world.queuedTraps.emplace_back([treeTiles](Random &rnd, World &world) {
+        world.queuedTraps.addTask([treeTiles](Random &rnd, World &world) {
             for (auto point : treeTiles) {
                 Tile &tile = world.getTile(point);
                 if (tile.blockID == TileID::leaf) {
@@ -394,7 +394,7 @@ void expireLivingTree(
         treeTiles.begin() + baseScan,
         treeTiles.end(),
         [](auto &a, auto &b) { return a.y > b.y; });
-    world.queuedEvil.emplace_back(
+    world.queuedEvil.addTask(
         [baseScan, treeTiles = std::move(treeTiles)](Random &, World &world) {
             int numCorrupt = 0;
             int numCrimson = 0;
@@ -555,7 +555,7 @@ void buryEnchantedSwords(Random &rnd, World &world)
 
         Point anchor{x, y};
         world.getTile(anchor).flag = Flag::anchor;
-        world.queuedTreasures.emplace_back([anchor](Random &, World &world) {
+        world.queuedTreasures.addTask([anchor](Random &, World &world) {
             auto [x, y] = findNearestAnchor(anchor, world);
             world.getTile(x, y).flag = Flag::none;
             TileBuffer shrine = Data::getSwordShrine(world.getFramedTiles());

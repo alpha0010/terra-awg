@@ -271,7 +271,7 @@ void maybePlaceCabinForChest(int x, int y, Random &rnd, World &world)
     }
     addCabinDebris(locations, world);
     if (trap.x != -1 && rnd.getDouble(0, 1) < 0.2 * world.conf.traps) {
-        world.queuedTraps.emplace_back(
+        world.queuedTraps.addTask(
             [chestX, chestY, trap](Random &, World &world) {
                 world.placeFramedTile(
                     chestX,

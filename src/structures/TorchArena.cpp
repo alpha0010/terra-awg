@@ -125,16 +125,16 @@ void placeTorchStructure(int x, int y, TileBuffer &data, World &world)
         }
     }
     world.placeBuffer(x, y, data);
-    world.queuedDeco.emplace_back(
-        [x, y, dW = data.getWidth(), dH = data.getHeight()](
-            Random &,
-            World &world) {
-            for (int i = 0; i < dW; ++i) {
-                for (int j = 0; j < dH; ++j) {
-                    world.getTile(x + i, y + j).liquid = Liquid::none;
-                }
+    world.queuedDeco.addTask([dW = data.getWidth(),
+                              dH = data.getHeight(),
+                              x,
+                              y](Random &, World &world) {
+        for (int i = 0; i < dW; ++i) {
+            for (int j = 0; j < dH; ++j) {
+                world.getTile(x + i, y + j).liquid = Liquid::none;
             }
-        });
+        }
+    });
 }
 
 void addArenaBubble(int x, int y, World &world)

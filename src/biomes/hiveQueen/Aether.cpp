@@ -74,10 +74,10 @@ void genAetherHiveQueen(Random &rnd, World &world)
                 maxEditPos = std::max(maxEditPos, pt.y);
             }
         });
-    world.queuedDeco.emplace_back([mossLocations](Random &, World &world) {
+    world.queuedDeco.addTask([mossLocations](Random &, World &world) {
         for (auto [x, y] : mossLocations) {
             growMossOn(x, y, world);
         }
     });
-    fillAetherShimmer(x, y, 75, maxBubblePos, maxEditPos, rnd, world);
+    fillAetherShimmer(x, y, 75, maxBubblePos, maxEditPos, world);
 }

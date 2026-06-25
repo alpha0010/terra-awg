@@ -276,7 +276,7 @@ private:
                 world.getTile(x + i, y + j).blockID = theme.brick;
             }
         }
-        world.queuedDeco.emplace_back(
+        world.queuedDeco.addTask(
             [x, y, mapWidth, mapHeight, scale](Random &rnd, World &world) {
                 parallelFor(
                     std::views::iota(0, mapWidth),

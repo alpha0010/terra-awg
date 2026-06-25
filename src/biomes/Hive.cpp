@@ -133,9 +133,9 @@ void fillHive(int hiveX, int hiveY, double size, Random &rnd, World &world)
             }
         }
     }
-    world.queuedTreasures.emplace_back([hiveX,
-                                        hiveY,
-                                        size](Random &rnd, World &world) {
+    world.queuedTreasures.addTask([hiveX,
+                                   hiveY,
+                                   size](Random &rnd, World &world) {
         std::vector<Point> usedLocations;
         for (int x = hiveX - size; x < hiveX + size; ++x) {
             for (int y = hiveY - size; y < hiveY + size; ++y) {

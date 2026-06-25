@@ -3,12 +3,12 @@
 
 #include "Chest.h"
 #include "Point.h"
+#include "QueuedTasks.h"
 #include "Tile.h"
 #include "ids/Biome.h"
 #include "ids/FramedTiles.h"
 #include "ids/TileVariant.h"
 #include <cstdint>
-#include <functional>
 #include <vector>
 
 struct Config;
@@ -137,10 +137,11 @@ public:
     int gemGroveSize;
     std::vector<Point> mushroomCenter;
 
-    std::vector<std::function<void(Random &, World &)>> queuedEvil;
-    std::vector<std::function<void(Random &, World &)>> queuedDeco;
-    std::vector<std::function<void(Random &, World &)>> queuedTraps;
-    std::vector<std::function<void(Random &, World &)>> queuedTreasures;
+    QueuedTasks queuedEvil;
+    QueuedTasks queuedPostBiome;
+    QueuedTasks queuedTreasures;
+    QueuedTasks queuedTraps;
+    QueuedTasks queuedDeco;
 };
 
 #endif // WORLD_H

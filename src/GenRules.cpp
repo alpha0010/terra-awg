@@ -100,6 +100,7 @@ enum class Step {
     genSpiderNest,
     genGlowingMoss,
     genGemGrove,
+    applyPostBiome,
     genDungeon,
     genTemple,
     genCavernSpawn,
@@ -199,6 +200,7 @@ inline std::array baseBiomeRules{
     Step::genGlowingMoss,
     Step::genGemGrove,
     Step::terrainGlitch,
+    Step::applyPostBiome,
 };
 
 inline std::array baseStructureRules{
@@ -246,6 +248,7 @@ inline std::array hiveQueenBiomeRules{
     Step::genGlowingMossHiveQueen,
     Step::genGemGroveHiveQueen,
     Step::terrainGlitch,
+    Step::applyPostBiome,
 };
 
 #define GEN_STEP(step)                                                         \
@@ -283,9 +286,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genCrimson)
         GEN_STEP(genCorruption)
     case Step::applyQueuedEvil:
-        for (const auto &applyQueuedEvil : world.queuedEvil) {
-            applyQueuedEvil(rnd, world);
-        }
+        world.queuedEvil.runTasks(rnd, world);
         break;
         GEN_STEP(genMeteorite)
         GEN_STEP(genAsteroidField)
@@ -293,6 +294,9 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genSpiderNest)
         GEN_STEP(genGlowingMoss)
         GEN_STEP(genGemGrove)
+    case Step::applyPostBiome:
+        world.queuedPostBiome.runTasks(rnd, world);
+        break;
         GEN_STEP(genDungeon)
         GEN_STEP(genTemple)
         GEN_STEP(genCavernSpawn)

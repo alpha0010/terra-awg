@@ -56,7 +56,7 @@ void placeMeteorite(int x, int y, Random &rnd, World &world)
             }
         }
     }
-    world.queuedTreasures.emplace_back([x, y, size](Random &, World &world) {
+    world.queuedTreasures.addTask([x, y, size](Random &, World &world) {
         double threshold = 0.85 * size;
         for (int i = -size; i < size; ++i) {
             for (int j = -size; j < size; ++j) {

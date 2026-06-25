@@ -286,6 +286,6 @@ void genGemGrove(Random &rnd, World &world)
     }
     world.gemGrove = {x, y};
     world.gemGroveSize = groveSize;
-    world.queuedDeco.emplace_back(placeGroveDecoGems);
-    world.queuedTreasures.emplace_back(placeGemChest);
+    world.queuedDeco.addTask(placeGroveDecoGems);
+    world.queuedTreasures.addTask(placeGemChest);
 }
