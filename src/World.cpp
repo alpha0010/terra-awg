@@ -279,6 +279,7 @@ inline const std::map<std::pair<int, Variant>, FrameDetails> tileFrameData{
     {{TileID::sunflower, Variant::none}, {2, 4, 0, 0}},
     {{TileID::tallGrassPlant, Variant::none}, {1, 1, 0, 0}},
     {{TileID::tallJunglePlant, Variant::none}, {1, 1, 0, 0}},
+    {{TileID::teleporter, Variant::none}, {3, 1, 0, 0}},
     {{TileID::trap, Variant::dartLeft}, {1, 1, 0, 0}},
     {{TileID::trap, Variant::dartRight}, {1, 1, 18, 0}},
     {{TileID::trap, Variant::flameLeft}, {1, 1, 0, 36}},

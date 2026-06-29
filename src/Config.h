@@ -58,6 +58,7 @@ struct Config {
     bool dontDigUp;
     bool glitched;
     double lootRandomizer;
+    int teleporters;
     int meteorites;
     double meteoriteSize;
     AetherBiome aether;

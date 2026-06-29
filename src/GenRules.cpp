@@ -65,6 +65,7 @@
 #include "structures/Treasure.h"
 #include "structures/Vines.h"
 #include "structures/Webs.h"
+#include "structures/beamMeUp/Teleporters.h"
 #include "structures/dontDigUp/LootRules.h"
 #include "structures/glitched/LootRules.h"
 #include "structures/hardmode/LootRules.h"
@@ -163,6 +164,8 @@ enum class Step {
     // Glitched.
     terrainGlitch,
     randomizeLoot,
+    // Beam me up.
+    genTeleporters,
 };
 
 inline std::array baseBiomeRules{
@@ -211,10 +214,10 @@ inline std::array baseStructureRules{
     Step::genStarterHome, Step::genIgloo,          Step::genMushroomCabin,
     Step::genTreasure,    Step::applyHardmodeLoot, Step::applyDontDigUpLoot,
     Step::randomizeLoot,  Step::genGlobalHive,     Step::genGlaciation,
-    Step::genPlants,      Step::genTraps,          Step::genTracks,
-    Step::genFlood,       Step::smoothSurfaces,    Step::finalizeWalls,
-    Step::genVines,       Step::genGrasses,        Step::genWebs,
-    Step::genGlobalEcho,  Step::genGlobalOutline,
+    Step::genPlants,      Step::genTraps,          Step::genTeleporters,
+    Step::genTracks,      Step::genFlood,          Step::smoothSurfaces,
+    Step::finalizeWalls,  Step::genVines,          Step::genGrasses,
+    Step::genWebs,        Step::genGlobalEcho,     Step::genGlobalOutline,
 };
 
 inline std::array hiveQueenBiomeRules{
@@ -356,6 +359,9 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP_WORLD(applyDontDigUpLoot)
         GEN_STEP(terrainGlitch)
         GEN_STEP(randomizeLoot)
+    case Step::genTeleporters:
+        genTeleporters(locations, rnd, world);
+        break;
     }
 }
 
@@ -431,6 +437,9 @@ void doWorldGen(Random &rnd, World &world)
     }
     if (world.conf.lootRandomizer < 0.001) {
         excludes.insert(Step::randomizeLoot);
+    }
+    if (world.conf.teleporters <= 0) {
+        excludes.insert(Step::genTeleporters);
     }
     LocationBins locations;
     std::vector<Step> steps;

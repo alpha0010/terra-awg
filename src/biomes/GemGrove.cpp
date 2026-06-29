@@ -102,7 +102,7 @@ void placeGroveDecoGems(Random &rnd, World &world)
                 [](Tile &tile) { return tile.blockID == TileID::empty; }) &&
             world.regionPasses(x, y, 3, 3, [](Tile &tile) {
                 return tile.wallID != WallID::empty &&
-                       tile.liquid == Liquid::none && !tile.wireRed;
+                       tile.liquid == Liquid::none && !tile.hasAnyWire();
             })) {
             world.placeBuffer(x, y, getDecoGem(rnd, world));
         }

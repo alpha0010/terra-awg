@@ -49,6 +49,11 @@ public:
     Flag flag;
 
     bool operator==(const Tile &) const = default;
+
+    bool hasAnyWire() const
+    {
+        return wireRed || wireBlue || wireGreen || wireYellow;
+    }
 };
 
 #endif // TILE_H

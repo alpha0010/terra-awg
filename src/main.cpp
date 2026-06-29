@@ -307,6 +307,7 @@ std::string assembleSeedFlags(Config &conf)
 {
     std::string seed;
     seed += maybeFlag(conf.spiderNestFreq <= 0, "Arachnophobia");
+    seed += maybeFlag(conf.teleporters > 2, "Beam Me Up");
     seed += maybeFlag(conf.endlessRain, "Bring a Towel");
     seed += maybeFlag(conf.purity, "Fish Mox");
     seed += maybeFlag(conf.endlessHalloween, "Hocus Pocus");

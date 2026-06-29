@@ -144,6 +144,13 @@ glitched = false
 # pools) to 4.0 (maximum scramble).
 lootRandomizer = 0.0
 
+# Activates "beam me up" secret seed.
+# Recommend count for world size: small - 8, medium - 18, large - 32.
+#
+# Note that high numbers of teleporters (e.g. 100) can take a long time to
+# generate, due to complexities in routing wires.
+teleporters = 0
+
 # Number of meteorites to place.
 meteorites = 0
 meteoriteSize = 1.0
@@ -739,6 +746,7 @@ Config readConfig(Random &rnd)
         false, // dontDigUp
         false, // glitched
         0.0,   // lootRandomizer
+        0,     // teleporters
         0,     // meteorites
         1.0,   // meteoriteSize
         AetherBiome::random,
@@ -845,6 +853,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, dontDigUp, Boolean);
     READ_CONF_VALUE(variation, glitched, Boolean);
     READ_CONF_VALUE(variation, lootRandomizer, Real);
+    READ_CONF_VALUE(variation, teleporters, Integer);
     READ_CONF_VALUE(variation, meteorites, Integer);
     READ_CONF_AREA_VALUE(variation, meteoriteSize);
     conf.aether = parseAetherBiome(reader.Get("variation", "aether", "RANDOM"));
