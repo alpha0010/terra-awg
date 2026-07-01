@@ -201,7 +201,7 @@ enum {
 
 namespace WallVariants
 {
-inline std::array const dirt = {
+inline constexpr std::array dirt = {
     WallID::Unsafe::dirt,
     WallID::Unsafe::rockyDirt,
     WallID::Unsafe::caveDirt,
@@ -212,14 +212,14 @@ inline std::array const dirt = {
     WallID::Unsafe::wavyDirt};
 
 // Excludes: oldStone
-inline std::array const stone = {
+inline constexpr std::array stone = {
     WallID::Unsafe::craggyStone,
     WallID::Unsafe::wornStone,
     WallID::Unsafe::stalactiteStone,
     WallID::Unsafe::mottledStone,
     WallID::Unsafe::fracturedStone};
 
-inline std::array const jungle = {
+inline constexpr std::array jungle = {
     WallID::Unsafe::mud,
     WallID::Unsafe::lichenStone,
     WallID::Unsafe::leafyJungle,
@@ -227,26 +227,26 @@ inline std::array const jungle = {
     WallID::Unsafe::jungleVine};
 
 // Excludes: crimsonBlister
-inline std::array const crimson = {
+inline constexpr std::array crimson = {
     WallID::Unsafe::crimstone,
     WallID::Unsafe::crimsonCrust,
     WallID::Unsafe::crimsonScab,
     WallID::Unsafe::crimsonTeeth};
 
 // Excludes: corruptTendril
-inline std::array const corruption = {
+inline constexpr std::array corruption = {
     WallID::Unsafe::ebonstone,
     WallID::Unsafe::corruptGrowth,
     WallID::Unsafe::corruptMass,
     WallID::Unsafe::corruptPustule};
 
-inline std::array const hallow = {
+inline constexpr std::array hallow = {
     WallID::Unsafe::hallowedPrism,
     WallID::Unsafe::hallowedCavern,
     WallID::Unsafe::hallowedShard,
     WallID::Unsafe::hallowedCrystalline};
 
-inline std::array const dungeon = {
+inline constexpr std::array dungeon = {
     WallID::Unsafe::blueBrick,
     WallID::Unsafe::greenBrick,
     WallID::Unsafe::pinkBrick,
@@ -257,7 +257,7 @@ inline std::array const dungeon = {
     WallID::Unsafe::greenTiled,
     WallID::Unsafe::pinkTiled};
 
-inline std::array const underworld = {
+inline constexpr std::array underworld = {
     WallID::Unsafe::ember,
     WallID::Unsafe::cinder,
     WallID::Unsafe::magma,

@@ -5,10 +5,8 @@
 #include <algorithm>
 #include <iostream>
 
-void genPondFor(
-    std::function<bool(const BiomeData &)> isBiomeActive,
-    Random &rnd,
-    World &world)
+template <typename Func>
+void genPondFor(Func isBiomeActive, Random &rnd, World &world)
 {
     int minX = 0;
     int maxX = 0;

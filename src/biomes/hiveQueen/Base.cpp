@@ -48,8 +48,8 @@ inline std::array const underworldTiles{
 
 inline auto hashPoint = [](const Point &pt) { return hash32pt(pt.x, pt.y); };
 
-std::vector<Point>
-iterateHex(Point start, int scale, std::function<void(Point)> f)
+template <typename Func>
+std::vector<Point> iterateHex(Point start, int scale, Func f)
 {
     std::unordered_set<Point, decltype(hashPoint)> visited(
         scale * scale,

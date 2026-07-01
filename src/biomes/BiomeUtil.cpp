@@ -1,12 +1,10 @@
 #include "BiomeUtil.h"
 
 #include "Random.h"
-#include "World.h"
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
 #include "vendor/frozen/map.h"
 #include <algorithm>
-#include <set>
 
 double computeOreThreshold(double oreMultiplier)
 {
@@ -315,54 +313,4 @@ bool isInBiome(int x, int y, int scanDist, Biome biome, World &world)
         }
     }
     return true;
-}
-
-void iterateDiamond(
-    int topHeight,
-    int centerHeight,
-    std::function<void(int, int)> f)
-{
-    for (int i = 0; i < 2 * topHeight; ++i) {
-        for (int j = std::abs(topHeight - i - 0.5); j < topHeight; ++j) {
-            f(i, j);
-        }
-        for (int j = 0; j < centerHeight; ++j) {
-            f(i, j + topHeight);
-        }
-        int maxJ = topHeight - std::abs(topHeight - i - 0.5);
-        for (int j = 0; j < maxJ; ++j) {
-            f(i, j + topHeight + centerHeight);
-        }
-    }
-}
-
-void iterateZone(
-    Point start,
-    World &world,
-    std::function<bool(Point)> isValid,
-    std::function<void(Point)> f)
-{
-    std::set<Point> border;
-    std::set<Point> visited;
-    std::vector<Point> locations{start};
-    while (!locations.empty()) {
-        Point loc = locations.back();
-        locations.pop_back();
-        if (loc.x < 0 || loc.y < 0 || loc.x >= world.getWidth() ||
-            loc.y >= world.getHeight() || visited.contains(loc) ||
-            border.contains(loc)) {
-            continue;
-        }
-        if (isValid(loc)) {
-            visited.insert(loc);
-            for (auto delta : {Point{-1, 0}, {1, 0}, {0, -1}, {0, 1}}) {
-                locations.push_back(loc + delta);
-            }
-        } else {
-            border.insert(loc);
-        }
-    }
-    for (Point loc : visited) {
-        f(loc);
-    }
 }
