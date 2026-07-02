@@ -366,6 +366,10 @@ void genCloud(Random &rnd, World &world)
             world.getWidth() - cloudScale * 200 - width);
         int maxY =
             std::max<int>(0.45 * world.getUndergroundLevel() - height, 50);
+        bool glitchCloud = world.conf.glitched && numClouds % 2 == 0;
+        if (glitchCloud) {
+            maxY = std::max(maxY, world.getSurfaceLevel(x));
+        }
         int y = rnd.getInt(
             std::min<int>(
                 numClouds == 3 ? std::midpoint<int>(cloudScale * 100, maxY)
@@ -377,7 +381,13 @@ void genCloud(Random &rnd, World &world)
                 y - 25,
                 width + hSpacingBuffer,
                 height + 50,
-                [](Tile &tile) { return tile.blockID == TileID::empty; })) {
+                glitchCloud ? ([](Tile &tile) {
+                    return tile.blockID != TileID::cloud &&
+                           tile.blockID != TileID::meteorite;
+                })
+                            : ([](Tile &tile) {
+                                  return tile.blockID == TileID::empty;
+                              }))) {
             continue;
         }
         for (int i = 0; i < width; ++i) {
@@ -437,6 +447,9 @@ void genCloud(Random &rnd, World &world)
         std::views::iota(0, world.getWidth()),
         [&tileConversion, &wallConversion, &world](int x) {
             int maxY = 0.45 * world.getUndergroundLevel() + 10;
+            if (world.conf.glitched) {
+                maxY = std::max(maxY, world.getSurfaceLevel(x));
+            }
             for (int y = 0; y < maxY; ++y) {
                 Tile &tile = world.getTile(x, y);
                 Biome biome = world.getBiome(x, y).active;

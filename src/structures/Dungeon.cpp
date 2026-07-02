@@ -1267,6 +1267,45 @@ private:
         }
     }
 
+    void addStalactites(const std::vector<Point> &zones)
+    {
+        int roomSpan = roomSize / 2 + wallThickness;
+        for (auto [x, y] : zones) {
+            for (int i = -roomSpan; i < roomSpan; ++i) {
+                int stalactiteLen = 0;
+                for (int j = -roomSpan; j < roomSpan; ++j) {
+                    if (world.getTile(x + i, y + j + 1).blockID ==
+                        TileID::empty) {
+                        Tile &tile = world.getTile(x + i, y + j);
+                        if (tile.blockID == theme.brick) {
+                            stalactiteLen = std::max(
+                                0.0,
+                                13.5 *
+                                    rnd.getFineNoise(4 * (x + i), 4 * (y + j)));
+                        } else if (
+                            tile.blockID == TileID::empty &&
+                            stalactiteLen > 0) {
+                            tile.blockID =
+                                world.regionPasses(
+                                    x + i,
+                                    y + j + 2,
+                                    1,
+                                    2,
+                                    [](Tile &tile) {
+                                        return tile.blockID == TileID::empty;
+                                    })
+                                    ? theme.brick
+                                    : theme.crackedBrick;
+                            --stalactiteLen;
+                        } else {
+                            stalactiteLen = 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     void applyWallVariety(const std::vector<Point> &zones)
     {
         size_t zonePortion = zones.size() / 3;
@@ -1480,6 +1519,9 @@ public:
         addFurniture(dungeonCenter, dungeonWidth);
         if (world.conf.forTheWorthy) {
             addFloatingSpikes(dungeonCenter, dungeonWidth);
+        }
+        if (world.conf.glitched) {
+            addStalactites(zones);
         }
         std::sort(
             zones.begin(),

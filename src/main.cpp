@@ -883,6 +883,7 @@ int main()
         conf.minecartTracks *= 1.5;
     }
     if (conf.glitched) {
+        conf.clouds *= 1.8;
         conf.lootRandomizer += 2.5;
     }
     if (conf.spawn == SpawnPoint::normal) {
