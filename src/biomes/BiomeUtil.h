@@ -56,6 +56,9 @@ void growMossOn(int x, int y, World &world);
 
 bool isInBiome(int x, int y, int scanDist, Biome biome, World &world);
 
+/**
+ * @tparam Func `(int, int)->void`
+ */
 template <typename Func>
 void iterateDiamond(int topHeight, int centerHeight, Func f)
 {
@@ -73,6 +76,10 @@ void iterateDiamond(int topHeight, int centerHeight, Func f)
     }
 }
 
+/**
+ * @tparam BoundsCheck `(Point)->bool`
+ * @tparam Func `(Point)->void`
+ */
 template <typename BoundsCheck, typename Func>
 void iterateZone(Point start, World &world, BoundsCheck isValid, Func f)
 {

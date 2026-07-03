@@ -86,6 +86,8 @@ public:
 
     /**
      * Check if all tiles in the area pass a predicate.
+     *
+     * @tparam Func `(Tile&)->bool`
      */
     template <typename Func>
     bool regionPasses(int x, int y, int width, int height, Func f)

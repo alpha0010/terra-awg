@@ -41,6 +41,7 @@
 #include "biomes/hiveQueen/GraniteCave.h"
 #include "biomes/hiveQueen/Hive.h"
 #include "biomes/hiveQueen/MarbleCave.h"
+#include "biomes/jaggedRocks/Chasms.h"
 #include "biomes/patches/Base.h"
 #include "biomes/shattered/ShatteredLand.h"
 #include "structures/BuriedBoat.h"
@@ -133,6 +134,8 @@ enum class Step {
     genSecondaryCorruption,
     // Shattered.
     genShatteredLand,
+    // Jagged Rocks.
+    genChasms,
     // Sunken.
     genFlood,
     // Tundra
@@ -174,6 +177,7 @@ inline std::array baseBiomeRules{
     Step::initBiomeNoise,
     Step::genWorldBase,
     Step::genWorldBasePatches,
+    Step::genChasms,
     Step::genOceans,
     Step::genBasins,
     Step::genShatteredLand,
@@ -225,6 +229,7 @@ inline std::array hiveQueenBiomeRules{
     Step::initNoise,
     Step::initBiomeNoise,
     Step::genWorldBaseHiveQueen,
+    Step::genChasms,
     Step::genOceans,
     Step::genShatteredLand,
     Step::genCloud,
@@ -335,6 +340,7 @@ void doGenStep(Step step, LocationBins &locations, Random &rnd, World &world)
         GEN_STEP(genSecondaryCrimson)
         GEN_STEP(genSecondaryCorruption)
         GEN_STEP(genShatteredLand)
+        GEN_STEP(genChasms)
         GEN_STEP_WORLD(genFlood)
         GEN_STEP(genGlaciation)
         GEN_STEP(genHardmodeOres)
@@ -394,6 +400,9 @@ void doWorldGen(Random &rnd, World &world)
     }
     if (!world.conf.shattered) {
         excludes.insert(Step::genShatteredLand);
+    }
+    if (!world.conf.jaggedRocks) {
+        excludes.insert(Step::genChasms);
     }
     if (!world.conf.sunken) {
         excludes.insert(Step::genFlood);

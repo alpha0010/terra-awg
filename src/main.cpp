@@ -314,6 +314,7 @@ std::string assembleSeedFlags(Config &conf)
     seed += maybeFlag(conf.spawn == SpawnPoint::cavern, "How Did I Get Here");
     seed += maybeFlag(conf.glitched, "I am Error");
     seed += maybeFlag(conf.fadedMemories > 0.005, "Invisible Plane");
+    seed += maybeFlag(conf.jaggedRocks, "Jagged Rocks");
     seed += maybeFlag(conf.endlessChristmas, "Jingle All the Way");
     seed += maybeFlag(conf.traps <= 0, "More Traps Please");
     seed += maybeFlag(conf.shattered, "Planetoids");

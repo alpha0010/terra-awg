@@ -88,6 +88,9 @@ doubleTrouble = false
 # Break up the world into floating islands.
 shattered = false
 
+# Score the world with chasms.
+jaggedRocks = false
+
 # Flood the majority of the world surface.
 #
 # Note that this may prevent meteorites. Also, Terraria's liquid engine
@@ -728,6 +731,7 @@ Config readConfig(Random &rnd)
         false, // allOres
         false, // doubleTrouble
         false, // shattered
+        false, // jaggedRocks
         false, // sunken
         false, // tundra
         false, // purity
@@ -834,6 +838,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, allOres, Boolean);
     READ_CONF_VALUE(variation, doubleTrouble, Boolean);
     READ_CONF_VALUE(variation, shattered, Boolean);
+    READ_CONF_VALUE(variation, jaggedRocks, Boolean);
     READ_CONF_VALUE(variation, sunken, Boolean);
     READ_CONF_VALUE(variation, tundra, Boolean);
     READ_CONF_VALUE(variation, purity, Boolean);

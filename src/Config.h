@@ -40,6 +40,7 @@ struct Config {
     bool allOres;
     bool doubleTrouble;
     bool shattered;
+    bool jaggedRocks;
     bool sunken;
     bool tundra;
     bool purity;
