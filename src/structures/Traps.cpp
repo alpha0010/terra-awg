@@ -9,7 +9,9 @@
 #include <algorithm>
 #include <iostream>
 
-inline constexpr auto trappableTiles = frozen::make_set<int>({
+namespace
+{
+constexpr auto trappableTiles = frozen::make_set<int>({
     TileID::empty,
     TileID::dirt,
     TileID::stone,
@@ -52,6 +54,7 @@ inline constexpr auto trappableTiles = frozen::make_set<int>({
     TileID::corruptJungleGrass,
     TileID::crimsonJungleGrass,
 });
+}
 
 bool isTrappable(Tile &tile)
 {

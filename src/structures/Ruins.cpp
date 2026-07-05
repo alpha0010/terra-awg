@@ -14,8 +14,6 @@
 #include <iostream>
 #include <set>
 
-inline std::array const roofCurve{1, 2, 3, 5, 8, 13, 21, 26, 29, 31, 32, 33};
-
 bool canPlaceFurniture(int x, int y, TileBuffer &data, World &world)
 {
     for (int i = 0; i < data.getWidth(); ++i) {
@@ -62,6 +60,8 @@ private:
 
     void buildRoof(int &minX, int &maxX, int &roofLevel)
     {
+        constexpr std::array
+            roofCurve{1, 2, 3, 5, 8, 13, 21, 26, 29, 31, 32, 33};
         int center = std::midpoint(minX, maxX);
         for (size_t j = 0; j < roofCurve.size(); ++j) {
             for (int i = -roofCurve[j]; i < roofCurve[j]; ++i) {

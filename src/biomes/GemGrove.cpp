@@ -14,9 +14,11 @@
 #include <iostream>
 #include <set>
 
+namespace
+{
 typedef std::array<std::pair<int, int>, 5> GemSwatch;
 
-inline const std::array gemSwatches = std::to_array<GemSwatch>({
+constexpr auto gemSwatches = std::to_array<GemSwatch>({
     {{{TileID::amethystGemspark, Paint::pink},
       {TileID::amethystGemspark, Paint::violet},
       {TileID::amethystGemspark, Paint::none},
@@ -53,6 +55,7 @@ inline const std::array gemSwatches = std::to_array<GemSwatch>({
       {TileID::diamondGemspark, Paint::black},
       {TileID::diamondGemspark, Paint::shadow}}},
 });
+} // namespace
 
 TileBuffer getDecoGem(Random &rnd, World &world)
 {

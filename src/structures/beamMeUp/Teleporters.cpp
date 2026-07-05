@@ -9,7 +9,9 @@
 #include <algorithm>
 #include <iostream>
 
-inline constexpr auto wireAvoidTiles = frozen::make_set<int>({
+namespace
+{
+constexpr auto wireAvoidTiles = frozen::make_set<int>({
     TileID::amberGemspark,
     TileID::amethystGemspark,
     TileID::candelabra,
@@ -42,7 +44,7 @@ inline constexpr auto wireAvoidTiles = frozen::make_set<int>({
     TileID::trap,
 });
 
-inline constexpr auto wireAvoidWalls = frozen::make_set([]() {
+constexpr auto wireAvoidWalls = frozen::make_set([]() {
     auto walls = std::to_array<int>({
         WallID::Safe::amberGemspark,
         WallID::Safe::amethystGemspark,
@@ -59,6 +61,7 @@ inline constexpr auto wireAvoidWalls = frozen::make_set([]() {
     std::copy(WallVariants::dungeon.begin(), WallVariants::dungeon.end(), itr);
     return ret;
 }());
+} // namespace
 
 bool isTeleporterLocation(int x, int y, int minX, int maxX, World &world)
 {

@@ -7,7 +7,9 @@
 #include <algorithm>
 #include <map>
 
-inline constexpr auto tileToRepTile = frozen::make_map<int, int>({
+namespace
+{
+constexpr auto tileToRepTile = frozen::make_map<int, int>({
     {TileID::aetherium, TileID::offlineAmethystGemspark},
     {TileID::amberGemspark, TileID::emeraldStone},
     {TileID::amberTree, TileID::emeraldStone},
@@ -175,7 +177,7 @@ inline constexpr auto tileToRepTile = frozen::make_map<int, int>({
     {TileID::yellowWillowTree, TileID::wood},
 });
 
-inline constexpr auto wallToRepTile = frozen::make_map<int, int>({
+constexpr auto wallToRepTile = frozen::make_map<int, int>({
     {WallID::Safe::ashWood, TileID::wood},
     {WallID::Safe::borealWood, TileID::wood},
     {WallID::Safe::cloud, TileID::cloud},
@@ -291,6 +293,7 @@ inline constexpr auto wallToRepTile = frozen::make_map<int, int>({
     {WallID::Unsafe::wavyDirt, TileID::dirt},
     {WallID::Unsafe::wornStone, TileID::stone},
 });
+} // namespace
 
 int getRepColorTile(int x, int y, World &world)
 {

@@ -10,7 +10,9 @@
 #include "vendor/frozen/set.h"
 #include <iostream>
 
-inline constexpr auto embeddedTraps = frozen::make_set<int>({
+namespace
+{
+constexpr auto embeddedTraps = frozen::make_set<int>({
     TileID::boulder,
     TileID::bouncyBoulder,
     TileID::explosives,
@@ -23,7 +25,7 @@ inline constexpr auto embeddedTraps = frozen::make_set<int>({
     TileID::spiderBoulder,
 });
 
-inline constexpr auto oreBacklights = frozen::make_map<int, int>({
+constexpr auto oreBacklights = frozen::make_map<int, int>({
     {TileID::copperOre, WallID::Safe::amberGemspark},
     {TileID::tinOre, WallID::Safe::topazGemspark},
     {TileID::ironOre, WallID::Safe::diamondGemspark},
@@ -41,6 +43,7 @@ inline constexpr auto oreBacklights = frozen::make_map<int, int>({
     {TileID::titaniumOre, WallID::Safe::diamondGemspark},
     {TileID::chlorophyteOre, WallID::Safe::emeraldGemspark},
 });
+} // namespace
 
 void genGlobalOutline(World &world)
 {

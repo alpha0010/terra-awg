@@ -38,7 +38,9 @@ bool isLocationUsed(
     return false;
 }
 
-inline constexpr auto nonSolidTiles = frozen::make_set<int>({
+namespace
+{
+constexpr auto nonSolidTiles = frozen::make_set<int>({
     TileID::empty,
     TileID::alchemyTable,
     TileID::altar,
@@ -172,6 +174,7 @@ inline constexpr auto nonSolidTiles = frozen::make_set<int>({
     TileID::workBench,
     TileID::yellowWillowTree,
 });
+}
 
 bool isSolidBlock(int tileId)
 {
@@ -223,28 +226,29 @@ Point findNearestAnchor(Point origin, World &world)
     return anchor;
 }
 
-inline std::array paintRainbow{
-    Paint::red,     Paint::orange, Paint::yellow,  Paint::lime,   Paint::green,
-    Paint::teal,    Paint::cyan,   Paint::skyBlue, Paint::blue,   Paint::purple,
-    Paint::violet,  Paint::pink,   Paint::violet,  Paint::purple, Paint::blue,
-    Paint::skyBlue, Paint::cyan,   Paint::teal,    Paint::green,  Paint::lime,
-    Paint::yellow,  Paint::orange, Paint::red};
-
 int getRainbowPaint(int x, int y)
 {
+    constexpr std::array paintRainbow{
+        Paint::red,    Paint::orange, Paint::yellow, Paint::lime,
+        Paint::green,  Paint::teal,   Paint::cyan,   Paint::skyBlue,
+        Paint::blue,   Paint::purple, Paint::violet, Paint::pink,
+        Paint::violet, Paint::purple, Paint::blue,   Paint::skyBlue,
+        Paint::cyan,   Paint::teal,   Paint::green,  Paint::lime,
+        Paint::yellow, Paint::orange, Paint::red};
     return paintRainbow[(x + y) % paintRainbow.size()];
 }
 
-inline std::array paintDeepRainbow{
-    Paint::deepRed,    Paint::deepOrange, Paint::deepYellow, Paint::deepLime,
-    Paint::deepGreen,  Paint::deepTeal,   Paint::deepCyan,   Paint::deepSkyBlue,
-    Paint::deepBlue,   Paint::deepPurple, Paint::deepViolet, Paint::deepPink,
-    Paint::deepViolet, Paint::deepPurple, Paint::deepBlue,   Paint::deepSkyBlue,
-    Paint::deepCyan,   Paint::deepTeal,   Paint::deepGreen,  Paint::deepLime,
-    Paint::deepYellow, Paint::deepOrange, Paint::deepRed};
-
 int getDeepRainbowPaint(int x, int y)
 {
+    constexpr std::array paintDeepRainbow{
+        Paint::deepRed,     Paint::deepOrange,  Paint::deepYellow,
+        Paint::deepLime,    Paint::deepGreen,   Paint::deepTeal,
+        Paint::deepCyan,    Paint::deepSkyBlue, Paint::deepBlue,
+        Paint::deepPurple,  Paint::deepViolet,  Paint::deepPink,
+        Paint::deepViolet,  Paint::deepPurple,  Paint::deepBlue,
+        Paint::deepSkyBlue, Paint::deepCyan,    Paint::deepTeal,
+        Paint::deepGreen,   Paint::deepLime,    Paint::deepYellow,
+        Paint::deepOrange,  Paint::deepRed};
     return paintDeepRainbow[(x + y) % paintDeepRainbow.size()];
 }
 

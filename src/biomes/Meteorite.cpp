@@ -9,13 +9,16 @@
 #include "vendor/frozen/set.h"
 #include <iostream>
 
-inline constexpr auto emptyBlocks = frozen::make_set<int>(
+namespace
+{
+constexpr auto emptyBlocks = frozen::make_set<int>(
     {TileID::empty,
      TileID::livingWood,
      TileID::leaf,
      TileID::livingMahogany,
      TileID::mahoganyLeaf,
      TileID::meteorite});
+}
 
 void placeMeteorite(int x, int y, Random &rnd, World &world)
 {

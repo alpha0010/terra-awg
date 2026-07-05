@@ -251,21 +251,20 @@ Point getHexCentroid(int x, int y, int scale)
     return {targetX, targetY};
 }
 
-inline constexpr auto mossFrameX = frozen::make_map<int, int>(
-    {{TileID::greenMossStone, 0},
-     {TileID::brownMossStone, 22},
-     {TileID::redMossStone, 44},
-     {TileID::blueMossStone, 66},
-     {TileID::purpleMossStone, 88},
-     {TileID::lavaMossStone, 110},
-     {TileID::kryptonMossStone, 132},
-     {TileID::xenonMossStone, 154},
-     {TileID::argonMossStone, 176},
-     {TileID::neonMossStone, 198},
-     {TileID::heliumMossStone, 220}});
-
 void growMossOn(int x, int y, World &world)
 {
+    constexpr auto mossFrameX = frozen::make_map<int, int>(
+        {{TileID::greenMossStone, 0},
+         {TileID::brownMossStone, 22},
+         {TileID::redMossStone, 44},
+         {TileID::blueMossStone, 66},
+         {TileID::purpleMossStone, 88},
+         {TileID::lavaMossStone, 110},
+         {TileID::kryptonMossStone, 132},
+         {TileID::xenonMossStone, 154},
+         {TileID::argonMossStone, 176},
+         {TileID::neonMossStone, 198},
+         {TileID::heliumMossStone, 220}});
     Tile &baseTile = world.getTile(x, y);
     auto itr = mossFrameX.find(baseTile.blockID);
     if (itr == mossFrameX.end() || baseTile.slope != Slope::none) {

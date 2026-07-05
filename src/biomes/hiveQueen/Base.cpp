@@ -15,42 +15,10 @@
 #include <mutex>
 #include <unordered_set>
 
-inline std::array const snowTiles{
-    TileID::snow,
-    TileID::ice,
-    TileID::stone,
-    TileID::thinIce,
-    TileID::slush};
-inline std::array const desertTiles{
-    TileID::sand,
-    TileID::sandstone,
-    TileID::desertFossil,
-    TileID::desertFossil,
-    TileID::desertFossil};
-inline std::array const jungleTiles{
-    TileID::mud,
-    TileID::mud,
-    TileID::clay,
-    TileID::silt,
-    TileID::stone};
-inline std::array const forestTiles{
-    TileID::dirt,
-    TileID::stone,
-    TileID::clay,
-    TileID::sand,
-    TileID::mud};
-inline std::array const underworldTiles{
-    TileID::ash,
-    TileID::ash,
-    TileID::ash,
-    TileID::ash,
-    TileID::ash};
-
-inline auto hashPoint = [](const Point &pt) { return hash32pt(pt.x, pt.y); };
-
 template <typename Func>
 std::vector<Point> iterateHex(Point start, int scale, Func f)
 {
+    auto hashPoint = [](const Point &pt) { return hash32pt(pt.x, pt.y); };
     std::unordered_set<Point, decltype(hashPoint)> visited(
         scale * scale,
         hashPoint);
@@ -220,6 +188,36 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
          &wallVarNoise,
          &rnd,
          &world](int x) {
+            constexpr std::array snowTiles{
+                TileID::snow,
+                TileID::ice,
+                TileID::stone,
+                TileID::thinIce,
+                TileID::slush};
+            constexpr std::array desertTiles{
+                TileID::sand,
+                TileID::sandstone,
+                TileID::desertFossil,
+                TileID::desertFossil,
+                TileID::desertFossil};
+            constexpr std::array jungleTiles{
+                TileID::mud,
+                TileID::mud,
+                TileID::clay,
+                TileID::silt,
+                TileID::stone};
+            constexpr std::array forestTiles{
+                TileID::dirt,
+                TileID::stone,
+                TileID::clay,
+                TileID::sand,
+                TileID::mud};
+            constexpr std::array underworldTiles{
+                TileID::ash,
+                TileID::ash,
+                TileID::ash,
+                TileID::ash,
+                TileID::ash};
             bool nearEdge = x < 350 || x > world.getWidth() - 350;
             for (int y = 0; y < world.getHeight(); ++y) {
                 BiomeData &biome = world.getBiome(x, y);

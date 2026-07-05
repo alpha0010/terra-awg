@@ -12,7 +12,9 @@
 #include "vendor/frozen/set.h"
 #include <algorithm>
 
-inline constexpr auto cabinClearTiles = frozen::make_set<int>({
+namespace
+{
+constexpr auto cabinClearTiles = frozen::make_set<int>({
     TileID::empty,         TileID::dirt,        TileID::stone,
     TileID::clay,          TileID::sand,        TileID::mud,
     TileID::copperOre,     TileID::tinOre,      TileID::ironOre,
@@ -21,6 +23,7 @@ inline constexpr auto cabinClearTiles = frozen::make_set<int>({
     TileID::palladiumOre,  TileID::mythrilOre,  TileID::orichalcumOre,
     TileID::adamantiteOre, TileID::titaniumOre, TileID::chlorophyteOre,
 });
+}
 
 bool canPlaceOnCabinGround(int x, int y, int width, int height, World &world)
 {

@@ -171,7 +171,9 @@ enum class Step {
     genTeleporters,
 };
 
-inline std::array baseBiomeRules{
+namespace
+{
+constexpr std::array baseBiomeRules{
     Step::planBiomes,
     Step::initNoise,
     Step::initBiomeNoise,
@@ -210,7 +212,7 @@ inline std::array baseBiomeRules{
     Step::applyPostBiome,
 };
 
-inline std::array baseStructureRules{
+constexpr std::array baseStructureRules{
     Step::genDungeon,     Step::genTemple,         Step::genTempleHiveQueen,
     Step::genCavernSpawn, Step::genPyramid,        Step::genDesertTomb,
     Step::genBuriedBoat,  Step::genSpiderHall,     Step::genRuins,
@@ -224,7 +226,7 @@ inline std::array baseStructureRules{
     Step::genWebs,        Step::genGlobalEcho,     Step::genGlobalOutline,
 };
 
-inline std::array hiveQueenBiomeRules{
+constexpr std::array hiveQueenBiomeRules{
     Step::planBiomes,
     Step::initNoise,
     Step::initBiomeNoise,
@@ -258,6 +260,7 @@ inline std::array hiveQueenBiomeRules{
     Step::terrainGlitch,
     Step::applyPostBiome,
 };
+} // namespace
 
 #define GEN_STEP(step)                                                         \
     case Step::step:                                                           \

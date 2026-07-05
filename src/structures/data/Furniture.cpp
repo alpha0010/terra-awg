@@ -236,7 +236,7 @@ std::vector<std::vector<uint16_t>> lanternData{
 namespace Data
 {
 
-inline constexpr auto frameDetail =
+constexpr auto frameDetail =
     frozen::make_map<std::pair<int, Variant>, std::pair<int, int>>({
         // Base: Metal Bathtub
         {{TileID::bathtub, Variant::blueDungeon}, {0, 756}},

@@ -10,7 +10,9 @@
 #include <cmath>
 #include <iostream>
 
-inline constexpr auto skipWalls = frozen::make_set<int>({
+namespace
+{
+constexpr auto skipWalls = frozen::make_set<int>({
     WallID::Unsafe::blueBrick,
     WallID::Unsafe::blueSlab,
     WallID::Unsafe::blueTiled,
@@ -22,6 +24,7 @@ inline constexpr auto skipWalls = frozen::make_set<int>({
     WallID::Unsafe::pinkTiled,
     WallID::Unsafe::lihzahrdBrick,
 });
+}
 
 void floodFill(int startX, int startY, int minY, World &world)
 {

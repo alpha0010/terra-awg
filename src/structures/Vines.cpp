@@ -11,23 +11,22 @@
 
 enum class ScanState { n, s, se, see, seee, e, ee, eee, eees };
 
-inline constexpr auto attatchTiles = frozen::make_set<int>(
-    {TileID::ice,
-     TileID::stone,
-     TileID::stoneSlab,
-     TileID::hive,
-     TileID::pearlstone,
-     TileID::ebonstone,
-     TileID::crimstone,
-     TileID::sandstone,
-     TileID::granite,
-     TileID::marble,
-     TileID::hallowedIce,
-     TileID::corruptIce,
-     TileID::crimsonIce});
-
 ScanState scanTransition(Tile &tile, ScanState state)
 {
+    constexpr auto attatchTiles = frozen::make_set<int>(
+        {TileID::ice,
+         TileID::stone,
+         TileID::stoneSlab,
+         TileID::hive,
+         TileID::pearlstone,
+         TileID::ebonstone,
+         TileID::crimstone,
+         TileID::sandstone,
+         TileID::granite,
+         TileID::marble,
+         TileID::hallowedIce,
+         TileID::corruptIce,
+         TileID::crimsonIce});
     if (tile.blockID == TileID::empty) {
         switch (state) {
         case ScanState::n:
@@ -66,20 +65,6 @@ ScanState scanTransition(Tile &tile, ScanState state)
     return ScanState::n;
 }
 
-inline constexpr auto stalactiteTypes = frozen::make_map<int, int>(
-    {{TileID::ice, 0},
-     {TileID::stone, 54},
-     {TileID::hive, 162},
-     {TileID::pearlstone, 216},
-     {TileID::ebonstone, 270},
-     {TileID::crimstone, 324},
-     {TileID::sandstone, 378},
-     {TileID::granite, 432},
-     {TileID::marble, 486},
-     {TileID::hallowedIce, 540},
-     {TileID::corruptIce, 594},
-     {TileID::crimsonIce, 648}});
-
 void placeStalactite(int x, int y, World &world)
 {
     int variation = hash32pt(x, y) % 6;
@@ -101,6 +86,19 @@ void placeStalactite(int x, int y, World &world)
         height = 2;
         paint = Paint::none;
     } else {
+        constexpr auto stalactiteTypes = frozen::make_map<int, int>(
+            {{TileID::ice, 0},
+             {TileID::stone, 54},
+             {TileID::hive, 162},
+             {TileID::pearlstone, 216},
+             {TileID::ebonstone, 270},
+             {TileID::crimstone, 324},
+             {TileID::sandstone, 378},
+             {TileID::granite, 432},
+             {TileID::marble, 486},
+             {TileID::hallowedIce, 540},
+             {TileID::corruptIce, 594},
+             {TileID::crimsonIce, 648}});
         auto itr = stalactiteTypes.find(probeTile.blockID);
         if (itr == stalactiteTypes.end()) {
             return;
@@ -123,19 +121,18 @@ void placeStalactite(int x, int y, World &world)
     }
 }
 
-inline constexpr auto stalagmiteTypes = frozen::make_map<int, int>(
-    {{TileID::stone, 54},
-     {TileID::hive, 162},
-     {TileID::pearlstone, 216},
-     {TileID::ebonstone, 270},
-     {TileID::crimstone, 324},
-     {TileID::sandstone, 378},
-     {TileID::granite, 432},
-     {TileID::marble, 486}});
-
 void placeStalagmite(int x, int y, World &world)
 {
     Tile &probeTile = world.getTile(x, y);
+    constexpr auto stalagmiteTypes = frozen::make_map<int, int>(
+        {{TileID::stone, 54},
+         {TileID::hive, 162},
+         {TileID::pearlstone, 216},
+         {TileID::ebonstone, 270},
+         {TileID::crimstone, 324},
+         {TileID::sandstone, 378},
+         {TileID::granite, 432},
+         {TileID::marble, 486}});
     auto itr = stalagmiteTypes.find(probeTile.blockID);
     if (itr == stalagmiteTypes.end() ||
         (itr->first == TileID::hive && probeTile.flag == Flag::border)) {

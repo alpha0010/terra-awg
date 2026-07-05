@@ -33,7 +33,9 @@ bool listContains(const T &list, const U &value)
     return std::find(std::begin(list), std::end(list), value) != std::end(list);
 }
 
-inline constexpr auto placementAvoidTiles = frozen::make_set<int>({
+namespace
+{
+constexpr auto placementAvoidTiles = frozen::make_set<int>({
     TileID::grate,
     TileID::leaf,
     TileID::livingWood,
@@ -46,6 +48,7 @@ inline constexpr auto placementAvoidTiles = frozen::make_set<int>({
     TileID::sillyPurpleBalloon,
     TileID::sillyGreenBalloon,
 });
+}
 
 bool isPlacementCandidate(int x, int y, World &world)
 {

@@ -51,35 +51,6 @@ void computeSurfaceLevel(Random &rnd, World &world)
     }
 }
 
-inline std::array const snowTiles{
-    TileID::snow,
-    TileID::snow,
-    TileID::ice,
-    TileID::stone,
-    TileID::thinIce,
-    TileID::slush};
-inline std::array const desertTiles{
-    TileID::sand,
-    TileID::sand,
-    TileID::sandstone,
-    TileID::desertFossil,
-    TileID::desertFossil,
-    TileID::desertFossil};
-inline std::array const jungleTiles{
-    TileID::mud,
-    TileID::jungleGrass,
-    TileID::mud,
-    TileID::clay,
-    TileID::silt,
-    TileID::stone};
-inline std::array const forestTiles{
-    TileID::dirt,
-    TileID::grass,
-    TileID::stone,
-    TileID::clay,
-    TileID::sand,
-    TileID::mud};
-
 int getWallVarIndex(
     int x,
     int y,
@@ -294,6 +265,34 @@ void applyBaseTerrain(Random &rnd, World &world)
          &wallVarNoise,
          &rnd,
          &world](int x) {
+            constexpr std::array snowTiles{
+                TileID::snow,
+                TileID::snow,
+                TileID::ice,
+                TileID::stone,
+                TileID::thinIce,
+                TileID::slush};
+            constexpr std::array desertTiles{
+                TileID::sand,
+                TileID::sand,
+                TileID::sandstone,
+                TileID::desertFossil,
+                TileID::desertFossil,
+                TileID::desertFossil};
+            constexpr std::array jungleTiles{
+                TileID::mud,
+                TileID::jungleGrass,
+                TileID::mud,
+                TileID::clay,
+                TileID::silt,
+                TileID::stone};
+            constexpr std::array forestTiles{
+                TileID::dirt,
+                TileID::grass,
+                TileID::stone,
+                TileID::clay,
+                TileID::sand,
+                TileID::mud};
             bool nearEdge = x < 350 || x > world.getWidth() - 350;
             int underworldRoof =
                 world.getUnderworldLevel() + 0.22 * underworldHeight +

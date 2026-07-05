@@ -8,7 +8,9 @@
 #include "structures/StructureUtil.h"
 #include "vendor/frozen/set.h"
 
-constexpr inline auto glitchedSprites = frozen::make_set<int>({
+namespace
+{
+constexpr auto glitchedSprites = frozen::make_set<int>({
     TileID::alchemyTable,
     TileID::altar,
     TileID::bastStatue,
@@ -70,7 +72,7 @@ constexpr inline auto glitchedSprites = frozen::make_set<int>({
     TileID::workBench,
 });
 
-constexpr inline std::array glitchedTiles{
+constexpr std::array glitchedTiles{
     TileID::adamantiteOre,
     TileID::aetherium,
     TileID::amberGemspark,
@@ -259,7 +261,7 @@ constexpr inline std::array glitchedTiles{
     TileID::xenonMossStone,
 };
 
-constexpr inline std::array glitchedPaints{
+constexpr std::array glitchedPaints{
     Paint::black,
     Paint::blue,
     Paint::brown,
@@ -278,6 +280,7 @@ constexpr inline std::array glitchedPaints{
     Paint::white,
     Paint::yellow,
 };
+} // namespace
 
 void applyGlitchedFinalize(int x, int y, Random &rnd, World &world)
 {

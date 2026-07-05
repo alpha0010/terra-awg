@@ -4,14 +4,17 @@
 #include "ids/ItemID.h"
 #include "ids/TileID.h"
 #include "vendor/INIReader.h"
+#include <array>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 
-inline const char *confName = "terra-awg.ini";
+namespace
+{
+const char *confName = "terra-awg.ini";
 
-inline const char *defaultConfigStr = R"([world]
+const char *defaultConfigStr = R"([world]
 # Name of the generated world.
 # Use the name:
 #   RANDOM
@@ -244,7 +247,7 @@ map = true
 )";
 
 // clang-format off
-inline const std::vector adjectives{
+constexpr std::array adjectives{
     "Abandoned", "Abhorrent", "Adorable", "Adventurous", "Ageless",
     "Aggravating", "Aggressive", "Agile", "Agreeable", "Alert", "Alien",
     "Alive", "Alleged", "Aloof", "Amber", "Amethyst", "Amusing", "Ancient",
@@ -354,7 +357,7 @@ inline const std::vector adjectives{
     "Worried", "Worrisome", "Wriggly", "Wrong", "Yellow", "Zany", "Zealous"
 };
 
-inline const std::vector locations{
+constexpr std::array locations{
     "Abode", "Abyss", "Accident", "Acres", "Afterworld", "Alcove", "Alley",
     "Apogee", "Arbor", "Archipelago", "Area", "Arena", "Artwork", "Asylum",
     "Backcountry", "Backwater", "Backwoods", "Badlands", "Bane", "Bank",
@@ -422,7 +425,7 @@ inline const std::vector locations{
     "Woods", "World", "Yard", "Zone"
 };
 
-inline const std::vector nouns{
+constexpr std::array nouns{
     "Ability", "Absurdity", "Accidents", "Acorns", "Adamantite", "Adoration",
     "Advantage", "Adventure", "Agony", "Alarm", "Allergies", "Amazement",
     "Angels", "Anger", "Anguish", "Annoyance", "Anvils", "Anxiety", "Apples",
@@ -547,6 +550,7 @@ inline const std::vector nouns{
     "Wyverns", "Xenon", "Yoyos", "Zombies"
 };
 // clang-format on
+} // namespace
 
 GameMode parseGameMode(const std::string &mode)
 {

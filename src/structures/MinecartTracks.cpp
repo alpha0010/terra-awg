@@ -35,7 +35,9 @@ enum {
 
 enum class Mode { none, flat, asc, desc };
 
-inline constexpr auto trackClearTiles = frozen::make_set<int>({
+namespace
+{
+constexpr auto trackClearTiles = frozen::make_set<int>({
     TileID::empty,
     TileID::dirt,
     TileID::stone,
@@ -109,27 +111,26 @@ inline constexpr auto trackClearTiles = frozen::make_set<int>({
     TileID::titaniumOre,
     TileID::chlorophyteOre,
 });
-
-inline constexpr auto trackEvilTiles = frozen::make_set<int>(
-    {TileID::ebonstone, TileID::lesion, TileID::crimstone, TileID::flesh});
+} // namespace
 
 bool canTrackClearTile(Tile &tile, World &world)
 {
+    constexpr auto trackEvilTiles = frozen::make_set<int>(
+        {TileID::ebonstone, TileID::lesion, TileID::crimstone, TileID::flesh});
     return trackClearTiles.contains(tile.blockID) ||
            (tile.blockID == TileID::hive && tile.flag != Flag::none) ||
            (world.conf.dontDigUp && trackEvilTiles.contains(tile.blockID));
 }
 
-inline std::array gemsparkRainbow{
-    WallID::Safe::rubyGemspark,
-    WallID::Safe::amberGemspark,
-    WallID::Safe::topazGemspark,
-    WallID::Safe::emeraldGemspark,
-    WallID::Safe::sapphireGemspark,
-    WallID::Safe::amethystGemspark};
-
 int getRainbowGemsparkWall(int x, int y)
 {
+    constexpr std::array gemsparkRainbow{
+        WallID::Safe::rubyGemspark,
+        WallID::Safe::amberGemspark,
+        WallID::Safe::topazGemspark,
+        WallID::Safe::emeraldGemspark,
+        WallID::Safe::sapphireGemspark,
+        WallID::Safe::amethystGemspark};
     return gemsparkRainbow[(x + y) % gemsparkRainbow.size()];
 }
 
