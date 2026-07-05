@@ -27,7 +27,7 @@ void genChasmAt(
         }
         for (double i = -weight; i < weight; ++i) {
             for (double j = -weight; j < weight; ++j) {
-                double threshold = 2 - 3 * std::hypot(i, j) / weight;
+                double threshold = 1.8 - 2.8 * std::hypot(i, j) / weight;
                 if (rnd.getFineNoise(pt.x + i, pt.y + j) < threshold) {
                     Tile &tile = world.getTile(pt.x + i, pt.y + j);
                     tile.wireRed = true;
@@ -86,10 +86,12 @@ void genChasms(Random &rnd, World &world)
         int maxWallClear = std::midpoint(
             world.getSurfaceLevel(x),
             world.getUndergroundLevel());
+        double exposedThreshold = 0;
         for (int y = 0; y < world.getHeight(); ++y) {
             Tile &tile = world.getTile(x, y);
             if (tile.wireRed) {
                 tile.wireRed = false;
+                exposedThreshold -= 0.07;
                 if (tile.flag == Flag::border &&
                     rnd.getStableUint(x, y) % 2 == 0) {
                     continue;
@@ -102,8 +104,14 @@ void genChasms(Random &rnd, World &world)
                                        tile.blockID == TileID::thinIce
                                    ? TileID::thinIce
                                    : TileID::empty;
-                if (y < maxWallClear + 8 * noise) {
+                if (y < maxWallClear + 8 * noise && noise > exposedThreshold) {
                     tile.wallID = WallID::empty;
+                }
+            } else {
+                if (tile.blockID == TileID::empty) {
+                    exposedThreshold -= 0.07;
+                } else {
+                    exposedThreshold = 0.2;
                 }
             }
         }
