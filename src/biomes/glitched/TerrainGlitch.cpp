@@ -144,9 +144,7 @@ void terrainGlitch(Random &rnd, World &world)
             int row = rnd.getInt(band, padded.getHeight() - band) - band / 2;
             parallelFor(
                 std::views::iota(row, row + band),
-                [delta, &padded, &world](int y) {
-                    rotateWorldRow(y, delta, padded);
-                });
+                [delta, &padded](int y) { rotateWorldRow(y, delta, padded); });
         } else {
             --numColShifts;
             int col = rnd.getInt(band, padded.getWidth() - band) - band / 2;

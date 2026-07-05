@@ -4,6 +4,7 @@
 #include "World.h"
 #include <algorithm>
 #include <iostream>
+#include <numbers>
 
 template <typename Func>
 void genPondFor(Func isBiomeActive, Random &rnd, World &world)
