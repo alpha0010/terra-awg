@@ -151,6 +151,9 @@ computeTrackBounds(double lengthScale, Random &rnd, World &world)
 bool isValidTrackSegment(int x, int y, World &world)
 {
     int minY = 0.8 * world.getUndergroundLevel();
+    if (world.conf.glitched) {
+        minY = std::min(minY, 200);
+    }
     int maxY = 0.2 * world.getHeight() + 0.8 * world.getUnderworldLevel();
     return x > 50 && x < world.getWidth() - 50 && y > minY && y < maxY &&
            world.regionPasses(
@@ -282,7 +285,10 @@ std::vector<Point> planTrack(double lengthScale, Random &rnd, World &world)
 {
     return planTrackAt(
         rnd.getInt(50, world.getWidth() - 50),
-        rnd.getInt(world.getUndergroundLevel(), world.getUnderworldLevel()),
+        rnd.getInt(
+            world.conf.glitched ? std::min(250, world.getUndergroundLevel())
+                                : world.getUndergroundLevel(),
+            world.getUnderworldLevel()),
         lengthScale,
         rnd,
         world);

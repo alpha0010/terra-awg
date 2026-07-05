@@ -886,6 +886,7 @@ int main()
     if (conf.glitched) {
         conf.clouds *= 1.8;
         conf.lootRandomizer += 2.5;
+        conf.minecartTracks *= 1.1;
     }
     if (conf.spawn == SpawnPoint::normal) {
         conf.spawn = SpawnPoint::surface;
