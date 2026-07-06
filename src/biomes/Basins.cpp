@@ -55,7 +55,7 @@ void genPondFor(Func isBiomeActive, Random &rnd, World &world)
                               (0.5 + (x - minX) / static_cast<double>(width))) -
                           0.7071);
         int surfaceY = world.getSurfaceLevel(x);
-        for (int j = -5; j < depth; ++j) {
+        for (int j = -3; j < depth; ++j) {
             Tile &tile = world.getTile(x, surfaceY + j);
             if (tile.flag != Flag::border) {
                 tile = {};

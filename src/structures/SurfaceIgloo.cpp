@@ -38,13 +38,18 @@ bool canPlaceIglooAt(int x, int y, TileBuffer &igloo, World &world)
          TileID::tinOre,
          TileID::cobaltOre,
          TileID::palladiumOre});
+    int maxLiquidClear = 0.4 * igloo.getWidth() * igloo.getHeight();
     return world.regionPasses(
         x,
         y,
         igloo.getWidth(),
         igloo.getHeight(),
-        [&clearableTiles](Tile &tile) {
-            return clearableTiles.contains(tile.blockID) &&
+        [&clearableTiles, &maxLiquidClear](Tile &tile) {
+            if (tile.liquid != Liquid::none) {
+                --maxLiquidClear;
+            }
+            return maxLiquidClear > 0 &&
+                   clearableTiles.contains(tile.blockID) &&
                    tile.flag != Flag::lake;
         });
 }
