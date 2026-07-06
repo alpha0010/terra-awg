@@ -1290,7 +1290,7 @@ private:
                                     x + i,
                                     y + j + 2,
                                     1,
-                                    2,
+                                    3,
                                     [](Tile &tile) {
                                         return tile.blockID == TileID::empty;
                                     })
