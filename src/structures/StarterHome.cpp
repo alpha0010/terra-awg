@@ -25,6 +25,7 @@ int themeToDirtVariant(Data::Variant theme)
         return TileID::granite;
     case Data::Variant::honey:
     case Data::Variant::mahogany:
+    case Data::Variant::mushroom:
         return TileID::mud;
     case Data::Variant::marble:
         return TileID::marble;
@@ -183,6 +184,23 @@ void placeHomeAt(
               rnd.select(
                   {WallID::Safe::marble, WallID::Safe::stalactiteStone})}});
         break;
+    case Data::Variant::mushroom:
+        themeTiles.insert(
+            {{TileID::wood,
+              rnd.select({TileID::glowingMushroom, TileID::slime})},
+             {TileID::woodenBeam, TileID::mushroomBeam},
+             {TileID::grayBrick,
+              rnd.select({TileID::ancientCobaltBrick, TileID::leadBrick})},
+             {TileID::dirt, TileID::mud}});
+        themeWalls.insert(
+            {{WallID::Safe::wood,
+              rnd.select({WallID::Safe::mushroom, WallID::Safe::slimeBlock})},
+             {WallID::Safe::planked,
+              rnd.select(
+                  {WallID::Safe::planked, WallID::Safe::shroomitePlating})},
+             {WallID::Safe::stone,
+              rnd.select({WallID::Safe::blueMossy, WallID::Safe::wornStone})}});
+        break;
     case Data::Variant::palm:
         themeTiles.insert(
             {{TileID::wood, TileID::palmWood},
@@ -245,6 +263,7 @@ void placeHomeAt(
             rnd.select({TileID::grayBrick, TileID::redBrick, TileID::tinBrick});
     }
     constexpr auto brickToWall = frozen::make_map<int, int>({
+        {TileID::ancientCobaltBrick, WallID::Safe::ancientCobaltBrick},
         {TileID::argonMossBrick, WallID::Safe::argonMossBrick},
         {TileID::grayBrick, WallID::Safe::grayBrick},
         {TileID::hive, WallID::Safe::hive},
@@ -252,6 +271,7 @@ void placeHomeAt(
         {TileID::iridescentBrick, WallID::Safe::iridescentBrick},
         {TileID::ironBrick, WallID::Safe::ironBrick},
         {TileID::kryptonMossBrick, WallID::Safe::kryptonMossBrick},
+        {TileID::leadBrick, WallID::Safe::leadBrick},
         {TileID::mudstoneBrick, WallID::Safe::mudstoneBrick},
         {TileID::neonMossBrick, WallID::Safe::neonMossBrick},
         {TileID::pearlstoneBrick, WallID::Safe::pearlstoneBrick},
@@ -339,7 +359,8 @@ void placeHomeAt(
         {{TileID::ashGrass, TileID::ash},
          {TileID::grass, TileID::dirt},
          {TileID::hallowedGrass, TileID::dirt},
-         {TileID::jungleGrass, TileID::mud}});
+         {TileID::jungleGrass, TileID::mud},
+         {TileID::mushroomGrass, TileID::mud}});
     for (int i = 0; i < home.getWidth(); ++i) {
         for (int j = 0; j < home.getHeight(); ++j) {
             Tile &homeTile = home.getTile(i, j);
@@ -354,7 +375,10 @@ void placeHomeAt(
                 (y < world.getUndergroundLevel() ||
                  toGrassItr->second != TileID::grass) &&
                 world.isExposed(x + i, y + j)) {
-                tile.blockID = toGrassItr->second;
+                tile.blockID = origTheme == Data::Variant::mushroom &&
+                                       toGrassItr->second == TileID::jungleGrass
+                                   ? TileID::mushroomGrass
+                                   : toGrassItr->second;
             } else {
                 auto toBlockItr = grassToBlock.find(tile.blockID);
                 if (toBlockItr != grassToBlock.end() &&
@@ -458,6 +482,9 @@ void genStarterHome(Random &rnd, World &world)
     } else if (
         tileCounts[TileID::granite] + tileCounts[TileID::smoothGranite] > 2) {
         theme = Data::Variant::granite;
+    } else if (
+        tileCounts[TileID::mushroomGrass] > 0 && tileCounts[TileID::mud] > 1) {
+        theme = Data::Variant::mushroom;
     } else if (
         (tileCounts[TileID::jungleGrass] > 0 && tileCounts[TileID::mud] > 1) ||
         tileCounts[TileID::livingMahogany] > 2) {
