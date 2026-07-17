@@ -143,7 +143,7 @@ void genFlood(World &world)
     }
     bool shouldBubbleSpawn =
         floodLevel < world.spawn.y - 2 &&
-        world.spawn.y < (world.conf.shattered
+        world.spawn.y < (world.conf.jaggedRocks || world.conf.shattered
                              ? world.getUnderworldLevel()
                              : world.getUndergroundLevel() + 30);
     if (shouldBubbleSpawn) {

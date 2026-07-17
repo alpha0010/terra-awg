@@ -139,8 +139,9 @@ void placeTorchStructure(int x, int y, TileBuffer &data, World &world)
 
 void addArenaBubble(int x, int y, World &world)
 {
-    if (!world.conf.sunken || !world.conf.shattered || x < 420 ||
-        x > world.getWidth() - 420) {
+    if (!world.conf.sunken ||
+        !((world.conf.shattered && x > 420 && x < world.getWidth() - 420) ||
+          world.conf.jaggedRocks)) {
         return;
     }
     double maxS = 45.5;
