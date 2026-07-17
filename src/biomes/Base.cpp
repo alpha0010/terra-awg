@@ -72,6 +72,9 @@ void registerSnow(Random &rnd, World &world)
     rnd.shuffleNoise();
     double center = world.snowCenter;
     double scanDist = world.conf.snowSize * 0.08 * world.getWidth();
+    if (scanDist < 240) {
+        scanDist += 25;
+    }
     double snowFloor =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;
     parallelFor(
@@ -99,6 +102,9 @@ void registerDesert(Random &rnd, World &world)
     rnd.shuffleNoise();
     double center = world.desertCenter;
     double scanDist = world.conf.desertSize * 0.08 * world.getWidth();
+    if (scanDist < 240) {
+        scanDist += 25;
+    }
     double desertFloor =
         (world.getCavernLevel() + 4 * world.getUnderworldLevel()) / 5;
     parallelFor(
@@ -125,6 +131,9 @@ void registerJungle(Random &rnd, World &world)
     rnd.shuffleNoise();
     double center = world.jungleCenter;
     double scanDist = world.conf.jungleSize * 0.11 * world.getWidth();
+    if (scanDist < 240) {
+        scanDist += 25;
+    }
     parallelFor(
         std::views::iota(
             std::max<int>(center - scanDist, 0),
