@@ -76,7 +76,8 @@ int testOrbHeartCandidate(int x, int y, World &world)
 {
     if (y < world.getUndergroundLevel() ||
         y > (world.conf.dontDigUp ? world.getCavernLevel()
-                                  : world.getUnderworldLevel())) {
+                                  : world.getUnderworldLevel()) +
+                (world.getHeight() < 900 ? 20 : 0)) {
         return TileID::empty;
     }
     int tendrilID = TileID::empty;
@@ -91,7 +92,8 @@ int testOrbHeartCandidate(int x, int y, World &world)
         return tendrilID;
     }
     constexpr auto allowedTiles = frozen::make_set<int>(
-        {TileID::clay,
+        {TileID::ash,
+         TileID::clay,
          TileID::mud,
          TileID::ebonstone,
          TileID::ebonsand,
@@ -480,8 +482,9 @@ void placeOrbHearts(
             sizeMult *= 2;
         }
     }
-    int orbHeartCount =
-        sizeMult * world.getWidth() * world.getHeight() / 240000;
+    int orbHeartCount = std::max<int>(
+        sizeMult * world.getWidth() * world.getHeight() / 240000,
+        4);
     std::vector<std::tuple<int, int, int>> usedLocations;
     for (int tries = 500 * orbHeartCount; orbHeartCount > 0 && tries > 0;
          --tries) {
