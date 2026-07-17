@@ -96,7 +96,7 @@ private:
                                        dungeonSize)
                                  : dungeonSize) *
                     initialH,
-                0.4 * world.getHeight()),
+                0.4948 * world.getUnderworldLevel()),
             2.5 * roomSize);
         int maxWidth =
             std::min(dungeonCenter, world.getWidth() - dungeonCenter) - 100;
@@ -1444,6 +1444,10 @@ public:
                 ? (4 * world.getUndergroundLevel() + world.getCavernLevel()) / 5
                 : (world.getUndergroundLevel() + 4 * world.getCavernLevel()) /
                       5;
+        if (world.getHeight() < 1200) {
+            yMin += (1 - world.getHeight() / 1200.0) *
+                    (world.getSurfaceLevel(dungeonCenter) - yMin);
+        }
         int shuffleX = rnd.getInt(0, world.getWidth());
         int shuffleY = rnd.getInt(0, world.getHeight());
         std::vector<Point> zones;
