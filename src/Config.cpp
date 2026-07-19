@@ -1,5 +1,6 @@
 #include "Config.h"
 
+#include "Presets.h"
 #include "Random.h"
 #include "ids/ItemID.h"
 #include "ids/TileID.h"
@@ -57,6 +58,10 @@ home = false
 # rare cases, Terra AWG may freeze or crash (please report this so I can
 # fix it).
 [variation]
+# Use a themed preset (overrides multiple other settings). Options:
+#   none/bridges/buried/downfall/microcosm/mountaineer/webbed
+preset = none
+
 # Add starter equipment at the spawn point. Options:
 #   none/iron/platinum/hellstone/mythril
 equipment = none
@@ -920,5 +925,6 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, endlessChristmas, Boolean);
     READ_CONF_VALUE(variation, vampirism, Boolean);
     READ_CONF_VALUE(extra, map, Boolean);
+    applyPreset(reader.Get("variation", "preset", "none"), conf);
     return conf;
 }
