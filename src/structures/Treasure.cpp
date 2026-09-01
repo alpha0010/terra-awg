@@ -257,7 +257,7 @@ void placeFallenLogs(
     World &world)
 {
     int logCount = world.getWidth() / rnd.getInt(1066, 1600);
-    while (logCount > 0) {
+    for (int tries = 500 * logCount; logCount > 0 && tries > 0; --tries) {
         int binId = rnd.getInt(0, maxBin);
         if (locations[binId].empty()) {
             continue;
@@ -688,8 +688,7 @@ Point selectShrineLocation(
                                   : rnd.getInt(
                                         world.getUndergroundLevel(),
                                         world.getUnderworldLevel());
-        if ((world.conf.biomes != BiomeLayout::columns &&
-             !isInBiome(x, y, 10, Biome::jungle, world)) ||
+        if (!isInBiome(x, y, 10, Biome::jungle, world) ||
             !world.regionPasses(
                 x,
                 y,
@@ -1233,15 +1232,16 @@ void placePots(int maxBin, LocationBins &locations, Random &rnd, World &world)
 void placeDirtiestBlocks(Random &rnd, World &world)
 {
     int numBlocks = world.getWidth() * world.getHeight() / 1680000;
-    while (numBlocks > 0) {
+    for (int tries = 0; numBlocks > 0 && tries < 2000; ++tries) {
         int x = rnd.getInt(60, world.getWidth() - 60);
         int y = rnd.getInt(60, world.getHeight() - 60);
         Tile &tile = world.getTile(x, y);
-        if (tile.blockID != TileID::dirt || world.isExposed(x, y)) {
-            continue;
+        if ((tile.blockID == TileID::dirt ||
+             (tries > 1000 && tile.blockID == TileID::mud)) &&
+            !world.isExposed(x, y)) {
+            tile.blockID = TileID::dirtiestBlock;
+            --numBlocks;
         }
-        tile.blockID = TileID::dirtiestBlock;
-        --numBlocks;
     }
 }
 
@@ -1250,7 +1250,8 @@ void placePals(int maxBin, LocationBins &locations, Random &rnd, World &world)
     int digtoiseCount =
         world.getWidth() * world.getHeight() / rnd.getInt(1646000, 2304000);
     std::vector<Point> usedLocations;
-    while (digtoiseCount > 0) {
+    for (int tries = 200 * digtoiseCount; digtoiseCount > 0 && tries > 0;
+         --tries) {
         int binId = rnd.getInt(0, maxBin);
         if (locations[binId].empty()) {
             continue;
@@ -1292,7 +1293,7 @@ void placePals(int maxBin, LocationBins &locations, Random &rnd, World &world)
          TileID::mushroomGrass,
          TileID::ashGrass,
          TileID::mud});
-    while (eggCount > 0) {
+    for (int tries = 200 * eggCount; eggCount > 0 && tries > 0; --tries) {
         int binId = rnd.getInt(0, maxBin);
         if (locations[binId].empty()) {
             continue;

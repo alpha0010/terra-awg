@@ -68,6 +68,9 @@ int getWallVarIndex(
 
 void registerSnow(Random &rnd, World &world)
 {
+    if (world.conf.snowSize <= 0) {
+        return;
+    }
     std::cout << "Freezing land\n";
     rnd.shuffleNoise();
     double center = world.snowCenter;
@@ -98,6 +101,9 @@ void registerSnow(Random &rnd, World &world)
 
 void registerDesert(Random &rnd, World &world)
 {
+    if (world.conf.desertSize <= 0) {
+        return;
+    }
     std::cout << "Desertification\n";
     rnd.shuffleNoise();
     double center = world.desertCenter;
@@ -128,9 +134,13 @@ void registerDesert(Random &rnd, World &world)
 
 void registerJungle(Random &rnd, World &world)
 {
+    if (world.conf.jungleSize <= 0) {
+        return;
+    }
     rnd.shuffleNoise();
     double center = world.jungleCenter;
-    double scanDist = world.conf.jungleSize * 0.11 * world.getWidth();
+    double scanDist = world.conf.jungleSize * 0.115 * world.getWidth() +
+                      0.11 * world.getHeight();
     if (scanDist < 240) {
         scanDist += 25;
     }
@@ -139,16 +149,29 @@ void registerJungle(Random &rnd, World &world)
             std::max<int>(center - scanDist, 0),
             std::min<int>(center + scanDist, world.getWidth())),
         [center, &rnd, &world](int x) {
-            double threshold =
-                std::abs(x - center) / 100.0 -
-                (world.conf.jungleSize * world.getWidth() / 1050.0);
+            double skew = 0;
+            double spread = 0;
+            double spreadScale =
+                world.conf.jungleSize < 1
+                    ? std::lerp(0.0, 0.0024, world.conf.jungleSize)
+                    : 0.0024;
             for (int y = 0; y < world.getHeight(); ++y) {
+                skew += 1.05 * rnd.getCoarseNoise(center, 0.55 * y);
+                spread =
+                    0.99 *
+                    (spread + rnd.getCoarseNoise(center + 500, 0.55 * y + 500));
+                double jungleSize =
+                    world.conf.jungleSize + spreadScale * spread;
+                double threshold = std::abs(x + skew - center) / 100.0 -
+                                   (jungleSize * world.getWidth() / 1050.0);
                 BiomeData &biome = world.getBiome(x, y);
                 biome.jungle = std::clamp(0.25 - 0.45 * threshold, 0.0, 1.0);
                 if (rnd.getCoarseNoise(x, y) > threshold &&
-                    rnd.getFineNoise(x, y) > std::abs(x - center) / 260.0 -
-                                                 (world.conf.jungleSize *
-                                                  world.getWidth() / 2700.0)) {
+                    rnd.getFineNoise(x, y) >
+                        std::abs(x + skew - center) / 260.0 -
+                            (jungleSize * world.getWidth() / 2700.0)) {
+                    biome.desert = std::min(1 - biome.jungle, biome.desert);
+                    biome.snow = std::min(1 - biome.jungle, biome.snow);
                     biome.active = Biome::jungle;
                 }
             }

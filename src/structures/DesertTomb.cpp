@@ -49,12 +49,12 @@ Point selectTombLocation(TileBuffer &tomb, Random &rnd, World &world)
         int numEmpty = 0;
         int numFilled = 0;
         int maxEntryFilled = tries / 250;
-        if ((world.conf.biomes == BiomeLayout::columns || isInBiome(
-                                                              x + biomeScan,
-                                                              y + biomeScan,
-                                                              biomeScan,
-                                                              Biome::desert,
-                                                              world)) &&
+        if (isInBiome(
+                x + biomeScan,
+                y + biomeScan,
+                biomeScan,
+                Biome::desert,
+                world) &&
             world.regionPasses(
                 x - 3,
                 y + tomb.getHeight() - 9,

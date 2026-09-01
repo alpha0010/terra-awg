@@ -113,8 +113,7 @@ Point selectTempleCenter(
     for (int numTries = 0; numTries < 1000; ++numTries) {
         int x = rnd.getInt(minX, maxX);
         int y = rnd.getInt(minY, maxY);
-        if ((world.conf.biomes == BiomeLayout::columns ||
-             isInBiome(x, y, 200 - 0.19 * numTries, Biome::jungle, world)) &&
+        if (isInBiome(x, y, 200 - 0.19 * numTries, Biome::jungle, world) &&
             isValid({x, y}, world)) {
             return {x, y};
         }

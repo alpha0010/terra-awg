@@ -187,7 +187,8 @@ void fillHive(int hiveX, int hiveY, double size, Random &rnd, World &world)
 
 Point selectHiveLocation(Random &rnd, World &world)
 {
-    if (world.conf.biomes == BiomeLayout::columns && !world.conf.hiveQueen) {
+    if (world.getHeight() < 950 && world.conf.biomes == BiomeLayout::columns &&
+        !world.conf.hiveQueen) {
         return {
             rnd.getInt(
                 std::max<int>(

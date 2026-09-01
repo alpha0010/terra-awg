@@ -48,12 +48,12 @@ Point selectBoatLocation(int width, int height, Random &rnd, World &world)
         int x = rnd.getInt(minX, maxX);
         int y = rnd.getInt(minY, maxY);
         int maxEmpty = 0.7 * width * height;
-        if ((world.conf.biomes == BiomeLayout::columns || isInBiome(
-                                                              x + biomeScan,
-                                                              y + biomeScan,
-                                                              biomeScan,
-                                                              Biome::snow,
-                                                              world)) &&
+        if (isInBiome(
+                x + biomeScan,
+                y + biomeScan,
+                biomeScan,
+                Biome::snow,
+                world) &&
             world.regionPasses(
                 x,
                 y,
