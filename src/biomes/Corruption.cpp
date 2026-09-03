@@ -79,10 +79,10 @@ std::pair<int, int> selectAvoidantEvilLocations(Random &rnd, World &world)
     int scanDist = 0.06 * world.getWidth();
     double maxForest = 0;
     int bestSurface = -1;
-    int betUnderground = -1;
+    int bestUnderground = -1;
     int undergroundY =
         std::midpoint(world.getCavernLevel(), world.getUnderworldLevel());
-    for (int tries = 0; tries < 10; ++tries) {
+    for (int tries = 0; tries < 64; ++tries) {
         auto [surfaceX, undergroundX] = baseSelectEvilLocations(rnd, world);
         double forestScore = 0;
         for (int i = -scanDist; i < scanDist; ++i) {
@@ -98,10 +98,10 @@ std::pair<int, int> selectAvoidantEvilLocations(Random &rnd, World &world)
         if (forestScore > maxForest) {
             maxForest = forestScore;
             bestSurface = surfaceX;
-            betUnderground = undergroundX;
+            bestUnderground = undergroundX;
         }
     }
-    return {bestSurface, betUnderground};
+    return {bestSurface, bestUnderground};
 }
 
 std::vector<std::pair<int, int>> selectEvilLocations(Random &rnd, World &world)
