@@ -334,6 +334,7 @@ enum {
     rodOfDiscord = 1326,
     ichorArrow = 1334,
     ichorBullet = 1335,
+    explosiveBunny = 1338,
     venomArrow = 1341,
     venomBullet = 1342,
     partyBullet = 1349,
@@ -769,6 +770,10 @@ enum {
     sharpSpikeBlock = 6134,
     musicBoxRainbowBoulder = 6145,
     musicBoxSilence = 6146,
+    glacierFang = 6153,
+    silverBracer = 6156,
+    poisonBarb = 6165,
+    chaosCylinder = 6168,
 };
 }
 

@@ -309,6 +309,8 @@ std::string assembleSeedFlags(Config &conf)
     seed += maybeFlag(conf.spiderNestFreq <= 0, "Arachnophobia");
     seed += maybeFlag(conf.teleporters > 2, "Beam Me Up");
     seed += maybeFlag(conf.endlessRain, "Bring a Towel");
+    seed += maybeFlag(conf.noLightning, "Calm Before the Storm");
+    seed += maybeFlag(conf.moreLightning, "Electric Boogaloo");
     seed += maybeFlag(conf.purity, "Fish Mox");
     seed += maybeFlag(conf.endlessHalloween, "Hocus Pocus");
     seed += maybeFlag(conf.spawn == SpawnPoint::cavern, "How Did I Get Here");
@@ -335,7 +337,7 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     auto npcs = determineNPCs(conf, rnd);
 
     Writer w(conf.getFilename() + ".wld");
-    w.putUint32(317); // File format version.
+    w.putUint32(326); // File format version.
     w.write("relogic", 7);
     w.putUint8(2);    // File type "world".
     w.putUint32(1);   // Save revision.
@@ -350,7 +352,7 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
 
     w.putString(conf.name);               // Map name.
     w.putString(assembleSeedFlags(conf)); // Seed.
-    w.putUint64(1361504632833);           // Generator version.
+    w.putUint64(1400159338497);           // Generator version.
     for (int i = 0; i < 16; ++i) {
         w.putUint8(rnd.getByte()); // GUID.
     }
@@ -521,6 +523,8 @@ void saveWorldFile(Config &conf, Random &rnd, World &world)
     w.putBool(false);                 // Team based spawns.
     w.putUint8(0);                    // Num extra spawn points.
     w.putBool(false);                 // Dual dungeons.
+    w.putBool(conf.moreLightning);    // More lightning.
+    w.putBool(conf.noLightning);      // No lightning.
     w.putString("");                  // Worldgen manifest.
     sectionPointers.push_back(w.tellp());
 

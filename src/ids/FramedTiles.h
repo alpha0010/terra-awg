@@ -3,6 +3,6 @@
 
 #include <bitset>
 
-typedef std::bitset<753> FramedBitset;
+typedef std::bitset<754> FramedBitset;
 
 #endif // FRAMEDTILES_H

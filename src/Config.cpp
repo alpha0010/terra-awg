@@ -242,6 +242,8 @@ theConstant = false
 zenith = false
 skyblock = false
 endlessRain = false
+moreLightning = false
+noLightning = false
 endlessHalloween = false
 endlessChristmas = false
 vampirism = false
@@ -813,6 +815,8 @@ Config readConfig(Random &rnd)
         false, // zenith
         false, // skyblock
         false, // endlessRain
+        false, // moreLightning
+        false, // noLightning
         false, // endlessHalloween
         false, // endlessChristmas
         false, // vampirism
@@ -921,6 +925,8 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, zenith, Boolean);
     READ_CONF_VALUE(variation, skyblock, Boolean);
     READ_CONF_VALUE(variation, endlessRain, Boolean);
+    READ_CONF_VALUE(variation, moreLightning, Boolean);
+    READ_CONF_VALUE(variation, noLightning, Boolean);
     READ_CONF_VALUE(variation, endlessHalloween, Boolean);
     READ_CONF_VALUE(variation, endlessChristmas, Boolean);
     READ_CONF_VALUE(variation, vampirism, Boolean);

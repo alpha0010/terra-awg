@@ -113,6 +113,8 @@ struct Config {
     bool zenith;
     bool skyblock;
     bool endlessRain;
+    bool moreLightning;
+    bool noLightning;
     bool endlessHalloween;
     bool endlessChristmas;
     bool vampirism;

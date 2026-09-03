@@ -176,6 +176,7 @@ Item getSurfacePrimaryLoot(Random &rnd, World &world)
         {ItemID::wandOfSparking, rnd.select(PrefixSet::magiclownokb), 1},
         {ItemID::radar, rnd.select(PrefixSet::accessory), 1},
         {ItemID::stepStool, rnd.select(PrefixSet::accessory), 1},
+        {ItemID::poisonBarb, rnd.select(PrefixSet::accessory), 1},
     });
 }
 
@@ -219,6 +220,7 @@ Item getFrozenPrimaryLoot(Random &rnd, World &world)
         {ItemID::iceBlade, rnd.select(PrefixSet::melee), 1},
         {ItemID::iceSkates, rnd.select(PrefixSet::accessory), 1},
         {ItemID::snowballCannon, rnd.select(PrefixSet::ranged), 1},
+        {ItemID::glacierFang, rnd.select(PrefixSet::magic), 1},
         {ItemID::blizzardInABottle, rnd.select(PrefixSet::accessory), 1},
         {ItemID::flurryBoots, rnd.select(PrefixSet::accessory), 1},
     });
@@ -2218,6 +2220,7 @@ void fillDungeonChest(Chest &chest, Random &rnd, World &world)
             {world.conf.forTheWorthy || world.conf.zenith ? 0.2 : 0,
              {ItemID::moonLordTorso, Prefix::none, 1}},
             {0.125, {ItemID::boneWelder, Prefix::none, 1}},
+            {0.25, {ItemID::silverBracer, rnd.select(PrefixSet::accessory), 1}},
             {0.2,
              {rnd.select({ItemID::suspiciousLookingEye, ItemID::slimeCrown}),
               Prefix::none,

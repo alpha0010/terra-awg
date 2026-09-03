@@ -13,7 +13,7 @@ constexpr FramedBitset genFramedTileLookup()
 {
     FramedBitset table;
     uint64_t parts[] = {
-        0x18000207b1fef,
+        0x38000207b1fef,
         0xfde0000003977ffd,
         0xa5e1fbfffffffff8,
         0x3fb1dffbc43effc0,
