@@ -123,14 +123,10 @@ std::vector<int> summon{
 void initCelebration()
 {
     accessory = {
-        Prefix::armored,
         Prefix::warding,
         Prefix::lucky,
-        Prefix::angry,
         Prefix::menacing,
-        Prefix::hasty_accessory,
         Prefix::quick_accessory,
-        Prefix::intrepid,
         Prefix::violent,
         Prefix::arcane,
     };
