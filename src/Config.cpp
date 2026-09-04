@@ -204,6 +204,7 @@ chests = 1.0
 gems = 1.0
 # Activates "no traps" secret seed when greater than 15.
 traps = 1.0
+destructiveTraps = 1.0
 trees = 1.0
 livingTrees = 1.0
 clouds = 1.0
@@ -782,6 +783,7 @@ Config readConfig(Random &rnd)
         1.0,   // chests
         1.0,   // gems
         1.0,   // traps
+        1.0,   // destructiveTraps
         1.0,   // trees
         1.0,   // livingTrees
         1.0,   // clouds
@@ -892,6 +894,7 @@ Config readConfig(Random &rnd)
     READ_CONF_VALUE(variation, chests, Real);
     READ_CONF_VALUE(variation, gems, Real);
     READ_CONF_VALUE(variation, traps, Real);
+    READ_CONF_VALUE(variation, destructiveTraps, Real);
     READ_CONF_VALUE(variation, trees, Real);
     READ_CONF_VALUE(variation, livingTrees, Real);
     READ_CONF_VALUE(variation, clouds, Real);

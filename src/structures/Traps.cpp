@@ -620,6 +620,11 @@ bool addChestDartTraps(int x, int y, Random &rnd, World &world)
 bool addChestExplosiveTraps(int x, int y, Random &rnd, World &world)
 {
     double numExplosives = rnd.getDouble(0, 3);
+    if (world.conf.destructiveTraps >= 1) {
+        numExplosives *= std::sqrt(world.conf.destructiveTraps);
+    } else if (rnd.getDouble(0, 1) > world.conf.destructiveTraps) {
+        return false;
+    }
     if (makeSaferTraps(world)) {
         numExplosives *= 0.7;
     }
@@ -643,7 +648,8 @@ bool addChestExplosiveTraps(int x, int y, Random &rnd, World &world)
 
 bool addChestLavaTrap(int x, int y, Random &rnd, World &world)
 {
-    if (y < std::midpoint(world.getCavernLevel(), world.getUnderworldLevel())) {
+    if (world.conf.destructiveTraps < 0.1 ||
+        y < std::midpoint(world.getCavernLevel(), world.getUnderworldLevel())) {
         return false;
     }
     Point pos = scanWhileNotSolid({x, y}, {0, -1}, world);
@@ -791,8 +797,13 @@ Point selectDetonatorLocation(int x, int y, World &world)
 
 void addOreTraps(std::vector<Point> &&locations, Random &rnd, World &world)
 {
+    int numTraps = std::min(world.conf.traps, 1.5) *
+                   std::min(world.conf.destructiveTraps, 1.5) *
+                   locations.size() / 20;
+    if (numTraps <= 0) {
+        return;
+    }
     std::shuffle(locations.begin(), locations.end(), rnd.getPRNG());
-    int numTraps = locations.size() / 20;
     std::vector<Point> usedLocations;
     for (auto [x, y] : locations) {
         if (y < world.getUndergroundLevel()) {

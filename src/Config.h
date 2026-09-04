@@ -80,6 +80,7 @@ struct Config {
     double chests;
     double gems;
     double traps;
+    double destructiveTraps;
     double trees;
     double livingTrees;
     double clouds;
