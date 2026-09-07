@@ -1,12 +1,12 @@
 #include "GlowingMoss.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 
 bool isSolidArea(int x, int y, int size, World &world)
 {
@@ -124,7 +124,7 @@ void fillGlowingMossCave(Random &rnd, World &world)
 
 void genGlowingMoss(Random &rnd, World &world)
 {
-    std::cout << "Energizing moss\n";
+    msgStrm << "Energizing moss" << std::endl;
     int numCaves = world.conf.glowingMossFreq * rnd.getDouble(2, 9);
     for (int i = 0; i < numCaves; ++i) {
         fillGlowingMossCave(rnd, world);

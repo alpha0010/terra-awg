@@ -1,11 +1,11 @@
 #include "GlowingMushroom.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
 #include "ids/WallID.h"
-#include <iostream>
 
 void fillMushroomField(
     int centerX,
@@ -157,7 +157,7 @@ void fillForestMushroomLayer(Random &rnd, World &world)
 
 void genGlowingMushroom(Random &rnd, World &world)
 {
-    std::cout << "Fertilizing glowing mushrooms\n";
+    msgStrm << "Fertilizing glowing mushrooms" << std::endl;
     int numFields = std::max<int>(
         world.conf.glowingMushroomFreq * world.getWidth() * world.getHeight() /
             3388000,

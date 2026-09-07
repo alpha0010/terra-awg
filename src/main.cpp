@@ -1,5 +1,6 @@
 #include "Config.h"
 #include "GenRules.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "Writer.h"
@@ -8,7 +9,6 @@
 #include "structures/StructureUtil.h"
 #include <array>
 #include <chrono>
-#include <iostream>
 
 #define FOREST_BACKGROUNDS 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 31, 51, 71, 72, 73
 #define SNOW_BACKGROUNDS 0, 1, 2, 3, 4, 5, 6, 7, 21, 22, 31, 32, 41, 42
@@ -910,14 +910,15 @@ int main()
     saveWorldFile(conf, rnd, world);
 
     auto mainEnd = std::chrono::high_resolution_clock::now();
-    std::cout << "\nTime: "
-              << 0.001 * std::chrono::duration_cast<std::chrono::milliseconds>(
-                             mainEnd - mainStart)
-                             .count()
-              << "s\n\n";
+    msgStrm << "\nTime: "
+            << 0.001 * std::chrono::duration_cast<std::chrono::milliseconds>(
+                           mainEnd - mainStart)
+                           .count()
+            << "s\n\n"
+            << std::flush;
 
     if (conf.map) {
-        std::cout << "Rendering map preview\n";
+        msgStrm << "Rendering map preview" << std::endl;
         savePreviewImage(conf.getFilename(), world);
     }
     return 0;

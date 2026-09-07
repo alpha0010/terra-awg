@@ -1,16 +1,16 @@
 #include "biomes/celebration/AsteroidField.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/AsteroidField.h"
 #include "ids/Paint.h"
 #include "structures/data/Balloons.h"
-#include <iostream>
 
 void genAsteroidFieldCelebration(Random &rnd, World &world)
 {
-    std::cout << "Inflating asteroids\n";
+    msgStrm << "Inflating asteroids" << std::endl;
     int width =
         world.conf.asteroids * rnd.getDouble(0.06, 0.07) * world.getWidth();
     int height = rnd.getDouble(0.18, 0.21) * world.getUndergroundLevel();

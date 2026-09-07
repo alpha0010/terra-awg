@@ -1,10 +1,10 @@
 #include "biomes/shattered/ShatteredLand.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
-#include <iostream>
 
 std::pair<int, double>
 distToBasin(int x, int y, int guessX, const std::vector<double> &basin)
@@ -59,7 +59,7 @@ bool markIslandAt(int x, int y, int size, Random &rnd, World &world)
 
 void genShatteredLand(Random &rnd, World &world)
 {
-    std::cout << "Observing cataclysm\n";
+    msgStrm << "Observing cataclysm" << std::endl;
     rnd.shuffleNoise();
     int centerSurface = world.getSurfaceLevel(world.getWidth() / 2) - 10;
     double totalDrop = 0.99 * world.getUnderworldLevel() - centerSurface;

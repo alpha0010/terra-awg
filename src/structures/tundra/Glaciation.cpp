@@ -1,17 +1,17 @@
 #include "structures/tundra/Glaciation.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 
 void genGlaciation(Random &rnd, World &world)
 {
-    std::cout << "Glaciation\n";
+    msgStrm << "Glaciation" << std::endl;
     rnd.shuffleNoise();
     int snowFloor =
         (world.getCavernLevel() + 2 * world.getUnderworldLevel()) / 3;

@@ -1,13 +1,13 @@
 #include "AshenField.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
-#include <iostream>
 
 void genAshenField(Random &rnd, World &world)
 {
@@ -46,7 +46,7 @@ void genAshenField(Random &rnd, World &world)
             })) {
         return;
     }
-    std::cout << "Managing wildfire\n";
+    msgStrm << "Managing wildfire" << std::endl;
     rnd.shuffleNoise();
     std::map<int, int> underworldWalls;
     for (int wallId : WallVariants::dirt) {

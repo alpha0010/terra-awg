@@ -1,6 +1,7 @@
 #include "Forest.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
@@ -11,7 +12,6 @@
 #include "structures/data/SwordShrines.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
-#include <iostream>
 #include <numbers>
 
 void drawRect(
@@ -600,7 +600,7 @@ void buryEnchantedSwords(Random &rnd, World &world)
 
 void genForest(Random &rnd, World &world)
 {
-    std::cout << "Nurturing forests\n";
+    msgStrm << "Nurturing forests" << std::endl;
     rnd.shuffleNoise();
     // Add living tree clumps.
     growLivingTrees(rnd, world);

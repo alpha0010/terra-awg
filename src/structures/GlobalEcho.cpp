@@ -1,16 +1,16 @@
 #include "structures/GlobalEcho.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
 #include "ids/WallID.h"
 #include <algorithm>
-#include <iostream>
 
 void genGlobalEcho(Random &rnd, World &world)
 {
-    std::cout << "Decaying memories\n";
+    msgStrm << "Decaying memories" << std::endl;
     rnd.shuffleNoise();
     double fadedMemories = std::clamp(world.conf.fadedMemories, 0.0, 1.0);
     double threshold =

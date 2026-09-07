@@ -1,11 +1,11 @@
 #include "biomes/hiveQueen/GraniteCave.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
-#include <iostream>
 #include <set>
 
 void fillGraniteCaveHex(int x, int y, World &world)
@@ -53,7 +53,7 @@ void fillGraniteCaveHex(int x, int y, World &world)
 
 void genGraniteCaveHiveQueen(Random &rnd, World &world)
 {
-    std::cout << "Smoothing granite\n";
+    msgStrm << "Smoothing granite" << std::endl;
     int numCaves =
         world.conf.graniteFreq * world.getWidth() * world.getHeight() / 2000000;
     int scanDist = world.conf.graniteSize * 90;

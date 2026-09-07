@@ -1,5 +1,6 @@
 #include "structures/MushroomCabin.h"
 
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
@@ -11,7 +12,6 @@
 #include "structures/data/Mushrooms.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
-#include <iostream>
 
 Point selectCabinLocation(
     Point center,
@@ -175,7 +175,7 @@ void placeMushroomFurniture(
 
 void genMushroomCabin(Random &rnd, World &world)
 {
-    std::cout << "Shaping mushrooms\n";
+    msgStrm << "Shaping mushrooms" << std::endl;
     std::vector<int> structIds{Data::mushrooms.begin(), Data::mushrooms.end()};
     std::shuffle(structIds.begin(), structIds.end(), rnd.getPRNG());
     auto mushroomItr = structIds.begin();

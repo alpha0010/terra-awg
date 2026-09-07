@@ -1,17 +1,17 @@
 #include "structures/hiveQueen/GlobalHive.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Util.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 
 void genGlobalHive(World &world)
 {
-    std::cout << "Globalizing bees\n";
+    msgStrm << "Globalizing bees" << std::endl;
     constexpr auto stoneTiles = frozen::make_set<int>(
         {TileID::stone,
          TileID::kryptonMossStone,

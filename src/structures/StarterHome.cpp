@@ -1,6 +1,7 @@
 #include "structures/StarterHome.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
@@ -11,7 +12,6 @@
 #include "structures/data/Homes.h"
 #include "vendor/frozen/map.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 #include <map>
 
 int themeToDirtVariant(Data::Variant theme)
@@ -461,7 +461,7 @@ determineSpecialTheme(Data::Variant biomeTheme, int y, World &world)
 
 void genStarterHome(Random &rnd, World &world)
 {
-    std::cout << "Purchasing property\n";
+    msgStrm << "Purchasing property" << std::endl;
     bool isNearSurface =
         std::abs(world.getSurfaceLevel(world.spawn.x) - world.spawn.y) < 30;
     if (world.conf.hiveQueen) {

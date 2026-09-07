@@ -1,6 +1,7 @@
 #include "structures/Ruins.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
@@ -11,7 +12,6 @@
 #include "structures/data/Furniture.h"
 #include "structures/data/RoomWindows.h"
 #include <algorithm>
-#include <iostream>
 #include <set>
 
 bool canPlaceFurniture(int x, int y, TileBuffer &data, World &world)
@@ -315,7 +315,7 @@ void igniteRuins(World &world)
 
 void genRuins(Random &rnd, World &world)
 {
-    std::cout << "Abandoning cities\n";
+    msgStrm << "Abandoning cities" << std::endl;
     Ruins structure(rnd, world);
     std::vector<Point> locations = structure.gen();
     std::shuffle(locations.begin(), locations.end(), rnd.getPRNG());

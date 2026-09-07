@@ -1,14 +1,14 @@
 #include "biomes/hiveQueen/GemGrove.h"
 
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "biomes/GemGrove.h"
-#include <iostream>
 
 void genGemGroveHiveQueen(Random &rnd, World &world)
 {
-    std::cout << "Imbuing gems\n";
+    msgStrm << "Imbuing gems" << std::endl;
     rnd.restoreShuffleState();
     int noiseShuffleX = rnd.getInt(0, world.getWidth());
     int noiseShuffleY = rnd.getInt(0, world.getHeight());

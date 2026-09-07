@@ -1,12 +1,12 @@
 #include "biomes/hardmode/HmOres.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 
 bool canSpawnChlorophyte(int x, int y, World &world)
 {
@@ -99,7 +99,7 @@ std::array<DepositDef, 3> getHmOreLayers(Random &rnd, World &world)
 
 void genHardmodeOres(Random &rnd, World &world)
 {
-    std::cout << "Blessing ore\n";
+    msgStrm << "Blessing ore" << std::endl;
     rnd.shuffleNoise();
     constexpr auto clearableTiles = frozen::make_set<int>({
         TileID::ash,

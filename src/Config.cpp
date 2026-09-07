@@ -1,5 +1,6 @@
 #include "Config.h"
 
+#include "MsgStream.h"
 #include "Presets.h"
 #include "Random.h"
 #include "ids/ItemID.h"
@@ -9,7 +10,6 @@
 #include <cstring>
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 
 namespace
 {
@@ -569,7 +569,7 @@ GameMode parseGameMode(const std::string &mode)
     } else if (mode == "master") {
         return GameMode::master;
     } else if (mode != "classic") {
-        std::cout << "Unknown mode '" << mode << "'\n";
+        msgStrm << "Unknown mode '" << mode << "'\n";
     }
     return GameMode::classic;
 }
@@ -581,7 +581,7 @@ EvilBiome parseEvilBiome(const std::string &evil)
     } else if (evil == "crimson") {
         return EvilBiome::crimson;
     } else if (evil != "RANDOM") {
-        std::cout << "Unknown evil '" << evil << "'\n";
+        msgStrm << "Unknown evil '" << evil << "'\n";
     }
     return EvilBiome::random;
 }
@@ -599,7 +599,7 @@ int parseEquipment(const std::string &equipment)
     } else if (equipment == "debug") {
         return ItemID::zenith;
     } else if (equipment != "none") {
-        std::cout << "Unknown equipment '" << equipment << "'\n";
+        msgStrm << "Unknown equipment '" << equipment << "'\n";
     }
     return 0;
 }
@@ -619,7 +619,7 @@ SpawnPoint parseSpawn(const std::string &spawn)
     } else if (spawn == "underworld") {
         return SpawnPoint::underworld;
     } else if (spawn != "normal") {
-        std::cout << "Unknown spawn '" << spawn << "'\n";
+        msgStrm << "Unknown spawn '" << spawn << "'\n";
     }
     return SpawnPoint::normal;
 }
@@ -631,7 +631,7 @@ BiomeLayout parseBiomeLayout(const std::string &biomes)
     } else if (biomes == "patches") {
         return BiomeLayout::patches;
     } else if (biomes != "columns") {
-        std::cout << "Unknown biome layout '" << biomes << "'\n";
+        msgStrm << "Unknown biome layout '" << biomes << "'\n";
     }
     return BiomeLayout::columns;
 }
@@ -645,7 +645,7 @@ AetherBiome parseAetherBiome(const std::string &aether)
     } else if (aether == "grove") {
         return AetherBiome::grove;
     } else if (aether != "RANDOM") {
-        std::cout << "Unknown aether '" << aether << "'\n";
+        msgStrm << "Unknown aether '" << aether << "'\n";
     }
     return AetherBiome::random;
 }
@@ -720,7 +720,7 @@ std::string Config::getFilename() const
         } else if (ore == #OPT2) {                                             \
             conf.KEY = TileID::OPT2##Ore;                                      \
         } else if (ore != "RANDOM") {                                          \
-            std::cout << "Unknown " #KEY " '" << ore << "'\n";                 \
+            msgStrm << "Unknown " #KEY " '" << ore << "'\n";                   \
         }                                                                      \
     } while (0)
 
@@ -829,7 +829,7 @@ Config readConfig(Random &rnd)
     }
     INIReader reader(confName);
     if (reader.ParseError() < 0) {
-        std::cout << "Unable to load config from'" << confName << "'\n";
+        msgStrm << "Unable to load config from'" << confName << "'\n";
         conf.seed = processSeed(conf.seed, rnd);
         return conf;
     }

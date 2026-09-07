@@ -1,13 +1,13 @@
 #include "biomes/Meteorite.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
 #include "structures/Dungeon.h"
 #include "structures/StructureUtil.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 
 namespace
 {
@@ -79,7 +79,7 @@ void genMeteorite(Random &rnd, World &world)
     if (world.conf.meteorites <= 0) {
         return;
     }
-    std::cout << "Bombarding surface\n";
+    msgStrm << "Bombarding surface" << std::endl;
     rnd.shuffleNoise();
     std::array avoidPoints{
         world.spawn.x,

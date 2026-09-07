@@ -1,13 +1,13 @@
 #include "Aether.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
-#include <iostream>
 
 /**
  * Distort nearby tiles in a wave pattern.
@@ -341,7 +341,7 @@ std::pair<int, int> applyAetherGrove(
 
 void genAether(Random &rnd, World &world)
 {
-    std::cout << "Bridging realities\n";
+    msgStrm << "Bridging realities" << std::endl;
     rnd.shuffleNoise();
     Point center;
     center.x = world.getWidth() * rnd.getDouble(0.08, 0.30);

@@ -1,6 +1,7 @@
 #include "structures/hiveQueen/Temple.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -10,7 +11,6 @@
 #include "structures/Temple.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
-#include <iostream>
 #include <map>
 #include <set>
 
@@ -330,7 +330,7 @@ void genTempleHiveQueen(Random &rnd, World &world)
     if (world.conf.templeSize < 0.01) {
         return;
     }
-    std::cout << "Training acolytes\n";
+    msgStrm << "Training acolytes" << std::endl;
     rnd.shuffleNoise();
     double size = std::max(
         world.conf.templeSize * 0.022 *

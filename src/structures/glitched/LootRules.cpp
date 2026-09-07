@@ -1,12 +1,12 @@
 #include "structures/glitched/LootRules.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/ItemID.h"
 #include "ids/Prefix.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 
 Item getAltPrimaryLoot(Random &rnd)
 {
@@ -451,7 +451,7 @@ int getAltSecondaryLoot(int stack, Random &rnd)
 
 void randomizeLoot(Random &rnd, World &world)
 {
-    std::cout << "Scrambling loot\n";
+    msgStrm << "Scrambling loot" << std::endl;
     constexpr auto lockedItems = frozen::make_set<int>({
         ItemID::desertTigerStaff,
         ItemID::flyingCarpet,

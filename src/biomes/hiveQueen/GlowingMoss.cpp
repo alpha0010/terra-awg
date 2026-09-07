@@ -1,11 +1,11 @@
 #include "biomes/hiveQueen/GlowingMoss.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
-#include <iostream>
 #include <set>
 
 Point selectGlowingMossLocation(
@@ -113,7 +113,7 @@ void fillGlowingMossHex(
 
 void genGlowingMossHiveQueen(Random &rnd, World &world)
 {
-    std::cout << "Energizing moss\n";
+    msgStrm << "Energizing moss" << std::endl;
     int numCaves = world.conf.glowingMossFreq * rnd.getDouble(2, 9);
     int scanDist = world.conf.glowingMossSize * 48;
     std::set<Point> visited;

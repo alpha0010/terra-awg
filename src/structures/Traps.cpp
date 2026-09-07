@@ -1,13 +1,13 @@
 #include "structures/Traps.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
-#include <iostream>
 
 namespace
 {
@@ -546,7 +546,7 @@ void placeDartTraps(Random &rnd, World &world)
 
 void genTraps(Random &rnd, World &world)
 {
-    std::cout << "Arming traps\n";
+    msgStrm << "Arming traps" << std::endl;
     placeSandTraps(rnd, world);
     placeBoulderTraps(rnd, world);
     placeLavaTraps(rnd, world);

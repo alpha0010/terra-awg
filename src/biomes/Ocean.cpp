@@ -1,6 +1,7 @@
 #include "Ocean.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -8,7 +9,6 @@
 #include "structures/LootRules.h"
 #include "structures/StructureUtil.h"
 #include <algorithm>
-#include <iostream>
 
 bool canPlaceReefChest(int x, int y, World &world)
 {
@@ -222,7 +222,7 @@ void setOceanSpawn(Random &rnd, World &world)
 
 void genOceans(Random &rnd, World &world)
 {
-    std::cout << "Filling oceans\n";
+    msgStrm << "Filling oceans" << std::endl;
     rnd.shuffleNoise();
     int waterTable = std::max(
                          world.getSurfaceLevel(300),

@@ -1,9 +1,9 @@
 #include "Basins.h"
 
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include <algorithm>
-#include <iostream>
 #include <numbers>
 
 template <typename Func>
@@ -71,7 +71,7 @@ void genPondFor(Func isBiomeActive, Random &rnd, World &world)
 
 void genBasins(Random &rnd, World &world)
 {
-    std::cout << "Stocking ponds\n";
+    msgStrm << "Stocking ponds" << std::endl;
     genPondFor(
         [](const BiomeData &biome) { return biome.forest > 0.99; },
         rnd,

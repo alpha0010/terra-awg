@@ -1,13 +1,13 @@
 #include "structures/beamMeUp/Teleporters.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Pathfinder.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
-#include <iostream>
 
 namespace
 {
@@ -127,19 +127,19 @@ void addJunctionBox(Tile &tile)
 
 void genTeleporters(const LocationBins &locations, Random &rnd, World &world)
 {
-    std::cout << "Wiring teleporters" << std::flush;
+    msgStrm << "Wiring teleporters" << std::flush;
     bool showProgress = world.conf.teleporters * 460800.0 /
                             (world.getWidth() * world.getHeight()) >
                         1;
     if (!showProgress) {
-        std::cout << '\n';
+        msgStrm << '\n';
     }
     std::vector<Point> usedLocations{world.spawn};
     int maxBin =
         binLocation(world.getWidth(), world.getHeight(), world.getHeight());
     for (int remaining = world.conf.teleporters; remaining > 0; --remaining) {
         if (showProgress) {
-            std::cout << '.' << std::flush;
+            msgStrm << '.' << std::flush;
         }
 
         int minX = 0;
@@ -246,6 +246,6 @@ void genTeleporters(const LocationBins &locations, Random &rnd, World &world)
         }
     }
     if (showProgress) {
-        std::cout << '\n';
+        msgStrm << '\n';
     }
 }

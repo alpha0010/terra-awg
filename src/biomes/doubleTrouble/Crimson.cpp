@@ -1,17 +1,17 @@
 #include "biomes/doubleTrouble/Crimson.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "biomes/Corruption.h"
 #include "biomes/Crimson.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 
 void genSecondaryCrimson(Random &rnd, World &world)
 {
-    std::cout << "Infecting the world\n";
+    msgStrm << "Infecting the world" << std::endl;
     rnd.shuffleNoise();
     if (world.conf.dontDigUp) {
         int minX = 0;

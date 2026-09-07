@@ -1,6 +1,7 @@
 #include "structures/SpiderHall.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
@@ -9,7 +10,6 @@
 #include "structures/data/Buildings.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
-#include <iostream>
 
 void convertRainbowBricks(int x, int y, Tile &tile)
 {
@@ -240,7 +240,7 @@ Point selectSpiderHallLocation(
 
 void genSpiderHall(Random &rnd, World &world)
 {
-    std::cout << "Spinning webs\n";
+    msgStrm << "Spinning webs" << std::endl;
     TileBuffer hall = Data::getBuilding(
         rnd.select({Data::Building::spiderHall1, Data::Building::spiderHall2}),
         world.getFramedTiles());

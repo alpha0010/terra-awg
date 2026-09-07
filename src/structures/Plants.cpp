@@ -1,6 +1,7 @@
 #include "structures/Plants.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
@@ -9,7 +10,6 @@
 #include "structures/data/Trees.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
-#include <iostream>
 
 bool isRegionEmpty(int x, int y, int width, int height, World &world)
 {
@@ -290,7 +290,7 @@ bool inGemGrove(int x, int y, World &world)
 
 void genPlants(const LocationBins &locations, Random &rnd, World &world)
 {
-    std::cout << "Growing trees\n";
+    msgStrm << "Growing trees" << std::endl;
     std::vector<Point> oreLocations;
     for (const auto &bin : locations) {
         for (auto [x, y] : bin.second) {
@@ -893,7 +893,7 @@ void growGrass(int x, int y, Random &rnd, World &world)
 
 void genGrasses(const LocationBins &locations, Random &rnd, World &world)
 {
-    std::cout << "Growing plants\n";
+    msgStrm << "Growing plants" << std::endl;
     rnd.shuffleNoise();
     world.queuedDeco.runTasks(rnd, world);
     growLivingTreeDeco(rnd, world);

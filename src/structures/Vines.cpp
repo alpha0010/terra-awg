@@ -1,5 +1,6 @@
 #include "structures/Vines.h"
 
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
@@ -7,7 +8,6 @@
 #include "ids/WallID.h"
 #include "vendor/frozen/map.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 
 enum class ScanState { n, s, se, see, seee, e, ee, eee, eees };
 
@@ -192,7 +192,7 @@ void embedGem(int x, int y, uint32_t randInt, World &world)
 
 void genVines(Random &rnd, World &world)
 {
-    std::cout << "Growing vines\n";
+    msgStrm << "Growing vines" << std::endl;
     constexpr auto vineTypes = frozen::make_map<int, int>(
         {{TileID::grass, TileID::vines},
          {TileID::leaf, TileID::vines},

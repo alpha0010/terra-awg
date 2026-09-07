@@ -1,5 +1,6 @@
 #include "structures/OceanWreck.h"
 
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
@@ -8,7 +9,6 @@
 #include "structures/data/Wrecks.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
-#include <iostream>
 
 bool tryPlaceWreck(int x, int y, TileBuffer &wreck, World &world)
 {
@@ -47,7 +47,7 @@ bool tryPlaceWreck(int x, int y, TileBuffer &wreck, World &world)
 
 void genOceanWreck(Random &rnd, World &world)
 {
-    std::cout << "Dropping debris\n";
+    msgStrm << "Dropping debris" << std::endl;
     std::vector<int> wrecks(Data::wrecks.begin(), Data::wrecks.end());
     std::shuffle(wrecks.begin(), wrecks.end(), rnd.getPRNG());
     wrecks.resize(rnd.getInt(2, 4));

@@ -1,6 +1,7 @@
 #include "Crimson.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
@@ -10,7 +11,6 @@
 #include "vendor/frozen/map.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
-#include <iostream>
 #include <map>
 
 void genCloudCrimson(Random &rnd, World &world)
@@ -58,7 +58,7 @@ void genCloudCrimson(Random &rnd, World &world)
 
 void genCrimson(Random &rnd, World &world)
 {
-    std::cout << "Infecting the world\n";
+    msgStrm << "Infecting the world" << std::endl;
     rnd.shuffleNoise();
     int minX = 0;
     int maxX = world.getWidth();

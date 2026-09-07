@@ -1,13 +1,13 @@
 #include "Base.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
 #include <algorithm>
-#include <iostream>
 
 void computeSurfaceLevel(Random &rnd, World &world)
 {
@@ -71,7 +71,7 @@ void registerSnow(Random &rnd, World &world)
     if (world.conf.snowSize <= 0) {
         return;
     }
-    std::cout << "Freezing land\n";
+    msgStrm << "Freezing land" << std::endl;
     rnd.shuffleNoise();
     double center = world.snowCenter;
     double scanDist = world.conf.snowSize * 0.08 * world.getWidth();
@@ -104,7 +104,7 @@ void registerDesert(Random &rnd, World &world)
     if (world.conf.desertSize <= 0) {
         return;
     }
-    std::cout << "Desertification\n";
+    msgStrm << "Desertification" << std::endl;
     rnd.shuffleNoise();
     double center = world.desertCenter;
     double scanDist = world.conf.desertSize * 0.08 * world.getWidth();
@@ -633,6 +633,6 @@ void genWorldBase(Random &rnd, World &world)
     registerJungle(rnd, world);
     registerUnderworld(rnd, world);
 
-    std::cout << "Generating base terrain\n";
+    msgStrm << "Generating base terrain" << std::endl;
     applyBaseTerrain(rnd, world);
 }

@@ -1,6 +1,7 @@
 #include "Cleanup.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
@@ -12,7 +13,6 @@
 #include "vendor/frozen/map.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
-#include <iostream>
 #include <map>
 
 std::pair<int, int> getAttachedOpenWall(World &world, int x, int y)
@@ -108,7 +108,7 @@ Slope computeSlope(World &world, int x, int y)
 
 void smoothSurfaces(World &world)
 {
-    std::cout << "Smoothing surfaces\n";
+    msgStrm << "Smoothing surfaces" << std::endl;
     constexpr auto stablizeBlocks = frozen::make_map<int, int>({
         {TileID::sand, TileID::hardenedSand},
         {TileID::ebonsand, TileID::hardenedEbonsand},
@@ -316,7 +316,7 @@ bool convertToMoss(
 
 void finalizeWalls(Random &rnd, World &world)
 {
-    std::cout << "Hardening walls\n";
+    msgStrm << "Hardening walls" << std::endl;
     std::vector<MossRegion> mosses;
     for (auto [blockID, wallID] :
          {std::pair{TileID::greenMossStone, WallID::Unsafe::greenMossy},

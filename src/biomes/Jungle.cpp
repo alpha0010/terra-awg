@@ -1,13 +1,13 @@
 #include "Jungle.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
 #include <algorithm>
-#include <iostream>
 #include <map>
 #include <numbers>
 #include <set>
@@ -238,7 +238,7 @@ void levitateIslands(int lb, int ub, Random &rnd, World &world)
 
 void genJungle(Random &rnd, World &world)
 {
-    std::cout << "Generating jungle\n";
+    msgStrm << "Generating jungle" << std::endl;
     rnd.shuffleNoise();
     int minX;
     int maxX;

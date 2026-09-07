@@ -1,12 +1,12 @@
 #include "GemCave.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
 #include <algorithm>
-#include <iostream>
 
 /**
  * Concentrated deposits of two gem types, and associated gem walls for added
@@ -54,7 +54,7 @@ void fillGemCave(
 
 void genGemCave(Random &rnd, World &world)
 {
-    std::cout << "Burying gems\n";
+    msgStrm << "Burying gems" << std::endl;
     rnd.shuffleNoise();
     // Place higher value gems deeper. Excludes amber.
     std::vector<std::pair<int, int>> gemTypes{

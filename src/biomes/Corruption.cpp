@@ -1,6 +1,7 @@
 #include "Corruption.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
@@ -9,7 +10,6 @@
 #include "vendor/frozen/map.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
-#include <iostream>
 #include <map>
 
 void genCloudCorruption(Random &rnd, World &world)
@@ -131,7 +131,7 @@ std::vector<std::pair<int, int>> selectEvilLocations(Random &rnd, World &world)
 
 void genCorruption(Random &rnd, World &world)
 {
-    std::cout << "Corrupting the world\n";
+    msgStrm << "Corrupting the world" << std::endl;
     rnd.shuffleNoise();
     int minX = 0;
     int maxX = world.getWidth();

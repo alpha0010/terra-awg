@@ -1,13 +1,13 @@
 #include "structures/Webs.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 
 void genWebs(Random &rnd, World &world)
 {
@@ -15,7 +15,7 @@ void genWebs(Random &rnd, World &world)
     if (mainThreshold < -1.002) {
         return;
     }
-    std::cout << "Spreading webs\n";
+    msgStrm << "Spreading webs" << std::endl;
     rnd.shuffleNoise();
     double secondaryThreshold = computeOreThreshold(0.08 * world.conf.cobwebs);
     constexpr auto targetWalls = frozen::make_set<int>(

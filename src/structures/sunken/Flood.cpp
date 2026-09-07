@@ -1,6 +1,7 @@
 #include "structures/sunken/Flood.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "World.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
@@ -8,7 +9,6 @@
 #include "vendor/frozen/set.h"
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 
 namespace
 {
@@ -130,7 +130,7 @@ void floodBubbleFinalize(Point center, int size, World &world)
 
 void genFlood(World &world)
 {
-    std::cout << "Flooding\n";
+    msgStrm << "Flooding" << std::endl;
     int probeDelta = world.conf.shattered ? 120 : 130;
     int floodLevel =
         std::max(

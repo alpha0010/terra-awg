@@ -2,6 +2,7 @@
 
 #include "Cleanup.h"
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -10,7 +11,6 @@
 #include "structures/Dungeon.h"
 #include "vendor/frozen/map.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 
 int selectHallowLocation(Random &rnd, World &world)
 {
@@ -98,7 +98,7 @@ void markForHallow(int centerX, Random &rnd, World &world)
 
 void genHallow(Random &rnd, World &world)
 {
-    std::cout << "Illuminating the world\n";
+    msgStrm << "Illuminating the world" << std::endl;
     int centerX = selectHallowLocation(rnd, world);
     constexpr auto paintedBlocks = frozen::make_set<int>({
         TileID::cloud,

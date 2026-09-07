@@ -1,6 +1,7 @@
 #include "GemGrove.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -11,7 +12,6 @@
 #include "structures/data/DecoGems.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
-#include <iostream>
 #include <set>
 
 namespace
@@ -258,7 +258,7 @@ Point selectGemGroveLocation(double &groveSize, Random &rnd, World &world)
 
 void genGemGrove(Random &rnd, World &world)
 {
-    std::cout << "Imbuing gems\n";
+    msgStrm << "Imbuing gems" << std::endl;
     rnd.restoreShuffleState();
     int noiseShuffleX = rnd.getInt(0, world.getWidth());
     int noiseShuffleY = rnd.getInt(0, world.getHeight());

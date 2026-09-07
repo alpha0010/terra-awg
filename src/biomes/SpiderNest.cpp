@@ -1,11 +1,11 @@
 #include "SpiderNest.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
-#include <iostream>
 
 void fillSpiderNest(int x, int y, Random &rnd, World &world)
 {
@@ -25,7 +25,7 @@ void fillSpiderNest(int x, int y, Random &rnd, World &world)
 
 void genSpiderNest(Random &rnd, World &world)
 {
-    std::cout << "Hatching spiders\n";
+    msgStrm << "Hatching spiders" << std::endl;
     rnd.shuffleNoise();
     int numNests = world.conf.spiderNestFreq * world.getWidth() *
                    world.getHeight() / 900000;

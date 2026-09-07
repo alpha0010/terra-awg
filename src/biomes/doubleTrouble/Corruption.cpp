@@ -1,16 +1,16 @@
 #include "biomes/doubleTrouble/Corruption.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "biomes/Corruption.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 
 void genSecondaryCorruption(Random &rnd, World &world)
 {
-    std::cout << "Corrupting the world\n";
+    msgStrm << "Corrupting the world" << std::endl;
     rnd.shuffleNoise();
     if (world.conf.dontDigUp) {
         int minX = 0;

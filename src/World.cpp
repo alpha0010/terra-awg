@@ -1,13 +1,13 @@
 #include "World.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "TileBuffer.h"
 #include "ids/Paint.h"
 #include "ids/WallID.h"
 #include "vendor/HashProspector.h"
 #include "vendor/frozen/map.h"
-#include <iostream>
 
 constexpr FramedBitset genFramedTileLookup()
 {
@@ -624,7 +624,7 @@ void World::placePainting(int x, int y, Painting painting)
 {
     auto itr = paintingData.find(painting);
     if (itr == paintingData.end()) {
-        std::cout << "Failed to find painting data\n";
+        msgStrm << "Failed to find painting data\n";
         return;
     }
     auto [blockID, offsetX, offsetY] = itr->second;
@@ -698,7 +698,7 @@ bool World::isIsolated(int x, int y) const
 
 void World::planBiomes(Random &rnd)
 {
-    std::cout << "Planning biomes\n";
+    msgStrm << "Planning biomes" << std::endl;
     double totalConfSize = std::max(conf.snowSize, 0.1) +
                            std::max(conf.desertSize, 0.1) +
                            std::max(conf.jungleSize, 0.1);

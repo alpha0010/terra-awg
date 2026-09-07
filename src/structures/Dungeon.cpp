@@ -1,6 +1,7 @@
 #include "structures/Dungeon.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
@@ -17,7 +18,6 @@
 #include "structures/data/Furniture.h"
 #include "vendor/frozen/map.h"
 #include <algorithm>
-#include <iostream>
 #include <set>
 
 struct DungeonTheme {
@@ -1574,7 +1574,7 @@ void genDungeon(Random &rnd, World &world)
     if (world.conf.dungeonSize < 0.01) {
         return;
     }
-    std::cout << "Employing the undead\n";
+    msgStrm << "Employing the undead" << std::endl;
     rnd.shuffleNoise();
     Dungeon structure(rnd, world);
     structure.gen(computeDungeonCenter(world));

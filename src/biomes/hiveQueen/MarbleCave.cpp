@@ -1,11 +1,11 @@
 #include "biomes/hiveQueen/MarbleCave.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
-#include <iostream>
 
 void fillMarbleCaveHex(int x, int y, Random &rnd, World &world)
 {
@@ -55,7 +55,7 @@ void fillMarbleCaveHex(int x, int y, Random &rnd, World &world)
 
 void genMarbleCaveHiveQueen(Random &rnd, World &world)
 {
-    std::cout << "Excavating marble\n";
+    msgStrm << "Excavating marble" << std::endl;
     int numCaves =
         world.conf.marbleFreq * world.getWidth() * world.getHeight() / 1200000;
     for (int i = 0; i < numCaves; ++i) {

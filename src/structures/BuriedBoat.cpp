@@ -1,6 +1,7 @@
 #include "structures/BuriedBoat.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -9,7 +10,6 @@
 #include "structures/LootRules.h"
 #include "structures/data/Boats.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 
 Point selectBoatLocation(int width, int height, Random &rnd, World &world)
 {
@@ -73,7 +73,7 @@ Point selectBoatLocation(int width, int height, Random &rnd, World &world)
 
 void genBuriedBoat(Random &rnd, World &world)
 {
-    std::cout << "Misplacing explorers\n";
+    msgStrm << "Misplacing explorers" << std::endl;
     rnd.shuffleNoise();
     TileBuffer boat = Data::getBoat(Data::Boat::frozen, world.getFramedTiles());
     auto [x, y] =

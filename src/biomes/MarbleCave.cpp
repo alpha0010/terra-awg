@@ -1,11 +1,11 @@
 #include "MarbleCave.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
-#include <iostream>
 
 void fillMarbleCave(int x, int y, Random &rnd, World &world)
 {
@@ -70,7 +70,7 @@ void fillMarbleCave(int x, int y, Random &rnd, World &world)
 
 void genMarbleCave(Random &rnd, World &world)
 {
-    std::cout << "Excavating marble\n";
+    msgStrm << "Excavating marble" << std::endl;
     int numCaves =
         world.conf.marbleFreq * world.getWidth() * world.getHeight() / 1200000;
     int minY =

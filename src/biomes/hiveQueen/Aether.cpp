@@ -1,13 +1,13 @@
 #include "biomes/hiveQueen/Aether.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/Aether.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
-#include <iostream>
 
 Point selectAetherLocation(Random &rnd, World &world)
 {
@@ -33,7 +33,7 @@ Point selectAetherLocation(Random &rnd, World &world)
 
 void genAetherHiveQueen(Random &rnd, World &world)
 {
-    std::cout << "Bridging realities\n";
+    msgStrm << "Bridging realities" << std::endl;
     rnd.shuffleNoise();
     auto [x, y] = selectAetherLocation(rnd, world);
     int maxBubblePos = y;

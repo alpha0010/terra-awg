@@ -1,6 +1,7 @@
 #include "structures/Treasure.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
@@ -16,7 +17,6 @@
 #include "vendor/frozen/map.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
-#include <iostream>
 
 enum class Gem {
     topaz = 18,
@@ -1356,7 +1356,7 @@ void placePals(int maxBin, LocationBins &locations, Random &rnd, World &world)
 
 LocationBins genTreasure(Random &rnd, World &world)
 {
-    std::cout << "Cataloging ground\n";
+    msgStrm << "Cataloging ground" << std::endl;
     std::vector<std::vector<Point>> rawLocations(world.getWidth());
     parallelFor(
         std::views::iota(50, world.getWidth() - 50),
@@ -1383,7 +1383,7 @@ LocationBins genTreasure(Random &rnd, World &world)
             }
         }
     }
-    std::cout << "Placing treasures\n";
+    msgStrm << "Placing treasures" << std::endl;
     if (!world.conf.home && world.conf.equipment != 0) {
         placeStarterChest(rnd, world);
     }

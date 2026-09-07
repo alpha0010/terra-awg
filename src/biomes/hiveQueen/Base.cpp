@@ -1,6 +1,7 @@
 #include "biomes/hiveQueen/Base.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
@@ -10,7 +11,6 @@
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
 #include <algorithm>
-#include <iostream>
 #include <map>
 #include <mutex>
 #include <unordered_set>
@@ -156,7 +156,7 @@ std::vector<Point> planHiveQueenBiomes(Random &rnd, World &world)
 
 void genWorldBaseHiveQueen(Random &rnd, World &world)
 {
-    std::cout << "Generating base terrain\n";
+    msgStrm << "Generating base terrain" << std::endl;
     rnd.shuffleNoise();
     rnd.saveShuffleState();
     std::vector<std::pair<int, int>> depositNoise;
@@ -450,7 +450,7 @@ void genWorldBaseHiveQueen(Random &rnd, World &world)
             }
         });
 
-    std::cout << "Generating honeycomb\n";
+    msgStrm << "Generating honeycomb" << std::endl;
     parallelFor(
         std::views::iota(0, world.getWidth()),
         [lavaLevel, &rnd, &world](int x) {

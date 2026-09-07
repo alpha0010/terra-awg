@@ -1,13 +1,13 @@
 #include "biomes/patches/Base.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "biomes/Base.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
 #include <algorithm>
-#include <iostream>
 
 BiomeData computeBiomeData(int x, int y, Random &rnd)
 {
@@ -159,7 +159,7 @@ void identifySurfaceBiomes(World &world)
 
 void genWorldBasePatches(Random &rnd, World &world)
 {
-    std::cout << "Generating base terrain\n";
+    msgStrm << "Generating base terrain" << std::endl;
     parallelFor(std::views::iota(0, world.getWidth()), [&rnd, &world](int x) {
         for (int y = 0; y < world.getHeight(); ++y) {
             world.getBiome(x, y) = computeBiomeData(x, y, rnd);

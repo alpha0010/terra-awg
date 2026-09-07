@@ -1,6 +1,7 @@
 #include "Cloud.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
@@ -12,7 +13,6 @@
 #include "structures/data/SkyBoxes.h"
 #include "vendor/frozen/map.h"
 #include <algorithm>
-#include <iostream>
 #include <numbers>
 
 bool isRowZoneEmpty(int x, int y, World &world)
@@ -346,7 +346,7 @@ void setCloudSpawn(Random &rnd, World &world)
 
 void genCloud(Random &rnd, World &world)
 {
-    std::cout << "Condensing clouds\n";
+    msgStrm << "Condensing clouds" << std::endl;
     rnd.shuffleNoise();
     if (world.conf.spawn == SpawnPoint::cloud) {
         setCloudSpawn(rnd, world);

@@ -1,6 +1,7 @@
 #include "structures/Temple.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -11,7 +12,6 @@
 #include "structures/StructureUtil.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
-#include <iostream>
 #include <set>
 
 template <typename Func> void iterateTemple(Point center, World &world, Func f)
@@ -560,7 +560,7 @@ void genTemple(Random &rnd, World &world)
     if (world.conf.templeSize < 0.01) {
         return;
     }
-    std::cout << "Training acolytes\n";
+    msgStrm << "Training acolytes" << std::endl;
     Point center = selectTempleCenter(testTempleSelection, rnd, world);
     if (center.x < 100) {
         return;

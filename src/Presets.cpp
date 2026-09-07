@@ -1,7 +1,7 @@
 #include "Presets.h"
 
 #include "Config.h"
-#include <iostream>
+#include "MsgStream.h"
 
 void applyPreset(const std::string &preset, Config &conf)
 {
@@ -56,6 +56,6 @@ void applyPreset(const std::string &preset, Config &conf)
         conf.spiderNestSize = 5;
         conf.endlessHalloween = true;
     } else if (preset != "none" && !preset.empty()) {
-        std::cout << "Unknown preset '" << preset << "'\n";
+        msgStrm << "Unknown preset '" << preset << "'\n";
     }
 }

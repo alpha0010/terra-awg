@@ -1,11 +1,11 @@
 #include "biomes/jaggedRocks/Chasms.h"
 
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
-#include <iostream>
 #include <numbers>
 
 void genChasmAt(
@@ -51,7 +51,7 @@ void genChasmAt(
 
 void genChasms(Random &rnd, World &world)
 {
-    std::cout << "Fracturing land\n";
+    msgStrm << "Fracturing land" << std::endl;
     rnd.shuffleNoise();
     std::vector<Point> usedLocations{
         {125, world.getSurfaceLevel(125)},

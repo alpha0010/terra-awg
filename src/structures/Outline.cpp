@@ -1,6 +1,7 @@
 #include "structures/Outline.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Util.h"
 #include "World.h"
 #include "ids/Paint.h"
@@ -8,7 +9,6 @@
 #include "structures/StructureUtil.h"
 #include "vendor/frozen/map.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 
 namespace
 {
@@ -47,7 +47,7 @@ constexpr auto oreBacklights = frozen::make_map<int, int>({
 
 void genGlobalOutline(World &world)
 {
-    std::cout << "Exposing details\n";
+    msgStrm << "Exposing details" << std::endl;
     bool illuminate = world.conf.fadedMemories < 0.001;
     parallelFor(
         std::views::iota(0, world.getWidth()),

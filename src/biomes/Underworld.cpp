@@ -1,6 +1,7 @@
 #include "Underworld.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
@@ -8,7 +9,6 @@
 #include "structures/StructureUtil.h"
 #include "structures/data/Bridges.h"
 #include <algorithm>
-#include <iostream>
 #include <map>
 #include <set>
 
@@ -160,7 +160,7 @@ void makeIslandMoats(int lavaLevel, Random &rnd, World &world)
 
 void genUnderworld(Random &rnd, World &world)
 {
-    std::cout << "Igniting the depths\n";
+    msgStrm << "Igniting the depths" << std::endl;
     rnd.shuffleNoise();
     int underworldHeight = world.getHeight() - world.getUnderworldLevel();
     int centerLevel = world.getUnderworldLevel() + 0.32 * underworldHeight;

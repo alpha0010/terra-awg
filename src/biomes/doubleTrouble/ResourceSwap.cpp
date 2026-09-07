@@ -1,16 +1,16 @@
 #include "biomes/doubleTrouble/ResourceSwap.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
 #include "ids/WallID.h"
 #include "vendor/frozen/map.h"
-#include <iostream>
 
 void swapResources(Random &rnd, World &world)
 {
-    std::cout << "Shuffling ores\n";
+    msgStrm << "Shuffling ores" << std::endl;
     rnd.restoreShuffleState();
     constexpr auto oreSwap = frozen::make_map<int, int>({
         {TileID::copperOre, TileID::tinOre},

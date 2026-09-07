@@ -1,6 +1,7 @@
 #include "Hive.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -8,7 +9,6 @@
 #include "structures/LootRules.h"
 #include "structures/StructureUtil.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 
 bool isHiveEdge(int x, int y, World &world)
 {
@@ -230,7 +230,7 @@ Point selectHiveLocation(Random &rnd, World &world)
 
 void genHive(Random &rnd, World &world)
 {
-    std::cout << "Importing bees\n";
+    msgStrm << "Importing bees" << std::endl;
     int numHives =
         world.conf.hiveFreq * std::max(0.4 * world.conf.jungleSize, 1.0) *
         (2.1 +

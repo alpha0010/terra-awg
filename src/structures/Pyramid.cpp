@@ -1,6 +1,7 @@
 #include "structures/Pyramid.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
@@ -9,7 +10,6 @@
 #include "structures/data/Rooms.h"
 #include "vendor/frozen/map.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 #include <map>
 #include <set>
 
@@ -419,7 +419,7 @@ selectUndergroundPyramidLocation(int size, Random &rnd, World &world)
 
 void genPyramid(Random &rnd, World &world)
 {
-    std::cout << "Building monuments\n";
+    msgStrm << "Building monuments" << std::endl;
     int size = 80;
     auto [x, y] = selectPyramidLocation(size, rnd, world);
     if (x == -1) {

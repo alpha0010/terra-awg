@@ -1,12 +1,12 @@
 #include "structures/Lake.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
 #include "ids/WallID.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 #include <set>
 
 bool isLiquidPathable(World &world, int x, int y)
@@ -346,7 +346,7 @@ void convertUndergroundLava(World &world, int x)
 
 void genLake(Random &rnd, World &world)
 {
-    std::cout << "Raining\n";
+    msgStrm << "Raining" << std::endl;
     parallelFor(std::views::iota(0, world.getWidth()), [&rnd, &world](int x) {
         simulateRain(rnd, world, x);
     });

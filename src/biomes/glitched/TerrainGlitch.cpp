@@ -1,12 +1,12 @@
 #include "biomes/glitched/TerrainGlitch.h"
 
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
 #include "biomes/glitched/PaddedWorld.h"
 #include "ids/WallID.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 
 void shiftWorldCol(int x, int delta, PaddedWorld &world)
 {
@@ -117,7 +117,7 @@ void terrainGlitch(Random &rnd, World &world)
     if (maxBand < 100) {
         return;
     }
-    std::cout << "ating terrGenerain\n";
+    msgStrm << "ating terrGenerain" << std::endl;
 
     int maxGlowingMushroom =
         world.getWidth() * std::sqrt(world.getHeight()) / 48500;

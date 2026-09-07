@@ -1,11 +1,11 @@
 #include "Random.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Util.h"
 #include "vendor/HashProspector.h"
 #include "vendor/OpenSimplexNoise.hpp"
 #include <algorithm>
-#include <iostream>
 #include <numbers>
 
 Random::Random() : noiseWidth(0), noiseHeight(0), noiseDeltaX(0), noiseDeltaY(0)
@@ -32,7 +32,7 @@ void Random::setSeed(const std::string &seed)
 
 void Random::initNoise(int width, int height, double scale)
 {
-    std::cout << "Sampling noise\n";
+    msgStrm << "Sampling noise" << std::endl;
     fineNoise.resize(width * height);
     coarseNoise.resize(width * height);
     std::uniform_int_distribution<int64_t> dist(
@@ -72,7 +72,7 @@ void Random::initNoise(int width, int height, double scale)
 
 void Random::computeBlurNoise()
 {
-    std::cout << "Blurring noise\n";
+    msgStrm << "Blurring noise" << std::endl;
     blurNoise.resize(coarseNoise.size());
     // Fast approximate Gaussian blur via horizontal/vertical smearing with
     // rolling averages.
@@ -100,7 +100,7 @@ void Random::computeBlurNoise()
 
 void Random::initBiomeNoise(double scale, const Config &conf)
 {
-    std::cout << "Measuring weather\n";
+    msgStrm << "Measuring weather" << std::endl;
     humidity.resize(noiseWidth * noiseHeight);
     temperature.resize(noiseWidth * noiseHeight);
     std::uniform_int_distribution<int64_t> dist(

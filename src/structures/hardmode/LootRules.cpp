@@ -1,11 +1,11 @@
 #include "structures/hardmode/LootRules.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "World.h"
 #include "ids/ItemID.h"
 #include "structures/StructureUtil.h"
 #include <cmath>
-#include <iostream>
 #include <map>
 
 void swapBottledHoney(int x, int y, Item &item, World &world)
@@ -49,7 +49,7 @@ void boostCoins(Item &item)
 
 void applyHardmodeLoot(World &world)
 {
-    std::cout << "Compounding interest\n";
+    msgStrm << "Compounding interest" << std::endl;
     std::map<int, int> itemUpdates{
         {ItemID::copperBar,
          world.ironVariant == TileID::ironOre ? ItemID::ironBar

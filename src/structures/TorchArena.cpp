@@ -1,13 +1,13 @@
 #include "structures/TorchArena.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/WallID.h"
 #include "structures/StructureUtil.h"
 #include "structures/data/Torches.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 
 Point selectArenaLocation(
     int arenaWidth,
@@ -162,7 +162,7 @@ void addArenaBubble(int x, int y, World &world)
 
 void genTorchArena(Random &rnd, World &world)
 {
-    std::cout << "Fueling TORCH\n";
+    msgStrm << "Fueling TORCH" << std::endl;
     int arenaWidth = rnd.getInt(90, 110);
     int arenaHeight = rnd.getInt(45, 52);
     auto [x, y] = selectArenaLocation(arenaWidth, arenaHeight, rnd, world);

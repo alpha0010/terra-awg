@@ -1,6 +1,7 @@
 #include "structures/SurfaceIgloo.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
@@ -10,7 +11,6 @@
 #include "structures/data/Igloos.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
-#include <iostream>
 
 bool canPlaceIglooAt(int x, int y, TileBuffer &igloo, World &world)
 {
@@ -127,7 +127,7 @@ bool placeIgloo(Point pt, TileBuffer &igloo, Random &rnd, World &world)
 
 void genIgloo(Random &rnd, World &world)
 {
-    std::cout << "Piling snow\n";
+    msgStrm << "Piling snow" << std::endl;
     std::vector<int> locations;
     if (world.conf.biomes == BiomeLayout::columns) {
         int scanDist = world.conf.snowSize * 0.05 * world.getWidth();

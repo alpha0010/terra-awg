@@ -1,12 +1,12 @@
 #include "structures/CavernSpawn.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "Util.h"
 #include "World.h"
 #include "ids/WallID.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 
 Point selectCavernSpawn(Random &rnd, World &world)
 {
@@ -80,7 +80,7 @@ int getNearestWall(Point pos, World &world)
 
 void genCavernSpawn(Random &rnd, World &world)
 {
-    std::cout << "Beginning expedition\n";
+    msgStrm << "Beginning expedition" << std::endl;
     Point pos = selectCavernSpawn(rnd, world);
     if (pos.x == -1) {
         return;

@@ -1,6 +1,7 @@
 #include "structures/DesertTomb.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -11,7 +12,6 @@
 #include "structures/data/Buildings.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
-#include <iostream>
 
 Point selectTombLocation(TileBuffer &tomb, Random &rnd, World &world)
 {
@@ -155,7 +155,7 @@ void addTombTreasure(std::vector<Point> &locations, Random &rnd, World &world)
 
 void genDesertTomb(Random &rnd, World &world)
 {
-    std::cout << "Embalming\n";
+    msgStrm << "Embalming" << std::endl;
     TileBuffer tomb = Data::getBuilding(
         rnd.select(
             {Data::Building::desertTomb1,

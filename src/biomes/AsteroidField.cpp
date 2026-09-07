@@ -1,10 +1,10 @@
 #include "biomes/AsteroidField.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "ids/Paint.h"
-#include <iostream>
 
 std::pair<int, int>
 selectAsteroidFieldLocation(int &width, int height, Random &rnd, World &world)
@@ -57,7 +57,7 @@ void doGenAsteroidField(
     Random &rnd,
     World &world)
 {
-    std::cout << "Suspending asteroids\n";
+    msgStrm << "Suspending asteroids" << std::endl;
     int width =
         world.conf.asteroids * rnd.getDouble(0.06, 0.07) * world.getWidth();
     int height = rnd.getDouble(0.18, 0.21) * world.getUndergroundLevel();

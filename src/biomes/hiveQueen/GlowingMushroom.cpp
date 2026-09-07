@@ -1,11 +1,11 @@
 #include "biomes/hiveQueen/GlowingMushroom.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
-#include <iostream>
 
 void fillMushroomFieldHex(
     int centerX,
@@ -78,7 +78,7 @@ void fillMushroomFieldHex(
 
 void genGlowingMushroomHiveQueen(Random &rnd, World &world)
 {
-    std::cout << "Fertilizing glowing mushrooms\n";
+    msgStrm << "Fertilizing glowing mushrooms" << std::endl;
     int numFields = std::max<int>(
         world.conf.glowingMushroomFreq * world.getWidth() * world.getHeight() /
             3388000,

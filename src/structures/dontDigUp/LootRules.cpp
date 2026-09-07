@@ -1,13 +1,13 @@
 #include "structures/dontDigUp/LootRules.h"
 
+#include "MsgStream.h"
 #include "World.h"
 #include "ids/ItemID.h"
 #include "vendor/frozen/map.h"
-#include <iostream>
 
 void applyDontDigUpLoot(World &world)
 {
-    std::cout << "Remixing loot\n";
+    msgStrm << "Remixing loot" << std::endl;
     constexpr auto itemUpdates = frozen::make_map<int, int>({
         {ItemID::wandOfSparking, ItemID::magicDagger},
         {ItemID::snowballCannon, ItemID::iceBow},

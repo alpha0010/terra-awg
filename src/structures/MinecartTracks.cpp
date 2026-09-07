@@ -1,6 +1,7 @@
 #include "structures/MinecartTracks.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
@@ -10,7 +11,6 @@
 #include "structures/StructureUtil.h"
 #include "vendor/frozen/set.h"
 #include <algorithm>
-#include <iostream>
 #include <numbers>
 #include <set>
 
@@ -424,7 +424,7 @@ void clearTrackHex(Point centroid, World &world)
 
 void genTracks(Random &rnd, World &world)
 {
-    std::cout << "Installing tracks\n";
+    msgStrm << "Installing tracks" << std::endl;
     rnd.shuffleNoise();
     int numTracks = world.conf.minecartTracks * world.getWidth() *
                     world.getHeight() / rnd.getInt(640000, 960000);

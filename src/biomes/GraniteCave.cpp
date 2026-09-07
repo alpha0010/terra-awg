@@ -1,12 +1,12 @@
 #include "GraniteCave.h"
 
 #include "Config.h"
+#include "MsgStream.h"
 #include "Random.h"
 #include "World.h"
 #include "biomes/BiomeUtil.h"
 #include "ids/WallID.h"
 #include "vendor/frozen/set.h"
-#include <iostream>
 
 void fillGraniteCave(int centerX, int centerY, Random &rnd, World &world)
 {
@@ -99,7 +99,7 @@ void fillGraniteCave(int centerX, int centerY, Random &rnd, World &world)
 
 void genGraniteCave(Random &rnd, World &world)
 {
-    std::cout << "Smoothing granite\n";
+    msgStrm << "Smoothing granite" << std::endl;
     int numCaves =
         world.conf.graniteFreq * world.getWidth() * world.getHeight() / 2000000;
     rnd.restoreShuffleState();
