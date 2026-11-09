@@ -57,9 +57,17 @@ void genWebs(Random &rnd, World &world)
          WallID::Unsafe::stalactiteStone,
          WallID::Unsafe::mottledStone,
          WallID::Unsafe::fracturedStone});
+    std::pair<int, int> wallNoise{
+        rnd.getInt(0, world.getWidth()),
+        rnd.getInt(0, world.getHeight())};
     parallelFor(
         std::views::iota(0, world.getWidth()),
-        [mainThreshold, secondaryThreshold, &targetWalls, &rnd, &world](int x) {
+        [mainThreshold,
+         secondaryThreshold,
+         wallNoise,
+         &targetWalls,
+         &rnd,
+         &world](int x) {
             for (int y = world.getSurfaceLevel(x); y < world.getHeight(); ++y) {
                 Tile &tile = world.getTile(x, y);
                 if (tile.blockID != TileID::empty ||
@@ -81,6 +89,12 @@ void genWebs(Random &rnd, World &world)
                 if (rnd.getFineNoise(4 * x, 4 * y) <
                     std::min(threshold, 0.15)) {
                     tile.blockID = TileID::cobweb;
+                    if (patchThreshold > -0.237 &&
+                        std::abs(rnd.getCoarseNoise(
+                            x + wallNoise.first,
+                            y + wallNoise.second)) > 0.48) {
+                        tile.wallID = WallID::Unsafe::spider;
+                    }
                 }
             }
         });
