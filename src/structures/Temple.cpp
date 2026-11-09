@@ -324,7 +324,7 @@ void addTempleTreasures(
 {
     int numChests = world.conf.chests * numRooms / 17.5;
     std::vector<Point> usedLocations;
-    while (numChests > 0) {
+    for (int tries = 5 * numChests; numChests > 0 && tries > 0; --tries) {
         auto [x, y] = rnd.select(locations);
         if (!canPlaceTempleTreasureAt(x, y, world) ||
             isLocationUsed(x, y, 12, usedLocations)) {
