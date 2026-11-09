@@ -542,6 +542,7 @@ enum {
     voidVault = 4076,
     musicBoxWindyDay = 4082,
     antiPortalBlock = 4091,
+    voidBag = 4131,
     terragrim = 4144,
     solarBrick = 4229,
     vortexBrick = 4230,

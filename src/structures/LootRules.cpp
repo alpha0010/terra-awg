@@ -2491,6 +2491,7 @@ void fillStarterChestDebug(Chest &chest, Random &rnd, World &world)
             {1, {ItemID::witchsBroom, Prefix::none, 2}},
             {1, {ItemID::rodOfHarmony, Prefix::none, 2}},
             {1, {ItemID::theGrandDesign, Prefix::none, 2}},
+            {1, {ItemID::voidBag, Prefix::none, 2}},
             {1,
              {world.ironVariant == TileID::ironOre ? ItemID::ironBar
                                                    : ItemID::leadBar,
