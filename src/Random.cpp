@@ -13,10 +13,10 @@ Random::Random() : noiseWidth(0), noiseHeight(0), noiseDeltaX(0), noiseDeltaY(0)
     std::string tmpSeed = std::to_string(std::random_device{}());
     tmpSeed += '-';
     auto now = std::chrono::high_resolution_clock::now();
-    tmpSeed +=
-        std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(
-                           now.time_since_epoch())
-                           .count());
+    tmpSeed += std::to_string(
+        std::chrono::duration_cast<std::chrono::nanoseconds>(
+            now.time_since_epoch())
+            .count());
     setSeed(tmpSeed);
 }
 

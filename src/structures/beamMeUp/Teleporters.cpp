@@ -76,12 +76,17 @@ bool isTeleporterLocation(int x, int y, int minX, int maxX, World &world)
                           tile.slope == Slope::none && !tile.actuated &&
                           !tile.hasAnyWire();
                }) &&
-           world.regionPasses(x, y - 5, 3, 5, [](Tile &tile) {
-               return tile.blockID == TileID::empty &&
-                      (tile.liquid == Liquid::none ||
-                       tile.liquid == Liquid::water) &&
-                      !tile.hasAnyWire();
-           });
+           world.regionPasses(
+               x,
+               y - 5,
+               3,
+               5,
+               [](Tile &tile) {
+                   return tile.blockID == TileID::empty &&
+                          (tile.liquid == Liquid::none ||
+                           tile.liquid == Liquid::water) &&
+                          !tile.hasAnyWire();
+               });
 }
 
 Point selectTeleporterLocation(

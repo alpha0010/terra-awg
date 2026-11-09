@@ -33,10 +33,11 @@ void fillMushroomField(
                 std::abs(rnd.getCoarseNoise(x + centerX, y + centerY)) > 0.07 &&
                 y > fieldFloor +
                         5 * rnd.getFineNoise(x, world.getUndergroundLevel()) -
-                        0.7 * std::sqrt(std::max(
-                                  fieldSize * fieldSize -
-                                      std::pow(centerX - x, 2),
-                                  0.0)) &&
+                        0.7 * std::sqrt(
+                                  std::max(
+                                      fieldSize * fieldSize -
+                                          std::pow(centerX - x, 2),
+                                      0.0)) &&
                 y < fieldFloor + 10 * rnd.getCoarseNoise(x, 0)) {
                 tile.blockID = TileID::empty;
                 tile.wallID = WallID::empty;

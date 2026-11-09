@@ -417,11 +417,15 @@ void placeLavaTraps(Random &rnd, World &world)
             continue;
         }
         int gapJ = 0;
-        while (gapJ < 50 &&
-               !world.regionPasses(x - 1, y + gapJ, 3, 3, [](Tile &tile) {
-                   return tile.blockID == TileID::empty &&
-                          tile.liquid == Liquid::none;
-               })) {
+        while (gapJ < 50 && !world.regionPasses(
+                                x - 1,
+                                y + gapJ,
+                                3,
+                                3,
+                                [](Tile &tile) {
+                                    return tile.blockID == TileID::empty &&
+                                           tile.liquid == Liquid::none;
+                                })) {
             ++gapJ;
         }
         if (gapJ == 50) {

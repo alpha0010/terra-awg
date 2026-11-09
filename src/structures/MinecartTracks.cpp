@@ -166,9 +166,14 @@ bool isValidTrackSegment(int x, int y, World &world)
                           (!tile.actuator || tile.blockID != TileID::sand) &&
                           canTrackClearTile(tile, world);
                }) &&
-           world.regionPasses(x, y + 1, 1, 20, [](Tile &tile) {
-               return tile.blockID != TileID::minecartTrack;
-           });
+           world.regionPasses(
+               x,
+               y + 1,
+               1,
+               20,
+               [](Tile &tile) {
+                   return tile.blockID != TileID::minecartTrack;
+               });
 }
 
 std::vector<Point> planStandardTrackAt(
