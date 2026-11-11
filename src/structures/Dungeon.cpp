@@ -28,6 +28,7 @@ struct DungeonTheme {
     int tiledWall;
     int paint;
     int altPaint;
+    Variant lockedChest;
     Data::Variant furniture;
 
     void apply(int themeBrick, Random &rnd)
@@ -43,6 +44,7 @@ struct DungeonTheme {
                  Paint::deepSkyBlue,
                  Paint::deepBlue,
                  Paint::deepPurple});
+            lockedChest = Variant::lockedBlue;
             furniture = Data::Variant::blueDungeon;
         } else if (themeBrick == TileID::greenBrick) {
             crackedBrick = TileID::crackedGreenBrick;
@@ -54,6 +56,7 @@ struct DungeonTheme {
                  Paint::deepLime,
                  Paint::deepGreen,
                  Paint::deepTeal});
+            lockedChest = Variant::lockedGreen;
             furniture = Data::Variant::greenDungeon;
         } else {
             crackedBrick = TileID::crackedPinkBrick;
@@ -65,6 +68,7 @@ struct DungeonTheme {
                  Paint::deepRed,
                  Paint::deepPink,
                  Paint::deepViolet});
+            lockedChest = Variant::lockedPink;
             furniture = Data::Variant::pinkDungeon;
         }
         altPaint = paint;
@@ -738,6 +742,17 @@ private:
         }
     }
 
+    Variant selectChestStyle(int x, int y)
+    {
+        if (y < world.getCavernLevel() +
+                    static_cast<int>(
+                        hash32pt(x, y) % (world.getUnderworldLevel() -
+                                          world.getCavernLevel()))) {
+            return Variant::goldLocked;
+        }
+        return theme.lockedChest;
+    }
+
     void addFunctionalFurniture(int dungeonCenter, int dungeonWidth)
     {
         std::vector<Point> locations;
@@ -777,7 +792,8 @@ private:
         while (numChests > 0) {
             auto [x, y] = rnd.select(locations);
             if (isValidPlacementLocation(x, y, 2, 3, true)) {
-                Chest &chest = world.placeChest(x, y - 1, Variant::goldLocked);
+                Chest &chest =
+                    world.placeChest(x, y - 1, selectChestStyle(x, y));
                 fillDungeonChest(chest, rnd, world);
                 --numChests;
             }
