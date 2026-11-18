@@ -311,8 +311,8 @@ void fillSurfaceChest(Chest &chest, int torchID, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(25, 50)}},
          getGlobalItemPotion(world),
-         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
-         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(7, 9)}},
+         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(7, 9)}},
          {2.0 / 3,
           {rnd.select(
                {ItemID::ironskinPotion,
@@ -360,8 +360,8 @@ void fillSurfaceAshWoodChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(25, 50)}},
          getGlobalItemPotion(world),
-         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
-         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(7, 9)}},
+         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(7, 9)}},
          {2.0 / 3,
           {rnd.select(
                {ItemID::ironskinPotion,
@@ -414,8 +414,8 @@ void fillSurfaceFrozenChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(25, 50)}},
          getGlobalItemPotion(world),
-         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
-         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(7, 9)}},
+         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(7, 9)}},
          {2.0 / 3,
           {rnd.select(
                {ItemID::ironskinPotion,
@@ -492,8 +492,8 @@ void fillLivingWoodChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(25, 50)}},
          getGlobalItemPotion(world),
-         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
-         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(7, 9)}},
+         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(7, 9)}},
          {2.0 / 3,
           {rnd.select(
                {ItemID::ironskinPotion,
@@ -545,8 +545,8 @@ void fillSurfaceMushroomChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(25, 50)}},
          getGlobalItemPotion(world),
-         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
-         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(7, 9)}},
+         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(7, 9)}},
          {2.0 / 3,
           {rnd.select(
                {ItemID::ironskinPotion,
@@ -615,8 +615,8 @@ void fillSurfacePalmWoodChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(25, 50)}},
          getGlobalItemPotion(world),
-         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
-         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(7, 9)}},
+         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(7, 9)}},
          {2.0 / 3,
           {rnd.select(
                {ItemID::ironskinPotion,
@@ -664,8 +664,8 @@ void fillSurfacePearlwoodChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(25, 50)}},
          getGlobalItemPotion(world),
-         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
-         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(7, 9)}},
+         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(7, 9)}},
          {2.0 / 3,
           {rnd.select(
                {ItemID::ironskinPotion,
@@ -713,8 +713,8 @@ void fillSurfaceRichMahoganyChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(25, 50)}},
          getGlobalItemPotion(world),
-         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
-         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(7, 9)}},
+         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(7, 9)}},
          {2.0 / 3,
           {rnd.select(
                {ItemID::ironskinPotion,
@@ -767,8 +767,8 @@ void fillSurfaceWaterChest(Chest &chest, Random &rnd, World &world)
            Prefix::none,
            rnd.getInt(25, 50)}},
          getGlobalItemPotion(world),
-         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
-         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
+         {0.5, {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(7, 9)}},
+         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(7, 9)}},
          {2.0 / 3,
           {rnd.select(
                {ItemID::ironskinPotion,
@@ -825,7 +825,7 @@ void fillUndergroundChest(
               rnd.getInt(25, 49)}},
             getGlobalItemPotion(world),
             {0.5,
-             {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
+             {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(7, 9)}},
             {2.0 / 3,
              {rnd.select(
                   {ItemID::regenerationPotion,
@@ -877,7 +877,7 @@ void fillUndergroundFrozenChest(Chest &chest, Random &rnd, World &world)
               rnd.getInt(25, 49)}},
             getGlobalItemPotion(world),
             {0.5,
-             {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
+             {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(7, 9)}},
             {2.0 / 3,
              {rnd.select(
                   {ItemID::regenerationPotion,
@@ -1035,7 +1035,7 @@ void fillUndergroundMushroomChest(Chest &chest, Random &rnd, World &world)
               rnd.getInt(25, 49)}},
             getGlobalItemPotion(world),
             {0.5,
-             {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
+             {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(7, 9)}},
             {2.0 / 3,
              {rnd.select(
                   {ItemID::regenerationPotion,
@@ -1084,7 +1084,7 @@ void fillUndergroundPearlwoodChest(Chest &chest, Random &rnd, World &world)
               rnd.getInt(25, 49)}},
             getGlobalItemPotion(world),
             {0.5,
-             {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
+             {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(7, 9)}},
             {2.0 / 3,
              {rnd.select(
                   {ItemID::regenerationPotion,
@@ -1151,7 +1151,7 @@ void fillUndergroundSandstoneChest(Chest &chest, Random &rnd, World &world)
               rnd.getInt(25, 49)}},
             getGlobalItemPotion(world),
             {0.5,
-             {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
+             {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(7, 9)}},
             {2.0 / 3,
              {rnd.select(
                   {ItemID::regenerationPotion,
@@ -1257,7 +1257,7 @@ void fillUndergroundWaterChest(Chest &chest, Random &rnd, World &world)
               rnd.getInt(25, 49)}},
             getGlobalItemPotion(world),
             {0.5,
-             {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
+             {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(7, 9)}},
             {2.0 / 3,
              {rnd.select(
                   {ItemID::regenerationPotion,
@@ -1924,8 +1924,8 @@ void fillSkywareChest(Chest &chest, Random &rnd, World &world)
          {0.5,
           {betterLoot ? ItemID::healingPotion : ItemID::lesserHealingPotion,
            Prefix::none,
-           rnd.getInt(3, 5)}},
-         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(3, 5)}},
+           rnd.getInt(7, 9)}},
+         {2.0 / 3, {ItemID::recallPotion, Prefix::none, rnd.getInt(7, 9)}},
          {2.0 / 3,
           {rnd.select(
                {ItemID::featherfallPotion,
@@ -2053,7 +2053,7 @@ void fillPyramidChest(Chest &chest, Random &rnd, World &world)
               rnd.getInt(25, 49)}},
             getGlobalItemPotion(world),
             {0.5,
-             {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(3, 5)}},
+             {ItemID::lesserHealingPotion, Prefix::none, rnd.getInt(7, 9)}},
             {2.0 / 3,
              {rnd.select(
                   {ItemID::regenerationPotion,
