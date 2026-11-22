@@ -561,6 +561,49 @@ void applyBaseTerrain(Random &rnd, World &world)
             }
         });
 
+    parallelFor(std::views::iota(0, world.getWidth()), [&world](int x) {
+        for (int y = world.getSurfaceLevel(x) + 3;
+             y < world.getUnderworldLevel();
+             ++y) {
+            Tile &tile = world.getTile(x, y);
+            if (tile.blockID != TileID::empty || tile.wireRed) {
+                continue;
+            }
+            iterateZone(
+                {x, y},
+                world,
+                [&world](Point pt) {
+                    Tile &tile = world.getTile(pt);
+                    return pt.y > world.getSurfaceLevel(pt.x) &&
+                           tile.blockID == TileID::empty && !tile.wireRed;
+                },
+                [&world](Point pt, int zoneSize) {
+                    if (zoneSize < world.conf.minCaveSize) {
+                        Tile &tile = world.getTile(pt);
+                        switch (world.getBiome(pt.x, pt.y).active) {
+                        case Biome::forest:
+                            tile.blockID = TileID::stone;
+                            break;
+                        case Biome::snow:
+                            tile.blockID = TileID::snow;
+                            break;
+                        case Biome::desert:
+                            tile.blockID = TileID::sand;
+                            break;
+                        case Biome::jungle:
+                            tile.blockID = TileID::mud;
+                            break;
+                        case Biome::underworld:
+                            tile.blockID = TileID::ash;
+                            break;
+                        }
+                    } else {
+                        world.getTile(pt).wireRed = true;
+                    }
+                });
+        }
+    });
+
     parallelFor(std::views::iota(0, world.getWidth()), [&rnd, &world](int x) {
         int stalactiteLen = 0;
         int stalacIter = 0;
@@ -574,6 +617,7 @@ void applyBaseTerrain(Random &rnd, World &world)
                 stalacIter = y / 35;
             }
             Tile &tile = world.getTile(x, y);
+            tile.wireRed = false;
             if (tile.blockID == TileID::empty) {
                 if (y > cavernGrassLevel &&
                     world.getBiome(x, y).active != Biome::underworld &&

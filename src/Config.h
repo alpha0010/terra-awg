@@ -73,6 +73,7 @@ struct Config {
     int oreT4;
     int oreT5;
     int oreT6;
+    int minCaveSize;
     double ore;
     double lifeCrystals;
     double manaCrystals;

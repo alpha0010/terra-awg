@@ -194,6 +194,9 @@ oreT5 = RANDOM
 # RANDOM/adamantite/titanium
 oreT6 = RANDOM
 
+# Only keep caves with at least this many tiles.
+minCaveSize = 10
+
 # Placement frequency multipliers. 0.5 means half the
 # normal amount, 2.0 means double the normal amount.
 ore = 1.0
@@ -776,6 +779,7 @@ Config readConfig(Random &rnd)
         -1,    // oreT4
         -1,    // oreT5
         -1,    // oreT6
+        10,    // minCaveSize
         1.0,   // ore
         1.0,   // lifeCrystals
         1.0,   // manaCrystals
@@ -887,6 +891,7 @@ Config readConfig(Random &rnd)
     READ_CONF_ORE_TIER(variation, oreT4, cobalt, palladium);
     READ_CONF_ORE_TIER(variation, oreT5, mythril, orichalcum);
     READ_CONF_ORE_TIER(variation, oreT6, adamantite, titanium);
+    READ_CONF_VALUE(variation, minCaveSize, Integer);
     READ_CONF_VALUE(variation, ore, Real);
     READ_CONF_VALUE(variation, lifeCrystals, Real);
     READ_CONF_VALUE(variation, manaCrystals, Real);

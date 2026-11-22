@@ -104,7 +104,11 @@ void iterateZone(Point start, World &world, BoundsCheck isValid, Func f)
         }
     }
     for (Point loc : visited) {
-        f(loc);
+        if constexpr (std::is_invocable_v<Func, Point, size_t>) {
+            f(loc, visited.size());
+        } else {
+            f(loc);
+        }
     }
 }
 
